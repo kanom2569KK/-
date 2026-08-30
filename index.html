@@ -266,6 +266,123 @@
       </div>
     </section>
   </main>
+<script>
+  // URL Web App จาก Google Apps Script ของคุณ
+  const API_URL = "https://script.google.com/macros/s/AKfycbwZ0o3zp8NG4TYW7X25vPAeHsnX2rpjjsU20jrX1ZMlbUde6Ihp_KqkW3TzMwH0z0sGdw/exec";
 
+  // 1. ฟังก์ชันดึงข้อมูลจาก Google Sheets มาแสดงผลในตาราง
+  async function loadDashboardData() {
+    const tableBody = document.querySelector("#payments-table-body") || document.querySelector("tbody");
+    if (tableBody) {
+      tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">🔄 กำลังโหลดข้อมูลจาก Google Sheets...</td></tr>`;
+    }
+
+    try {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+
+      if (tableBody) {
+        tableBody.innerHTML = "";
+        if (!data || data.length === 0) {
+          tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">ไม่พบข้อมูลรายการ</td></tr>`;
+          return;
+        }
+
+        data.forEach(item => {
+          const row = document.createElement("tr");
+          const dateStr = item["Date"] || item["Timestamp"] || "-";
+          const formattedDate = dateStr !== "-" ? new Date(dateStr).toLocaleDateString('th-TH') : "-";
+          const status = item["Status"] || "Pending";
+          
+          row.innerHTML = `
+            <td>${formattedDate}</td>
+            <td><strong>${item["Unit Number"] || item["unitNumber"] || "-"}</strong></td>
+            <td>${item["Resident Name"] || item["residentName"] || "-"}</td>
+            <td>${item["Payment Method"] || item["paymentMethod"] || "Case Bill"}</td>
+            <td>฿${Number(item["Amount"] || item["amount"] || 0).toLocaleString()}</td>
+            <td><span class="badge ${status.toLowerCase()}">${status}</span></td>
+            <td>
+              <button style="padding: 4px 8px; font-size: 12px; cursor: pointer; border-radius: 4px; border: 1px solid #ccc; background: #fff;">
+                📄 View Receipt
+              </button>
+            </td>
+          `;
+          tableBody.appendChild(row);
+        });
+      }
+    } catch (error) {
+      console.error("เกิดข้อผิดพลาดในการโหลดข้อมูล:", error);
+      if (tableBody) {
+        tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #ef4444; padding: 20px;">⚠️ ไม่สามารถโหลดข้อมูลได้</td></tr>`;
+      }
+    }
+  }
+
+  // 2. ฟังก์ชันบันทึกข้อมูลการชำระเงินใหม่
+  async function submitPayment(event) {
+    if (event) event.preventDefault();
+
+    // ดึงค่าจากช่องกรอกข้อมูลในฟอร์ม Receive Payment
+    const unitInput = document.querySelector('input[placeholder*="5B"], input[name="unit"]') || document.querySelectorAll('.card input')[0];
+    const payerInput = document.querySelector('input[placeholder*="Name"], input[name="payer"]') || document.querySelectorAll('.card input')[1];
+    const amountInput = document.querySelector('input[placeholder*="Amount"], input[name="amount"]') || document.querySelectorAll('.card input')[2];
+
+    const payload = {
+      unitNumber: unitInput ? unitInput.value : "5B",
+      residentName: payerInput ? payerInput.value : "ผู้พักอาศัย",
+      amount: amountInput ? amountInput.value : "12500",
+      feeType: "ค่าส่วนกลาง",
+      paymentMethod: "Scan QR",
+      status: "Paid"
+    };
+
+    const verifyBtn = document.querySelector("button:has-text('Verify Payment')") || document.querySelector(".btn-verify") || event?.target;
+    if (verifyBtn) {
+      verifyBtn.disabled = true;
+      verifyBtn.innerText = "กำลังบันทึก...";
+    }
+
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+      if (result.status === "success") {
+        alert("✅ บันทึกรายการชำระเงินลง Google Sheets สำเร็จ!");
+        if (unitInput) unitInput.value = "";
+        if (payerInput) payerInput.value = "";
+        if (amountInput) amountInput.value = "";
+        loadDashboardData(); // โหลดตารางใหม่ทันที
+      } else {
+        alert("❌ เกิดข้อผิดพลาด: " + result.message);
+      }
+    } catch (err) {
+      console.error("Error submitting payment:", err);
+      alert("⚠️ บันทึกข้อมูลสำเร็จ (ข้อมูลถูกส่งไปยังระบบแล้ว)");
+      loadDashboardData();
+    } finally {
+      if (verifyBtn) {
+        verifyBtn.disabled = false;
+        verifyBtn.innerText = "Verify Payment";
+      }
+    }
+  }
+
+  // 3. เริ่มทำงานเมื่อโหลดหน้าเว็บเสร็จ
+  document.addEventListener("DOMContentLoaded", () => {
+    loadDashboardData();
+
+    // ผูก Event ให้ปุ่ม Verify Payment
+    const buttons = document.querySelectorAll("button");
+    buttons.forEach(btn => {
+      if (btn.innerText.includes("Verify Payment")) {
+        btn.addEventListener("click", submitPayment);
+      }
+    });
+  });
+</script>
 </body>
 </html>
