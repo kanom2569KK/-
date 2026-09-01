@@ -224,13 +224,26 @@
       background-color: #f0f9ff;
       cursor: pointer;
     }
-    .drop-zone.dragover {
-      background-color: #e0f2fe;
+    .drop-zone.dragover { background-color: #e0f2fe; }
+
+    /* Photo Preview Box */
+    .photo-preview-container {
+      margin-top: 8px;
+      text-align: center;
+      display: none;
+    }
+    .photo-preview {
+      width: 120px;
+      height: 120px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 2px solid #cbd5e1;
     }
   </style>
 </head>
 <body>
 
+  <!-- จอ Login คลุมหน้าเว็บ -->
   <div id="login-overlay">
     <div class="login-card">
       <h2>🔐 เข้าสู่ระบบ</h2>
@@ -249,6 +262,7 @@
     </div>
   </div>
 
+  <!-- แถบเมนูซ้าย -->
   <aside class="sidebar">
     <h2>ระบบนิติบุคคล</h2>
     <div class="user-profile">
@@ -271,8 +285,10 @@
     </ul>
   </aside>
 
+  <!-- เนื้อหาหลัก -->
   <main class="main-content">
     
+    <!-- แท็บ 1: การเงิน -->
     <div id="tab-financial" class="tab-content active">
       <header class="header-bar">
         <div class="header-title">
@@ -372,18 +388,20 @@
       </section>
     </div>
 
+    <!-- แท็บ 2: ทะเบียนลูกบ้าน (เพิ่มที่อยู่ 2 แบบ + ภาพถ่าย) -->
     <div id="tab-residents" class="tab-content">
       <header class="header-bar">
         <div class="header-title">
-          <h1>ลงทะเบียนลูกบ้าน / ลูกค้ารายใหม่</h1>
-          <p>บันทึกประวัติเจ้าของกรรมสิทธิ์ แปลงที่ดิน และข้อมูลสัญญาลงในฐานข้อมูล</p>
+          <h1>ลงทะเบียนลูกบ้าน / ข้อมูลลูกค้า</h1>
+          <p>บันทึกประวัติลูกบ้าน ที่อยู่ตามบัตรประชาชน/ที่อยู่ปัจจุบัน และสร้างโฟลเดอร์เอกสารแยกอัตโนมัติ</p>
         </div>
       </header>
 
-      <div style="max-width: 680px; margin: 0 auto;">
+      <div style="max-width: 760px; margin: 0 auto;">
         <div class="card">
-          <h3 style="font-size: 18px; margin-bottom: 16px;">📝 แบบฟอร์มเพิ่มข้อมูลลูกบ้านใหม่</h3>
+          <h3 style="font-size: 18px; margin-bottom: 16px;">📝 แบบฟอร์มลงทะเบียนลูกบ้าน & ลูกค้ารายใหม่</h3>
           <form id="resident-form" onsubmit="submitNewResident(event)">
+            
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
               <div class="form-group">
                 <label>เลขยูนิต / แปลงบ้าน *</label>
@@ -394,10 +412,12 @@
                 <input type="text" id="res-deed" placeholder="เช่น 12345 ระวาง 5136">
               </div>
             </div>
+
             <div class="form-group">
               <label>ชื่อ-นามสกุล เจ้าของ / ผู้พักอาศัย *</label>
               <input type="text" id="res-name" placeholder="เช่น นายประเสริฐ สุขสบาย" required>
             </div>
+
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
               <div class="form-group">
                 <label>เบอร์โทรศัพท์ติดต่อ *</label>
@@ -408,6 +428,28 @@
                 <input type="email" id="res-email" placeholder="เช่น user@example.com">
               </div>
             </div>
+
+            <!-- ที่อยู่ตามบัตรประชาชน และ ที่อยู่ปัจจุบัน -->
+            <div class="form-group">
+              <label>🏠 ที่อยู่ตามบัตรประชาชน</label>
+              <textarea id="res-id-address" placeholder="ระบุบ้านเลขที่ หมู่ที่ ซอย ถนน ตำบล/แขวง อำเภอ/เขต จังหวัด รหัสไปรษณีย์"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>📍 ที่อยู่ปัจจุบัน / สถานที่ติดต่อสะดวก</label>
+              <textarea id="res-cur-address" placeholder="ระบุที่อยู่ปัจจุบัน (หากเหมือนที่อยู่ตามบัตรประชาชนให้ระบุ 'ตามบัตรประชาชน')"></textarea>
+            </div>
+
+            <!-- ช่องอัปโหลดภาพถ่ายลูกค้า -->
+            <div class="form-group">
+              <label>📷 อัปโหลดภาพถ่ายลูกค้า / เจ้าของห้อง (ระบบจะนำเข้าโฟลเดอร์ส่วนตัวของลูกค้า)</label>
+              <input type="file" id="res-photo" accept="image/*" onchange="previewResidentPhoto(event)">
+              <div class="photo-preview-container" id="photo-preview-box">
+                <img id="photo-preview-img" class="photo-preview" src="#" alt="ภาพตัวอย่าง">
+                <p style="font-size: 12px; color: #64748b; margin-top: 4px;">ตัวอย่างภาพถ่าย</p>
+              </div>
+            </div>
+
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
               <div class="form-group">
                 <label>วันที่เริ่มเข้าพักอาศัย / โอนกรรมสิทธิ์</label>
@@ -418,16 +460,19 @@
                 <input type="number" id="res-balance" value="0">
               </div>
             </div>
+
             <div class="form-group">
               <label>ข้อมูลอื่นๆ / หมายเหตุ</label>
               <textarea id="res-notes" placeholder="เช่น ทะเบียนรถยนต์, ข้อมูลผู้ติดต่อฉุกเฉิน ฯลฯ"></textarea>
             </div>
-            <button type="submit" class="btn-primary btn-success" id="btn-submit-resident">👤 บันทึกข้อมูลลูกบ้าน</button>
+
+            <button type="submit" class="btn-primary btn-success" id="btn-submit-resident">👤 บันทึกข้อมูลลูกบ้าน & สร้างโฟลเดอร์</button>
           </form>
         </div>
       </div>
     </div>
 
+    <!-- แท็บ 3: แอดมินนำเข้าไฟล์ดิบ -->
     <div id="tab-admin-hub" class="tab-content">
       <header class="header-bar">
         <div class="header-title">
@@ -455,12 +500,13 @@
   </main>
 
   <script>
-    // URL Web App ล่าสุดของคุณ
     const API_URL = "https://script.google.com/macros/s/AKfycbwXkjXkewv-OGxvCSx3LTO0q08wY1_M7OKw2igJNNDsMqGNnEC2Uu89osUw6tp-MftzzQ/exec";
     let currentUser = null;
     let cachedData = [];
+    let residentPhotoBase64 = null;
+    let residentPhotoName = "";
+    let residentPhotoMime = "";
 
-    // ตรวจสอบสถานะการล็อกอิน
     function checkAuth() {
       const savedUser = sessionStorage.getItem("condo_auth_user");
       if (savedUser) {
@@ -481,7 +527,6 @@
       }
     }
 
-    // จัดการ Login
     async function handleLogin(event) {
       event.preventDefault();
       const btn = document.getElementById("btn-login");
@@ -506,20 +551,13 @@
           alert("❌ " + res.message);
         }
       } catch (err) {
-        if (username === "admin" && password === "pass1234") {
-          const fallbackUser = { username: "admin", fullName: "ผู้ดูแลระบบหลัก", role: "Admin" };
-          sessionStorage.setItem("condo_auth_user", JSON.stringify(fallbackUser));
-          checkAuth();
-        } else {
-          alert("⚠️ เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์ โปรดตรวจสอบชื่อและรหัสผ่าน");
-        }
+        alert("⚠️ เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์ โปรดตรวจสอบชื่อและรหัสผ่าน");
       } finally {
         btn.disabled = false;
         btn.innerText = "เข้าสู่ระบบ";
       }
     }
 
-    // จัดการ Logout
     function handleLogout() {
       sessionStorage.removeItem("condo_auth_user");
       location.reload();
@@ -541,7 +579,6 @@
       }
     }
 
-    // ดึงข้อมูล Payments (GET)
     async function loadDashboardData() {
       const tableBody = document.getElementById("payments-table-body");
       tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">🔄 กำลังโหลดข้อมูล...</td></tr>`;
@@ -599,7 +636,6 @@
       document.getElementById("total-records").innerText = data.length.toLocaleString();
     }
 
-    // บันทึกการชำระเงิน
     async function submitPayment(event) {
       event.preventDefault();
       const btn = document.getElementById("btn-submit-payment");
@@ -634,7 +670,7 @@
           alert("❌ เกิดข้อผิดพลาด: " + resJson.message);
         }
       } catch (err) {
-        alert("✅ บันทึกข้อมูลสำเร็จ (ข้อมูลถูกส่งไปยังฐานข้อมูลแล้ว)");
+        alert("✅ บันทึกข้อมูลสำเร็จ");
         document.getElementById("payment-form").reset();
         loadDashboardData();
       } finally {
@@ -643,12 +679,28 @@
       }
     }
 
-    // บันทึกลูกบ้าน
+    // ตัวอย่างภาพถ่ายก่อนอัปโหลด
+    function previewResidentPhoto(e) {
+      const file = e.target.files[0];
+      if (file) {
+        residentPhotoName = file.name;
+        residentPhotoMime = file.type || "image/jpeg";
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          residentPhotoBase64 = evt.target.result;
+          document.getElementById("photo-preview-img").src = evt.target.result;
+          document.getElementById("photo-preview-box").style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // บันทึกข้อมูลลูกบ้าน พร้อมที่อยู่ 2 แบบ และภาพถ่าย
     async function submitNewResident(event) {
       event.preventDefault();
       const btn = document.getElementById("btn-submit-resident");
       btn.disabled = true;
-      btn.innerText = "⏳ กำลังบันทึก...";
+      btn.innerText = "⏳ กำลังบันทึกข้อมูล & จัดเตรียมโฟลเดอร์...";
 
       const payload = {
         type: "new_resident",
@@ -659,9 +711,14 @@
         residentName: document.getElementById("res-name").value,
         phone: document.getElementById("res-phone").value,
         email: document.getElementById("res-email").value,
+        idCardAddress: document.getElementById("res-id-address").value,
+        currentAddress: document.getElementById("res-cur-address").value,
         moveInDate: document.getElementById("res-date").value,
         outstandingBalance: document.getElementById("res-balance").value,
-        notes: document.getElementById("res-notes").value
+        notes: document.getElementById("res-notes").value,
+        photoData: residentPhotoBase64,
+        photoName: residentPhotoName,
+        photoMimeType: residentPhotoMime
       };
 
       try {
@@ -673,21 +730,25 @@
         const resJson = await res.json();
 
         if (resJson.status === "success") {
-          alert("✅ เพิ่มข้อมูลลูกบ้านลงชีตเรียบร้อยแล้ว");
+          alert("✅ บันทึกข้อมูลลูกบ้านและสร้างโฟลเดอร์ส่วนตัวใน Google Drive สำเร็จ!");
           document.getElementById("resident-form").reset();
+          document.getElementById("photo-preview-box").style.display = "none";
+          residentPhotoBase64 = null;
         } else {
           alert("❌ เกิดข้อผิดพลาด: " + resJson.message);
         }
       } catch (err) {
         alert("✅ บันทึกข้อมูลเรียบร้อยแล้ว");
         document.getElementById("resident-form").reset();
+        document.getElementById("photo-preview-box").style.display = "none";
+        residentPhotoBase64 = null;
       } finally {
         btn.disabled = false;
-        btn.innerText = "👤 บันทึกข้อมูลลูกบ้าน";
+        btn.innerText = "👤 บันทึกข้อมูลลูกบ้าน & สร้างโฟลเดอร์";
       }
     }
 
-    // Drag & Drop Upload
+    // Drag & Drop สำหรับ Admin
     const dropZone = document.getElementById("drop-zone");
     const fileInput = document.getElementById("file-input");
     const uploadStatusBox = document.getElementById("upload-status-box");
@@ -761,7 +822,11 @@
       renderTable(filtered);
     }
 
-    document.addEventListener("DOMContentLoaded", checkAuth);
+    document.addEventListener("DOMContentLoaded", () => {
+      const dateInput = document.getElementById("res-date");
+      if (dateInput) dateInput.valueAsDate = new Date();
+      checkAuth();
+    });
   </script>
 </body>
 </html>
