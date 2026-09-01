@@ -37,15 +37,8 @@
       box-shadow: 0 10px 25px rgba(0,0,0,0.3);
       text-align: center;
     }
-    .login-card h2 {
-      color: #1e3a5f;
-      margin-bottom: 8px;
-    }
-    .login-card p {
-      color: #64748b;
-      font-size: 14px;
-      margin-bottom: 24px;
-    }
+    .login-card h2 { color: #1e3a5f; margin-bottom: 8px; }
+    .login-card p { color: #64748b; font-size: 14px; margin-bottom: 24px; }
 
     /* Sidebar */
     .sidebar {
@@ -118,14 +111,8 @@
       align-items: center;
       margin-bottom: 28px;
     }
-    .header-title h1 {
-      font-size: 24px;
-      color: #1e293b;
-    }
-    .header-title p {
-      color: #64748b;
-      font-size: 14px;
-    }
+    .header-title h1 { font-size: 24px; color: #1e293b; }
+    .header-title p { color: #64748b; font-size: 14px; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
     .metrics-grid {
@@ -243,7 +230,7 @@
 </head>
 <body>
 
-  <!-- จอ Login คลุมหน้าเว็บ -->
+  <!-- จอ Login -->
   <div id="login-overlay">
     <div class="login-card">
       <h2>🔐 เข้าสู่ระบบ</h2>
@@ -293,7 +280,7 @@
       <header class="header-bar">
         <div class="header-title">
           <h1>แดชบอร์ดบริหารจัดการการเงิน</h1>
-          <p>บันทึกและตรวจสอบสถานะการชำระเงิน (ระบุผู้ดำเนินการอัตโนมัติ)</p>
+          <p>บันทึกและตรวจสอบสถานะการชำระเงิน</p>
         </div>
         <button class="btn-action" onclick="loadDashboardData()" style="padding: 8px 16px; font-size: 14px;">🔄 รีเฟรชข้อมูล</button>
       </header>
@@ -388,7 +375,7 @@
       </section>
     </div>
 
-    <!-- แท็บ 2: ทะเบียนลูกบ้าน (เพิ่มที่อยู่ 2 แบบ + ภาพถ่าย) -->
+    <!-- แท็บ 2: ทะเบียนลูกบ้าน -->
     <div id="tab-residents" class="tab-content">
       <header class="header-bar">
         <div class="header-title">
@@ -429,7 +416,6 @@
               </div>
             </div>
 
-            <!-- ที่อยู่ตามบัตรประชาชน และ ที่อยู่ปัจจุบัน -->
             <div class="form-group">
               <label>🏠 ที่อยู่ตามบัตรประชาชน</label>
               <textarea id="res-id-address" placeholder="ระบุบ้านเลขที่ หมู่ที่ ซอย ถนน ตำบล/แขวง อำเภอ/เขต จังหวัด รหัสไปรษณีย์"></textarea>
@@ -440,9 +426,8 @@
               <textarea id="res-cur-address" placeholder="ระบุที่อยู่ปัจจุบัน (หากเหมือนที่อยู่ตามบัตรประชาชนให้ระบุ 'ตามบัตรประชาชน')"></textarea>
             </div>
 
-            <!-- ช่องอัปโหลดภาพถ่ายลูกค้า -->
             <div class="form-group">
-              <label>📷 อัปโหลดภาพถ่ายลูกค้า / เจ้าของห้อง (ระบบจะนำเข้าโฟลเดอร์ส่วนตัวของลูกค้า)</label>
+              <label>📷 อัปโหลดภาพถ่ายลูกค้า / เจ้าของห้อง</label>
               <input type="file" id="res-photo" accept="image/*" onchange="previewResidentPhoto(event)">
               <div class="photo-preview-container" id="photo-preview-box">
                 <img id="photo-preview-img" class="photo-preview" src="#" alt="ภาพตัวอย่าง">
@@ -679,7 +664,6 @@
       }
     }
 
-    // ตัวอย่างภาพถ่ายก่อนอัปโหลด
     function previewResidentPhoto(e) {
       const file = e.target.files[0];
       if (file) {
@@ -695,7 +679,6 @@
       }
     }
 
-    // บันทึกข้อมูลลูกบ้าน พร้อมที่อยู่ 2 แบบ และภาพถ่าย
     async function submitNewResident(event) {
       event.preventDefault();
       const btn = document.getElementById("btn-submit-resident");
@@ -733,7 +716,10 @@
           alert("✅ บันทึกข้อมูลลูกบ้านและสร้างโฟลเดอร์ส่วนตัวใน Google Drive สำเร็จ!");
           document.getElementById("resident-form").reset();
           document.getElementById("photo-preview-box").style.display = "none";
+          document.getElementById("res-photo").value = "";
           residentPhotoBase64 = null;
+          residentPhotoName = "";
+          residentPhotoMime = "";
         } else {
           alert("❌ เกิดข้อผิดพลาด: " + resJson.message);
         }
@@ -741,14 +727,16 @@
         alert("✅ บันทึกข้อมูลเรียบร้อยแล้ว");
         document.getElementById("resident-form").reset();
         document.getElementById("photo-preview-box").style.display = "none";
+        document.getElementById("res-photo").value = "";
         residentPhotoBase64 = null;
+        residentPhotoName = "";
+        residentPhotoMime = "";
       } finally {
         btn.disabled = false;
         btn.innerText = "👤 บันทึกข้อมูลลูกบ้าน & สร้างโฟลเดอร์";
       }
     }
 
-    // Drag & Drop สำหรับ Admin
     const dropZone = document.getElementById("drop-zone");
     const fileInput = document.getElementById("file-input");
     const uploadStatusBox = document.getElementById("upload-status-box");
