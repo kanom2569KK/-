@@ -335,7 +335,6 @@
       <li class="nav-item" id="menu-billing">
         <button onclick="switchTab('billing')">📑<span class="tooltip">ออกเอกสาร (PDF)</span></button>
       </li>
-      <!-- 🏆 แท็บใหม่: กิลด์ EXP & เควสต์ -->
       <li class="nav-item" id="menu-exp">
         <button onclick="switchTab('exp')">🏆<span class="tooltip">สถานะ & กิลด์ EXP</span></button>
       </li>
@@ -534,13 +533,10 @@
       </div>
     </div>
 
-    <!-- =======================================================
-         🏆 แท็บ 4: กิลด์ EXP & เควสต์ประจำวัน (GAMIFICATION TAB)
-         ======================================================= -->
+    <!-- แท็บ 4: กิลด์ EXP -->
     <div id="tab-exp" class="tab-content">
       <div style="display: grid; grid-template-columns: 1.2fr 1.8fr; gap: 20px;">
         
-        <!-- ฝั่งซ้าย: ข้อมูลตัวละคร & หลอดเลเวล -->
         <div class="card" style="text-align: center;">
           <div style="display: inline-block; position: relative;">
             <div style="font-size: 60px; background: var(--input-bg); border-radius: 50%; padding: 12px 18px; border: 3px solid var(--accent-gold); box-shadow: 0 0 20px rgba(251,191,36,0.4);">
@@ -564,7 +560,6 @@
             </p>
           </div>
 
-          <!-- เส้นทางพัฒนาสายอาชีพ -->
           <div style="margin-top: 20px; text-align: left; font-size: 13px; color: var(--text-muted);">
             <div style="font-weight: bold; color: var(--accent-gold); margin-bottom: 8px;">👑 ลำดับสายอาชีพ (Job Classes):</div>
             <div style="display: flex; flex-direction: column; gap: 4px;">
@@ -578,14 +573,13 @@
           </div>
         </div>
 
-        <!-- ฝั่งขวา: กระดานภารกิจกิลด์ (Quest Board) -->
         <div class="card">
           <div class="card-title">📜 กระดานภารกิจรับ EXP ประจำกิลด์ (Guild Quests)</div>
           <div style="display: flex; flex-direction: column; gap: 12px;">
             <div class="quest-item">
               <div>
                 <strong>🌞 เช็กชื่อประจำวัน (Daily Login)</strong>
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">ล็อกอินเข้าใช้งานระบบครั้งแรกของวัน</p>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">ล็อกอินเข้าใช้งานระบบครั้งแรกของวัน (วันละ 1 ครั้ง)</p>
               </div>
               <span class="quest-exp">+10 EXP / วัน</span>
             </div>
@@ -667,7 +661,7 @@
     let pendingUnitForRegistration = "";
 
     // ==========================================
-    // 🌟 คำนวณเลเวล & EXP (สูตร 3 x (Lv-1)^2)
+    // 🌟 คำนวณเลเวล & EXP
     // ==========================================
     function calculateLevelData(exp) {
       let level = Math.floor(Math.sqrt(exp / 3)) + 1;
@@ -705,12 +699,10 @@
       if(!currentUser) return;
       const stats = calculateLevelData(currentUser.exp);
       
-      // อัปเดตใน Modal Popup
       document.getElementById("prof-name").innerText = currentUser.fullName;
       document.getElementById("prof-title").innerText = stats.title;
       document.getElementById("prof-level").innerText = stats.level;
       
-      // อัปเดตในแท็บ EXP เต็มจอ
       document.getElementById("tab-exp-name").innerText = currentUser.fullName;
       document.getElementById("tab-exp-title").innerText = stats.title;
       document.getElementById("tab-exp-level").innerText = stats.level;
@@ -765,7 +757,7 @@
           sessionStorage.setItem("condo_auth_user", JSON.stringify(resJson.user));
           checkAuth();
           if (resJson.dailyLoginBonus) {
-            setTimeout(() => showExpToast(10, "Daily Login รายวัน"), 1000);
+            setTimeout(() => showExpToast(10, "Daily Login รายวัน"), 800);
           }
         } else alert("❌ " + resJson.message);
       } catch (err) { alert("⚠️ เชื่อมต่อขัดข้อง"); } 
