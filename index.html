@@ -43,7 +43,7 @@
     .login-card p { color: #64748b; font-size: 14px; margin-bottom: 24px; }
 
     /* =======================================================
-       🧙‍♂️ RAGNAROK RETRO 16-BIT NPC DIALOG POPUP
+       🧙‍♂️ RAGNAROK RETRO 16-BIT WIZARD POPUP DIALOG
        ======================================================= */
     #ro-modal-overlay {
       position: fixed;
@@ -97,8 +97,8 @@
       flex-shrink: 0;
     }
     .ro-npc-frame {
-      width: 90px;
-      height: 105px;
+      width: 95px;
+      height: 110px;
       background: radial-gradient(circle, #2d3748 0%, #1a202c 100%);
       border: 2px solid #718096;
       border-radius: 8px;
@@ -110,31 +110,32 @@
       position: relative;
     }
     
-    /* 16-bit Animation */
+    /* 16-bit Wizard Animations */
     .wizard-character {
       position: relative;
       display: inline-block;
       animation: wizardBob 2s infinite ease-in-out;
     }
     .wizard-body {
-      font-size: 40px;
+      font-size: 42px;
       line-height: 1;
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
     }
     .magic-staff {
       position: absolute;
-      top: -4px;
-      right: -12px;
-      font-size: 24px;
+      top: -6px;
+      right: -14px;
+      font-size: 26px;
       transform-origin: bottom center;
       animation: staffWave 2.4s infinite ease-in-out;
+      filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
     }
     .staff-glow {
       position: absolute;
-      top: 0px;
-      right: -4px;
-      width: 12px;
-      height: 12px;
+      top: -2px;
+      right: -6px;
+      width: 14px;
+      height: 14px;
       background: rgba(56, 189, 248, 0.9);
       border-radius: 50%;
       animation: magicGlowPulse 1.5s infinite alternate ease-in-out;
@@ -398,9 +399,6 @@
 </head>
 <body>
 
-  <!-- =======================================================
-       🕹️ POPUP RAGNAROK RETRO 16-BIT WIZARD
-       ======================================================= -->
   <div id="ro-modal-overlay">
     <div class="ro-window">
       <div class="ro-header">
@@ -434,7 +432,6 @@
     </div>
   </div>
 
-  <!-- จอ Login -->
   <div id="login-overlay">
     <div class="login-card">
       <h2>🔐 เข้าสู่ระบบ</h2>
@@ -453,7 +450,6 @@
     </div>
   </div>
 
-  <!-- แถบเมนูซ้าย -->
   <aside class="sidebar">
     <h2>ระบบนิติบุคคล</h2>
     <div class="user-profile">
@@ -476,10 +472,8 @@
     </ul>
   </aside>
 
-  <!-- เนื้อหาหลัก -->
   <main class="main-content">
     
-    <!-- แท็บ 1: การเงิน -->
     <div id="tab-financial" class="tab-content active">
       <header class="header-bar">
         <div class="header-title">
@@ -579,7 +573,6 @@
       </section>
     </div>
 
-    <!-- แท็บ 2: ทะเบียนลูกบ้าน -->
     <div id="tab-residents" class="tab-content">
       <header class="header-bar">
         <div class="header-title">
@@ -661,7 +654,6 @@
       </div>
     </div>
 
-    <!-- แท็บ 3: แอดมินนำเข้าไฟล์ดิบ -->
     <div id="tab-admin-hub" class="tab-content">
       <header class="header-bar">
         <div class="header-title">
