@@ -5,7 +5,103 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ระบบบริหารจัดการโครงการ - แดชบอร์ดนิติบุคคล</title>
   <style>
-    * {
+/* =======================================================
+       🧙‍♂️ 16-BIT RETRO WIZARD & GLOWING STAFF ANIMATION
+       ======================================================= */
+    .ro-npc-col {
+      width: 120px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .ro-npc-frame {
+      width: 100px;
+      height: 115px;
+      background: radial-gradient(circle, #2d3748 0%, #1a202c 100%);
+      border: 3px solid #718096;
+      border-radius: 8px;
+      box-shadow: inset 2px 2px 0px #a0aec0, inset -2px -2px 0px #4a5568, 0 4px 10px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: visible;
+    }
+    
+    /* ตัวพ่อมด Pixel Stance */
+    .wizard-character {
+      position: relative;
+      display: inline-block;
+      animation: wizardBob 2s infinite ease-in-out;
+    }
+    .wizard-body {
+      font-size: 42px;
+      line-height: 1;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+      image-rendering: pixelated;
+    }
+
+    /* ไม้เท้าเวทมนตร์และการขยับ */
+    .magic-staff {
+      position: absolute;
+      top: -6px;
+      right: -14px;
+      font-size: 26px;
+      transform-origin: bottom center;
+      animation: staffWave 2.4s infinite ease-in-out;
+      filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
+    }
+
+    /* แสงเรืองรองจากลูกแก้วไม้เท้า (Glow Light) */
+    .staff-glow {
+      position: absolute;
+      top: 0px;
+      right: -6px;
+      width: 14px;
+      height: 14px;
+      background: rgba(56, 189, 248, 0.9);
+      border-radius: 50%;
+      box-shadow: 0 0 12px 6px rgba(56, 189, 248, 0.85), 0 0 20px 10px rgba(129, 140, 248, 0.6);
+      animation: magicGlowPulse 1.5s infinite alternate ease-in-out;
+      pointer-events: none;
+    }
+
+    .ro-npc-name {
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: bold;
+      color: #2b5282;
+      background: #ffffff;
+      padding: 2px 8px;
+      border-radius: 10px;
+      border: 1px solid #9cb1ce;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* Keyframes การขยับ */
+    @keyframes wizardBob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+    @keyframes staffWave {
+      0%, 100% { transform: rotate(0deg) translateY(0); }
+      25% { transform: rotate(-12deg) translateY(-2px); }
+      75% { transform: rotate(8deg) translateY(1px); }
+    }
+    @keyframes magicGlowPulse {
+      0% {
+        transform: scale(0.7);
+        opacity: 0.5;
+        box-shadow: 0 0 6px 3px rgba(56, 189, 248, 0.6);
+      }
+      100% {
+        transform: scale(1.3);
+        opacity: 1;
+        box-shadow: 0 0 16px 8px rgba(56, 189, 248, 0.95), 0 0 24px 12px rgba(129, 140, 248, 0.7);
+      }
+    }    * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
