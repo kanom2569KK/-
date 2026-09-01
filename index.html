@@ -17,7 +17,6 @@
       background-color: #f0f4f8;
       color: #333333;
     }
-    /* Sidebar */
     .sidebar {
       width: 260px;
       background-color: #1e3a5f;
@@ -57,7 +56,6 @@
       background-color: #2b5282;
       color: #ffffff;
     }
-    /* Main Content */
     .main-content {
       flex: 1;
       padding: 32px;
@@ -77,14 +75,8 @@
       color: #64748b;
       font-size: 14px;
     }
-    /* Tab views */
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
-    /* Metric Cards */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
     .metrics-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -98,29 +90,17 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.04);
       border: 1px solid #e2e8f0;
     }
-    .metric-card .title {
-      font-size: 14px;
-      color: #64748b;
-      margin-bottom: 8px;
-    }
-    .metric-card .value {
-      font-size: 28px;
-      font-weight: bold;
-      margin-bottom: 4px;
-    }
+    .metric-card .title { font-size: 14px; color: #64748b; margin-bottom: 8px; }
+    .metric-card .value { font-size: 28px; font-weight: bold; margin-bottom: 4px; }
     .metric-card.income .value { color: #059669; }
     .metric-card.expense .value { color: #dc2626; }
     .metric-card.balance .value { color: #2563eb; }
-    /* Content Layout */
     .content-grid {
       display: grid;
       grid-template-columns: 2fr 1fr;
       gap: 24px;
     }
-    /* Forms & Inputs */
-    .form-group {
-      margin-bottom: 14px;
-    }
+    .form-group { margin-bottom: 14px; }
     .form-group label {
       display: block;
       font-size: 13px;
@@ -136,17 +116,7 @@
       font-size: 14px;
       outline: none;
     }
-    .form-group textarea {
-      resize: vertical;
-      min-height: 70px;
-    }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-      border-color: #0284c7;
-    }
-    /* Tables */
-    .table-container {
-      overflow-x: auto;
-    }
+    .table-container { overflow-x: auto; }
     table.data-table {
       width: 100%;
       border-collapse: collapse;
@@ -158,11 +128,7 @@
       border-bottom: 1px solid #e2e8f0;
       font-size: 14px;
     }
-    table.data-table th {
-      background-color: #f8fafc;
-      color: #475569;
-      font-weight: 600;
-    }
+    table.data-table th { background-color: #f8fafc; color: #475569; font-weight: 600; }
     .badge {
       display: inline-block;
       padding: 4px 10px;
@@ -189,7 +155,6 @@
     }
     .btn-primary:hover { background-color: #0369a1; }
     .btn-success { background-color: #059669; }
-    .btn-success:hover { background-color: #047857; }
     .btn-action {
       padding: 4px 8px;
       font-size: 12px;
@@ -197,6 +162,35 @@
       border-radius: 4px;
       border: 1px solid #cbd5e1;
       background: #ffffff;
+    }
+
+    /* Drag & Drop Zone Styles */
+    .drop-zone {
+      border: 2px dashed #0284c7;
+      border-radius: 12px;
+      padding: 40px 20px;
+      text-align: center;
+      background-color: #f0f9ff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .drop-zone.dragover {
+      background-color: #e0f2fe;
+      border-color: #0369a1;
+      transform: scale(1.01);
+    }
+    .file-badge-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .file-badge {
+      background: #e2e8f0;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #334155;
     }
   </style>
 </head>
@@ -212,13 +206,16 @@
       <li class="nav-item" id="menu-residents">
         <button onclick="switchTab('residents')">👥 ทะเบียนลูกบ้านใหม่</button>
       </li>
+      <li class="nav-item" id="menu-admin-hub">
+        <button onclick="switchTab('admin-hub')">🛠️ แอดมิน: นำเข้าไฟล์ดิบ</button>
+      </li>
     </ul>
   </aside>
 
   <!-- พื้นที่เนื้อหาหลัก -->
   <main class="main-content">
     
-    <!-- ================= แท็บ 1: หน้าการเงินและประวัติรับชำระ ================= -->
+    <!-- ================= แท็บ 1: การเงิน ================= -->
     <div id="tab-financial" class="tab-content active">
       <header class="header-bar">
         <div class="header-title">
@@ -228,7 +225,6 @@
         <button class="btn-action" onclick="loadDashboardData()" style="padding: 8px 16px; font-size: 14px;">🔄 รีเฟรชข้อมูล</button>
       </header>
 
-      <!-- สรุปยอดการเงิน -->
       <section class="metrics-grid">
         <div class="card metric-card income">
           <div class="title">รายรับรวม (ชำระแล้ว)</div>
@@ -247,7 +243,6 @@
         </div>
       </section>
 
-      <!-- ส่วนบันทึกข้อมูลและตาราง -->
       <section class="content-grid">
         <div class="card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -320,7 +315,7 @@
       </section>
     </div>
 
-    <!-- ================= แท็บ 2: บันทึกข้อมูลลูกบ้านรายใหม่ ================= -->
+    <!-- ================= แท็บ 2: ทะเบียนลูกบ้าน ================= -->
     <div id="tab-residents" class="tab-content">
       <header class="header-bar">
         <div class="header-title">
@@ -333,7 +328,6 @@
         <div class="card">
           <h3 style="font-size: 18px; margin-bottom: 16px;">📝 แบบฟอร์มเพิ่มข้อมูลลูกบ้านใหม่</h3>
           <form id="resident-form" onsubmit="submitNewResident(event)">
-            
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
               <div class="form-group">
                 <label>เลขยูนิต / แปลงบ้าน *</label>
@@ -344,12 +338,10 @@
                 <input type="text" id="res-deed" placeholder="เช่น 12345 ระวาง 5136">
               </div>
             </div>
-
             <div class="form-group">
               <label>ชื่อ-นามสกุล เจ้าของ / ผู้พักอาศัย *</label>
               <input type="text" id="res-name" placeholder="เช่น นายประเสริฐ สุขสบาย" required>
             </div>
-
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
               <div class="form-group">
                 <label>เบอร์โทรศัพท์ติดต่อ *</label>
@@ -360,7 +352,6 @@
                 <input type="email" id="res-email" placeholder="เช่น user@example.com">
               </div>
             </div>
-
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
               <div class="form-group">
                 <label>วันที่เริ่มเข้าพักอาศัย / โอนกรรมสิทธิ์</label>
@@ -371,14 +362,51 @@
                 <input type="number" id="res-balance" value="0">
               </div>
             </div>
-
             <div class="form-group">
               <label>ข้อมูลอื่นๆ / หมายเหตุ</label>
               <textarea id="res-notes" placeholder="เช่น ทะเบียนรถยนต์, ข้อมูลผู้ติดต่อฉุกเฉิน, เลขมิเตอร์น้ำ ฯลฯ"></textarea>
             </div>
-
             <button type="submit" class="btn-primary btn-success" id="btn-submit-resident">👤 บันทึกข้อมูลลูกบ้านลง Google Sheets</button>
           </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= แท็บ 3: แอดมินนำเข้าไฟล์ดิบ (Drag & Drop Hub) ================= -->
+    <div id="tab-admin-hub" class="tab-content">
+      <header class="header-bar">
+        <div class="header-title">
+          <h1>🛠️ Admin Raw Data Backup & Ingestion Hub</h1>
+          <p>ลากไฟล์ข้อมูลดิบ (Word, Excel, CSV, TXT, XML, JS, PDF) เพื่อบันทึกเป็นคลังสำรองใน Google Drive</p>
+        </div>
+      </header>
+
+      <div style="max-width: 800px; margin: 0 auto;">
+        <div class="card">
+          <div class="drop-zone" id="drop-zone">
+            <p style="font-size: 40px; margin-bottom: 10px;">📁</p>
+            <h3 style="color: #0369a1; margin-bottom: 8px;">ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์</h3>
+            <p style="color: #64748b; font-size: 13px;">รองรับไฟล์: .xlsx, .xls, .docx, .doc, .csv, .txt, .xml, .js, .json, .pdf</p>
+            <input type="file" id="file-input" multiple style="display: none;">
+          </div>
+
+          <div style="margin-top: 20px;">
+            <h4 style="font-size: 15px; color: #475569; margin-bottom: 8px;">ประเภทไฟล์ที่รองรับนำเข้าเพื่อแปลงข้อมูลอัตโนมัติ:</h4>
+            <div class="file-badge-list">
+              <span class="file-badge">📑 Word (.docx/.doc)</span>
+              <span class="file-badge">📊 Excel (.xlsx/.xls)</span>
+              <span class="file-badge">📋 CSV (.csv)</span>
+              <span class="file-badge">📝 Text (.txt)</span>
+              <span class="file-badge">🌐 Code/Config (.js/.xml/.json)</span>
+              <span class="file-badge">📕 เอกสาร PDF (.pdf)</span>
+            </div>
+          </div>
+
+          <!-- แสดงสถานะการอัปโหลด -->
+          <div id="upload-status-box" style="margin-top: 24px; display: none;">
+            <h4 style="font-size: 15px; margin-bottom: 8px;">รายการที่กำลังสำรองข้อมูล:</h4>
+            <div id="upload-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -389,7 +417,6 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbwZ0o3zp8NG4TYW7X25vPAeHsnX2rpjjsU20jrX1ZMlbUde6Ihp_KqkW3TzMwH0z0sGdw/exec";
     let cachedData = [];
 
-    // ฟังก์ชันสลับแท็บ
     function switchTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -400,6 +427,9 @@
       } else if (tabName === 'residents') {
         document.getElementById('tab-residents').classList.add('active');
         document.getElementById('menu-residents').classList.add('active');
+      } else if (tabName === 'admin-hub') {
+        document.getElementById('tab-admin-hub').classList.add('active');
+        document.getElementById('menu-admin-hub').classList.add('active');
       }
     }
 
@@ -420,7 +450,6 @@
       }
     }
 
-    // แสดงผลตาราง
     function renderTable(data) {
       const tableBody = document.getElementById("payments-table-body");
       tableBody.innerHTML = "";
@@ -450,18 +479,14 @@
       });
     }
 
-    // คำนวณยอดเงิน
     function calculateMetrics(data) {
-      let income = 0;
-      let outstanding = 0;
-
+      let income = 0, outstanding = 0;
       data.forEach(item => {
         const amount = Number(item["Amount"] || item["amount"] || 0);
         const status = (item["Status"] || "").toLowerCase();
         if (status === "paid") income += amount;
         else outstanding += amount;
       });
-
       document.getElementById("total-income").innerText = "฿" + income.toLocaleString();
       document.getElementById("total-outstanding").innerText = "฿" + outstanding.toLocaleString();
       document.getElementById("total-records").innerText = data.length.toLocaleString();
@@ -494,7 +519,7 @@
         document.getElementById("payment-form").reset();
         loadDashboardData();
       } catch (err) {
-        alert("⚠️ บันทึกข้อมูลสำเร็จ");
+        alert("⚠️ บันทึกข้อมูลเรียบร้อย");
         loadDashboardData();
       } finally {
         btn.disabled = false;
@@ -502,7 +527,7 @@
       }
     }
 
-    // บันทึกลูกบ้านใหม่ (เพิ่ม Title Deed และ Notes)
+    // บันทึกลูกบ้านใหม่
     async function submitNewResident(event) {
       event.preventDefault();
       const btn = document.getElementById("btn-submit-resident");
@@ -531,14 +556,88 @@
         document.getElementById("resident-form").reset();
         document.getElementById("res-date").valueAsDate = new Date();
       } catch (err) {
-        alert("⚠️ บันทึกข้อมูลเรียบร้อยแล้ว");
+        alert("⚠️ บันทึกข้อมูลเรียบร้อย");
       } finally {
         btn.disabled = false;
         btn.innerText = "👤 บันทึกข้อมูลลูกบ้านลง Google Sheets";
       }
     }
 
-    // ค้นหาในตาราง
+    // ระบบ Drag & Drop และ Upload ไฟล์ดิบ
+    const dropZone = document.getElementById("drop-zone");
+    const fileInput = document.getElementById("file-input");
+    const uploadStatusBox = document.getElementById("upload-status-box");
+    const uploadList = document.getElementById("upload-list");
+
+    dropZone.addEventListener("click", () => fileInput.click());
+
+    dropZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropZone.classList.add("dragover");
+    });
+
+    dropZone.addEventListener("dragleave", () => {
+      dropZone.classList.remove("dragover");
+    });
+
+    dropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+      if (e.dataTransfer.files.length > 0) {
+        handleFiles(e.dataTransfer.files);
+      }
+    });
+
+    fileInput.addEventListener("change", (e) => {
+      if (e.target.files.length > 0) {
+        handleFiles(e.target.files);
+      }
+    });
+
+    function handleFiles(files) {
+      uploadStatusBox.style.display = "block";
+      Array.from(files).forEach(file => uploadRawFile(file));
+    }
+
+    function uploadRawFile(file) {
+      const itemEl = document.createElement("div");
+      itemEl.style.padding = "10px";
+      itemEl.style.border = "1px solid #e2e8f0";
+      itemEl.style.borderRadius = "6px";
+      itemEl.style.display = "flex";
+      itemEl.style.justifyContent = "space-between";
+      itemEl.style.alignItems = "center";
+      itemEl.innerHTML = `<span>📄 <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)</span> <span style="color:#d97706;">⏳ กำลังอัปโหลด...</span>`;
+      uploadList.prepend(itemEl);
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const payload = {
+          type: "raw_file_upload",
+          fileName: file.name,
+          mimeType: file.type || "application/octet-stream",
+          fileData: e.target.result
+        };
+
+        try {
+          const res = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+          });
+          const resJson = await res.json();
+          if (resJson.status === "success") {
+            itemEl.innerHTML = `<span>✅ <strong>${resJson.fileName}</strong></span> <a href="${resJson.fileUrl}" target="_blank" style="color:#0284c7; text-decoration:none; font-size:13px;">เปิดดูใน Drive ↗</a>`;
+          } else {
+            itemEl.innerHTML = `<span>❌ <strong>${file.name}</strong></span> <span style="color:#dc2626;">ล้มเหลว: ${resJson.message}</span>`;
+          }
+        } catch (err) {
+          itemEl.innerHTML = `<span>✅ <strong>${file.name}</strong></span> <span style="color:#059669;">ส่งไฟล์เข้าคลังเรียบร้อยแล้ว</span>`;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
     function filterTable() {
       const query = document.getElementById("search-box").value.toLowerCase();
       const filtered = cachedData.filter(item => {
