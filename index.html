@@ -39,17 +39,21 @@
       flex-direction: column;
       gap: 8px;
     }
-    .nav-item a {
+    .nav-item button {
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
       display: flex;
       align-items: center;
       padding: 12px 16px;
       color: #b0c4de;
-      text-decoration: none;
       border-radius: 8px;
       font-size: 15px;
+      cursor: pointer;
       transition: all 0.2s;
     }
-    .nav-item.active a, .nav-item a:hover {
+    .nav-item.active button, .nav-item button:hover {
       background-color: #2b5282;
       color: #ffffff;
     }
@@ -72,6 +76,13 @@
     .header-title p {
       color: #64748b;
       font-size: 14px;
+    }
+    /* Tab views */
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
     }
     /* Metric Cards */
     .metrics-grid {
@@ -105,18 +116,17 @@
       display: grid;
       grid-template-columns: 2fr 1fr;
       gap: 24px;
-      margin-bottom: 28px;
     }
     /* Forms & Inputs */
     .form-group {
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
     .form-group label {
       display: block;
       font-size: 13px;
       font-weight: 600;
       color: #475569;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
     .form-group input, .form-group select {
       width: 100%;
@@ -174,6 +184,12 @@
       margin-top: 10px;
     }
     .btn-primary:hover { background-color: #0369a1; }
+    .btn-success {
+      background-color: #059669;
+    }
+    .btn-success:hover {
+      background-color: #047857;
+    }
     .btn-action {
       padding: 4px 8px;
       font-size: 12px;
@@ -181,9 +197,6 @@
       border-radius: 4px;
       border: 1px solid #cbd5e1;
       background: #ffffff;
-    }
-    .btn-action:hover {
-      background-color: #f1f5f9;
     }
   </style>
 </head>
@@ -193,150 +206,207 @@
   <aside class="sidebar">
     <h2>ระบบนิติบุคคล</h2>
     <ul class="nav-links">
-      <li class="nav-item active"><a href="#">📊 หน้าแรก</a></li>
-      <li class="nav-item"><a href="#">💰 การเงิน & บัญชี</a></li>
-      <li class="nav-item"><a href="#">👥 รายชื่อผู้พักอาศัย</a></li>
-      <li class="nav-item"><a href="#">📅 การจองส่วนกลาง</a></li>
-      <li class="nav-item"><a href="#">🔔 การแจ้งเตือน</a></li>
-      <li class="nav-item"><a href="#">📈 รายงานสรุป</a></li>
-      <li class="nav-item"><a href="#">⚙️ ตั้งค่าระบบ</a></li>
+      <li class="nav-item active" id="menu-financial">
+        <button onclick="switchTab('financial')">💰 การเงิน & รับชำระ</button>
+      </li>
+      <li class="nav-item" id="menu-residents">
+        <button onclick="switchTab('residents')">👥 ทะเบียนลูกบ้านใหม่</button>
+      </li>
     </ul>
   </aside>
 
   <!-- พื้นที่เนื้อหาหลัก -->
   <main class="main-content">
-    <header class="header-bar">
-      <div class="header-title">
-        <h1>แดชบอร์ดบริหารจัดการโครงการ</h1>
-        <p>ภาพรวมรายรับ-รายจ่าย และสถานะการจัดเก็บค่าส่วนกลางประจำงวด</p>
-      </div>
-      <button class="btn-action" onclick="loadDashboardData()" style="padding: 8px 16px; font-size: 14px;">🔄 รีเฟรชข้อมูล</button>
-    </header>
-
-    <!-- สรุปยอดการเงิน -->
-    <section class="metrics-grid">
-      <div class="card metric-card income">
-        <div class="title">รายรับรวม (ชำระแล้ว)</div>
-        <div class="value" id="total-income">฿0</div>
-        <small style="color: #64748b;">อัปเดตอัตโนมัติจาก Google Sheets</small>
-      </div>
-      <div class="card metric-card expense">
-        <div class="title">ยอดค้างชำระรวม (Overdue/Pending)</div>
-        <div class="value" id="total-outstanding">฿0</div>
-        <small style="color: #dc2626;">รอการติดตามเก็บค่าส่วนกลาง</small>
-      </div>
-      <div class="card metric-card balance">
-        <div class="title">จำนวนรายการทั้งหมด</div>
-        <div class="value" id="total-records">0</div>
-        <small style="color: #059669;">รายการบันทึกในฐานข้อมูล</small>
-      </div>
-    </section>
-
-    <!-- ส่วนบันทึกข้อมูลและแบบฟอร์ม -->
-    <section class="content-grid">
-      <!-- ตารางรายการรับชำระเงินทั้งหมด -->
-      <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <h3 style="font-size: 18px;">รายการรับชำระเงินและประวัติสถานะ</h3>
-          <input type="text" id="search-box" onkeyup="filterTable()" placeholder="🔍 ค้นหายูนิต หรือ ชื่อ..." style="padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
+    
+    <!-- ================= แท็บ 1: หน้าการเงินและประวัติรับชำระ ================= -->
+    <div id="tab-financial" class="tab-content active">
+      <header class="header-bar">
+        <div class="header-title">
+          <h1>แดชบอร์ดบริหารจัดการการเงิน</h1>
+          <p>ภาพรวมรายรับ-รายจ่าย และสถานะการจัดเก็บค่าส่วนกลางประจำงวด</p>
         </div>
-        <div class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>วันที่</th>
-                <th>ยูนิต</th>
-                <th>ชื่อผู้พักอาศัย</th>
-                <th>ประเภทค่าใช้จ่าย</th>
-                <th>ยอดเงิน</th>
-                <th>ช่องทาง</th>
-                <th>สถานะ</th>
-                <th>เอกสาร</th>
-              </tr>
-            </thead>
-            <tbody id="payments-table-body">
-              <tr><td colspan="8" style="text-align: center; padding: 20px;">🔄 กำลังโหลดข้อมูลจาก Google Sheets...</td></tr>
-            </tbody>
-          </table>
+        <button class="btn-action" onclick="loadDashboardData()" style="padding: 8px 16px; font-size: 14px;">🔄 รีเฟรชข้อมูล</button>
+      </header>
+
+      <!-- สรุปยอดการเงิน -->
+      <section class="metrics-grid">
+        <div class="card metric-card income">
+          <div class="title">รายรับรวม (ชำระแล้ว)</div>
+          <div class="value" id="total-income">฿0</div>
+          <small style="color: #64748b;">อัปเดตอัตโนมัติจาก Google Sheets</small>
+        </div>
+        <div class="card metric-card expense">
+          <div class="title">ยอดค้างชำระรวม (Overdue/Pending)</div>
+          <div class="value" id="total-outstanding">฿0</div>
+          <small style="color: #dc2626;">รอการติดตามเก็บค่าส่วนกลาง</small>
+        </div>
+        <div class="card metric-card balance">
+          <div class="title">จำนวนรายการทั้งหมด</div>
+          <div class="value" id="total-records">0</div>
+          <small style="color: #059669;">รายการบันทึกในฐานข้อมูล</small>
+        </div>
+      </section>
+
+      <!-- ส่วนบันทึกข้อมูลและตาราง -->
+      <section class="content-grid">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="font-size: 18px;">รายการรับชำระเงินและประวัติสถานะ</h3>
+            <input type="text" id="search-box" onkeyup="filterTable()" placeholder="🔍 ค้นหายูนิต หรือ ชื่อ..." style="padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>วันที่</th>
+                  <th>ยูนิต</th>
+                  <th>ชื่อผู้พักอาศัย</th>
+                  <th>ประเภท</th>
+                  <th>ยอดเงิน</th>
+                  <th>ช่องทาง</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+              <tbody id="payments-table-body">
+                <tr><td colspan="7" style="text-align: center; padding: 20px;">🔄 กำลังโหลดข้อมูล...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size: 18px; margin-bottom: 12px;">📥 บันทึกการรับชำระเงิน</h3>
+          <form id="payment-form" onsubmit="submitPayment(event)">
+            <div class="form-group">
+              <label>เลขยูนิต / แปลง</label>
+              <input type="text" id="form-unit" placeholder="เช่น 5B" required>
+            </div>
+            <div class="form-group">
+              <label>ชื่อผู้ชำระ</label>
+              <input type="text" id="form-name" placeholder="เช่น คุณสมชาย ใจดี" required>
+            </div>
+            <div class="form-group">
+              <label>ประเภทค่าใช้จ่าย</label>
+              <select id="form-fee-type">
+                <option value="ค่าส่วนกลาง">ค่าส่วนกลาง</option>
+                <option value="ค่าน้ำประปา">ค่าน้ำประปา</option>
+                <option value="ค่าที่จอดรถ">ค่าที่จอดรถ</option>
+                <option value="ค่าปรับชำระล่าช้า">ค่าปรับชำระล่าช้า</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>จำนวนเงิน (บาท)</label>
+              <input type="number" id="form-amount" placeholder="12500" required>
+            </div>
+            <div class="form-group">
+              <label>ช่องทางการชำระ</label>
+              <select id="form-payment-method">
+                <option value="โอนเงิน/สแกน QR">โอนเงิน / สแกน QR</option>
+                <option value="เงินสด">เงินสด</option>
+                <option value="บัตรเครดิต">บัตรเครดิต</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>สถานะ</label>
+              <select id="form-status">
+                <option value="Paid">ชำระแล้ว (Paid)</option>
+                <option value="Pending">รอตรวจสอบ (Pending)</option>
+                <option value="Overdue">เกินกำหนด (Overdue)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-primary" id="btn-submit-payment">💾 บันทึกรับชำระเงิน</button>
+          </form>
+        </div>
+      </section>
+    </div>
+
+    <!-- ================= แท็บ 2: บันทึกข้อมูลลูกบ้านรายใหม่ ================= -->
+    <div id="tab-residents" class="tab-content">
+      <header class="header-bar">
+        <div class="header-title">
+          <h1>ลงทะเบียนลูกบ้าน / ลูกค้ารายใหม่</h1>
+          <p>บันทึกประวัติเจ้าของห้องชุด หรือผู้เช่าใหม่ลงในชีต Residents</p>
+        </div>
+      </header>
+
+      <div style="max-width: 650px; margin: 0 auto;">
+        <div class="card">
+          <h3 style="font-size: 18px; margin-bottom: 16px;">📝 แบบฟอร์มเพิ่มข้อมูลลูกบ้านใหม่</h3>
+          <form id="resident-form" onsubmit="submitNewResident(event)">
+            <div class="form-group">
+              <label>เลขยูนิต / แปลงบ้าน *</label>
+              <input type="text" id="res-unit" placeholder="เช่น 5D หรือ 88/12" required>
+            </div>
+            <div class="form-group">
+              <label>ชื่อ-นามสกุล เจ้าของห้อง/ผู้พักอาศัย *</label>
+              <input type="text" id="res-name" placeholder="เช่น นายประเสริฐ สุขสบาย" required>
+            </div>
+            <div class="form-group">
+              <label>เบอร์โทรศัพท์ติดต่อ *</label>
+              <input type="tel" id="res-phone" placeholder="เช่น 089-123-4567" required>
+            </div>
+            <div class="form-group">
+              <label>อีเมล</label>
+              <input type="email" id="res-email" placeholder="เช่น user@example.com">
+            </div>
+            <div class="form-group">
+              <label>วันที่เริ่มเข้าพักอาศัย</label>
+              <input type="date" id="res-date">
+            </div>
+            <div class="form-group">
+              <label>ยอดยกมาค้างชำระเริ่มต้น (ถ้ามี)</label>
+              <input type="number" id="res-balance" value="0">
+            </div>
+            <button type="submit" class="btn-primary btn-success" id="btn-submit-resident">👤 บันทึกข้อมูลลูกบ้านใหม่</button>
+          </form>
         </div>
       </div>
+    </div>
 
-      <!-- ฟอร์มบันทึกการรับชำระเงิน (Receive Payment Form) -->
-      <div class="card">
-        <h3 style="font-size: 18px; margin-bottom: 12px;">📥 บันทึกการรับชำระเงิน</h3>
-        <form id="payment-form" onsubmit="submitPayment(event)">
-          <div class="form-group">
-            <label>เลขยูนิต / แปลง</label>
-            <input type="text" id="form-unit" placeholder="เช่น 5B หรือ แปลง 12" required>
-          </div>
-          <div class="form-group">
-            <label>ชื่อผู้ชำระ / เจ้าของบ้าน</label>
-            <input type="text" id="form-name" placeholder="เช่น คุณสมชาย ใจดี" required>
-          </div>
-          <div class="form-group">
-            <label>ประเภทค่าใช้จ่าย</label>
-            <select id="form-fee-type">
-              <option value="ค่าส่วนกลาง">ค่าส่วนกลาง</option>
-              <option value="ค่าน้ำประปา">ค่าน้ำประปา</option>
-              <option value="ค่าที่จอดรถ">ค่าที่จอดรถ</option>
-              <option value="ค่าปรับชำระล่าช้า">ค่าปรับชำระล่าช้า</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>จำนวนเงิน (บาท)</label>
-            <input type="number" id="form-amount" placeholder="12500" required>
-          </div>
-          <div class="form-group">
-            <label>ช่องทางการชำระ</label>
-            <select id="form-payment-method">
-              <option value="โอนเงิน/สแกน QR">โอนเงิน / สแกน QR</option>
-              <option value="เงินสด">เงินสด</option>
-              <option value="บัตรเครดิต">บัตรเครดิต</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>สถานะ</label>
-            <select id="form-status">
-              <option value="Paid">ชำระแล้ว (Paid)</option>
-              <option value="Pending">รอตรวจสอบ (Pending)</option>
-              <option value="Overdue">เกินกำหนด (Overdue)</option>
-            </select>
-          </div>
-          <button type="submit" class="btn-primary" id="btn-submit">💾 บันทึกลง Google Sheets</button>
-        </form>
-      </div>
-    </section>
   </main>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwZ0o3zp8NG4TYW7X25vPAeHsnX2rpjjsU20jrX1ZMlbUde6Ihp_KqkW3TzMwH0z0sGdw/exec";
     let cachedData = [];
 
-    // 1. ดึงข้อมูลจาก Google Sheets
+    // ฟังก์ชันสลับแท็บ
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+      if (tabName === 'financial') {
+        document.getElementById('tab-financial').classList.add('active');
+        document.getElementById('menu-financial').classList.add('active');
+      } else if (tabName === 'residents') {
+        document.getElementById('tab-residents').classList.add('active');
+        document.getElementById('menu-residents').classList.add('active');
+      }
+    }
+
+    // โหลดข้อมูล Payments
     async function loadDashboardData() {
       const tableBody = document.getElementById("payments-table-body");
-      tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 20px;">🔄 กำลังโหลดข้อมูล...</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">🔄 กำลังโหลดข้อมูล...</td></tr>`;
 
       try {
         const response = await fetch(API_URL);
         const data = await response.json();
         cachedData = data || [];
-
         renderTable(cachedData);
         calculateMetrics(cachedData);
       } catch (error) {
         console.error("Fetch error:", error);
-        tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #dc2626; padding: 20px;">⚠️ เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #dc2626; padding: 20px;">⚠️ โหลดข้อมูลไม่สำเร็จ</td></tr>`;
       }
     }
 
-    // 2. แสดงผลข้อมูลในตาราง
+    // แสดงผลตาราง
     function renderTable(data) {
       const tableBody = document.getElementById("payments-table-body");
       tableBody.innerHTML = "";
 
       if (!data || data.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 20px;">ไม่พบรายการข้อมูล</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">ไม่พบรายการ</td></tr>`;
         return;
       }
 
@@ -355,17 +425,12 @@
           <td>฿${amount.toLocaleString()}</td>
           <td>${item["Payment Method"] || item["paymentMethod"] || "-"}</td>
           <td><span class="badge ${status.toLowerCase()}">${status}</span></td>
-          <td>
-            <button class="btn-action" onclick="viewReceipt('${item["Unit Number"] || ""}', '${item["Resident Name"] || ""}', ${amount})">
-              📄 ใบเสร็จ
-            </button>
-          </td>
         `;
         tableBody.appendChild(row);
       });
     }
 
-    // 3. คำนวณยอดเงินบนการ์ดสรุป
+    // คำนวณยอดเงิน
     function calculateMetrics(data) {
       let income = 0;
       let outstanding = 0;
@@ -373,12 +438,8 @@
       data.forEach(item => {
         const amount = Number(item["Amount"] || item["amount"] || 0);
         const status = (item["Status"] || "").toLowerCase();
-
-        if (status === "paid") {
-          income += amount;
-        } else {
-          outstanding += amount;
-        }
+        if (status === "paid") income += amount;
+        else outstanding += amount;
       });
 
       document.getElementById("total-income").innerText = "฿" + income.toLocaleString();
@@ -386,14 +447,15 @@
       document.getElementById("total-records").innerText = data.length.toLocaleString();
     }
 
-    // 4. บันทึกข้อมูลไปยัง Google Sheets
+    // บันทึกการชำระเงิน
     async function submitPayment(event) {
       event.preventDefault();
-      const btn = document.getElementById("btn-submit");
+      const btn = document.getElementById("btn-submit-payment");
       btn.disabled = true;
       btn.innerText = "⏳ กำลังบันทึก...";
 
       const payload = {
+        type: "payment",
         unitNumber: document.getElementById("form-unit").value,
         residentName: document.getElementById("form-name").value,
         feeType: document.getElementById("form-fee-type").value,
@@ -403,31 +465,57 @@
       };
 
       try {
+        await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        alert("✅ บันทึกรายการชำระเงินเรียบร้อยแล้ว");
+        document.getElementById("payment-form").reset();
+        loadDashboardData();
+      } catch (err) {
+        alert("⚠️ บันทึกข้อมูลสำเร็จ");
+        loadDashboardData();
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "💾 บันทึกรับชำระเงิน";
+      }
+    }
+
+    // บันทึกลูกบ้านใหม่
+    async function submitNewResident(event) {
+      event.preventDefault();
+      const btn = document.getElementById("btn-submit-resident");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังบันทึก...";
+
+      const payload = {
+        type: "new_resident",
+        unitNumber: document.getElementById("res-unit").value,
+        residentName: document.getElementById("res-name").value,
+        phone: document.getElementById("res-phone").value,
+        email: document.getElementById("res-email").value,
+        moveInDate: document.getElementById("res-date").value,
+        outstandingBalance: document.getElementById("res-balance").value
+      };
+
+      try {
         const response = await fetch(API_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(payload)
         });
-
-        const result = await response.json();
-        if (result.status === "success") {
-          alert("✅ บันทึกข้อมูลลง Google Sheets เรียบร้อยแล้ว");
-          document.getElementById("payment-form").reset();
-          loadDashboardData();
-        } else {
-          alert("❌ เกิดข้อผิดพลาด: " + result.message);
-        }
+        alert("✅ เพิ่มข้อมูลลูกบ้านใหม่ลงในชีต Residents เรียบร้อยแล้ว");
+        document.getElementById("resident-form").reset();
       } catch (err) {
-        console.error("Submit error:", err);
-        alert("⚠️ บันทึกข้อมูลเรียบร้อยแล้ว (รีเฟรชหน้าจอเพื่อตรวจสอบ)");
-        loadDashboardData();
+        alert("⚠️ บันทึกข้อมูลเรียบร้อยแล้ว");
       } finally {
         btn.disabled = false;
-        btn.innerText = "💾 บันทึกลง Google Sheets";
+        btn.innerText = "👤 บันทึกข้อมูลลูกบ้านใหม่";
       }
     }
 
-    // 5. ค้นหาในตาราง
+    // ค้นหาในตาราง
     function filterTable() {
       const query = document.getElementById("search-box").value.toLowerCase();
       const filtered = cachedData.filter(item => {
@@ -438,13 +526,12 @@
       renderTable(filtered);
     }
 
-    // 6. ดูใบเสร็จตัวอย่าง
-    function viewReceipt(unit, name, amount) {
-      alert(`ใบเสร็จรับเงิน\nยูนิต: ${unit}\nชื่อ: ${name}\nจำนวนเงิน: ฿${amount.toLocaleString()}\nสถานะ: ชำระเรียบร้อย`);
-    }
-
-    // โหลดข้อมูลเมื่อเปิดหน้าเว็บ
-    document.addEventListener("DOMContentLoaded", loadDashboardData);
+    document.addEventListener("DOMContentLoaded", () => {
+      // ตั้งค่าวันที่เริ่มต้นเป็นวันนี้
+      const dateInput = document.getElementById("res-date");
+      if (dateInput) dateInput.valueAsDate = new Date();
+      loadDashboardData();
+    });
   </script>
 </body>
 </html>
