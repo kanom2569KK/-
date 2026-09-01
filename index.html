@@ -18,7 +18,7 @@
       color: #333333;
     }
 
-    /* Login Screen Overlay */
+    /* Login Screen */
     #login-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -39,6 +39,107 @@
     }
     .login-card h2 { color: #1e3a5f; margin-bottom: 8px; }
     .login-card p { color: #64748b; font-size: 14px; margin-bottom: 24px; }
+
+    /* =======================================================
+       🎨 RAGNAROK ONLINE 2000s RETRO POPUP UI
+       ======================================================= */
+    #ro-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.65);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
+    .ro-window {
+      background: #e7eef7;
+      border: 2px solid #5a739c;
+      border-radius: 6px;
+      box-shadow: inset 1px 1px 0px #ffffff, inset -1px -1px 0px #8fa0ba, 4px 6px 15px rgba(0,0,0,0.5);
+      width: 90%;
+      max-width: 460px;
+      overflow: hidden;
+      font-family: Tahoma, 'Sarabun', sans-serif;
+    }
+    .ro-header {
+      background: linear-gradient(180deg, #7b96be 0%, #466591 100%);
+      color: #ffffff;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334d72;
+      letter-spacing: 0.5px;
+      text-shadow: 1px 1px 1px #22354e;
+    }
+    .ro-header .ro-close {
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      color: #ffdddd;
+    }
+    .ro-body {
+      padding: 16px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      background: #edf2f9;
+    }
+    .ro-npc-icon {
+      font-size: 40px;
+      background: #ffffff;
+      border: 1px solid #9cb1ce;
+      border-radius: 8px;
+      padding: 8px;
+      box-shadow: inset 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    .ro-dialog-box {
+      flex: 1;
+      background: #ffffff;
+      border: 1px solid #a4b7d1;
+      padding: 12px;
+      border-radius: 4px;
+      box-shadow: inset 1px 1px 2px rgba(0,0,0,0.05);
+      font-size: 14px;
+      line-height: 1.5;
+      color: #1e293b;
+    }
+    .ro-dialog-box strong {
+      color: #b91c1c;
+    }
+    .ro-footer {
+      padding: 10px 16px;
+      background: #d8e2ef;
+      border-top: 1px solid #b8c8dc;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .ro-btn {
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: bold;
+      border-radius: 3px;
+      cursor: pointer;
+      border: 1px solid #5a739c;
+      box-shadow: 1px 1px 0px #ffffff inset;
+    }
+    .ro-btn-primary {
+      background: linear-gradient(180deg, #6ba5e7 0%, #3071b8 100%);
+      color: #ffffff;
+      text-shadow: 1px 1px 1px #1d4b80;
+      border-color: #2b5d99;
+    }
+    .ro-btn-primary:hover {
+      background: linear-gradient(180deg, #7cb3f2 0%, #3b7dc7 100%);
+    }
+    .ro-btn-cancel {
+      background: linear-gradient(180deg, #f0f0f0 0%, #cccccc 100%);
+      color: #333333;
+    }
 
     /* Sidebar */
     .sidebar {
@@ -201,8 +302,6 @@
       border: 1px solid #cbd5e1;
       background: #ffffff;
     }
-
-    /* Drag & Drop */
     .drop-zone {
       border: 2px dashed #0284c7;
       border-radius: 12px;
@@ -212,8 +311,6 @@
       cursor: pointer;
     }
     .drop-zone.dragover { background-color: #e0f2fe; }
-
-    /* Photo Preview Box */
     .photo-preview-container {
       margin-top: 8px;
       text-align: center;
@@ -229,6 +326,31 @@
   </style>
 </head>
 <body>
+
+  <!-- =======================================================
+       🕹️ POPUP RAGNAROK ONLINE 2000s DIALOG
+       ======================================================= -->
+  <div id="ro-modal-overlay">
+    <div class="ro-window">
+      <div class="ro-header">
+        <span>[ แจ้งเตือนจากเจ้าหน้าที่นิติบุคคล ]</span>
+        <span class="ro-close" onclick="closeRoModal()">✕</span>
+      </div>
+      <div class="ro-body">
+        <div class="ro-npc-icon">🧙‍♂️</div>
+        <div class="ro-dialog-box">
+          <p id="ro-dialog-text">
+            ไม่พบข้อมูลยูนิต <strong>[<span id="ro-target-unit">-</span>]</strong> ในระบบทะเบียนลูกบ้าน!<br><br>
+            กรุณาทำการ <strong>"ลงทะเบียนลูกบ้านใหม่"</strong> ให้เรียบร้อยก่อน จึงจะสามารถบันทึกรับชำระเงินได้
+          </p>
+        </div>
+      </div>
+      <div class="ro-footer">
+        <button class="ro-btn ro-btn-cancel" onclick="closeRoModal()">ยกเลิก</button>
+        <button class="ro-btn ro-btn-primary" onclick="goToResidentRegistration()">ลงทะเบียนลูกบ้านเดี๋ยวนี้ ➔</button>
+      </div>
+    </div>
+  </div>
 
   <!-- จอ Login -->
   <div id="login-overlay">
@@ -249,7 +371,7 @@
     </div>
   </div>
 
-  <!-- แถบเมนูซ้าย -->
+  <!-- เมนูซ้าย -->
   <aside class="sidebar">
     <h2>ระบบนิติบุคคล</h2>
     <div class="user-profile">
@@ -280,7 +402,7 @@
       <header class="header-bar">
         <div class="header-title">
           <h1>แดชบอร์ดบริหารจัดการการเงิน</h1>
-          <p>บันทึกและตรวจสอบสถานะการชำระเงิน</p>
+          <p>บันทึกและตรวจสอบสถานะการชำระเงิน (ตรวจสอบลูกบ้านอัตโนมัติ)</p>
         </div>
         <button class="btn-action" onclick="loadDashboardData()" style="padding: 8px 16px; font-size: 14px;">🔄 รีเฟรชข้อมูล</button>
       </header>
@@ -334,11 +456,11 @@
           <form id="payment-form" onsubmit="submitPayment(event)">
             <div class="form-group">
               <label>เลขยูนิต / แปลง</label>
-              <input type="text" id="form-unit" placeholder="เช่น 5B" required>
+              <input type="text" id="form-unit" placeholder="เช่น 1 หรือ A01" onblur="autoFillResidentName(this.value)" required>
             </div>
             <div class="form-group">
               <label>ชื่อผู้ชำระ</label>
-              <input type="text" id="form-name" placeholder="เช่น คุณสมชาย ใจดี" required>
+              <input type="text" id="form-name" placeholder="เช่น ตาตุ๊ ทดดี" required>
             </div>
             <div class="form-group">
               <label>ประเภทค่าใช้จ่าย</label>
@@ -487,10 +609,12 @@
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwXkjXkewv-OGxvCSx3LTO0q08wY1_M7OKw2igJNNDsMqGNnEC2Uu89osUw6tp-MftzzQ/exec";
     let currentUser = null;
-    let cachedData = [];
+    let cachedPayments = [];
+    let cachedResidents = [];
     let residentPhotoBase64 = null;
     let residentPhotoName = "";
     let residentPhotoMime = "";
+    let pendingUnitForRegistration = "";
 
     function checkAuth() {
       const savedUser = sessionStorage.getItem("condo_auth_user");
@@ -564,6 +688,38 @@
       }
     }
 
+    // ฟังก์ชันเปิด/ปิด Popup สไตล์ Ragnarok
+    function openRoModal(unit) {
+      pendingUnitForRegistration = unit;
+      document.getElementById("ro-target-unit").innerText = unit;
+      document.getElementById("ro-modal-overlay").style.display = "flex";
+    }
+
+    function closeRoModal() {
+      document.getElementById("ro-modal-overlay").style.display = "none";
+    }
+
+    function goToResidentRegistration() {
+      closeRoModal();
+      switchTab('residents');
+      const resUnitInput = document.getElementById("res-unit");
+      if (resUnitInput && pendingUnitForRegistration) {
+        resUnitInput.value = pendingUnitForRegistration;
+        document.getElementById("res-name").focus();
+      }
+    }
+
+    // ตรวจสอบชื่อลูกบ้านอัตโนมัติเมื่อพิมพ์เลขยูนิต
+    function autoFillResidentName(inputUnit) {
+      const cleanUnit = String(inputUnit || "").trim().toLowerCase();
+      if (!cleanUnit) return;
+
+      const found = cachedResidents.find(r => r.unitNumber === cleanUnit);
+      if (found && found.residentName) {
+        document.getElementById("form-name").value = found.residentName;
+      }
+    }
+
     async function loadDashboardData() {
       const tableBody = document.getElementById("payments-table-body");
       tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">🔄 กำลังโหลดข้อมูล...</td></tr>`;
@@ -571,9 +727,17 @@
       try {
         const response = await fetch(API_URL);
         const data = await response.json();
-        cachedData = data || [];
-        renderTable(cachedData);
-        calculateMetrics(cachedData);
+        
+        // แยกข้อมูล payments และ residents
+        if (data.payments) {
+          cachedPayments = data.payments || [];
+          cachedResidents = data.residents || [];
+        } else if (Array.isArray(data)) {
+          cachedPayments = data;
+        }
+
+        renderTable(cachedPayments);
+        calculateMetrics(cachedPayments);
       } catch (error) {
         tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #dc2626; padding: 20px;">⚠️ โหลดข้อมูลไม่สำเร็จ</td></tr>`;
       }
@@ -621,8 +785,21 @@
       document.getElementById("total-records").innerText = data.length.toLocaleString();
     }
 
+    // บันทึกการชำระเงิน พร้อมดักจับตรวจสอบลูกบ้าน
     async function submitPayment(event) {
       event.preventDefault();
+      const inputUnit = document.getElementById("form-unit").value.trim();
+      const cleanUnit = inputUnit.toLowerCase();
+
+      // 🔍 ตรวจสอบว่ามียูนิตนี้ในชีต Residents หรือไม่
+      if (cachedResidents.length > 0) {
+        const residentExists = cachedResidents.some(r => r.unitNumber === cleanUnit);
+        if (!residentExists) {
+          openRoModal(inputUnit);
+          return; // หยุดการทำงาน ไม่ส่งบันทึก
+        }
+      }
+
       const btn = document.getElementById("btn-submit-payment");
       btn.disabled = true;
       btn.innerText = "⏳ กำลังบันทึก...";
@@ -631,7 +808,7 @@
         type: "payment",
         operator: currentUser?.username || "Guest",
         operatorRole: currentUser?.role || "Staff",
-        unitNumber: document.getElementById("form-unit").value,
+        unitNumber: inputUnit,
         residentName: document.getElementById("form-name").value,
         feeType: document.getElementById("form-fee-type").value,
         amount: document.getElementById("form-amount").value,
@@ -720,6 +897,10 @@
           residentPhotoBase64 = null;
           residentPhotoName = "";
           residentPhotoMime = "";
+          
+          // โหลดข้อมูลล่าสุดเพื่อให้ตรวจเจอในการจ่ายเงินทันที
+          loadDashboardData();
+          switchTab('financial');
         } else {
           alert("❌ เกิดข้อผิดพลาด: " + resJson.message);
         }
@@ -731,6 +912,8 @@
         residentPhotoBase64 = null;
         residentPhotoName = "";
         residentPhotoMime = "";
+        loadDashboardData();
+        switchTab('financial');
       } finally {
         btn.disabled = false;
         btn.innerText = "👤 บันทึกข้อมูลลูกบ้าน & สร้างโฟลเดอร์";
@@ -802,7 +985,7 @@
 
     function filterTable() {
       const query = document.getElementById("search-box").value.toLowerCase();
-      const filtered = cachedData.filter(item => {
+      const filtered = cachedPayments.filter(item => {
         const unit = String(item["Unit Number"] || item["unitNumber"] || "").toLowerCase();
         const name = String(item["Resident Name"] || item["residentName"] || "").toLowerCase();
         return unit.includes(query) || name.includes(query);
