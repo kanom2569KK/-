@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ระบบบริหารจัดการโครงการ - แดชบอร์ดนิติบุคคล</title>
+
+  <!-- โหลดฟอนต์ Sarabun -->
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+
   <style>
     * {
       box-sizing: border-box;
@@ -268,7 +272,7 @@
         <button onclick="switchTab('admin-hub')">🛠️ แอดมิน: นำเข้าไฟล์ดิบ</button>
       </li>
       <li class="nav-item">
-        <button class="btn-logout" onclick="handleLogout()">🚪 ออกจากระบบ</button>
+        <button type="button" class="btn-logout" onclick="handleLogout()">🚪 ออกจากระบบ</button>
       </li>
     </ul>
   </aside>
@@ -308,7 +312,7 @@
         <div class="card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
             <h3 style="font-size: 18px;">รายการรับชำระเงินและประวัติสถานะ</h3>
-            <input type="text" id="search-box" onkeyup="filterTable()" placeholder="🔍 ค้นหายูนิต หรือ ชื่อ..." style="padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px;">
+            <input type="text" id="search-box" onkeyup="filterTable()" placeholder="🔍 ค้นหายูนิต หรือ ชื่อ..." style="padding: 6px 12px; border: 1px solid #cbd5e1; border-radius:6px; width: 260px;">
           </div>
           <div class="table-container">
             <table class="data-table">
@@ -461,9 +465,29 @@
   </main>
 
   <script>
+    // เปลี่ยนค่า API_URL ถ้าต้องการทดสอบกับ mock server (ค่าเดิมจาก Google Apps Script)
     const API_URL = "https://script.google.com/macros/s/AKfycbwZ0o3zp8NG4TYW7X25vPAeHsnX2rpjjsU20jrX1ZMlbUde6Ihp_KqkW3TzMwH0z0sGdw/exec";
     let currentUser = null;
     let cachedData = [];
+
+    // ฟังก์ชันช่วย parse วันที่ (รองรับ ISO string และ Excel serial number)
+    function parseDate(value) {
+      if (!value && value !== 0) return "-";
+      // ถ้าเป็นตัวเลข (หรือสตริงตัวเลข) อาจเป็น Excel serial
+      const num = Number(value);
+      if (!isNaN(num) && String(value).trim() !== "" && !String(value).includes("-") && String(value).length < 6) {
+        // Excel serial number -> JavaScript Date
+        // Excel's serial 1 = 1900-01-01, but Excel has the 1900 leap bug; safer to use 25569 offset (days between 1899-12-30 and 1970-01-01)
+        const utcDays = num - 25569;
+        const utcValue = utcDays * 86400 * 1000;
+        const date = new Date(utcValue);
+        return date.toLocaleDateString('th-TH');
+      }
+      // Try Date parse
+      const d = new Date(value);
+      if (!isNaN(d)) return d.toLocaleDateString('th-TH');
+      return String(value);
+    }
 
     // ตรวจสอบสถานะการล็อกอิน
     function checkAuth() {
@@ -471,8 +495,9 @@
       if (savedUser) {
         currentUser = JSON.parse(savedUser);
         document.getElementById("login-overlay").style.display = "none";
-        document.getElementById("current-user-display").innerText = currentUser.fullName;
-        document.getElementById("current-role-display").innerText = `สิทธิ์: ${currentUser.role}`;
+        document.getElementById("current-user-display").innerText = currentUser.fullName || currentUser.username || "-";
+        // แก้: ไม่ต้องใส่คำว่า "สิทธิ์:" อีกครั้ง (HTML มีคำว่า "สิทธิ์:" อยู่แล้ว)
+        document.getElementById("current-role-display").innerText = currentUser.role || "-";
 
         // จัดการสิทธิ์การแสดงผลเมนูแอดมิน
         if (currentUser.role !== "Admin") {
@@ -500,7 +525,7 @@
       try {
         const response = await fetch(API_URL, {
           method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          headers: { "Content-Type": "application/json;charset=utf-8" },
           body: JSON.stringify({ type: "login", username, password })
         });
         const res = await response.json();
@@ -512,7 +537,8 @@
           alert("❌ " + res.message);
         }
       } catch (err) {
-        // กรณีเชื่อมต่อครั้งแรกและระบบเพิ่งสร้าง Sheet Users ให้ Admin ลองเข้าอัตโนมัติ
+        console.error("Login error:", err);
+        // กรณีเชื่อมต่อครั้งแรกและระบบเพิ่งสร้าง Sheet Users ให้ Adminลองเข้าอัตโนมัติ
         if (username === "admin" && password === "pass1234") {
           const fallbackUser = { username: "admin", fullName: "ผู้ดูแลระบบหลัก", role: "Admin" };
           sessionStorage.setItem("condo_auth_user", JSON.stringify(fallbackUser));
@@ -559,6 +585,7 @@
         renderTable(cachedData);
         calculateMetrics(cachedData);
       } catch (error) {
+        console.error("loadDashboardData error:", error);
         tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #dc2626; padding: 20px;">⚠️ โหลดข้อมูลไม่สำเร็จ</td></tr>`;
       }
     }
@@ -575,8 +602,8 @@
       data.forEach(item => {
         const row = document.createElement("tr");
         const dateStr = item["Date"] || item["Timestamp"] || "-";
-        const formattedDate = dateStr !== "-" ? new Date(dateStr).toLocaleDateString('th-TH') : "-";
-        const status = item["Status"] || "Pending";
+        const formattedDate = dateStr !== "-" ? parseDate(dateStr) : "-";
+        const status = (item["Status"] || "Pending").toString();
         const amount = Number(item["Amount"] || item["amount"] || 0);
 
         row.innerHTML = `
@@ -619,7 +646,7 @@
         unitNumber: document.getElementById("form-unit").value,
         residentName: document.getElementById("form-name").value,
         feeType: document.getElementById("form-fee-type").value,
-        amount: document.getElementById("form-amount").value,
+        amount: Number(document.getElementById("form-amount").value || 0),
         paymentMethod: document.getElementById("form-payment-method").value,
         status: document.getElementById("form-status").value
       };
@@ -627,14 +654,15 @@
       try {
         await fetch(API_URL, {
           method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          headers: { "Content-Type": "application/json;charset=utf-8" },
           body: JSON.stringify(payload)
         });
         alert("✅ บันทึกรายการชำระเงินเรียบร้อยแล้ว");
         document.getElementById("payment-form").reset();
         loadDashboardData();
       } catch (err) {
-        alert("⚠️ บันทึกข้อมูลสำเร็จ");
+        console.error("submitPayment error:", err);
+        alert("⚠️ เกิดข้อผิดพลาดขณะบันทึกรายการ โปรดลองอีกครั้ง");
         loadDashboardData();
       } finally {
         btn.disabled = false;
@@ -659,20 +687,21 @@
         phone: document.getElementById("res-phone").value,
         email: document.getElementById("res-email").value,
         moveInDate: document.getElementById("res-date").value,
-        outstandingBalance: document.getElementById("res-balance").value,
+        outstandingBalance: Number(document.getElementById("res-balance").value || 0),
         notes: document.getElementById("res-notes").value
       };
 
       try {
         await fetch(API_URL, {
           method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          headers: { "Content-Type": "application/json;charset=utf-8" },
           body: JSON.stringify(payload)
         });
         alert("✅ เพิ่มข้อมูลลูกบ้านลงชีตเรียบร้อยแล้ว");
         document.getElementById("resident-form").reset();
       } catch (err) {
-        alert("⚠️ บันทึกข้อมูลเรียบร้อย");
+        console.error("submitNewResident error:", err);
+        alert("⚠️ เกิดข้อผิดพลาดขณะบันทึกข้อมูลลูกบ้าน โปรดลองอีกครั้ง");
       } finally {
         btn.disabled = false;
         btn.innerText = "👤 บันทึกข้อมูลลูกบ้าน";
@@ -727,15 +756,20 @@
         try {
           const res = await fetch(API_URL, {
             method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            headers: { "Content-Type": "application/json;charset=utf-8" },
             body: JSON.stringify(payload)
           });
           const resJson = await res.json();
           if (resJson.status === "success") {
-            itemEl.innerHTML = `<span>✅ <strong>${resJson.fileName}</strong></span> <a href="${resJson.fileUrl}" target="_blank" style="color:#0284c7; text-decoration:none;">เปิดดูใน Drive ↗</a>`;
+            // แสดงลิงก์ไฟล์ที่ระบบคืนมา (fileUrl)
+            itemEl.innerHTML = `<span>✅ <strong>${resJson.fileName || file.name}</strong></span> <a href="${resJson.fileUrl || '#'}" target="_blank" style="color:#0284c7; text-decoration:none; margin-left:8px;">เปิดดู</a>`;
+          } else {
+            console.error("uploadRawFile response:", resJson);
+            itemEl.innerHTML = `<span>❌ <strong>${file.name}</strong></span> <span style="color:#b91c1c; margin-left:8px;">อัปโหลดล้มเหลว</span>`;
           }
         } catch (err) {
-          itemEl.innerHTML = `<span>✅ <strong>${file.name}</strong></span> <span style="color:#059669;">บันทึกสำเร็จ</span>`;
+          console.error("uploadRawFile error:", err);
+          itemEl.innerHTML = `<span>❌ <strong>${file.name}</strong></span> <span style="color:#b91c1c; margin-left:8px;">เกิดข้อผิดพลาดขณะอัปโหลด</span>`;
         }
       };
       reader.readAsDataURL(file);
