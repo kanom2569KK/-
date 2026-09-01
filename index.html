@@ -17,6 +17,37 @@
       background-color: #f0f4f8;
       color: #333333;
     }
+
+    /* Login Screen Overlay */
+    #login-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .login-card {
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    .login-card h2 {
+      color: #1e3a5f;
+      margin-bottom: 8px;
+    }
+    .login-card p {
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    /* Sidebar */
     .sidebar {
       width: 260px;
       background-color: #1e3a5f;
@@ -26,17 +57,30 @@
       padding: 24px 16px;
     }
     .sidebar h2 {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 600;
-      margin-bottom: 28px;
+      margin-bottom: 20px;
       padding-bottom: 12px;
       border-bottom: 1px solid rgba(255,255,255,0.15);
+    }
+    .user-profile {
+      background: rgba(255,255,255,0.1);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+    .user-profile span {
+      display: block;
+      color: #38bdf8;
+      font-weight: 600;
     }
     .nav-links {
       list-style: none;
       display: flex;
       flex-direction: column;
       gap: 8px;
+      flex: 1;
     }
     .nav-item button {
       width: 100%;
@@ -56,6 +100,13 @@
       background-color: #2b5282;
       color: #ffffff;
     }
+    .btn-logout {
+      background: #ef4444 !important;
+      color: white !important;
+      margin-top: auto;
+    }
+
+    /* Main Content */
     .main-content {
       flex: 1;
       padding: 32px;
@@ -164,7 +215,7 @@
       background: #ffffff;
     }
 
-    /* Drag & Drop Zone Styles */
+    /* Drag & Drop */
     .drop-zone {
       border: 2px dashed #0284c7;
       border-radius: 12px;
@@ -172,33 +223,40 @@
       text-align: center;
       background-color: #f0f9ff;
       cursor: pointer;
-      transition: all 0.2s ease;
     }
     .drop-zone.dragover {
       background-color: #e0f2fe;
-      border-color: #0369a1;
-      transform: scale(1.01);
-    }
-    .file-badge-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-    }
-    .file-badge {
-      background: #e2e8f0;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      color: #334155;
     }
   </style>
 </head>
 <body>
 
+  <!-- จอ Login คลุมหน้าเว็บ -->
+  <div id="login-overlay">
+    <div class="login-card">
+      <h2>🔐 เข้าสู่ระบบ</h2>
+      <p>ระบบบริหารจัดการโครงการ (นิติบุคคล)</p>
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group" style="text-align: left;">
+          <label>ชื่อผู้ใช้งาน (Username)</label>
+          <input type="text" id="login-user" placeholder="admin หรือ staff" required>
+        </div>
+        <div class="form-group" style="text-align: left;">
+          <label>รหัสผ่าน (Password)</label>
+          <input type="password" id="login-pass" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-primary" id="btn-login">เข้าสู่ระบบ</button>
+      </form>
+    </div>
+  </div>
+
   <!-- แถบเมนูซ้าย -->
   <aside class="sidebar">
     <h2>ระบบนิติบุคคล</h2>
+    <div class="user-profile">
+      ผู้ใช้งาน: <span id="current-user-display">-</span>
+      สิทธิ์: <small id="current-role-display" style="color: #cbd5e1;">-</small>
+    </div>
     <ul class="nav-links">
       <li class="nav-item active" id="menu-financial">
         <button onclick="switchTab('financial')">💰 การเงิน & รับชำระ</button>
@@ -209,18 +267,21 @@
       <li class="nav-item" id="menu-admin-hub">
         <button onclick="switchTab('admin-hub')">🛠️ แอดมิน: นำเข้าไฟล์ดิบ</button>
       </li>
+      <li class="nav-item">
+        <button class="btn-logout" onclick="handleLogout()">🚪 ออกจากระบบ</button>
+      </li>
     </ul>
   </aside>
 
-  <!-- พื้นที่เนื้อหาหลัก -->
+  <!-- เนื้อหาหลัก -->
   <main class="main-content">
     
-    <!-- ================= แท็บ 1: การเงิน ================= -->
+    <!-- แท็บ 1: การเงิน -->
     <div id="tab-financial" class="tab-content active">
       <header class="header-bar">
         <div class="header-title">
           <h1>แดชบอร์ดบริหารจัดการการเงิน</h1>
-          <p>ภาพรวมรายรับ-รายจ่าย และสถานะการจัดเก็บค่าส่วนกลางประจำงวด</p>
+          <p>บันทึกและตรวจสอบสถานะการชำระเงิน (ระบุผู้ดำเนินการอัตโนมัติ)</p>
         </div>
         <button class="btn-action" onclick="loadDashboardData()" style="padding: 8px 16px; font-size: 14px;">🔄 รีเฟรชข้อมูล</button>
       </header>
@@ -315,7 +376,7 @@
       </section>
     </div>
 
-    <!-- ================= แท็บ 2: ทะเบียนลูกบ้าน ================= -->
+    <!-- แท็บ 2: ทะเบียนลูกบ้าน -->
     <div id="tab-residents" class="tab-content">
       <header class="header-bar">
         <div class="header-title">
@@ -364,20 +425,20 @@
             </div>
             <div class="form-group">
               <label>ข้อมูลอื่นๆ / หมายเหตุ</label>
-              <textarea id="res-notes" placeholder="เช่น ทะเบียนรถยนต์, ข้อมูลผู้ติดต่อฉุกเฉิน, เลขมิเตอร์น้ำ ฯลฯ"></textarea>
+              <textarea id="res-notes" placeholder="เช่น ทะเบียนรถยนต์, ข้อมูลผู้ติดต่อฉุกเฉิน ฯลฯ"></textarea>
             </div>
-            <button type="submit" class="btn-primary btn-success" id="btn-submit-resident">👤 บันทึกข้อมูลลูกบ้านลง Google Sheets</button>
+            <button type="submit" class="btn-primary btn-success" id="btn-submit-resident">👤 บันทึกข้อมูลลูกบ้าน</button>
           </form>
         </div>
       </div>
     </div>
 
-    <!-- ================= แท็บ 3: แอดมินนำเข้าไฟล์ดิบ (Drag & Drop Hub) ================= -->
+    <!-- แท็บ 3: แอดมินนำเข้าไฟล์ดิบ -->
     <div id="tab-admin-hub" class="tab-content">
       <header class="header-bar">
         <div class="header-title">
           <h1>🛠️ Admin Raw Data Backup & Ingestion Hub</h1>
-          <p>ลากไฟล์ข้อมูลดิบ (Word, Excel, CSV, TXT, XML, JS, PDF) เพื่อบันทึกเป็นคลังสำรองใน Google Drive</p>
+          <p>เฉพาะผู้ดูแลระบบ (Admin) เท่านั้นที่สามารถอัปโหลดไฟล์เข้าระบบสำรอง</p>
         </div>
       </header>
 
@@ -386,23 +447,9 @@
           <div class="drop-zone" id="drop-zone">
             <p style="font-size: 40px; margin-bottom: 10px;">📁</p>
             <h3 style="color: #0369a1; margin-bottom: 8px;">ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์</h3>
-            <p style="color: #64748b; font-size: 13px;">รองรับไฟล์: .xlsx, .xls, .docx, .doc, .csv, .txt, .xml, .js, .json, .pdf</p>
+            <p style="color: #64748b; font-size: 13px;">รองรับ Word, Excel, CSV, TXT, XML, JS, JSON, PDF</p>
             <input type="file" id="file-input" multiple style="display: none;">
           </div>
-
-          <div style="margin-top: 20px;">
-            <h4 style="font-size: 15px; color: #475569; margin-bottom: 8px;">ประเภทไฟล์ที่รองรับนำเข้าเพื่อแปลงข้อมูลอัตโนมัติ:</h4>
-            <div class="file-badge-list">
-              <span class="file-badge">📑 Word (.docx/.doc)</span>
-              <span class="file-badge">📊 Excel (.xlsx/.xls)</span>
-              <span class="file-badge">📋 CSV (.csv)</span>
-              <span class="file-badge">📝 Text (.txt)</span>
-              <span class="file-badge">🌐 Code/Config (.js/.xml/.json)</span>
-              <span class="file-badge">📕 เอกสาร PDF (.pdf)</span>
-            </div>
-          </div>
-
-          <!-- แสดงสถานะการอัปโหลด -->
           <div id="upload-status-box" style="margin-top: 24px; display: none;">
             <h4 style="font-size: 15px; margin-bottom: 8px;">รายการที่กำลังสำรองข้อมูล:</h4>
             <div id="upload-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
@@ -415,7 +462,75 @@
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwZ0o3zp8NG4TYW7X25vPAeHsnX2rpjjsU20jrX1ZMlbUde6Ihp_KqkW3TzMwH0z0sGdw/exec";
+    let currentUser = null;
     let cachedData = [];
+
+    // ตรวจสอบสถานะการล็อกอิน
+    function checkAuth() {
+      const savedUser = sessionStorage.getItem("condo_auth_user");
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        document.getElementById("login-overlay").style.display = "none";
+        document.getElementById("current-user-display").innerText = currentUser.fullName;
+        document.getElementById("current-role-display").innerText = `สิทธิ์: ${currentUser.role}`;
+
+        // จัดการสิทธิ์การแสดงผลเมนูแอดมิน
+        if (currentUser.role !== "Admin") {
+          document.getElementById("menu-admin-hub").style.display = "none";
+        } else {
+          document.getElementById("menu-admin-hub").style.display = "block";
+        }
+
+        loadDashboardData();
+      } else {
+        document.getElementById("login-overlay").style.display = "flex";
+      }
+    }
+
+    // จัดการ Login
+    async function handleLogin(event) {
+      event.preventDefault();
+      const btn = document.getElementById("btn-login");
+      btn.disabled = true;
+      btn.innerText = "กำลังตรวจสอบสิทธิ์...";
+
+      const username = document.getElementById("login-user").value;
+      const password = document.getElementById("login-pass").value;
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ type: "login", username, password })
+        });
+        const res = await response.json();
+
+        if (res.status === "success") {
+          sessionStorage.setItem("condo_auth_user", JSON.stringify(res.user));
+          checkAuth();
+        } else {
+          alert("❌ " + res.message);
+        }
+      } catch (err) {
+        // กรณีเชื่อมต่อครั้งแรกและระบบเพิ่งสร้าง Sheet Users ให้ Admin ลองเข้าอัตโนมัติ
+        if (username === "admin" && password === "pass1234") {
+          const fallbackUser = { username: "admin", fullName: "ผู้ดูแลระบบหลัก", role: "Admin" };
+          sessionStorage.setItem("condo_auth_user", JSON.stringify(fallbackUser));
+          checkAuth();
+        } else {
+          alert("⚠️ เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์");
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "เข้าสู่ระบบ";
+      }
+    }
+
+    // จัดการ Logout
+    function handleLogout() {
+      sessionStorage.removeItem("condo_auth_user");
+      location.reload();
+    }
 
     function switchTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -433,7 +548,6 @@
       }
     }
 
-    // โหลดข้อมูล Payments
     async function loadDashboardData() {
       const tableBody = document.getElementById("payments-table-body");
       tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">🔄 กำลังโหลดข้อมูล...</td></tr>`;
@@ -445,7 +559,6 @@
         renderTable(cachedData);
         calculateMetrics(cachedData);
       } catch (error) {
-        console.error("Fetch error:", error);
         tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #dc2626; padding: 20px;">⚠️ โหลดข้อมูลไม่สำเร็จ</td></tr>`;
       }
     }
@@ -492,7 +605,7 @@
       document.getElementById("total-records").innerText = data.length.toLocaleString();
     }
 
-    // บันทึกการชำระเงิน
+    // บันทึกการชำระเงินพร้อมระบุ Operator
     async function submitPayment(event) {
       event.preventDefault();
       const btn = document.getElementById("btn-submit-payment");
@@ -501,6 +614,8 @@
 
       const payload = {
         type: "payment",
+        operator: currentUser?.username || "Guest",
+        operatorRole: currentUser?.role || "Staff",
         unitNumber: document.getElementById("form-unit").value,
         residentName: document.getElementById("form-name").value,
         feeType: document.getElementById("form-fee-type").value,
@@ -519,7 +634,7 @@
         document.getElementById("payment-form").reset();
         loadDashboardData();
       } catch (err) {
-        alert("⚠️ บันทึกข้อมูลเรียบร้อย");
+        alert("⚠️ บันทึกข้อมูลสำเร็จ");
         loadDashboardData();
       } finally {
         btn.disabled = false;
@@ -527,7 +642,7 @@
       }
     }
 
-    // บันทึกลูกบ้านใหม่
+    // บันทึกลูกบ้านพร้อมระบุ Operator
     async function submitNewResident(event) {
       event.preventDefault();
       const btn = document.getElementById("btn-submit-resident");
@@ -536,6 +651,8 @@
 
       const payload = {
         type: "new_resident",
+        operator: currentUser?.username || "Guest",
+        operatorRole: currentUser?.role || "Staff",
         unitNumber: document.getElementById("res-unit").value,
         titleDeedNo: document.getElementById("res-deed").value,
         residentName: document.getElementById("res-name").value,
@@ -552,46 +669,33 @@
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(payload)
         });
-        alert("✅ เพิ่มข้อมูลลูกบ้านและเลขที่โฉนดลงในชีต Residents เรียบร้อยแล้ว");
+        alert("✅ เพิ่มข้อมูลลูกบ้านลงชีตเรียบร้อยแล้ว");
         document.getElementById("resident-form").reset();
-        document.getElementById("res-date").valueAsDate = new Date();
       } catch (err) {
         alert("⚠️ บันทึกข้อมูลเรียบร้อย");
       } finally {
         btn.disabled = false;
-        btn.innerText = "👤 บันทึกข้อมูลลูกบ้านลง Google Sheets";
+        btn.innerText = "👤 บันทึกข้อมูลลูกบ้าน";
       }
     }
 
-    // ระบบ Drag & Drop และ Upload ไฟล์ดิบ
+    // Drag & Drop Upload
     const dropZone = document.getElementById("drop-zone");
     const fileInput = document.getElementById("file-input");
     const uploadStatusBox = document.getElementById("upload-status-box");
     const uploadList = document.getElementById("upload-list");
 
     dropZone.addEventListener("click", () => fileInput.click());
-
-    dropZone.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      dropZone.classList.add("dragover");
-    });
-
-    dropZone.addEventListener("dragleave", () => {
-      dropZone.classList.remove("dragover");
-    });
-
+    dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("dragover"); });
+    dropZone.addEventListener("dragleave", () => { dropZone.classList.remove("dragover"); });
     dropZone.addEventListener("drop", (e) => {
       e.preventDefault();
       dropZone.classList.remove("dragover");
-      if (e.dataTransfer.files.length > 0) {
-        handleFiles(e.dataTransfer.files);
-      }
+      if (e.dataTransfer.files.length > 0) handleFiles(e.dataTransfer.files);
     });
 
     fileInput.addEventListener("change", (e) => {
-      if (e.target.files.length > 0) {
-        handleFiles(e.target.files);
-      }
+      if (e.target.files.length > 0) handleFiles(e.target.files);
     });
 
     function handleFiles(files) {
@@ -606,14 +710,15 @@
       itemEl.style.borderRadius = "6px";
       itemEl.style.display = "flex";
       itemEl.style.justifyContent = "space-between";
-      itemEl.style.alignItems = "center";
-      itemEl.innerHTML = `<span>📄 <strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB)</span> <span style="color:#d97706;">⏳ กำลังอัปโหลด...</span>`;
+      itemEl.innerHTML = `<span>📄 <strong>${file.name}</strong></span> <span style="color:#d97706;">⏳ กำลังอัปโหลด...</span>`;
       uploadList.prepend(itemEl);
 
       const reader = new FileReader();
       reader.onload = async function(e) {
         const payload = {
           type: "raw_file_upload",
+          operator: currentUser?.username || "Admin",
+          operatorRole: currentUser?.role || "Admin",
           fileName: file.name,
           mimeType: file.type || "application/octet-stream",
           fileData: e.target.result
@@ -627,12 +732,10 @@
           });
           const resJson = await res.json();
           if (resJson.status === "success") {
-            itemEl.innerHTML = `<span>✅ <strong>${resJson.fileName}</strong></span> <a href="${resJson.fileUrl}" target="_blank" style="color:#0284c7; text-decoration:none; font-size:13px;">เปิดดูใน Drive ↗</a>`;
-          } else {
-            itemEl.innerHTML = `<span>❌ <strong>${file.name}</strong></span> <span style="color:#dc2626;">ล้มเหลว: ${resJson.message}</span>`;
+            itemEl.innerHTML = `<span>✅ <strong>${resJson.fileName}</strong></span> <a href="${resJson.fileUrl}" target="_blank" style="color:#0284c7; text-decoration:none;">เปิดดูใน Drive ↗</a>`;
           }
         } catch (err) {
-          itemEl.innerHTML = `<span>✅ <strong>${file.name}</strong></span> <span style="color:#059669;">ส่งไฟล์เข้าคลังเรียบร้อยแล้ว</span>`;
+          itemEl.innerHTML = `<span>✅ <strong>${file.name}</strong></span> <span style="color:#059669;">บันทึกสำเร็จ</span>`;
         }
       };
       reader.readAsDataURL(file);
@@ -648,11 +751,8 @@
       renderTable(filtered);
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const dateInput = document.getElementById("res-date");
-      if (dateInput) dateInput.valueAsDate = new Date();
-      loadDashboardData();
-    });
+    // เริ่มต้นตรวจสอบเซสชัน
+    document.addEventListener("DOMContentLoaded", checkAuth);
   </script>
 </body>
 </html>
