@@ -128,7 +128,7 @@
       color: #475569;
       margin-bottom: 6px;
     }
-    .form-group input, .form-group select {
+    .form-group input, .form-group select, .form-group textarea {
       width: 100%;
       padding: 10px;
       border: 1px solid #cbd5e1;
@@ -136,7 +136,11 @@
       font-size: 14px;
       outline: none;
     }
-    .form-group input:focus, .form-group select:focus {
+    .form-group textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
       border-color: #0284c7;
     }
     /* Tables */
@@ -184,12 +188,8 @@
       margin-top: 10px;
     }
     .btn-primary:hover { background-color: #0369a1; }
-    .btn-success {
-      background-color: #059669;
-    }
-    .btn-success:hover {
-      background-color: #047857;
-    }
+    .btn-success { background-color: #059669; }
+    .btn-success:hover { background-color: #047857; }
     .btn-action {
       padding: 4px 8px;
       font-size: 12px;
@@ -325,39 +325,59 @@
       <header class="header-bar">
         <div class="header-title">
           <h1>ลงทะเบียนลูกบ้าน / ลูกค้ารายใหม่</h1>
-          <p>บันทึกประวัติเจ้าของห้องชุด หรือผู้เช่าใหม่ลงในชีต Residents</p>
+          <p>บันทึกประวัติเจ้าของกรรมสิทธิ์ แปลงที่ดิน และข้อมูลสัญญาลงในฐานข้อมูล</p>
         </div>
       </header>
 
-      <div style="max-width: 650px; margin: 0 auto;">
+      <div style="max-width: 680px; margin: 0 auto;">
         <div class="card">
           <h3 style="font-size: 18px; margin-bottom: 16px;">📝 แบบฟอร์มเพิ่มข้อมูลลูกบ้านใหม่</h3>
           <form id="resident-form" onsubmit="submitNewResident(event)">
-            <div class="form-group">
-              <label>เลขยูนิต / แปลงบ้าน *</label>
-              <input type="text" id="res-unit" placeholder="เช่น 5D หรือ 88/12" required>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group">
+                <label>เลขยูนิต / แปลงบ้าน *</label>
+                <input type="text" id="res-unit" placeholder="เช่น แปลง 12 หรือ 5B" required>
+              </div>
+              <div class="form-group">
+                <label>เลขที่โฉนดที่ดิน (Title Deed No.)</label>
+                <input type="text" id="res-deed" placeholder="เช่น 12345 ระวาง 5136">
+              </div>
             </div>
+
             <div class="form-group">
-              <label>ชื่อ-นามสกุล เจ้าของห้อง/ผู้พักอาศัย *</label>
+              <label>ชื่อ-นามสกุล เจ้าของ / ผู้พักอาศัย *</label>
               <input type="text" id="res-name" placeholder="เช่น นายประเสริฐ สุขสบาย" required>
             </div>
-            <div class="form-group">
-              <label>เบอร์โทรศัพท์ติดต่อ *</label>
-              <input type="tel" id="res-phone" placeholder="เช่น 089-123-4567" required>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group">
+                <label>เบอร์โทรศัพท์ติดต่อ *</label>
+                <input type="tel" id="res-phone" placeholder="เช่น 089-123-4567" required>
+              </div>
+              <div class="form-group">
+                <label>อีเมล</label>
+                <input type="email" id="res-email" placeholder="เช่น user@example.com">
+              </div>
             </div>
-            <div class="form-group">
-              <label>อีเมล</label>
-              <input type="email" id="res-email" placeholder="เช่น user@example.com">
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="form-group">
+                <label>วันที่เริ่มเข้าพักอาศัย / โอนกรรมสิทธิ์</label>
+                <input type="date" id="res-date">
+              </div>
+              <div class="form-group">
+                <label>ยอดยกมาค้างชำระเริ่มต้น (บาท)</label>
+                <input type="number" id="res-balance" value="0">
+              </div>
             </div>
+
             <div class="form-group">
-              <label>วันที่เริ่มเข้าพักอาศัย</label>
-              <input type="date" id="res-date">
+              <label>ข้อมูลอื่นๆ / หมายเหตุ</label>
+              <textarea id="res-notes" placeholder="เช่น ทะเบียนรถยนต์, ข้อมูลผู้ติดต่อฉุกเฉิน, เลขมิเตอร์น้ำ ฯลฯ"></textarea>
             </div>
-            <div class="form-group">
-              <label>ยอดยกมาค้างชำระเริ่มต้น (ถ้ามี)</label>
-              <input type="number" id="res-balance" value="0">
-            </div>
-            <button type="submit" class="btn-primary btn-success" id="btn-submit-resident">👤 บันทึกข้อมูลลูกบ้านใหม่</button>
+
+            <button type="submit" class="btn-primary btn-success" id="btn-submit-resident">👤 บันทึกข้อมูลลูกบ้านลง Google Sheets</button>
           </form>
         </div>
       </div>
@@ -482,7 +502,7 @@
       }
     }
 
-    // บันทึกลูกบ้านใหม่
+    // บันทึกลูกบ้านใหม่ (เพิ่ม Title Deed และ Notes)
     async function submitNewResident(event) {
       event.preventDefault();
       const btn = document.getElementById("btn-submit-resident");
@@ -492,26 +512,29 @@
       const payload = {
         type: "new_resident",
         unitNumber: document.getElementById("res-unit").value,
+        titleDeedNo: document.getElementById("res-deed").value,
         residentName: document.getElementById("res-name").value,
         phone: document.getElementById("res-phone").value,
         email: document.getElementById("res-email").value,
         moveInDate: document.getElementById("res-date").value,
-        outstandingBalance: document.getElementById("res-balance").value
+        outstandingBalance: document.getElementById("res-balance").value,
+        notes: document.getElementById("res-notes").value
       };
 
       try {
-        const response = await fetch(API_URL, {
+        await fetch(API_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(payload)
         });
-        alert("✅ เพิ่มข้อมูลลูกบ้านใหม่ลงในชีต Residents เรียบร้อยแล้ว");
+        alert("✅ เพิ่มข้อมูลลูกบ้านและเลขที่โฉนดลงในชีต Residents เรียบร้อยแล้ว");
         document.getElementById("resident-form").reset();
+        document.getElementById("res-date").valueAsDate = new Date();
       } catch (err) {
         alert("⚠️ บันทึกข้อมูลเรียบร้อยแล้ว");
       } finally {
         btn.disabled = false;
-        btn.innerText = "👤 บันทึกข้อมูลลูกบ้านใหม่";
+        btn.innerText = "👤 บันทึกข้อมูลลูกบ้านลง Google Sheets";
       }
     }
 
@@ -527,7 +550,6 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      // ตั้งค่าวันที่เริ่มต้นเป็นวันนี้
       const dateInput = document.getElementById("res-date");
       if (dateInput) dateInput.valueAsDate = new Date();
       loadDashboardData();
