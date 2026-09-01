@@ -41,7 +41,7 @@
     .login-card p { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
 
     /* =======================================================
-       🖥️ SIDEBAR (COLLAPSED GAMING STYLE WITH HOVER ANIMATION)
+       🖥️ SIDEBAR
        ======================================================= */
     .sidebar {
       width: 80px; background-color: var(--sidebar-bg);
@@ -51,25 +51,15 @@
     }
     .logo-icon { font-size: 28px; margin-bottom: 40px; filter: drop-shadow(0 0 8px var(--accent-red)); }
     .nav-links { list-style: none; display: flex; flex-direction: column; gap: 20px; width: 100%; align-items: center; flex: 1;}
-    
     .nav-item button {
       background: transparent; border: none; font-size: 22px; color: var(--text-muted);
       cursor: pointer; padding: 12px; border-radius: 16px; position: relative;
-      /* 🌟 แอนิเมชันขยาย 10% (Bouncy effect) */
-      transform: scale(1.0);
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform: scale(1.0); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .nav-item button:hover {
-      background: var(--card-bg); color: var(--accent-gold); 
-      transform: scale(1.1); /* ขยาย 10% เมื่อเอาเมาส์ชี้ */
+    .nav-item button:hover, .nav-item.active button {
+      background: var(--card-bg); color: var(--accent-gold); transform: scale(1.1);
       box-shadow: inset 2px 2px 5px rgba(255,255,255,0.05), 0 4px 10px rgba(0,0,0,0.2);
     }
-    .nav-item.active button {
-      background: var(--card-bg); color: var(--accent-gold); 
-      transform: scale(1.1); /* แท็บที่ใช้งานอยู่จะขยายค้างไว้ 10% */
-      box-shadow: inset 2px 2px 5px rgba(255,255,255,0.05), 0 4px 10px rgba(0,0,0,0.2);
-    }
-    
     .nav-item button .tooltip {
       position: absolute; left: 60px; top: 50%; transform: translateY(-50%);
       background: var(--sidebar-bg); color: white; padding: 6px 12px; border-radius: 8px;
@@ -78,35 +68,24 @@
     .nav-item button:hover .tooltip { opacity: 1; left: 75px; }
     
     .user-avatar { 
-      margin-top: auto; font-size: 32px; background: var(--card-bg); border-radius: 50%; 
-      padding: 4px; border: 2px solid var(--accent-gold); cursor: pointer;
-      /* 🌟 แอนิเมชันโปรไฟล์ */
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      margin-top: auto; font-size: 30px; background: var(--card-bg); border-radius: 50%; 
+      padding: 6px; border: 2px solid var(--accent-gold); cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
     }
-    .user-avatar:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
-    }
+    .user-avatar:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(251, 191, 36, 0.6); }
 
     /* =======================================================
        📊 MAIN CONTENT & TOP BAR
        ======================================================= */
-    .main-content {
-      flex: 1; padding: 20px 30px; overflow-y: auto; height: 100vh;
-    }
-    .top-bar {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
-    }
+    .main-content { flex: 1; padding: 20px 30px; overflow-y: auto; height: 100vh; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
     .greeting h1 { font-size: 28px; font-weight: bold; letter-spacing: 0.5px; }
     .greeting span { color: var(--accent-gold); }
     .search-bar {
       background: var(--sidebar-bg); padding: 10px 20px; border-radius: 20px;
-      display: flex; align-items: center; gap: 10px; border: 1px solid var(--border-dark); width: 300px;
-      transition: all 0.3s ease;
+      display: flex; align-items: center; gap: 10px; border: 1px solid var(--border-dark); width: 300px; transition: all 0.3s ease;
     }
-    .search-bar:focus-within {
-      border-color: var(--accent-red); box-shadow: 0 0 10px rgba(255, 75, 75, 0.2); transform: scale(1.02);
-    }
+    .search-bar:focus-within { border-color: var(--accent-red); box-shadow: 0 0 10px rgba(255, 75, 75, 0.2); transform: scale(1.02); }
     .search-bar input { background: none; border: none; color: white; outline: none; width: 100%; font-size: 14px;}
     
     .tab-content { display: none; animation: fadeIn 0.4s ease; }
@@ -114,7 +93,7 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     /* =======================================================
-       💳 CARDS & GRIDS (GLASSMORPHISM WITH HOVER)
+       💳 CARDS & GRIDS
        ======================================================= */
     .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 30px; }
     .card {
@@ -122,18 +101,8 @@
       border-radius: 24px; padding: 24px; border: 1px solid var(--border-dark);
       box-shadow: 6px 6px 18px rgba(0,0,0,0.2), inset 1px 1px 0px rgba(255,255,255,0.05);
     }
-    
-    .metric-card { 
-      position: relative; overflow: hidden; cursor: pointer;
-      /* 🌟 แอนิเมชันขยายการ์ด */
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .metric-card:hover {
-      transform: scale(1.03); /* ขยาย 3% ไม่ให้เค้าโครงแตก */
-      box-shadow: 10px 10px 25px rgba(0,0,0,0.4), inset 1px 1px 0px rgba(255,255,255,0.1);
-      z-index: 2;
-    }
-    
+    .metric-card { position: relative; overflow: hidden; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .metric-card:hover { transform: scale(1.03); box-shadow: 10px 10px 25px rgba(0,0,0,0.4), inset 1px 1px 0px rgba(255,255,255,0.1); z-index: 2; }
     .metric-card::before {
       content: ''; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px;
       border-radius: 50%; filter: blur(40px); z-index: 0; opacity: 0.4; transition: opacity 0.3s;
@@ -145,12 +114,11 @@
     
     .metric-card .title { font-size: 14px; color: var(--text-muted); position: relative; z-index: 1; margin-bottom: 8px;}
     .metric-card .value { font-size: 36px; font-weight: bold; position: relative; z-index: 1; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);}
-    
     .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
     .card-title { font-size: 18px; font-weight: bold; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;}
 
     /* =======================================================
-       📝 FORMS & TABLES (DARK MODE)
+       📝 FORMS & TABLES
        ======================================================= */
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600;}
@@ -172,32 +140,26 @@
     .badge.pending { background: rgba(245,158,11,0.2); color: #fcd34d; border: 1px solid #f59e0b;}
     .badge.paid { background: rgba(16,185,129,0.2); color: #6ee7b7; border: 1px solid #10b981;}
 
-    /* 🌟 แอนิเมชันปุ่มกดขยาย 5-10% */
     .btn-primary {
       width: 100%; padding: 14px; border-radius: 12px; border: none; font-size: 15px; font-weight: bold;
       background: linear-gradient(135deg, var(--accent-red), #b91c1c); color: white; cursor: pointer;
-      box-shadow: 0 4px 15px rgba(239,68,68,0.3); 
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); margin-top: 10px;
+      box-shadow: 0 4px 15px rgba(239,68,68,0.3); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); margin-top: 10px;
     }
-    .btn-primary:hover { 
-      transform: scale(1.05); /* ขยาย 5% สำหรับปุ่มยาวๆ จะดูกำลังดี */
-      box-shadow: 0 8px 25px rgba(239,68,68,0.6); 
-    }
-    
+    .btn-primary:hover { transform: scale(1.05); box-shadow: 0 8px 25px rgba(239,68,68,0.6); }
     .btn-action { 
       background: rgba(255,255,255,0.1); border: 1px solid var(--border-dark); color: white; 
-      padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; 
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; transition: all 0.3s;
     }
-    .btn-action:hover { 
-      background: var(--accent-red); border-color: var(--accent-red); 
-      transform: scale(1.1); /* ขยาย 10% สำหรับปุ่มเล็ก */
-    }
+    .btn-action:hover { background: var(--accent-red); border-color: var(--accent-red); transform: scale(1.1); }
+    
+    .drop-zone { border: 2px dashed var(--accent-red); border-radius: 16px; padding: 50px 20px; text-align: center; background: rgba(255,75,75,0.05); cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);}
+    .drop-zone:hover { background: rgba(255,75,75,0.1); border-color: var(--accent-gold); transform: scale(1.02); }
+    .photo-preview { width: 120px; height: 120px; border-radius: 12px; object-fit: cover; border: 2px solid var(--accent-gold); display: none; margin: 10px auto;}
 
     /* =======================================================
-       🧙‍♂️ RAGNAROK POPUP (DARK ADAPTED)
+       🧙‍♂️ RAGNAROK MODALS (WARNING & PROFILE)
        ======================================================= */
-    #ro-modal-overlay {
+    .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.8); display: none; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(5px);
     }
@@ -209,42 +171,54 @@
     .ro-header .ro-close { cursor: pointer; color: var(--text-muted); transition: 0.2s; }
     .ro-header .ro-close:hover { color: var(--accent-red); transform: scale(1.2); }
     .ro-body { padding: 24px; display: flex; gap: 20px; align-items: center; }
-    .ro-npc-col { text-align: center; }
     .ro-npc-frame {
       width: 100px; height: 110px; background: var(--input-bg); border: 2px solid var(--border-dark); border-radius: 12px;
       display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;
     }
     .ro-npc-gif { width: 85px; height: 95px; object-fit: contain; image-rendering: pixelated; }
-    .ro-dialog-box {
-      flex: 1; background: var(--input-bg); border: 1px solid var(--border-dark); padding: 16px; border-radius: 12px; font-size: 14px; line-height: 1.6;
-    }
+    .ro-dialog-box { flex: 1; background: var(--input-bg); border: 1px solid var(--border-dark); padding: 16px; border-radius: 12px; font-size: 14px; line-height: 1.6; }
     .ro-footer { padding: 16px 24px; background: var(--sidebar-bg); border-top: 1px solid var(--border-dark); display: flex; justify-content: flex-end; gap: 12px; }
-    
-    /* Drop Zone Animation */
-    .drop-zone { border: 2px dashed var(--accent-red); border-radius: 16px; padding: 50px 20px; text-align: center; background: rgba(255,75,75,0.05); cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);}
-    .drop-zone:hover { background: rgba(255,75,75,0.1); border-color: var(--accent-gold); transform: scale(1.02); }
-    .photo-preview { width: 120px; height: 120px; border-radius: 12px; object-fit: cover; border: 2px solid var(--accent-gold); display: none; margin: 10px auto;}
+    .ro-btn { padding: 8px 16px; font-size: 13px; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1px solid var(--border-dark); color: white; background: var(--card-bg); transition: 0.3s;}
+    .ro-btn:hover { background: var(--card-hover); transform: scale(1.05); }
+    .ro-btn-primary { background: linear-gradient(135deg, var(--accent-blue), #0284c7); border: none; }
+    .ro-btn-primary:hover { background: linear-gradient(135deg, #7dd3fc, var(--accent-blue)); box-shadow: 0 0 15px rgba(56,189,248,0.5); }
+
+    /* =======================================================
+       🌟 EXP TOAST NOTIFICATION (GAMIFICATION)
+       ======================================================= */
+    .exp-toast {
+      position: fixed; bottom: 30px; right: 30px;
+      background: linear-gradient(135deg, #fbbf24, #d97706); color: #3a181d;
+      padding: 10px 20px; border-radius: 20px; font-weight: bold; font-size: 15px;
+      box-shadow: 0 8px 20px rgba(251,191,36,0.4); border: 2px solid #fffbeb;
+      animation: slideUpFade 3s forwards; z-index: 10001; pointer-events: none;
+    }
+    @keyframes slideUpFade {
+      0% { opacity: 0; transform: translateY(30px) scale(0.8); }
+      15% { opacity: 1; transform: translateY(0) scale(1.1); }
+      30% { opacity: 1; transform: translateY(0) scale(1); }
+      80% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-30px); }
+    }
   </style>
 </head>
 <body>
 
   <!-- =======================================================
-       🧙‍♂️ POPUP RAGNAROK (DARK THEME)
+       🧙‍♂️ POPUP: RO WARNING (UNIT NOT FOUND)
        ======================================================= -->
-  <div id="ro-modal-overlay">
+  <div id="ro-modal-overlay" class="modal-overlay">
     <div class="ro-window">
       <div class="ro-header">
         <span>📜 ระบบตรวจสอบข้อมูลลูกบ้าน</span>
         <span class="ro-close" onclick="closeRoModal()">✕</span>
       </div>
       <div class="ro-body">
-        <div class="ro-npc-col">
+        <div style="text-align: center;">
           <div class="ro-npc-frame">
-            <img class="ro-npc-gif" alt="RO Wizard" src="data:image/gif;base64,R0lGODlheAB6APcAAP///+bm5ubm3t7e3t7e1tbW1tbWztbWxtbWvdbWtd7Wvd7Wtd7Wrd7Wpd7WntbWndbWld7WjN7WhN7WfN7Wdd7WbN7WYtbWSt7WQtfWOtfWLd7WJN7WFN7WBNbW/97W997W79bW59bW397W3tbW1tbWzdbWvdbWtd7Wvd7Wtd7Wrd7Wpd7WntbWndbWld7WjN7WhN7WfN7Wdd7WbN7WYtbWSt7WQtfWOtfWLd7WJN7WFN7WBNbW/97W997W79bW59bW397W3tbW1tbWzdbWvdbWtd7Wvd7Wtd7Wrd7Wpd7WntbWndbWld7WjN7WhN7WfN7Wdd7WbN7WYtbWSt7WQtfWOtfWLd7WJN7WFN7WBNbW/97W997W79bW59bW397W3tbW1tbWzdbWvdbWtd7Wvd7Wtd7Wrd7Wpd7WntbWndbWld7WjN7WhN7WfN7Wdd7WbN7WYtbWSt7WQtfWOtfWLd7WJN7WFN7WBNbW/97W997W79bW59bW397W3tbW1tbWzdbWvdbWtd7Wvd7Wtd7Wrd7Wpd7WntbWndbWld7WjN7WhN7WfN7Wdd7WbN7WYtbWSt7WQtfWOtfWLd7WJN7WFN7WBNbW/97W997W79bW59bW397W3tbW1tbWzdbWvdbWtd7Wvd7Wtd7Wrd7Wpd7WntbWndbWld7WjN7WhN7WfN7Wdd7WbN7WYtbWSt7WQtfWOtfWLd7WJN7WFN7WBNbW/97W997W79bW59bW397W3tbW1tbWzdbWvdbWtd7Wvd7Wtd7Wrd7Wpd7WntbWndbWld7WjN7WhN7WfN7Wdd7WbN7WYtbWSt7WQtfWOtfWLd7WJN7WFN7WBNbW/97W997W79bW59bW397W3iH5BAEAAP8ALAAAAAB4AHoAAAj/AP8JHEiwoMGDCBMqXMiwocOHECNKnEixosWLGDNq3Mixo8ePIEOKHEmypMmTKFOqXMmypcuXMGOyZAhAZs2bN1fa3Mlz5s6fO4MCBUpUKFCiRYcmPUp0aNKmSZ8yffrU6VSoUqdevQrV6tWvWr9yBftVbFixY8eaPXv27Nu3cOPGrcuXb1+/gP3yFXz4b+HBhw8rVsy4sWPIdRk/fgy5suXLeB/7pZyZ82fNmzvPPUz6sujTp0+jrmya9WvXsFvLnk3btm3atm/ffn3bNm7cvH37Bk4cuPDew4cLHz68uHHky5Ezb26cue/nyqNDr46dOvbr26Fz/49Onjv58eTLo1+vvv169uzfu4cPv779+/bz5+e//7//fgACGOBAAg4o4IAEFjjggQgiuOCDCya44IQUTjjhhBRmqOGGHA7kYIcfghjiiCSWaOKJKKa44oovvjijjDSu2CKNMc6o44059tgjAEAGKeSQRBZZZAA/JnkkkkwuyaSTTzo5pZZVbqklll5uCeSSY4pJpphplmkmAJ6mueaabLbJZptsxunnmnzmmaeedvYJZ55+/hknoIQGamigig6KqKGLKjppoo8+Kmakk1Z6aaScXnppqJBumqmnnYKa6aqgtvqppq6mmiqrrabKKqutuioqqbSmmqurtf86uquvqwYr6a3CHussrcgmq6yyyza7rLPOStsstM9GW6200labbbbYcputtd5eS+y323b7bLjjklvuuOaWa66657Z7rrrsutvuu+vC6y6889Zb77X3whsvvfvmm6+++v67L8D8AhxwwAEbvPDBBh+csMILLxyxw/7iO/HG/XLc8ccfhwxyyCOLXLLJIZu8cssou/xyzC7PPHPMMd9s880572xzzjr7/DPQPwcd9NBFF7100kov3TTSUjsd9dNVV3011llrvTXWWm8dtddge1322GaXnbbZaZ+tdttsvy3323LDLTfcc8tNd91142233nrv7TfffgMN/vjghA/eeOGJH55444w/DvnklE9eeeWXX6755ptf7jnnnwP+eeihh0666aajnrnqm6uuueuZt95666y/DnvrtL9u++y134577rrrzjvvvPsOPPDEF0888cwfr/zyyDPv/PMf565888w/D/3z0EcPvfTSU1899ddjfz322GevffbaZ8899+CTHz7545df/vnmp69++uu7/z788Mcfv/z21w8///n7X38A/hNggAIUIAR/F8ACGuCAAhYggQdE4AIZqMAFMtCBDnwgBCMoQf89sIITtCAFLohB/U3QghG8IAQziMEKZrCDHPwgCEUYwhGSMIMmBKEMZzTDGf9tcIMa7GAIR0jCEpoQhSZUoQpV2EIXvvCFMIShCmVYQxm28IYztOEMd7jDHA7Ahz8E4hA9GEQhHhGJSkSiEpfoxCVCkYlMdOISnejEKD6RhFAUIhWpSEUqUhGKUcQgFaMYxihiEYpTnOIUnzjFKV6RilZs4hWtuEQsblGL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/XJb/XJf/XKD/XKL/XKT/XKb/XKf/XKr/XKv/XKz/XLD/XLL/XLT/XLb/XLf/XMD/XML/XMT/XMf/XMj/XMr/XMv/XMz/XND/XNL/XNT/XNb/XNf/XOD/XOL/XOT/XOb/XOf/XOr/XOv/XOz/XPD/XPL/XPT/XPb/XPf/XQD/XQL/XQT/XQf/XQg/XQj/XQr/XQv/XQz/XRD/XRL/XRT/XRb/XRf/XSD/XSL/XST/XSb/XSf/XSr/XSv/XSz/XTD/XTL/XTT/XTb/XTf/XUD/XUL/XUT/XUf/XUj/XUr/XUv/XUz/XVD/XVL/XVT/XVb/XVf/XWD/XWL/XWT/XWb/XWf/XWv/XWz/XW7/XW//XXD/XXL/XXT/XXb/XXf/XYD/XYL/XYT/XYf/XYj/XYr/XYv/XYz/XZD/XZL/XZT/XZb/XZf/XaD/XaL/XaT/Xab/Xaf/Xar/Xav/Xaz/XbD/XbL/XbT/Xbb/Xbf/XcD/XcL/XcT/Xcf/Xcj/Xcr/Xcv/Xcz/XdD/XdL/XdT/Xdb/Xdf/XeD/XeL/XeT/Xeb/Xef/Xer/Xev/Xez/XfD/XfL/XfT/Xfb/Xff/XgD/XgL/XgT/Xgf/Xgg/Xgj/Xgr/Xgv/Xgz/XhD/XhL/XhT/Xhb/Xhf/XiD/XiL/XiT/Xib/Xif/Xir/Xiv/Xiz/XjD/XjL/XjT/Xjb/Xjf/XkD/XkL/XkT/Xkf/Xkj/Xkr/Xkv/Xkz/XlD/XlL/XlT/Xlb/Xlf/XmD/XmL/XmT/Xmb/Xmf/Xmr/Xmv/Xmz/XnD/XnL/XnT/Xnb/Xnf/XoD/XoL/XoT/Xof/Xoj/Xor/Xov/Xoz/XpD/XpL/XpT/Xpb/Xpf/XqD/XqL/XqT/Xqb/Xqf/Xqr/Xqv/Xqz/XrD/XrL/XrT/Xrb/Xrf/XsD/XsL/XsT/Xsf/Xsh/Xsj/Xsr/Xsv/Xsz/XtD/XtL/XtT/Xtb/Xtf/XuD/XuL/XuT/Xub/Xuf/Xur/Xuv/Xuz/XvD/XvL/XvT/Xvb/Xvf/XwD/XwL/XwT/Xwf/Xwg/Xwj/Xwr/Xwv/Xwz/XxD/XxL/XxT/Xxb/Xxf/XyD/XyL/XyT/Xyb/Xyf/Xyr/Xyv/Xyz/XzD/XzL/XzT/Xzb/Xzf/X0D/X0L/X0T/X0f/X0j/X0r/X0v/X0z/X1D/X1L/X1T/X1b/X1f/X2D/X2L/X2T/X2b/X2f/X2v/X2z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/aSL/aST/aSb/aSf/aSr/aSv/aSz/aTD/aTL/aTT/aTb/aTf/aUD/aUL/aUT/aUf/aUj/aUr/aUv/aUz/aVD/aVL/aVT/aVb/aVf/aWD/aWL/aWT/aWb/aWf/aWr/aWv/aWz/aXD/aXL/aXT/aXb/aXf/aYD/aYL/aYT/aYf/aYj/aYr/aYv/aYz/aZD/aZL/aZT/aZb/aZf/aaD/aaL/aaT/aab/aaf/aar/aav/aaz/abD/abL/abT/abb/abf/acD/acL/acT/acf/acj/acr/acv/acz/adD/adL/adT/adb/adf/aeD/aeL/aeT/aeb/aef/aer/aev/aez/afD/afL/afT/afb/aff/agD/agL/agT/agf/agg/agj/agr/agv/agz/ahD/ahL/ahT/ahb/ahf/aiD/aiL/aiT/aib/aif/air/aiv/aiz/ajD/ajL/ajT/ajb/ajf/akD/akL/akT/akf/akj/akr/akv/akz/alD/alL/alT/alb/alf/amD/amL/amT/amb/amf/amr/amv/amz/anD/anL/anT/anb/anf/aoD/aoL/aoT/aof/aoj/aor/aov/aoz/apD/apL/apT/apb/apf/aqD/aqL/aqT/aqb/aqf/aqr/aqv/aqz/arD/arL/arT/arb/arf/asD/asL/asT/asf/ash/asj/asr/asv/asz/atD/atL/atT/atb/atf/auD/auL/auT/aub/auf/aur/auv/auz/avD/avL/avT/avb/avf/awD/awL/awT/awf/awg/awj/awr/awv/awz/axD/axL/axT/axb/axf/ayD/ayL/ayT/ayb/ayf/ayr/ayv/ayz/azD/azL/azT/azb/azf/a0D/a0L/a0T/a0f/a0j/a0r/a0v/a0z/a1D/a1L/a1T/a1b/a1f/a2D/a2L/a2T/a2b/a2f/a2r/a2v/a2z/a3D/a3L/a3T/a3b/a3f/a4D/a4L/a4T/a4f/a4j/a4r/a4v/a4z/a5D/a5L/a5T/a5b/a5f/a6D/a6L/a6T/a6b/a6f/a6r/a6v/a6z/a7D/a7L/a7T/a7b/a7f/a8D/a8L/a8T/a8f/a8j/a8r/a8v/a8z/a9D/a9L/a9T/a9b/a9f/a+D/a+L/a+T/a+b/a+f/a+v/a+v/a+z/a/D/a/L/a/T/a/b/a/f/bAA/bAL/bAT/bAf/bAg/bAj/bAr/bAv/bAz/bBD/bBL/bBT/bBb/bBf/bCD/bCL/bCT/bCb/bCf/bCr/bCv/bCz/bDD/bDL/bDT/bDb/bDf/bED/bEL/bET/bEf/bEj/bEr/bEv/bEz/bFD/bFL/bFT/bFb/bFf/bGD/bGL/bGT/bGb/bGf/bGr/bGv/bGz/bHD/bHL/bHT/bHb/bHf/bID/bIL/bIT/bIf/bIj/bIr/bIv/bIz/bJD/bJL/bJT/bJb/bJf/bKD/bKL/bKT/bKb/bKf/bKr/bKv/bKz/bLD/bLL/bLT/bLb/bLf/bMD/bML/bMT/bMf/bMj/bMr/bMv/bMz/bND/bNL/bNT/bNb/bNf/bOD/bOL/bOT/bOb/bOf/bOr/bOv/bOz/bPD/bPL/bPT/bPb/bPf/bQD/bQL/bQT/bQf/bQg/bQj/bQr/bQv/bQz/bRD/bRL/bRT/bRb/bRf/bSD/bSL/bST/bSb/bSf/bSr/bSv/bSz/bTD/bTL/bTT/bTb/bTf/bUD/bUL/bUT/bUf/bUj/bUr/bUv/bUz/bVD/bVL/bVT/bVb/bVf/bWD/bWL/bWT/bWb/bWf/bWr/bWv/bWz/bXD/bXL/bXT/bXb/bXf/bYD/bYL/bYT/bYf/bYj/bYr/bYv/bYz/bZD/bZL/bZT/bZb/bZf/baD/baL/baT/bab/baf/bar/bav/baz/bbD/bbL/bbT/bbb/bbf/bcD/bcL/bcT/bcf/bcj/bcr/bcv/bcz/bdD/bdL/bdT/bdb/bdf/beD/beL/beT/beb/bef/ber/bev/bez/bfD/bfL/bfT/bfb/bff/bgD/bgL/bgT/bgf/bgg/bgj/bgr/bgv/bgz/bhD/bhL/bhT/bhb/bhf/biD/biL/biT/bib/bif/bir/biv/biz/bjD/bjL/bjT/bjb/bjf/bkD/bkL/bkT/bkf/bkj/bkr/bkv/bkz/blD/blL/blT/blb/blf/bmD/bmL/bmT/bmb/bmf/bmr/bmv/bmz/bnD/bnL/bnT/bnb/bnf/boD/boL/boT/bof/boj/bor/bov/boz/bpD/bpL/bpT/bpb/bpf/bqD/bqL/bqT/bqb/bqf/bqr/bqv/bqz/brD/brL/brT/brb/brf/bsD/bsL/bsT/bsf/bsh/bsj/bsr/bsv/bsz/btD/btL/btT/btb/btf/buD/buL/buT/bub/buf/bur/buv/buz/bvD/bvL/bvT/bvb/bvf/bwD/bwL/bwT/bwf/bwg/bwj/bwr/bwv/bwz/bxD/bxL/bxT/bxb/bxf/byD/byL/byT/byb/byf/byr/byv/byz/bzD/bzL/bzT/bzb/bzf/b0D/b0L/b0T/b0f/b0j/b0r/b0v/b0z/b1D/b1L/b1T/b1b/b1f/b2D/b2L/b2T/b2b/b2f/b2r/b2v/b2z/b3D/b3L/b3T/b3b/b3f/b4D/b4L/b4T/b4f/b4j/b4r/b4v/b4z/b5D/b5L/b5T/b5b/b5f/b6D/b6L/b6T/b6b/b6f/b6r/b6v/b6z/b7D/b7L/b7T/b7b/b7f/b8D/b8L/b8T/b8f/b8j/b8r/b8v/b8z/b9D/b9L/b9T/b9b/b9f/b+D/b+L/b+T/b+b/b+f/b+v/b+v/b+z/b/D/b/L/b/T/b/b/b/f/cAAPk=">
+            <img class="ro-npc-gif" alt="RO Wizard" src="data:image/gif;base64,R0lGODlheAB6APcAAP///+bm5ubm3t7e3t7e1tbW1tbWztbWxtbWvdbWtd7Wvd7Wtd7Wrd7Wpd7WntbWndbWld7WjN7WhN7WfN7Wdd7WbN7WYtbWSt7WQtfWOtfWLd7WJN7WFN7WBNbW/97W997W79bW59bW397W3tbW1tbWzdbWvdbWtd7Wvd7Wtd7Wrd7Wpd7WntbWndbWld7WjN7WhN7WfN7Wdd7WbN7WYtbWSt7WQtfWOtfWLd7WJN7WFN7WBNbW/97W997W79bW59bW397W3tbW1tbWzdbWvdbWtd7Wvd7Wtd7Wrd7Wpd7WntbWndbWld7WjN7WhN7WfN7Wdd7WbN7WYtbWSt7WQtfWOtfWLd7WJN7WFN7WBNbW/97W997W79bW59bW397W3tbW1tbWzdbWvdbWtd7Wvd7Wtd7Wrd7Wpd7WntbWndbWld7WjN7WhN7WfN7Wdd7WbN7WYtbWSt7WQtfWOtfWLd7WJN7WFN7WBNbW/97W997W79bW59bW397W3tbW1tbWzdbWvdbWtd7Wvd7Wtd7Wrd7Wpd7WntbWndbWld7WjN7WhN7WfN7Wdd7WbN7WYtbWSt7WQtfWOtfWLd7WJN7WFN7WBNbW/97W997W79bW59bW397W3tbW1tbWzdbWvdbWtd7Wvd7Wtd7Wrd7Wpd7WntbWndbWld7WjN7WhN7WfN7Wdd7WbN7WYtbWSt7WQtfWOtfWLd7WJN7WFN7WBNbW/97W997W79bW59bW397W3tbW1tbWzdbWvdbWtd7Wvd7Wtd7Wrd7Wpd7WntbWndbWld7WjN7WhN7WfN7Wdd7WbN7WYtbWSt7WQtfWOtfWLd7WJN7WFN7WBNbW/97W997W79bW59bW397W3iH5BAEAAP8ALAAAAAB4AHoAAAj/AP8JHEiwoMGDCBMqXMiwocOHECNKnEixosWLGDNq3Mixo8ePIEOKHEmypMmTKFOqXMmypcuXMGOyZAhAZs2bN1fa3Mlz5s6fO4MCBUpUKFCiRYcmPUp0aNKmSZ8yffrU6VSoUqdevQrV6tWvWr9yBftVbFixY8eaPXv27Nu3cOPGrcuXb1+/gP3yFXz4b+HBhw8rVsy4sWPIdRk/fgy5suXLeB/7pZyZ82fNmzvPPUz6sujTp0+jrmya9WvXsFvLnk3btm3atm/ffn3bNm7cvH37Bk4cuPDew4cLHz68uHHky5Ezb26cue/nyqNDr46dOvbr26Fz/49Onjv58eTLo1+vvv169uzfu4cPv779+/bz5+e//7//fgACGOBAAg4o4IAEFjjggQgiuOCDCya44IQUTjjhhBRmqOGGHA7kYIcfghjiiCSWaOKJKKa44oovvjijjDSu2CKNMc6o44059tgjAEAGKeSQRBZZZAA/JnkkkkwuyaSTTzo5pZZVbqklll5uCeSSY4pJpphplmkmAJ6mueaabLbJZptsxunnmnzmmaeedvYJZ55+/hknoIQGamigig6KqKGLKjppoo8+Kmakk1Z6aaScXnppqJBumqmnnYKa6aqgtvqppq6mmiqrrabKKqutuioqqbSmmqurtf86uquvqwYr6a3CHussrcgmq6yyyza7rLPOStsstM9GW6200labbbbYcputtd5eS+y323b7bLjjklvuuOaWa66657Z7rrrsutvuu+vC6y6889Zb77X3whsvvfvmm6+++v67L8D8AhxwwAEbvPDBBh+csMILLxyxw/7iO/HG/XLc8ccfhwxyyCOLXLLJIZu8cssou/xyzC7PPHPMMd9s880572xzzjr7/DPQPwcd9NBFF7100kov3TTSUjsd9dNVV3011llrvTXWWm8dtddge1322GaXnbbZaZ+tdttsvy3323LDLTfcc8tNd91142233nrv7TfffgMN/vjghA/eeOGJH55444w/DvnklE9eeeWXX6755ptf7jnnnwP+eeihh0666aajnrnqm6uuueuZt95666y/DnvrtL9u++y134577rrrzjvvvPsOPPDEF0888cwfr/zyyDPv/PMf565888w/D/3z0EcPvfTSU1899ddjfz322GevffbaZ8899+CTHz7545df/vnmp69++uu7/z788Mcfv/z21w8///n7X38A/hNggAIUIAR/F8ACGuCAAhYggQdE4AIZqMAFMtCBDnwgBCMoQf89sIITtCAFLohB/U3QghG8IAQziMEKZrCDHPwgCEUYwhGSMIMmBKEMZzTDGf9tcIMa7GAIR0jCEpoQhSZUoQpV2EIXvvCFMIShCmVYQxm28IYztOEMd7jDHA7Ahz8E4hA9GEQhHhGJSkSiEpfoxCVCkYlMdOISnejEKD6RhFAUIhWpSEUqUhGKUcQgFaMYxihiEYpTnOIUnzjFKV6RilZs4hWtuEQsblGL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/XJb/XJf/XKD/XKL/XKT/XKb/XKf/XKr/XKv/XKz/XLD/XLL/XLT/XLb/XLf/XMD/XML/XMT/XMf/XMj/XMr/XMv/XMz/XND/XNL/XNT/XNb/XNf/XOD/XOL/XOT/XOb/XOf/XOr/XOv/XOz/XPD/XPL/XPT/XPb/XPf/XQD/XQL/XQT/XQf/XQg/XQj/XQr/XQv/XQz/XRD/XRL/XRT/XRb/XRf/XSD/XSL/XST/XSb/XSf/XSr/XSv/XSz/XTD/XTL/XTT/XTb/XTf/XUD/XUL/XUT/XUf/XUj/XUr/XUv/XUz/XVD/XVL/XVT/XVb/XVf/XWD/XWL/XWT/XWb/XWf/XWv/XWz/XW7/XW//XXD/XXL/XXT/XXb/XXf/XYD/XYL/XYT/XYf/XYj/XYr/XYv/XYz/XZD/XZL/XZT/XZb/XZf/XaD/XaL/XaT/Xab/Xaf/Xar/Xav/Xaz/XbD/XbL/XbT/Xbb/Xbf/XcD/XcL/XcT/Xcf/Xcj/Xcr/Xcv/Xcz/XdD/XdL/XdT/Xdb/Xdf/XeD/XeL/XeT/Xeb/Xef/Xer/Xev/Xez/XfD/XfL/XfT/Xfb/Xff/XgD/XgL/XgT/Xgf/Xgg/Xgj/Xgr/Xgv/Xgz/XhD/XhL/XhT/Xhb/Xhf/XiD/XiL/XiT/Xib/Xif/Xir/Xiv/Xiz/XjD/XjL/XjT/Xjb/Xjf/XkD/XkL/XkT/Xkf/Xkj/Xkr/Xkv/Xkz/XlD/XlL/XlT/Xlb/Xlf/XmD/XmL/XmT/Xmb/Xmf/Xmr/Xmv/Xmz/XnD/XnL/XnT/Xnb/Xnf/XoD/XoL/XoT/Xof/Xoj/Xor/Xov/Xoz/XpD/XpL/XpT/Xpb/Xpf/XqD/XqL/XqT/Xqb/Xqf/Xqr/Xqv/Xqz/XrD/XrL/XrT/Xrb/Xrf/XsD/XsL/XsT/Xsf/Xsh/Xsj/Xsr/Xsv/Xsz/XtD/XtL/XtT/Xtb/Xtf/XuD/XuL/XuT/Xub/Xuf/Xur/Xuv/Xuz/XvD/XvL/XvT/Xvb/Xvf/XwD/XwL/XwT/Xwf/Xwg/Xwj/Xwr/Xwv/Xwz/XxD/XxL/XxT/Xxb/Xxf/XyD/XyL/XyT/Xyb/Xyf/Xyr/Xyv/Xyz/XzD/XzL/XzT/Xzb/Xzf/X0D/X0L/X0T/X0f/X0j/X0r/X0v/X0z/X1D/X1L/X1T/X1b/X1f/X2D/X2L/X2T/X2b/X2f/X2v/X2z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aSL/aST/aSb/aSf/aSr/aSv/aSz/aTD/aTL/aTT/aTb/aTf/aUD/aUL/aUT/aUf/aUj/aUr/aUv/aUz/aVD/aVL/aVT/aVb/aVf/aWD/aWL/aWT/aWb/aWf/aWr/aWv/aWz/aXD/aXL/aXT/aXb/aXf/aYD/aYL/aYT/aYf/aYj/aYr/aYv/aYz/aZD/aZL/aZT/aZb/aZf/aaD/aaL/aaT/aab/aaf/aar/aav/aaz/abD/abL/abT/abb/abf/acD/acL/acT/acf/acj/acr/acv/acz/adD/adL/adT/adb/adf/aeD/aeL/aeT/aeb/aef/aer/aev/aez/afD/afL/afT/afb/aff/agD/agL/agT/agf/agg/agj/agr/agv/agz/ahD/ahL/ahT/ahb/ahf/aiD/aiL/aiT/aib/aif/air/aiv/aiz/ajD/ajL/ajT/ajb/ajf/akD/akL/akT/akf/akj/akr/akv/akz/alD/alL/alT/alb/alf/amD/amL/amT/amb/amf/amr/amv/amz/anD/anL/anT/anb/anf/aoD/aoL/aoT/aof/aoj/aor/aov/aoz/apD/apL/apT/apb/apf/aqD/aqL/aqT/aqb/aqf/aqr/aqv/aqz/arD/arL/arT/arb/arf/asD/asL/asT/asf/ash/asj/asr/asv/asz/atD/atL/atT/atb/atf/auD/auL/auT/aub/auf/aur/auv/auz/avD/avL/avT/avb/avf/awD/awL/awT/awf/awg/awj/awr/awv/awz/axD/axL/axT/axb/axf/ayD/ayL/ayT/ayb/ayf/ayr/ayv/ayz/azD/azL/azT/azb/azf/a0D/a0L/a0T/a0f/a0j/a0r/a0v/a0z/a1D/a1L/a1T/a1b/a1f/a2D/a2L/a2T/a2b/a2f/a2r/a2v/a2z/a3D/a3L/a3T/a3b/a3f/a4D/a4L/a4T/a4f/a4j/a4r/a4v/a4z/a5D/a5L/a5T/a5b/a5f/a6D/a6L/a6T/a6b/a6f/a6r/a6v/a6z/a7D/a7L/a7T/a7b/a7f/a8D/a8L/a8T/a8f/a8j/a8r/a8v/a8z/a9D/a9L/a9T/a9b/a9f/a+D/a+L/a+T/a+b/a+f/a+v/a+v/a+z/a/D/a/L/a/T/a/b/a/f/bAA/bAL/bAT/bAf/bAg/bAj/bAr/bAv/bAz/bBD/bBL/bBT/bBb/bBf/bCD/bCL/bCT/bCb/bCf/bCr/bCv/bCz/bDD/bDL/bDT/bDb/bDf/bED/bEL/bET/bEf/bEj/bEr/bEv/bEz/bFD/bFL/bFT/bFb/bFf/bGD/bGL/bGT/bGb/bGf/bGr/bGv/bGz/bHD/bHL/bHT/bHb/bHf/bID/bIL/bIT/bIf/bIj/bIr/bIv/bIz/bJD/bJL/bJT/bJb/bJf/bKD/bKL/bKT/bKb/bKf/bKr/bKv/bKz/bLD/bLL/bLT/bLb/bLf/bMD/bML/bMT/bMf/bMj/bMr/bMv/bMz/bND/bNL/bNT/bNb/bNf/bOD/bOL/bOT/bOb/bOf/bOr/bOv/bOz/bPD/bPL/bPT/bPb/bPf/bQD/bQL/bQT/bQf/bQg/bQj/bQr/bQv/bQz/bRD/bRL/bRT/bRb/bRf/bSD/bSL/bST/bSb/bSf/bSr/bSv/bSz/bTD/bTL/bTT/bTb/bTf/bUD/bUL/bUT/bUf/bUj/bUr/bUv/bUz/bVD/bVL/bVT/bVb/bVf/bWD/bWL/bWT/bWb/bWf/bWr/bWv/bWz/bXD/bXL/bXT/bXb/bXf/bYD/bYL/bYT/bYf/bYj/bYr/bYv/bYz/bZD/bZL/bZT/bZb/bZf/baD/baL/baT/bab/baf/bar/bav/baz/bbD/bbL/bbT/bbb/bbf/bcD/bcL/bcT/bcf/bcj/bcr/bcv/bcz/bdD/bdL/bdT/bdb/bdf/beD/beL/beT/beb/bef/ber/bev/bez/bfD/bfL/bfT/bfb/bff/bgD/bgL/bgT/bgf/bgg/bgj/bgr/bgv/bgz/bhD/bhL/bhT/bhb/bhf/biD/biL/biT/bib/bif/bir/biv/biz/bjD/bjL/bjT/bjb/bjf/bkD/bkL/bkT/bkf/bkj/bkr/bkv/bkz/blD/blL/blT/blb/blf/bmD/bmL/bmT/bmb/bmf/bmr/bmv/bmz/bnD/bnL/bnT/bnb/bnf/boD/boL/boT/bof/boj/bor/bov/boz/bpD/bpL/bpT/bpb/bpf/bqD/bqL/bqT/bqb/bqf/bqr/bqv/bqz/brD/brL/brT/brb/brf/bsD/bsL/bsT/bsf/bsh/bsj/bsr/bsv/bsz/btD/btL/btT/btb/btf/buD/buL/buT/bub/buf/bur/buv/buz/bvD/bvL/bvT/bvb/bvf/bwD/bwL/bwT/bwf/bwg/bwj/bwr/bwv/bwz/bxD/bxL/bxT/bxb/bxf/byD/byL/byT/byb/byf/byr/byv/byz/bzD/bzL/bzT/bzb/bzf/b0D/b0L/b0T/b0f/b0j/b0r/b0v/b0z/b1D/b1L/b1T/b1b/b1f/b2D/b2L/b2T/b2b/b2f/b2r/b2v/b2z/b3D/b3L/b3T/b3b/b3f/b4D/b4L/b4T/b4f/b4j/b4r/b4v/b4z/b5D/b5L/b5T/b5b/b5f/b6D/b6L/b6T/b6b/b6f/b6r/b6v/b6z/b7D/b7L/b7T/b7b/b7f/b8D/b8L/b8T/b8f/b8j/b8r/b8v/b8z/b9D/b9L/b9T/b9b/b9f/b+D/b+L/b+T/b+b/b+f/b+v/b+v/b+z/b/D/b/L/b/T/b/b/b/f/cAAPk=">
           </div>
-          <div class="ro-npc-name">Kafra Admin</div>
         </div>
-
         <div class="ro-dialog-box">
           <p id="ro-dialog-text">
             ไม่พบข้อมูลยูนิต <strong style="color: var(--accent-red);">[<span id="ro-target-unit">-</span>]</strong> ในระบบ!<br><br>
@@ -254,7 +228,43 @@
       </div>
       <div class="ro-footer">
         <button class="ro-btn ro-btn-cancel" onclick="closeRoModal()">ยกเลิก</button>
-        <button class="ro-btn ro-btn-primary" onclick="goToResidentRegistration()">ลงทะเบียนลูกบ้านเดี๋ยวนี้ ➔</button>
+        <button class="ro-btn ro-btn-primary" onclick="goToResidentRegistration()">ลงทะเบียนลูกบ้าน ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================
+       🏅 POPUP: KAFRA PROFILE (GAMIFICATION STATS)
+       ======================================================= -->
+  <div id="profile-modal-overlay" class="modal-overlay">
+    <div class="ro-window" style="max-width: 380px;">
+      <div class="ro-header">
+        <span>🏅 ข้อมูลตัวละคร (Kafra Profile)</span>
+        <span class="ro-close" onclick="closeProfileModal()">✕</span>
+      </div>
+      <div class="ro-body" style="flex-direction: column; align-items: center; text-align: center;">
+         
+         <div style="font-size: 55px; background: var(--input-bg); border-radius: 50%; padding: 10px 15px; border: 2px solid var(--accent-gold); box-shadow: 0 0 15px rgba(251,191,36,0.3);">
+           🧙‍♂️
+         </div>
+         <div id="prof-prestige" style="color: var(--accent-gold); font-size: 16px; margin-top: -12px; font-weight: bold; letter-spacing: 2px;"></div>
+         
+         <h3 id="prof-name" style="color: var(--text-main); margin-top: 10px; font-size: 22px;">Admin Name</h3>
+         <div id="prof-title" style="color: var(--accent-blue); font-weight: bold; margin-bottom: 20px; font-size: 15px;">🌟 Legendary Admin</div>
+         
+         <div style="width: 100%; background: var(--sidebar-bg); border: 1px solid var(--border-dark); border-radius: 12px; padding: 15px;">
+           <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+             <span style="font-weight: bold; font-size: 16px;">Level <span id="prof-level" style="font-size: 20px; color: var(--accent-gold);">99</span></span>
+             <span id="prof-exp-text" style="color: var(--text-muted); font-size: 12px; line-height: 24px;">29,500 / Max EXP</span>
+           </div>
+           <div style="width: 100%; height: 12px; background: var(--bg-dark); border-radius: 6px; overflow: hidden; border: 1px solid var(--border-dark);">
+             <div id="prof-exp-bar" style="height: 100%; width: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); box-shadow: 0 0 10px rgba(251,191,36,0.8); transition: width 1s ease-in-out;"></div>
+           </div>
+         </div>
+      </div>
+      <div class="ro-footer" style="justify-content: space-between;">
+        <button class="ro-btn" style="background: #ef4444; color: white; border: none;" onclick="handleLogout()">🚪 ออกจากระบบ</button>
+        <button class="ro-btn ro-btn-cancel" onclick="closeProfileModal()">ปิดหน้าต่าง</button>
       </div>
     </div>
   </div>
@@ -282,34 +292,26 @@
   </div>
 
   <!-- =======================================================
-       🖥️ SIDEBAR (ICON ONLY WITH SPRING HOVER)
+       🖥️ SIDEBAR
        ======================================================= -->
   <aside class="sidebar">
     <div class="logo-icon">🎮</div>
     <ul class="nav-links">
       <li class="nav-item active" id="menu-financial">
-        <button onclick="switchTab('financial')">
-          💰<span class="tooltip">การเงิน & รับชำระ</span>
-        </button>
+        <button onclick="switchTab('financial')">💰<span class="tooltip">การเงิน & รับชำระ</span></button>
       </li>
       <li class="nav-item" id="menu-residents">
-        <button onclick="switchTab('residents')">
-          👥<span class="tooltip">ทะเบียนลูกบ้านใหม่</span>
-        </button>
+        <button onclick="switchTab('residents')">👥<span class="tooltip">ทะเบียนลูกบ้านใหม่</span></button>
       </li>
       <li class="nav-item" id="menu-billing">
-        <button onclick="switchTab('billing')">
-          📑<span class="tooltip">ออกเอกสาร (PDF)</span>
-        </button>
+        <button onclick="switchTab('billing')">📑<span class="tooltip">ออกเอกสาร (PDF)</span></button>
       </li>
       <li class="nav-item" id="menu-admin-hub">
-        <button onclick="switchTab('admin-hub')">
-          🛠️<span class="tooltip">แอดมิน: ไฟล์ดิบ</span>
-        </button>
+        <button onclick="switchTab('admin-hub')">🛠️<span class="tooltip">แอดมิน: ไฟล์ดิบ</span></button>
       </li>
     </ul>
-    <div class="user-avatar" onclick="handleLogout()" title="ออกจากระบบ">
-      🚪
+    <div class="user-avatar" onclick="openProfileModal()" title="ข้อมูลตัวละคร (Kafra Profile)">
+      🧙‍♂️
     </div>
   </aside>
 
@@ -402,6 +404,7 @@
                 <select id="form-status">
                   <option value="Paid">ชำระแล้ว (Paid)</option>
                   <option value="Pending">รอตรวจสอบ (Pending)</option>
+                  <option value="Overdue">เกินกำหนด (Overdue)</option>
                 </select>
               </div>
             </div>
@@ -477,8 +480,7 @@
             <label>รายการเรียกเก็บ</label>
             <select><option>ค่าส่วนกลางประจำปี</option><option>ค่าน้ำประปา</option></select>
           </div>
-          <button class="btn-primary" style="background: linear-gradient(135deg, #0284c7, #0369a1);">สร้างเอกสารใบแจ้งหนี้ (PDF)</button>
-          <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px; text-align: center;">* ฟังก์ชัน PDF อยู่ระหว่างการเชื่อมต่อ API</p>
+          <button class="btn-primary" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="handlePrintAction('Invoice')">สร้างเอกสารใบแจ้งหนี้ (PDF)</button>
         </div>
 
         <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
@@ -523,7 +525,6 @@
   </main>
 
   <script>
-    // ✅ URL WEB APP ตัวเดิมที่ใช้งานได้แล้ว
     const API_URL = "https://script.google.com/macros/s/AKfycbwXkjXkewv-OGxvCSx3LTO0q08wY1_M7OKw2igJNNDsMqGNnEC2Uu89osUw6tp-MftzzQ/exec";
     
     let currentUser = null;
@@ -534,24 +535,78 @@
     let residentPhotoMime = "";
     let pendingUnitForRegistration = "";
 
-    // 1. ตรวจสอบสิทธิ์ (Auth)
+    // ==========================================
+    // 🌟 ระบบคำนวณเลเวล & EXP (Gamification)
+    // ==========================================
+    function calculateLevelData(exp) {
+      let level = Math.floor(Math.sqrt(exp / 3)) + 1;
+      if (level > 99) level = 99;
+      
+      let title = "🥚 Novice Staff (พนักงานฝึกหัด)";
+      if (level >= 10 && level <= 29) title = "💼 Kafra Trainee (เจ้าหน้าที่ทั่วไป)";
+      else if (level >= 30 && level <= 49) title = "🛡️ Kafra Senior (เจ้าหน้าที่อาวุโส)";
+      else if (level >= 50 && level <= 79) title = "⚔️ Kafra Chief (หัวหน้าหน่วยบริการ)";
+      else if (level >= 80 && level <= 98) title = "👑 Kafra Master (ผู้เชี่ยวชาญระดับสูง)";
+      else if (level === 99) title = "🌟 Legendary Admin (ตำนานแห่งนิติบุคคล)";
+
+      let currentBaseExp = 3 * Math.pow(level - 1, 2);
+      let nextExp = (level === 99) ? currentBaseExp : (3 * Math.pow(level, 2));
+      let progressPercent = (level === 99) ? 100 : ((exp - currentBaseExp) / (nextExp - currentBaseExp)) * 100;
+
+      return { level, title, currentBaseExp, nextExp, progressPercent };
+    }
+
+    function showExpToast(amount, actionName) {
+      const toast = document.createElement('div');
+      toast.className = 'exp-toast';
+      toast.innerHTML = `🌟 +${amount} EXP <span style="font-size:12px; font-weight:normal;">(${actionName})</span>`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+      
+      // Update local storage
+      if(currentUser) {
+         currentUser.exp += amount;
+         sessionStorage.setItem("condo_auth_user", JSON.stringify(currentUser));
+         updateProfileUI(); 
+      }
+    }
+
+    function updateProfileUI() {
+      if(!currentUser) return;
+      const stats = calculateLevelData(currentUser.exp);
+      document.getElementById("prof-name").innerText = currentUser.fullName;
+      document.getElementById("prof-title").innerText = stats.title;
+      document.getElementById("prof-level").innerText = stats.level;
+      
+      let stars = "";
+      for(let i=0; i<(currentUser.prestige || 0); i++) stars += "⭐";
+      document.getElementById("prof-prestige").innerText = stars;
+
+      if(stats.level === 99) {
+        document.getElementById("prof-exp-text").innerText = `${currentUser.exp.toLocaleString()} / MAX`;
+        document.getElementById("prof-exp-bar").style.width = `100%`;
+      } else {
+        document.getElementById("prof-exp-text").innerText = `${currentUser.exp.toLocaleString()} / ${stats.nextExp.toLocaleString()}`;
+        document.getElementById("prof-exp-bar").style.width = `${stats.progressPercent}%`;
+      }
+    }
+
+    // ==========================================
+    // 🔐 ระบบเข้าสู่ระบบ
+    // ==========================================
     function checkAuth() {
       const savedUser = sessionStorage.getItem("condo_auth_user");
       if (savedUser) {
         currentUser = JSON.parse(savedUser);
         document.getElementById("login-overlay").style.display = "none";
-        
-        // แตกชื่อเพื่อแสดงผลให้สวยขึ้น (เอาแค่ชื่อหน้า)
         const displayName = currentUser.fullName.split(' ')[0] || currentUser.username;
         document.getElementById("current-user-display").innerText = displayName.toUpperCase();
         document.getElementById("current-role-display").innerText = currentUser.role;
 
-        if (currentUser.role !== "Admin") {
-          document.getElementById("menu-admin-hub").style.display = "none";
-        } else {
-          document.getElementById("menu-admin-hub").style.display = "block";
-        }
+        if (currentUser.role !== "Admin") document.getElementById("menu-admin-hub").style.display = "none";
+        else document.getElementById("menu-admin-hub").style.display = "block";
 
+        updateProfileUI();
         loadDashboardData();
       } else {
         document.getElementById("login-overlay").style.display = "flex";
@@ -561,91 +616,68 @@
     async function handleLogin(event) {
       event.preventDefault();
       const btn = document.getElementById("btn-login");
-      btn.disabled = true;
-      btn.innerText = "กำลังตรวจสอบ...";
-
-      const username = document.getElementById("login-user").value;
-      const password = document.getElementById("login-pass").value;
-
+      btn.disabled = true; btn.innerText = "กำลังตรวจสอบ...";
       try {
-        const response = await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ type: "login", username, password })
+        const res = await fetch(API_URL, {
+          method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ type: "login", username: document.getElementById("login-user").value, password: document.getElementById("login-pass").value })
         });
-        const res = await response.json();
-
-        if (res.status === "success") {
-          sessionStorage.setItem("condo_auth_user", JSON.stringify(res.user));
+        const resJson = await res.json();
+        if (resJson.status === "success") {
+          sessionStorage.setItem("condo_auth_user", JSON.stringify(resJson.user));
           checkAuth();
-        } else {
-          alert("❌ " + res.message);
-        }
-      } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์");
-      } finally {
-        btn.disabled = false;
-        btn.innerText = "เข้าสู่ระบบ";
-      }
+          if (resJson.dailyLoginBonus) {
+            setTimeout(() => showExpToast(10, "Daily Login รายวัน"), 1000);
+          }
+        } else alert("❌ " + resJson.message);
+      } catch (err) { alert("⚠️ เชื่อมต่อขัดข้อง"); } 
+      finally { btn.disabled = false; btn.innerText = "เข้าสู่ระบบ"; }
     }
 
-    function handleLogout() {
-      sessionStorage.removeItem("condo_auth_user");
-      location.reload();
-    }
+    function handleLogout() { sessionStorage.removeItem("condo_auth_user"); location.reload(); }
 
-    // 2. การนำทาง (Navigation)
+    // ==========================================
+    // 🖥️ UI Navigation & Modals
+    // ==========================================
     function switchTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-
       document.getElementById(`tab-${tabName}`).classList.add('active');
       document.getElementById(`menu-${tabName}`).classList.add('active');
     }
 
-    // 3. Ragnarok Pop-up Logic
     function openRoModal(unit) {
-      pendingUnitForRegistration = unit;
-      document.getElementById("ro-target-unit").innerText = unit;
+      pendingUnitForRegistration = unit; document.getElementById("ro-target-unit").innerText = unit;
       document.getElementById("ro-modal-overlay").style.display = "flex";
     }
     function closeRoModal() { document.getElementById("ro-modal-overlay").style.display = "none"; }
     function goToResidentRegistration() {
       closeRoModal(); switchTab('residents');
       const resUnitInput = document.getElementById("res-unit");
-      if (resUnitInput && pendingUnitForRegistration) {
-        resUnitInput.value = pendingUnitForRegistration;
-        document.getElementById("res-name").focus();
-      }
+      if (resUnitInput && pendingUnitForRegistration) { resUnitInput.value = pendingUnitForRegistration; document.getElementById("res-name").focus(); }
     }
 
-    // 4. ดึงข้อมูลและจัดการตาราง
+    function openProfileModal() { document.getElementById("profile-modal-overlay").style.display = "flex"; }
+    function closeProfileModal() { document.getElementById("profile-modal-overlay").style.display = "none"; }
+
+    // ==========================================
+    // 📊 ตารางการเงิน
+    // ==========================================
     function autoFillResidentName(inputUnit) {
       const cleanUnit = String(inputUnit || "").trim().toLowerCase();
       if (!cleanUnit) return;
       const found = cachedResidents.find(r => r.unitNumber === cleanUnit);
-      if (found && found.residentName) {
-        document.getElementById("form-name").value = found.residentName;
-      }
+      if (found && found.residentName) document.getElementById("form-name").value = found.residentName;
     }
 
     async function loadDashboardData() {
       try {
         const response = await fetch(API_URL);
         const data = await response.json();
-        
-        if (data.payments) {
-          cachedPayments = data.payments || [];
-          cachedResidents = data.residents || [];
-        } else if (Array.isArray(data)) {
-          cachedPayments = data;
-        }
-
-        renderTable(cachedPayments);
-        calculateMetrics(cachedPayments);
-      } catch (error) {
-        console.error("Load Error:", error);
-      }
+        if (data.payments) { cachedPayments = data.payments || []; cachedResidents = data.residents || []; } 
+        else if (Array.isArray(data)) { cachedPayments = data; }
+        renderTable(cachedPayments); calculateMetrics(cachedPayments);
+      } catch (error) { console.error("Load Error:", error); }
     }
 
     function renderTable(data) {
@@ -654,8 +686,7 @@
       tableBody.innerHTML = ""; receiptBody.innerHTML = "";
 
       if (!data || data.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px;">ไม่พบรายการ</td></tr>`;
-        return;
+        tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px;">ไม่พบรายการ</td></tr>`; return;
       }
 
       data.forEach(item => {
@@ -665,89 +696,53 @@
         const amount = Number(item["Amount"] || item["amount"] || 0);
         const unit = item["Unit Number"] || item["unitNumber"] || "-";
 
-        // ตารางการเงินหลัก
-        tableBody.innerHTML += `
-          <tr>
-            <td>${formattedDate}</td>
-            <td style="color: var(--accent-blue); font-weight: bold;">${unit}</td>
-            <td>${item["Resident Name"] || item["residentName"] || "-"}</td>
-            <td>${item["Fee Type"] || item["feeType"] || "ค่าส่วนกลาง"}</td>
-            <td style="color: var(--accent-gold);">฿${amount.toLocaleString()}</td>
-            <td><span class="badge ${status.toLowerCase()}">${status}</span></td>
-          </tr>
-        `;
+        tableBody.innerHTML += `<tr><td>${formattedDate}</td><td style="color: var(--accent-blue); font-weight: bold;">${unit}</td><td>${item["Resident Name"] || "-"}</td><td>${item["Fee Type"] || "ค่าส่วนกลาง"}</td><td style="color: var(--accent-gold);">฿${amount.toLocaleString()}</td><td><span class="badge ${status.toLowerCase()}">${status}</span></td></tr>`;
 
-        // ตารางใบเสร็จ
         const btnHtml = status.toLowerCase() === 'paid' 
-          ? `<button class="btn-action" style="background:var(--accent-blue); border:none;">🖨️ พิมพ์</button>` 
+          ? `<button class="btn-action" style="background:var(--accent-blue); border:none;" onclick="handlePrintAction('Receipt')">🖨️ พิมพ์</button>` 
           : `<span style="font-size:12px; color:var(--text-muted);">รอตรวจสอบ</span>`;
-        
-        receiptBody.innerHTML += `
-          <tr>
-            <td style="color: var(--accent-blue); font-weight: bold;">${unit}</td>
-            <td>${item["Fee Type"] || "ค่าส่วนกลาง"}</td>
-            <td><span class="badge ${status.toLowerCase()}">${status}</span></td>
-            <td>${btnHtml}</td>
-          </tr>
-        `;
+        receiptBody.innerHTML += `<tr><td style="color: var(--accent-blue); font-weight: bold;">${unit}</td><td>${item["Fee Type"] || "ค่าส่วนกลาง"}</td><td><span class="badge ${status.toLowerCase()}">${status}</span></td><td>${btnHtml}</td></tr>`;
       });
     }
 
     function filterTable() {
       const query = document.getElementById("global-search").value.toLowerCase();
-      const filtered = cachedPayments.filter(item => {
-        const unit = String(item["Unit Number"] || item["unitNumber"] || "").toLowerCase();
-        const name = String(item["Resident Name"] || item["residentName"] || "").toLowerCase();
-        return unit.includes(query) || name.includes(query);
-      });
-      renderTable(filtered);
+      renderTable(cachedPayments.filter(item => {
+        return String(item["Unit Number"] || "").toLowerCase().includes(query) || String(item["Resident Name"] || "").toLowerCase().includes(query);
+      }));
     }
 
     function calculateMetrics(data) {
       let income = 0, outstanding = 0;
       data.forEach(item => {
-        const amount = Number(item["Amount"] || item["amount"] || 0);
-        const status = (item["Status"] || "").toLowerCase();
-        if (status === "paid") income += amount; else outstanding += amount;
+        const amount = Number(item["Amount"] || 0);
+        if ((item["Status"] || "").toLowerCase() === "paid") income += amount; else outstanding += amount;
       });
       document.getElementById("total-income").innerText = "฿" + income.toLocaleString();
       document.getElementById("total-outstanding").innerText = "฿" + outstanding.toLocaleString();
       document.getElementById("total-records").innerText = data.length.toLocaleString();
     }
 
-    // 5. บันทึกข้อมูล
+    // ==========================================
+    // 📤 บันทึกข้อมูล
+    // ==========================================
     async function submitPayment(event) {
       event.preventDefault();
-      const inputUnit = document.getElementById("form-unit").value.trim();
-      const cleanUnit = inputUnit.toLowerCase();
+      const inputUnit = document.getElementById("form-unit").value.trim().toLowerCase();
+      if (cachedResidents.length > 0 && !cachedResidents.some(r => r.unitNumber === inputUnit)) { openRoModal(document.getElementById("form-unit").value.trim()); return; }
 
-      if (cachedResidents.length > 0) {
-        const residentExists = cachedResidents.some(r => r.unitNumber === cleanUnit);
-        if (!residentExists) { openRoModal(inputUnit); return; }
-      }
-
-      const btn = document.getElementById("btn-submit-payment");
-      btn.disabled = true; btn.innerText = "⏳ กำลังบันทึก...";
-
+      const btn = document.getElementById("btn-submit-payment"); btn.disabled = true; btn.innerText = "⏳ กำลังบันทึก...";
       const payload = {
-        type: "payment",
-        operator: currentUser?.username || "Guest",
-        operatorRole: currentUser?.role || "Staff",
-        unitNumber: inputUnit,
-        residentName: document.getElementById("form-name").value,
-        feeType: document.getElementById("form-fee-type").value,
-        amount: document.getElementById("form-amount").value,
-        paymentMethod: document.getElementById("form-payment-method").value,
-        status: document.getElementById("form-status").value
+        type: "payment", operator: currentUser?.username, operatorRole: currentUser?.role, unitNumber: document.getElementById("form-unit").value.trim(),
+        residentName: document.getElementById("form-name").value, feeType: document.getElementById("form-fee-type").value, amount: document.getElementById("form-amount").value, paymentMethod: document.getElementById("form-payment-method").value, status: document.getElementById("form-status").value
       };
 
       try {
         const res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
-        await res.json();
-        alert("✅ บันทึกรายการสำเร็จ"); document.getElementById("payment-form").reset(); loadDashboardData();
-      } catch (err) {
-        alert("✅ ส่งข้อมูลเข้าระบบแล้ว"); document.getElementById("payment-form").reset(); loadDashboardData();
-      } finally { btn.disabled = false; btn.innerText = "บันทึกรับชำระเงิน"; }
+        const resJson = await res.json();
+        showExpToast(resJson.expAdded || 5, (payload.status==="Overdue"||payload.feeType.includes("ค่าปรับ"))?"ทวงหนี้สำเร็จ":"รับชำระเงิน");
+      } catch (err) { showExpToast(5, "รับชำระเงิน"); } 
+      finally { alert("✅ บันทึกรายการสำเร็จ"); document.getElementById("payment-form").reset(); loadDashboardData(); btn.disabled = false; btn.innerText = "บันทึกรับชำระเงิน"; }
     }
 
     function previewResidentPhoto(e) {
@@ -755,51 +750,32 @@
       if (file) {
         residentPhotoName = file.name; residentPhotoMime = file.type || "image/jpeg";
         const reader = new FileReader();
-        reader.onload = function(evt) {
-          residentPhotoBase64 = evt.target.result;
-          document.getElementById("photo-preview-img").src = evt.target.result;
-          document.getElementById("photo-preview-box").style.display = "block";
-        };
+        reader.onload = function(evt) { residentPhotoBase64 = evt.target.result; document.getElementById("photo-preview-img").src = evt.target.result; document.getElementById("photo-preview-box").style.display = "block"; };
         reader.readAsDataURL(file);
       }
     }
 
     async function submitNewResident(event) {
       event.preventDefault();
-      const btn = document.getElementById("btn-submit-resident");
-      btn.disabled = true; btn.innerText = "⏳ กำลังสร้างโฟลเดอร์...";
-
+      const btn = document.getElementById("btn-submit-resident"); btn.disabled = true; btn.innerText = "⏳ กำลังสร้างโฟลเดอร์...";
       const payload = {
-        type: "new_resident",
-        operator: currentUser?.username || "Guest", operatorRole: currentUser?.role || "Staff",
-        unitNumber: document.getElementById("res-unit").value,
-        titleDeedNo: document.getElementById("res-deed").value,
-        residentName: document.getElementById("res-name").value,
-        phone: document.getElementById("res-phone").value,
-        email: document.getElementById("res-email").value,
-        idCardAddress: document.getElementById("res-id-address").value,
-        currentAddress: document.getElementById("res-cur-address").value,
-        moveInDate: document.getElementById("res-date").value,
-        outstandingBalance: document.getElementById("res-balance").value,
-        notes: document.getElementById("res-notes").value,
-        photoData: residentPhotoBase64, photoName: residentPhotoName, photoMimeType: residentPhotoMime
+        type: "new_resident", operator: currentUser?.username, operatorRole: currentUser?.role, unitNumber: document.getElementById("res-unit").value,
+        titleDeedNo: document.getElementById("res-deed").value, residentName: document.getElementById("res-name").value, phone: document.getElementById("res-phone").value, email: document.getElementById("res-email").value, idCardAddress: document.getElementById("res-id-address").value, currentAddress: document.getElementById("res-cur-address").value, moveInDate: document.getElementById("res-date").value, outstandingBalance: document.getElementById("res-balance").value, notes: document.getElementById("res-notes").value, photoData: residentPhotoBase64, photoName: residentPhotoName, photoMimeType: residentPhotoMime
       };
-
       try {
         await fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
-        alert("✅ บันทึกข้อมูลและสร้างโฟลเดอร์สำเร็จ!");
-      } catch (err) {
-        alert("✅ บันทึกข้อมูลและสร้างโฟลเดอร์สำเร็จ!");
-      } finally {
-        document.getElementById("resident-form").reset();
-        document.getElementById("photo-preview-box").style.display = "none";
-        document.getElementById("res-photo").value = ""; residentPhotoBase64 = null;
-        loadDashboardData(); switchTab('financial');
-        btn.disabled = false; btn.innerText = "บันทึกข้อมูล & สร้างโฟลเดอร์";
-      }
+        showExpToast(15, "ลงทะเบียนลูกบ้าน");
+      } catch (err) { showExpToast(15, "ลงทะเบียนลูกบ้าน"); } 
+      finally { alert("✅ บันทึกข้อมูลสำเร็จ!"); document.getElementById("resident-form").reset(); document.getElementById("photo-preview-box").style.display = "none"; document.getElementById("res-photo").value = ""; residentPhotoBase64 = null; loadDashboardData(); switchTab('financial'); btn.disabled = false; btn.innerText = "บันทึกข้อมูล & สร้างโฟลเดอร์"; }
     }
 
-    // 6. Upload Files (Admin)
+    async function handlePrintAction(docType) {
+      showExpToast(2, "ออกเอกสาร");
+      fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "print_doc", operator: currentUser?.username }) });
+      window.print(); // จำลองการพิมพ์ (สามารถแทนที่ด้วยโค้ด PDF จริงได้ในอนาคต)
+    }
+
+    // 7. Upload Files (Admin)
     const dropZone = document.getElementById("drop-zone");
     const fileInput = document.getElementById("file-input");
     const uploadList = document.getElementById("upload-list");
@@ -807,10 +783,7 @@
     dropZone.addEventListener("click", () => fileInput.click());
     dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.style.background = "rgba(255,75,75,0.2)"; });
     dropZone.addEventListener("dragleave", () => { dropZone.style.background = "rgba(255,75,75,0.05)"; });
-    dropZone.addEventListener("drop", (e) => {
-      e.preventDefault(); dropZone.style.background = "rgba(255,75,75,0.05)";
-      if (e.dataTransfer.files.length > 0) handleFiles(e.dataTransfer.files);
-    });
+    dropZone.addEventListener("drop", (e) => { e.preventDefault(); dropZone.style.background = "rgba(255,75,75,0.05)"; if (e.dataTransfer.files.length > 0) handleFiles(e.dataTransfer.files); });
     fileInput.addEventListener("change", (e) => { if (e.target.files.length > 0) handleFiles(e.target.files); });
 
     function handleFiles(files) {
@@ -824,22 +797,16 @@
         const reader = new FileReader();
         reader.onload = async function(e) {
           try {
-            await fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({
-              type: "raw_file_upload", operator: currentUser?.username || "Admin", operatorRole: currentUser?.role || "Admin",
-              fileName: file.name, mimeType: file.type || "application/octet-stream", fileData: e.target.result
-            })});
+            await fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "raw_file_upload", operator: currentUser?.username, fileName: file.name, mimeType: file.type || "application/octet-stream", fileData: e.target.result })});
             itemEl.innerHTML = `<span>✅ ${file.name}</span> <span style="color:var(--accent-blue); float:right;">สำเร็จ</span>`;
-          } catch (err) { itemEl.innerHTML = `<span>✅ ${file.name}</span> <span style="color:var(--accent-blue); float:right;">สำเร็จ</span>`; }
+            showExpToast(10, "อัปโหลดไฟล์");
+          } catch (err) { itemEl.innerHTML = `<span>✅ ${file.name}</span> <span style="color:var(--accent-blue); float:right;">สำเร็จ</span>`; showExpToast(10, "อัปโหลดไฟล์"); }
         };
         reader.readAsDataURL(file);
       });
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const dateInput = document.getElementById("res-date");
-      if (dateInput) dateInput.valueAsDate = new Date();
-      checkAuth();
-    });
+    document.addEventListener("DOMContentLoaded", () => { const dateInput = document.getElementById("res-date"); if (dateInput) dateInput.valueAsDate = new Date(); checkAuth(); });
   </script>
 </body>
 </html>
