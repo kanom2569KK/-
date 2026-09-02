@@ -3,212 +3,220 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ระบบบริหารจัดการโครงการ - แดชบอร์ดนิติบุคคล</title>
+  <title>ระบบบริหารจัดการโครงการ - แดชบอร์ดนิติบุคคล (Wooden GUI)</title>
   <style>
     :root {
-      --bg-dark: #3a181d;
-      --sidebar-bg: #220b10;
-      --card-bg: #4a2128;
-      --card-hover: #592831;
-      --text-main: #f8f9fa;
-      --text-muted: #d0a9af;
-      --accent-red: #ff4b4b;
+      --wood-dark: #2a1508;
+      --wood-panel: #4a2511;
+      --wood-border: #1a0c04;
+      --wood-btn: #b45309;
+      --wood-btn-hover: #d97706;
+      --text-main: #fef3c7;
+      --text-muted: #d4d4d4;
       --accent-gold: #fbbf24;
-      --accent-blue: #38bdf8;
-      --accent-green: #10b981;
-      --border-dark: #5c2c34;
-      --input-bg: #2d1016;
+      --accent-red: #dc2626;
+      --accent-green: #059669;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; }
-    body { display: flex; min-height: 100vh; background-color: var(--bg-dark); color: var(--text-main); overflow: hidden; }
+    body { 
+      display: flex; min-height: 100vh; 
+      background-color: var(--wood-dark);
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(74, 37, 17, 0.6) 0%, rgba(26, 21, 8, 0.95) 100%),
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 2px, transparent 2px, transparent 4px);
+      color: var(--text-main); overflow: hidden; 
+    }
 
+    /* Overlays */
     .screen-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(18, 5, 8, 0.95); backdrop-filter: blur(10px);
+      background: rgba(10, 5, 2, 0.9); backdrop-filter: blur(8px);
       display: flex; justify-content: center; align-items: center; z-index: 9999;
     }
-    .login-card {
-      background: linear-gradient(145deg, var(--card-bg), var(--sidebar-bg));
-      padding: 40px; border-radius: 24px; width: 90%; max-width: 400px;
-      box-shadow: 10px 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--border-dark); text-align: center;
+    .login-card, .char-select-container {
+      background: linear-gradient(145deg, #5c2c12, #3d1b0a);
+      border: 8px solid #200e05; border-radius: 20px;
+      padding: 35px; box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.6);
+      text-align: center; position: relative;
     }
-    .login-card h2 { color: var(--accent-gold); margin-bottom: 8px; }
-    .login-card p { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+    .login-card { width: 90%; max-width: 400px; }
+    .char-select-container { width: 92%; max-width: 720px; }
 
-    .char-select-container {
-      background: linear-gradient(145deg, var(--card-bg), var(--sidebar-bg));
-      padding: 30px; border-radius: 24px; width: 92%; max-width: 680px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.8); border: 2px solid var(--accent-gold); text-align: center;
+    /* Wooden Panels & Cards */
+    .card {
+      background: linear-gradient(145deg, #4a2511, #361b0c);
+      border: 6px solid #200e05; border-radius: 16px; padding: 22px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.6), inset 0 0 15px rgba(0,0,0,0.4);
+      position: relative;
     }
-    .char-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 14px; margin: 20px 0;
-      max-height: 320px; overflow-y: auto; padding: 10px;
+    .card-title {
+      font-size: 17px; font-weight: bold; margin-bottom: 18px;
+      color: var(--accent-gold); text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+      border-bottom: 2px dashed #6b3414; padding-bottom: 8px;
+      display: flex; align-items: center; gap: 10px;
     }
-    .char-option-card {
-      background: var(--input-bg); border: 2px solid var(--border-dark); border-radius: 16px;
-      padding: 16px 8px; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-    }
-    .char-option-card:hover { transform: scale(1.06); border-color: var(--accent-gold); box-shadow: 0 6px 15px rgba(251,191,36,0.4); }
-    .char-option-card.selected { border-color: var(--accent-gold); background: linear-gradient(145deg, rgba(251,191,36,0.25), var(--card-bg)); box-shadow: 0 0 15px rgba(251,191,36,0.6); }
-    
-    .char-sprite-frame {
-      width: 70px; height: 70px; background: #1a080c; border-radius: 12px; border: 1px solid var(--border-dark);
-      display: flex; align-items: center; justify-content: center; margin-bottom: 8px; overflow: hidden;
-    }
-    .char-sprite-frame img { width: 60px; height: 60px; object-fit: contain; image-rendering: pixelated; }
 
-    /* Sidebar */
+    /* Sidebar (Wooden Tower Theme) */
     .sidebar {
-      width: 90px; background-color: var(--sidebar-bg);
-      margin: 20px 0 20px 20px; border-radius: 24px;
-      display: flex; flex-direction: column; align-items: center; padding: 30px 0;
-      box-shadow: 5px 5px 15px rgba(0,0,0,0.3); z-index: 10;
+      width: 100px; background: linear-gradient(180deg, #4a2511, #2a1508);
+      margin: 20px 0 20px 20px; border-radius: 16px; border: 6px solid #1a0c04;
+      display: flex; flex-direction: column; align-items: center; padding: 25px 0;
+      box-shadow: 10px 10px 30px rgba(0,0,0,0.6); z-index: 10;
     }
-    .company-logo { margin-bottom: 30px; position: relative; cursor: pointer; transition: all 0.3s; }
+    .company-logo { margin-bottom: 25px; position: relative; cursor: pointer; transition: 0.3s; }
     .company-logo img {
-      width: 55px; height: 55px; object-fit: contain; border-radius: 14px;
-      border: 2px solid var(--accent-gold); box-shadow: 0 0 15px rgba(251, 191, 36, 0.3); background-color: #ffffff;
+      width: 55px; height: 55px; object-fit: contain; border-radius: 12px;
+      border: 3px solid var(--accent-gold); background: #ffffff; box-shadow: 0 0 10px rgba(251,191,36,0.5);
     }
-    .company-logo:hover { transform: scale(1.1); }
+    .company-logo:hover { transform: scale(1.08); }
     .company-logo .tooltip {
       position: absolute; left: 75px; top: 50%; transform: translateY(-50%);
-      background: var(--sidebar-bg); color: var(--accent-gold); padding: 8px 14px; border-radius: 8px;
-      font-size: 13px; font-weight: bold; white-space: nowrap; opacity: 0; pointer-events: none; transition: 0.2s; border: 1px solid var(--border-dark); z-index: 100;
+      background: var(--wood-dark); color: var(--accent-gold); padding: 8px 14px; border-radius: 8px;
+      font-size: 13px; font-weight: bold; white-space: nowrap; opacity: 0; pointer-events: none; transition: 0.2s; border: 2px solid var(--wood-border); z-index: 100;
     }
-    .company-logo:hover .tooltip { opacity: 1; left: 80px; }
+    .company-logo:hover .tooltip { opacity: 1; left: 85px; }
 
-    .nav-links { list-style: none; display: flex; flex-direction: column; gap: 16px; width: 100%; align-items: center; flex: 1;}
+    .nav-links { list-style: none; display: flex; flex-direction: column; gap: 14px; width: 100%; align-items: center; flex: 1;}
     .nav-item button {
-      background: transparent; border: none; font-size: 22px; color: var(--text-muted);
-      cursor: pointer; padding: 12px; border-radius: 16px; position: relative;
-      transform: scale(1.0); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      background: linear-gradient(135deg, #78350f, #451a03); border: 3px solid #200e05; font-size: 22px; color: var(--text-muted);
+      cursor: pointer; padding: 10px; border-radius: 12px; position: relative; width: 65px; height: 55px;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 4px 10px rgba(0,0,0,0.4);
     }
     .nav-item button:hover, .nav-item.active button {
-      background: var(--card-bg); color: var(--accent-gold); transform: scale(1.1);
-      box-shadow: inset 2px 2px 5px rgba(255,255,255,0.05), 0 4px 10px rgba(0,0,0,0.2);
+      background: linear-gradient(135deg, #d97706, #b45309); color: var(--accent-gold);
+      border-color: var(--accent-gold); transform: scale(1.1);
+      box-shadow: 0 0 15px rgba(251,191,36,0.6), inset 0 2px 4px rgba(255,255,255,0.3);
     }
     .nav-item button .tooltip {
-      position: absolute; left: 60px; top: 50%; transform: translateY(-50%);
-      background: var(--sidebar-bg); color: white; padding: 6px 12px; border-radius: 8px;
-      font-size: 12px; white-space: nowrap; opacity: 0; pointer-events: none; transition: 0.2s; border: 1px solid var(--border-dark); z-index: 100;
+      position: absolute; left: 65px; top: 50%; transform: translateY(-50%);
+      background: var(--wood-dark); color: white; padding: 6px 12px; border-radius: 8px;
+      font-size: 12px; white-space: nowrap; opacity: 0; pointer-events: none; transition: 0.2s; border: 2px solid var(--wood-border); z-index: 100;
     }
-    .nav-item button:hover .tooltip { opacity: 1; left: 75px; }
+    .nav-item button:hover .tooltip { opacity: 1; left: 80px; }
     
     .user-avatar { 
-      margin-top: auto; width: 55px; height: 55px; background: var(--card-bg); border-radius: 50%; 
-      display: flex; align-items: center; justify-content: center; border: 2px solid var(--accent-gold); cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 0 10px rgba(251, 191, 36, 0.2); overflow: hidden;
+      margin-top: auto; width: 60px; height: 60px; background: linear-gradient(135deg, #78350f, #451a03); border-radius: 50%; 
+      display: flex; align-items: center; justify-content: center; border: 3px solid var(--accent-gold); cursor: pointer;
+      transition: 0.3s; box-shadow: 0 0 12px rgba(251,191,36,0.4); overflow: hidden;
     }
-    .user-avatar img { width: 45px; height: 45px; object-fit: contain; image-rendering: pixelated; }
-    .user-avatar:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(251, 191, 36, 0.6); }
+    .user-avatar img { width: 50px; height: 50px; object-fit: contain; image-rendering: pixelated; }
+    .user-avatar:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(251,191,36,0.8); }
 
     /* Main Content */
     .main-content { flex: 1; padding: 20px 30px; overflow-y: auto; height: 100vh; }
     .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-    .greeting h1 { font-size: 26px; font-weight: bold; letter-spacing: 0.5px; }
-    .greeting span { color: var(--accent-gold); }
+    .greeting h1 { font-size: 26px; font-weight: bold; color: var(--accent-gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+    .greeting span { color: #fde047; }
     .search-bar {
-      background: var(--sidebar-bg); padding: 10px 20px; border-radius: 20px;
-      display: flex; align-items: center; gap: 10px; border: 1px solid var(--border-dark); width: 300px; transition: all 0.3s ease;
+      background: #2a1508; padding: 10px 20px; border-radius: 14px;
+      display: flex; align-items: center; gap: 10px; border: 3px solid #1a0c04; width: 300px;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
     }
-    .search-bar:focus-within { border-color: var(--accent-red); box-shadow: 0 0 10px rgba(255, 75, 75, 0.2); transform: scale(1.02); }
     .search-bar input { background: none; border: none; color: white; outline: none; width: 100%; font-size: 14px;}
     
-    .tab-content { display: none; animation: fadeIn 0.4s ease; }
+    .tab-content { display: none; animation: fadeIn 0.3s ease; }
     .tab-content.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Cards & Tables */
+    /* Metrics & Grids */
     .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 24px; }
-    .card {
-      background: linear-gradient(145deg, var(--card-bg), var(--sidebar-bg));
-      border-radius: 20px; padding: 22px; border: 1px solid var(--border-dark);
-      box-shadow: 6px 6px 18px rgba(0,0,0,0.2), inset 1px 1px 0px rgba(255,255,255,0.05);
+    .metric-card { 
+      background: linear-gradient(145deg, #5c2c12, #381808);
+      border: 5px solid #1a0c04; border-radius: 16px; padding: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.4);
+      cursor: pointer; transition: 0.3s;
     }
-    .metric-card { position: relative; overflow: hidden; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-    .metric-card:hover { transform: scale(1.03); box-shadow: 10px 10px 25px rgba(0,0,0,0.4); z-index: 2; }
-    .metric-card::before {
-      content: ''; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px;
-      border-radius: 50%; filter: blur(40px); z-index: 0; opacity: 0.4; transition: opacity 0.3s;
-    }
-    .metric-card:hover::before { opacity: 0.7; }
-    .metric-card.income::before { background: #10b981; }
-    .metric-card.expense::before { background: #ef4444; }
-    .metric-card.balance::before { background: #3b82f6; }
-    
-    .metric-card .title { font-size: 14px; color: var(--text-muted); position: relative; z-index: 1; margin-bottom: 8px;}
-    .metric-card .value { font-size: 34px; font-weight: bold; position: relative; z-index: 1; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);}
+    .metric-card:hover { transform: scale(1.03); border-color: var(--accent-gold); }
+    .metric-card .title { font-size: 14px; color: var(--text-muted); margin-bottom: 8px;}
+    .metric-card .value { font-size: 32px; font-weight: bold; color: var(--accent-gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);}
     .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
-    .card-title { font-size: 17px; font-weight: bold; margin-bottom: 18px; display: flex; align-items: center; gap: 10px;}
 
     /* Forms & Tables */
     .form-group { margin-bottom: 14px; }
-    .form-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600;}
+    .form-group label { display: block; font-size: 13px; color: var(--accent-gold); margin-bottom: 6px; font-weight: 600;}
     .form-group input, .form-group select, .form-group textarea {
-      width: 100%; padding: 11px 14px; background: var(--input-bg); color: var(--text-main);
-      border: 1px solid var(--border-dark); border-radius: 12px; font-size: 14px; outline: none; transition: 0.3s;
+      width: 100%; padding: 11px 14px; background: #231106; color: var(--text-main);
+      border: 3px solid #140803; border-radius: 10px; font-size: 14px; outline: none; transition: 0.3s;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
     }
-    .form-group input:focus, .form-group select:focus { border-color: var(--accent-red); box-shadow: 0 0 8px rgba(255,75,75,0.3); }
+    .form-group input:focus, .form-group select:focus { border-color: var(--accent-gold); }
     
     .table-container { overflow-x: auto; max-height: 380px; }
     table.data-table { width: 100%; border-collapse: collapse; }
-    table.data-table th, table.data-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border-dark); font-size: 14px; }
-    table.data-table th { position: sticky; top: 0; background: var(--sidebar-bg); color: var(--accent-gold); font-weight: 600; z-index: 2;}
-    table.data-table tbody tr { transition: background 0.2s; }
-    table.data-table tbody tr:hover { background: rgba(255,255,255,0.05); }
+    table.data-table th, table.data-table td { padding: 12px 14px; text-align: left; border-bottom: 2px solid #2a1508; font-size: 14px; }
+    table.data-table th { position: sticky; top: 0; background: #231106; color: var(--accent-gold); font-weight: bold; z-index: 2;}
+    table.data-table tbody tr:hover { background: rgba(251,191,36,0.05); }
     
     .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;}
-    .badge.overdue { background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid #ef4444;}
-    .badge.pending { background: rgba(245,158,11,0.2); color: #fcd34d; border: 1px solid #f59e0b;}
-    .badge.paid { background: rgba(16,185,129,0.2); color: #6ee7b7; border: 1px solid #10b981;}
+    .badge.overdue { background: rgba(220,38,38,0.3); color: #fca5a5; border: 1px solid var(--accent-red);}
+    .badge.pending { background: rgba(217,119,6,0.3); color: #fcd34d; border: 1px solid #d97706;}
+    .badge.paid { background: rgba(5,150,105,0.3); color: #6ee7b7; border: 1px solid var(--accent-green);}
 
+    /* Wooden Buttons */
     .btn-primary {
-      width: 100%; padding: 13px; border-radius: 12px; border: none; font-size: 15px; font-weight: bold;
-      background: linear-gradient(135deg, var(--accent-red), #b91c1c); color: white; cursor: pointer;
-      box-shadow: 0 4px 15px rgba(239,68,68,0.3); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); margin-top: 8px;
+      width: 100%; padding: 14px; border-radius: 12px; border: 3px solid #140803; font-size: 15px; font-weight: bold;
+      background: linear-gradient(135deg, #d97706, #b45309); color: #fffbeb; cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5), inset 0 2px 3px rgba(255,255,255,0.3); transition: 0.2s; margin-top: 8px;
     }
-    .btn-primary:hover { transform: scale(1.04); box-shadow: 0 8px 25px rgba(239,68,68,0.6); }
+    .btn-primary:hover { transform: scale(1.02); background: linear-gradient(135deg, #fbbf24, #d97706); }
     .btn-action { 
-      background: rgba(255,255,255,0.1); border: 1px solid var(--border-dark); color: white; 
-      padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; transition: all 0.3s;
+      background: #78350f; border: 2px solid #200e05; color: white; 
+      padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; transition: 0.2s;
     }
-    .btn-action:hover { background: var(--accent-red); border-color: var(--accent-red); transform: scale(1.1); }
+    .btn-action:hover { background: var(--wood-btn-hover); }
     
-    .drop-zone { border: 2px dashed var(--accent-red); border-radius: 16px; padding: 45px 20px; text-align: center; background: rgba(255,75,75,0.05); cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);}
-    .drop-zone:hover { background: rgba(255,75,75,0.1); border-color: var(--accent-gold); transform: scale(1.02); }
-    .photo-preview { width: 120px; height: 120px; border-radius: 12px; object-fit: cover; border: 2px solid var(--accent-gold); display: none; margin: 10px auto;}
+    .drop-zone { border: 3px dashed #b45309; border-radius: 14px; padding: 45px 20px; text-align: center; background: rgba(180,83,9,0.08); cursor: pointer; transition: 0.3s;}
+    .drop-zone:hover { background: rgba(180,83,9,0.15); border-color: var(--accent-gold); }
+    .photo-preview { width: 120px; height: 120px; border-radius: 12px; object-fit: cover; border: 3px solid var(--accent-gold); display: none; margin: 10px auto;}
 
-    /* Modals */
+    /* Modals & Character Select */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.8); display: none; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(5px);
+      background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(6px);
     }
     .ro-window {
-      background: var(--bg-dark); border: 2px solid var(--accent-gold); border-radius: 16px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(251,191,36,0.1); width: 90%; max-width: 520px; overflow: hidden;
+      background: linear-gradient(145deg, #5c2c12, #3d1b0a); border: 6px solid #1a0c04; border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.9); width: 90%; max-width: 520px; overflow: hidden;
     }
-    .ro-header { background: var(--sidebar-bg); color: var(--accent-gold); padding: 12px 20px; font-weight: bold; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-dark); }
+    .ro-header { background: #2a1508; color: var(--accent-gold); padding: 14px 20px; font-weight: bold; display: flex; justify-content: space-between; border-bottom: 3px solid #1a0c04; }
     .ro-header .ro-close { cursor: pointer; color: var(--text-muted); transition: 0.2s; }
     .ro-header .ro-close:hover { color: var(--accent-red); transform: scale(1.2); }
     .ro-body { padding: 22px; display: flex; gap: 20px; align-items: center; }
     .ro-npc-frame {
-      width: 100px; height: 110px; background: var(--input-bg); border: 2px solid var(--border-dark); border-radius: 12px;
+      width: 100px; height: 110px; background: #231106; border: 3px solid #140803; border-radius: 12px;
       display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;
     }
     .ro-npc-frame img { width: 80px; height: 80px; object-fit: contain; image-rendering: pixelated; }
-    .ro-dialog-box { flex: 1; background: var(--input-bg); border: 1px solid var(--border-dark); padding: 16px; border-radius: 12px; font-size: 14px; line-height: 1.6; }
-    .ro-footer { padding: 14px 20px; background: var(--sidebar-bg); border-top: 1px solid var(--border-dark); display: flex; justify-content: flex-end; gap: 12px; }
-    .ro-btn { padding: 8px 16px; font-size: 13px; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1px solid var(--border-dark); color: white; background: var(--card-bg); transition: 0.3s;}
-    .ro-btn:hover { background: var(--card-hover); transform: scale(1.05); }
-    .ro-btn-primary { background: linear-gradient(135deg, var(--accent-blue), #0284c7); border: none; }
+    .ro-dialog-box { flex: 1; background: #231106; border: 3px solid #140803; padding: 16px; border-radius: 12px; font-size: 14px; line-height: 1.6; }
+    .ro-footer { padding: 14px 20px; background: #2a1508; border-top: 3px solid #1a0c04; display: flex; justify-content: flex-end; gap: 12px; }
+    .ro-btn { padding: 8px 16px; font-size: 13px; font-weight: bold; border-radius: 8px; cursor: pointer; border: 2px solid #140803; color: white; background: #78350f; transition: 0.2s;}
+    .ro-btn:hover { background: #b45309; }
+    .ro-btn-primary { background: linear-gradient(135deg, #0284c7, #0369a1); border: none; }
+
+    /* Character Selection Grid */
+    .char-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); gap: 14px; margin: 20px 0;
+      max-height: 350px; overflow-y: auto; padding: 10px;
+    }
+    .char-option-card {
+      background: #231106; border: 3px solid #140803; border-radius: 16px;
+      padding: 14px 8px; cursor: pointer; transition: 0.2s;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .char-option-card:hover { transform: scale(1.05); border-color: var(--accent-gold); }
+    .char-option-card.selected { border-color: var(--accent-gold); background: linear-gradient(145deg, rgba(251,191,36,0.2), #381808); box-shadow: 0 0 15px rgba(251,191,36,0.5); }
+    .char-sprite-frame {
+      width: 70px; height: 70px; background: #120602; border-radius: 12px; border: 2px solid #140803;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 8px; overflow: hidden;
+    }
+    .char-sprite-frame img { width: 60px; height: 60px; object-fit: contain; image-rendering: pixelated; }
 
     /* EXP Toast */
     .exp-toast {
       position: fixed; bottom: 30px; right: 30px;
-      background: linear-gradient(135deg, #fbbf24, #d97706); color: #3a181d;
+      background: linear-gradient(135deg, #fbbf24, #d97706); color: #2a1508;
       padding: 12px 22px; border-radius: 20px; font-weight: bold; font-size: 15px;
-      box-shadow: 0 8px 25px rgba(251,191,36,0.5); border: 2px solid #fffbeb;
+      box-shadow: 0 8px 25px rgba(251,191,36,0.6); border: 3px solid #fffbeb;
       animation: slideUpFade 3s forwards; z-index: 10001; pointer-events: none;
     }
     @keyframes slideUpFade {
@@ -219,18 +227,16 @@
       100% { opacity: 0; transform: translateY(-30px); }
     }
     .quest-item {
-      background: var(--input-bg); border: 1px solid var(--border-dark);
-      padding: 14px 18px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s;
+      background: #231106; border: 3px solid #140803;
+      padding: 14px 18px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s;
     }
-    .quest-item:hover { transform: scale(1.02); border-color: var(--accent-gold); }
-    .quest-exp { background: rgba(251,191,36,0.15); color: var(--accent-gold); padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; border: 1px solid var(--accent-gold); }
+    .quest-item:hover { transform: scale(1.01); border-color: var(--accent-gold); }
+    .quest-exp { background: rgba(251,191,36,0.15); color: var(--accent-gold); padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; border: 2px solid var(--accent-gold); }
   </style>
 </head>
 <body>
 
-  <!-- =======================================================
-       🧙‍♂️ POPUP: RO WARNING
-       ======================================================= -->
+  <!-- RO Warning Modal -->
   <div id="ro-modal-overlay" class="modal-overlay">
     <div class="ro-window">
       <div class="ro-header">
@@ -255,12 +261,10 @@
     </div>
   </div>
 
-  <!-- =======================================================
-       🎭 CHAR SELECT SCREEN (AFTER LOGIN)
-       ======================================================= -->
+  <!-- Character Selection Screen (After Login) -->
   <div id="char-select-screen" class="screen-overlay" style="display: none;">
     <div class="char-select-container">
-      <h2 style="color: var(--accent-gold); font-size: 22px; margin-bottom: 4px;">⚔️ เลือกตัวละครประจำตัว (Avatar Profile)</h2>
+      <h2 style="color: var(--accent-gold); font-size: 22px; margin-bottom: 4px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">⚔️ เลือกตัวละครประจำตัว (Avatar Profile)</h2>
       <p style="color: var(--text-muted); font-size: 12px;">เลือกตัวละครที่คุณต้องการใช้เป็นโปรไฟล์ส่วนตัว (อิสระทุกตำแหน่งงาน)</p>
       
       <div class="char-grid">
@@ -268,47 +272,38 @@
           <div class="char-sprite-frame"><img src="Job03mini.gif" alt="Cleric"></div>
           <strong style="color: var(--accent-gold); font-size: 12px;">Cleric</strong>
         </div>
-
         <div class="char-option-card" id="opt-Job04mini" onclick="pickAvatar('Job04mini')">
           <div class="char-sprite-frame"><img src="Job04mini.gif" alt="Rogue"></div>
           <strong style="color: var(--accent-gold); font-size: 12px;">Rogue</strong>
         </div>
-
         <div class="char-option-card" id="opt-Job05mini" onclick="pickAvatar('Job05mini')">
           <div class="char-sprite-frame"><img src="Job05mini.gif" alt="Hunter"></div>
           <strong style="color: var(--accent-gold); font-size: 12px;">Hunter</strong>
         </div>
-
         <div class="char-option-card" id="opt-Job06mini" onclick="pickAvatar('Job06mini')">
           <div class="char-sprite-frame"><img src="Job06mini.gif" alt="Monk"></div>
           <strong style="color: var(--accent-gold); font-size: 12px;">Monk</strong>
         </div>
-
         <div class="char-option-card" id="opt-Job07mini" onclick="pickAvatar('Job07mini')">
           <div class="char-sprite-frame"><img src="Job07mini.gif" alt="Warlock"></div>
           <strong style="color: var(--accent-gold); font-size: 12px;">Warlock</strong>
         </div>
-
         <div class="char-option-card" id="opt-Job08mini" onclick="pickAvatar('Job08mini')">
           <div class="char-sprite-frame"><img src="Job08mini.gif" alt="Fighter"></div>
           <strong style="color: var(--accent-gold); font-size: 12px;">Fighter</strong>
         </div>
-
         <div class="char-option-card" id="opt-Job09mini" onclick="pickAvatar('Job09mini')">
           <div class="char-sprite-frame"><img src="Job09mini.gif" alt="Mage"></div>
           <strong style="color: var(--accent-gold); font-size: 12px;">Mage</strong>
         </div>
-
         <div class="char-option-card" id="opt-Job010mini" onclick="pickAvatar('Job010mini')">
           <div class="char-sprite-frame"><img src="Job010mini.gif" alt="Ranger"></div>
           <strong style="color: var(--accent-gold); font-size: 12px;">Ranger</strong>
         </div>
-
         <div class="char-option-card" id="opt-Swmini" onclick="pickAvatar('Swmini')">
           <div class="char-sprite-frame"><img src="Swmini.gif" alt="Knight"></div>
           <strong style="color: var(--accent-gold); font-size: 12px;">Knight</strong>
         </div>
-
         <div class="char-option-card" id="opt-WIZmini" onclick="pickAvatar('WIZmini')">
           <div class="char-sprite-frame"><img src="WIZmini.gif" alt="Grand Wizard"></div>
           <strong style="color: var(--accent-gold); font-size: 12px;">Grand Wiz</strong>
@@ -319,9 +314,7 @@
     </div>
   </div>
 
-  <!-- =======================================================
-       🏅 POPUP: KAFRA PROFILE
-       ======================================================= -->
+  <!-- Kafra Profile Modal -->
   <div id="profile-modal-overlay" class="modal-overlay">
     <div class="ro-window" style="max-width: 380px;">
       <div class="ro-header">
@@ -329,42 +322,40 @@
         <span class="ro-close" onclick="closeProfileModal()">✕</span>
       </div>
       <div class="ro-body" style="flex-direction: column; align-items: center; text-align: center;">
-         <div id="prof-avatar-display" style="width: 80px; height: 80px; background: var(--input-bg); border-radius: 50%; border: 2px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(251,191,36,0.3); overflow: hidden;">
+         <div id="prof-avatar-display" style="width: 80px; height: 80px; background: #231106; border-radius: 50%; border: 3px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(251,191,36,0.3); overflow: hidden;">
            <img id="prof-avatar-img" src="WIZmini.gif" style="width: 65px; height: 65px; object-fit: contain; image-rendering: pixelated;" alt="Avatar">
          </div>
          <div id="prof-prestige" style="color: var(--accent-gold); font-size: 16px; margin-top: -6px; font-weight: bold; letter-spacing: 2px;"></div>
          <h3 id="prof-name" style="color: var(--text-main); margin-top: 10px; font-size: 20px;">Admin Name</h3>
-         <div id="prof-title" style="color: var(--accent-blue); font-weight: bold; margin-bottom: 16px; font-size: 14px;">🌟 Legendary Admin</div>
+         <div id="prof-title" style="color: var(--accent-gold); font-weight: bold; margin-bottom: 16px; font-size: 14px;">🌟 Legendary Admin</div>
          
-         <button class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #220b10; font-weight: bold; border: none; margin-bottom: 16px; padding: 6px 16px;" onclick="openCharSelectFromProfile()">
+         <button class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #2a1508; font-weight: bold; border: 2px solid #140803; margin-bottom: 16px; padding: 6px 16px;" onclick="openCharSelectFromProfile()">
            🔄 เปลี่ยนตัวละคร (Change Avatar)
          </button>
 
-         <div style="width: 100%; background: var(--sidebar-bg); border: 1px solid var(--border-dark); border-radius: 12px; padding: 15px;">
+         <div style="width: 100%; background: #231106; border: 3px solid #140803; border-radius: 12px; padding: 15px;">
            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
              <span style="font-weight: bold; font-size: 15px;">Level <span id="prof-level" style="font-size: 18px; color: var(--accent-gold);">99</span></span>
              <span id="prof-exp-text" style="color: var(--text-muted); font-size: 12px; line-height: 22px;">29,500 / Max EXP</span>
            </div>
-           <div style="width: 100%; height: 12px; background: var(--bg-dark); border-radius: 6px; overflow: hidden; border: 1px solid var(--border-dark);">
+           <div style="width: 100%; height: 12px; background: #120602; border-radius: 6px; overflow: hidden; border: 2px solid #140803;">
              <div id="prof-exp-bar" style="height: 100%; width: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); box-shadow: 0 0 10px rgba(251,191,36,0.8); transition: width 1s ease-in-out;"></div>
            </div>
          </div>
       </div>
       <div class="ro-footer" style="justify-content: space-between;">
-        <button class="ro-btn" style="background: #ef4444; color: white; border: none;" onclick="handleLogout()">🚪 ออกจากระบบ</button>
+        <button class="ro-btn" style="background: #dc2626; color: white; border: none;" onclick="handleLogout()">🚪 ออกจากระบบ</button>
         <button class="ro-btn ro-btn-cancel" onclick="closeProfileModal()">ปิดหน้าต่าง</button>
       </div>
     </div>
   </div>
 
-  <!-- =======================================================
-       🔐 LOGIN CARD
-       ======================================================= -->
+  <!-- Login Card -->
   <div id="login-overlay" class="screen-overlay">
     <div class="login-card">
-      <div class="logo-icon">🏢</div>
-      <h2>เข้าสู่ระบบนิติบุคคล</h2>
-      <p>Dashboard Management System</p>
+      <div class="logo-icon" style="font-size: 40px; margin-bottom: 10px;">🪵</div>
+      <h2 style="color: var(--accent-gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">เข้าสู่ระบบนิติบุคคล</h2>
+      <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Wooden GUI Management System</p>
       <form onsubmit="handleLogin(event)">
         <div class="form-group" style="text-align: left;">
           <label>ชื่อผู้ใช้งาน (Username)</label>
@@ -379,9 +370,7 @@
     </div>
   </div>
 
-  <!-- =======================================================
-       🖥️ SIDEBAR
-       ======================================================= -->
+  <!-- Sidebar -->
   <aside class="sidebar">
     <div class="company-logo" onclick="window.open('https://www.facebook.com/udomsukplace', '_blank')">
       <img src="https://ui-avatars.com/api/?name=Udomsuk&background=4a2128&color=fbbf24&size=150&bold=true" alt="Udomsuk Logo">
@@ -411,9 +400,7 @@
     </div>
   </aside>
 
-  <!-- =======================================================
-       📊 MAIN CONTENT
-       ======================================================= -->
+  <!-- Main Content -->
   <main class="main-content">
     
     <div class="top-bar">
@@ -426,26 +413,26 @@
       </div>
     </div>
 
-    <!-- แท็บ 1: การเงิน -->
+    <!-- Tab 1: Financial -->
     <div id="tab-financial" class="tab-content active">
       <section class="metrics-grid">
-        <div class="card metric-card income">
+        <div class="metric-card">
           <div class="title">รายรับรวม (ชำระแล้ว)</div>
           <div class="value" id="total-income">฿0</div>
         </div>
-        <div class="card metric-card expense">
+        <div class="metric-card">
           <div class="title">ยอดค้างชำระรวม</div>
-          <div class="value" id="total-outstanding">฿0</div>
+          <div class="value" id="total-outstanding" style="color: #fca5a5;">฿0</div>
         </div>
-        <div class="card metric-card balance">
+        <div class="metric-card">
           <div class="title">จำนวนรายการทั้งหมด</div>
-          <div class="value" id="total-records">0</div>
+          <div class="value" id="total-records" style="color: #60a5fa;">0</div>
         </div>
       </section>
 
       <section class="content-grid">
         <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
-          <div class="card-title" style="padding: 20px 24px 0;">📊 รายการรับชำระเงินและประวัติสถานะ</div>
+          <div class="card-title" style="padding: 20px 24px 0; border: none; margin-bottom: 0;">📊 รายการรับชำระเงินและประวัติสถานะ</div>
           <div class="table-container">
             <table class="data-table">
               <thead>
@@ -509,7 +496,7 @@
       </section>
     </div>
 
-    <!-- แท็บ 2: ทะเบียนลูกบ้าน -->
+    <!-- Tab 2: Residents -->
     <div id="tab-residents" class="tab-content">
       <div style="max-width: 800px; margin: 0 auto;">
         <div class="card">
@@ -558,7 +545,7 @@
       </div>
     </div>
 
-    <!-- แท็บ 3: ออกเอกสาร (Billing) -->
+    <!-- Tab 3: Billing -->
     <div id="tab-billing" class="tab-content">
       <div class="content-grid">
         <div class="card">
@@ -579,7 +566,7 @@
         </div>
 
         <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
-          <div class="card-title" style="padding: 20px 24px 0;">🖨️ พิมพ์ใบเสร็จรับเงิน (Receipt)</div>
+          <div class="card-title" style="padding: 20px 24px 0; border:none; margin-bottom:0;">🖨️ พิมพ์ใบเสร็จรับเงิน (Receipt)</div>
           <div class="table-container">
             <table class="data-table">
               <thead>
@@ -597,30 +584,30 @@
       </div>
     </div>
 
-    <!-- แท็บ 4: กิลด์ EXP -->
+    <!-- Tab 4: EXP & Guild -->
     <div id="tab-exp" class="tab-content">
       <div style="display: grid; grid-template-columns: 1.2fr 1.8fr; gap: 20px;">
         
         <div class="card" style="text-align: center;">
           <div style="display: inline-block; position: relative;">
-            <div style="width: 90px; height: 90px; background: var(--input-bg); border-radius: 50%; border: 3px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(251,191,36,0.4); margin: 0 auto; overflow: hidden;">
+            <div style="width: 90px; height: 90px; background: #231106; border-radius: 50%; border: 3px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(251,191,36,0.4); margin: 0 auto; overflow: hidden;">
               <img id="tab-exp-avatar-img" src="WIZmini.gif" style="width: 75px; height: 75px; object-fit: contain; image-rendering: pixelated;" alt="Avatar">
             </div>
             <div id="tab-exp-prestige" style="position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); color: var(--accent-gold); font-size: 16px; font-weight: bold; white-space: nowrap;"></div>
           </div>
-          <h2 id="tab-exp-name" style="margin-top: 14px; font-size: 22px;">Admin</h2>
-          <p id="tab-exp-title" style="color: var(--accent-blue); font-weight: bold; margin-bottom: 16px; font-size: 15px;">🌟 Legendary Admin</p>
+          <h2 id="tab-exp-name" style="margin-top: 14px; font-size: 22px; color: var(--accent-gold);">Admin</h2>
+          <p id="tab-exp-title" style="color: #60a5fa; font-weight: bold; margin-bottom: 16px; font-size: 15px;">🌟 Legendary Admin</p>
 
-          <button class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #220b10; font-weight: bold; border: none; margin-bottom: 18px; padding: 6px 18px;" onclick="openCharSelectFromProfile()">
+          <button class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #2a1508; font-weight: bold; border: 2px solid #140803; margin-bottom: 18px; padding: 6px 18px;" onclick="openCharSelectFromProfile()">
             🔄 เปลี่ยนตัวละคร (Change Avatar)
           </button>
 
-          <div style="background: var(--input-bg); border: 1px solid var(--border-dark); border-radius: 14px; padding: 18px; text-align: left;">
+          <div style="background: #231106; border: 3px solid #140803; border-radius: 14px; padding: 18px; text-align: left;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
               <span style="font-size: 16px; font-weight: bold;">Level <span id="tab-exp-level" style="color: var(--accent-gold); font-size: 20px;">99</span></span>
               <span id="tab-exp-text" style="color: var(--text-muted); font-size: 13px; line-height: 24px;">29,500 / MAX</span>
             </div>
-            <div style="width: 100%; height: 14px; background: var(--bg-dark); border-radius: 7px; overflow: hidden; border: 1px solid var(--border-dark);">
+            <div style="width: 100%; height: 14px; background: #120602; border-radius: 7px; overflow: hidden; border: 2px solid #140803;">
               <div id="tab-exp-bar" style="height: 100%; width: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); box-shadow: 0 0 10px rgba(251,191,36,0.8); transition: width 1s ease-in-out;"></div>
             </div>
             <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px; text-align: center;">
@@ -648,12 +635,12 @@
               <span class="quest-exp">+5 EXP / รายการ</span>
             </div>
 
-            <div class="quest-item" style="border-color: rgba(239,68,68,0.4);">
+            <div class="quest-item" style="border-color: #b91c1c;">
               <div>
                 <strong style="color: #fca5a5;">🎯 ล่าค่าหัวลูกหนี้ (Bounty Hunter)</strong>
                 <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">บันทึกรับเงินยูนิตที่ค้างชำระ (Overdue) หรือมีค่าปรับ</p>
               </div>
-              <span class="quest-exp" style="background: rgba(239,68,68,0.2); color: #fca5a5; border-color: #ef4444;">+20 EXP / รายการ</span>
+              <span class="quest-exp" style="background: rgba(220,38,38,0.2); color: #fca5a5; border-color: #dc2626;">+20 EXP / รายการ</span>
             </div>
 
             <div class="quest-item">
@@ -685,7 +672,7 @@
       </div>
     </div>
 
-    <!-- แท็บ 5: แอดมินนำเข้าไฟล์ดิบ -->
+    <!-- Tab 5: Admin Hub -->
     <div id="tab-admin-hub" class="tab-content">
       <div style="max-width: 800px; margin: 0 auto;">
         <div class="card">
@@ -915,12 +902,12 @@
         const amount = Number(item["Amount"] || item["amount"] || 0);
         const unit = item["Unit Number"] || item["unitNumber"] || "-";
 
-        tableBody.innerHTML += `<tr><td>${formattedDate}</td><td style="color: var(--accent-blue); font-weight: bold;">${unit}</td><td>${item["Resident Name"] || "-"}</td><td>${item["Fee Type"] || "ค่าส่วนกลาง"}</td><td style="color: var(--accent-gold);">฿${amount.toLocaleString()}</td><td><span class="badge ${status.toLowerCase()}">${status}</span></td></tr>`;
+        tableBody.innerHTML += `<tr><td>${formattedDate}</td><td style="color: var(--accent-gold); font-weight: bold;">${unit}</td><td>${item["Resident Name"] || "-"}</td><td>${item["Fee Type"] || "ค่าส่วนกลาง"}</td><td style="color: #6ee7b7;">฿${amount.toLocaleString()}</td><td><span class="badge ${status.toLowerCase()}">${status}</span></td></tr>`;
 
         const btnHtml = status.toLowerCase() === 'paid' 
-          ? `<button class="btn-action" style="background:var(--accent-blue); border:none;" onclick="handlePrintAction('Receipt')">🖨️ พิมพ์</button>` 
+          ? `<button class="btn-action" onclick="handlePrintAction('Receipt')">🖨️ พิมพ์</button>` 
           : `<span style="font-size:12px; color:var(--text-muted);">รอตรวจสอบ</span>`;
-        receiptBody.innerHTML += `<tr><td style="color: var(--accent-blue); font-weight: bold;">${unit}</td><td>${item["Fee Type"] || "ค่าส่วนกลาง"}</td><td><span class="badge ${status.toLowerCase()}">${status}</span></td><td>${btnHtml}</td></tr>`;
+        receiptBody.innerHTML += `<tr><td style="color: var(--accent-gold); font-weight: bold;">${unit}</td><td>${item["Fee Type"] || "ค่าส่วนกลาง"}</td><td><span class="badge ${status.toLowerCase()}">${status}</span></td><td>${btnHtml}</td></tr>`;
       });
     }
 
@@ -996,16 +983,16 @@
     const uploadList = document.getElementById("upload-list");
 
     dropZone.addEventListener("click", () => fileInput.click());
-    dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.style.background = "rgba(255,75,75,0.2)"; });
-    dropZone.addEventListener("dragleave", () => { dropZone.style.background = "rgba(255,75,75,0.05)"; });
-    dropZone.addEventListener("drop", (e) => { e.preventDefault(); dropZone.style.background = "rgba(255,75,75,0.05)"; if (e.dataTransfer.files.length > 0) handleFiles(e.dataTransfer.files); });
+    dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.style.background = "rgba(180,83,9,0.2)"; });
+    dropZone.addEventListener("dragleave", () => { dropZone.style.background = "rgba(180,83,9,0.08)"; });
+    dropZone.addEventListener("drop", (e) => { e.preventDefault(); dropZone.style.background = "rgba(180,83,9,0.08)"; if (e.dataTransfer.files.length > 0) handleFiles(e.dataTransfer.files); });
     fileInput.addEventListener("change", (e) => { if (e.target.files.length > 0) handleFiles(e.target.files); });
 
     function handleFiles(files) {
       document.getElementById("upload-status-box").style.display = "block";
       Array.from(files).forEach(file => {
         const itemEl = document.createElement("div");
-        itemEl.style.padding = "10px"; itemEl.style.background = "rgba(0,0,0,0.2)"; itemEl.style.borderRadius = "8px";
+        itemEl.style.padding = "10px"; itemEl.style.background = "#231106"; itemEl.style.borderRadius = "8px"; itemEl.style.border = "2px solid #140803";
         itemEl.innerHTML = `<span>📄 ${file.name}</span> <span style="color:var(--accent-gold); float:right;">⏳ อัปโหลด...</span>`;
         uploadList.prepend(itemEl);
 
@@ -1013,9 +1000,9 @@
         reader.onload = async function(e) {
           try {
             await fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "raw_file_upload", operator: currentUser?.username, fileName: file.name, mimeType: file.type || "application/octet-stream", fileData: e.target.result })});
-            itemEl.innerHTML = `<span>✅ ${file.name}</span> <span style="color:var(--accent-blue); float:right;">สำเร็จ</span>`;
+            itemEl.innerHTML = `<span>✅ ${file.name}</span> <span style="color:#6ee7b7; float:right;">สำเร็จ</span>`;
             showExpToast(10, "อัปโหลดไฟล์");
-          } catch (err) { itemEl.innerHTML = `<span>✅ ${file.name}</span> <span style="color:var(--accent-blue); float:right;">สำเร็จ</span>`; showExpToast(10, "อัปโหลดไฟล์"); }
+          } catch (err) { itemEl.innerHTML = `<span>✅ ${file.name}</span> <span style="color:#6ee7b7; float:right;">สำเร็จ</span>`; showExpToast(10, "อัปโหลดไฟล์"); }
         };
         reader.readAsDataURL(file);
       });
