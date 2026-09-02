@@ -56,7 +56,7 @@
       display: flex; align-items: center; gap: 10px;
     }
 
-    /* Sidebar (Wooden Tower Theme) */
+    /* Sidebar */
     .sidebar {
       width: 100px; background: linear-gradient(180deg, #4a2511, #2a1508);
       margin: 20px 0 20px 20px; border-radius: 16px; border: 6px solid #1a0c04;
@@ -65,8 +65,8 @@
     }
     .company-logo { margin-bottom: 25px; position: relative; cursor: pointer; transition: 0.3s; }
     .company-logo img {
-      width: 55px; height: 55px; object-fit: contain; border-radius: 12px;
-      border: 3px solid var(--accent-gold); background: #ffffff; box-shadow: 0 0 10px rgba(251,191,36,0.5);
+      width: 60px; height: 60px; object-fit: contain; border-radius: 12px;
+      border: 3px solid var(--accent-gold); background: #231106; box-shadow: 0 0 10px rgba(251,191,36,0.5);
     }
     .company-logo:hover { transform: scale(1.08); }
     .company-logo .tooltip {
@@ -353,7 +353,9 @@
   <!-- Login Card -->
   <div id="login-overlay" class="screen-overlay">
     <div class="login-card">
-      <div class="logo-icon" style="font-size: 40px; margin-bottom: 10px;">🪵</div>
+      <div style="width: 65px; height: 65px; background: #231106; border-radius: 50%; border: 3px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(251,191,36,0.4); margin: 0 auto 12px; overflow: hidden;">
+        <img src="logomini.png" style="width: 50px; height: 50px; object-fit: contain;" alt="Logo">
+      </div>
       <h2 style="color: var(--accent-gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">เข้าสู่ระบบนิติบุคคล</h2>
       <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Wooden GUI Management System</p>
       <form onsubmit="handleLogin(event)">
@@ -373,7 +375,7 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="company-logo" onclick="window.open('https://www.facebook.com/udomsukplace', '_blank')">
-      <img src="https://ui-avatars.com/api/?name=Udomsuk&background=4a2128&color=fbbf24&size=150&bold=true" alt="Udomsuk Logo">
+      <img src="logomini.png" alt="Udomsuk Logo">
       <span class="tooltip">บจก.อุดมสุขกบินทร์บุรีบ้านและที่ดิน จำกัด</span>
     </div>
 
