@@ -751,7 +751,7 @@
         <button onclick="switchTab('billing')">📑<span class="tooltip">ออกใบแจ้งหนี้</span></button>
       </li>
       <li class="nav-item" id="menu-admin-hub">
-        <button onclick="switchTab('admin-hub')">🛠️<span class="tooltip">แอดมิน: ไฟล์ดิบ</span></button>
+        <button onclick="switchTab('admin-hub')">🛠️<span class="tooltip">แอดมิน: ไฟล์ดิบ & ระบบ</span></button>
       </li>
     </ul>
     
@@ -976,9 +976,10 @@
       </div>
     </div>
 
-    <!-- Tab 5: Admin Hub -->
+    <!-- Tab 5: Admin Hub (เพิ่มปุ่ม Factory Reset ล้างข้อมูลทดสอบ) -->
     <div id="tab-admin-hub" class="tab-content">
-      <div style="max-width: 800px; margin: 0 auto;">
+      <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+        
         <div class="card">
           <div class="card-title">🛠️ อัปโหลดไฟล์ดิบสำรองข้อมูล (Admin Only)</div>
           <div class="drop-zone" id="drop-zone">
@@ -991,6 +992,22 @@
             <div id="upload-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
           </div>
         </div>
+
+        <!-- กล่องคำสั่งพิเศษสำหรับ Admin ล้างข้อมูลทดสอบ -->
+        <div class="card" style="border-color: #7f1d1d; background: linear-gradient(145deg, #3d1515, #220808);">
+          <div class="card-title" style="color: #fca5a5; border-bottom-color: #991b1b;">
+            <span>⚠️ แดชบอร์ดรีเซ็ตระบบ (Admin Testing Reset)</span>
+            <span class="badge overdue">อันตราย</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+            ปุ่มนี้ใช้สำหรับ <strong>ล้างข้อมูลการทดสอบทั้งหมด</strong> (ตารางทะเบียนลูกบ้าน, ประวัติการรับเงิน, คิวใบแจ้งหนี้ และประวัติการทำงาน) ในคลิกเดียว เพื่อเริ่มการทดสอบรอบใหม่ตั้งแต่ต้นจนจบแบบสะอาด 100%<br>
+            <em style="color: #f87171;">* บัญชีผู้ใช้งานและรหัสผ่านพนักงานในระบบจะไม่ถูกลบ *</em>
+          </p>
+          <button type="button" class="btn-primary" id="btn-admin-reset" style="background: linear-gradient(135deg, #dc2626, #991b1b); border-color: #450a0a;" onclick="handleAdminFactoryReset()">
+            🗑️ ล้างข้อมูลใน Sheet และรีเซ็ตระบบทั้งหมด (เริ่มรอบใหม่)
+          </button>
+        </div>
+
       </div>
     </div>
 
@@ -1012,7 +1029,6 @@
     let pendingUnitForRegistration = "";
     let tempSelectedAvatar = "WIZmini";
 
-    // 📅 ฟังก์ชันแปลงวันที่และรอบบิลให้แสดงผลภาษาไทยสวยงาม
     function formatDisplayDate(val) {
       if (!val || val === "-" || val === "") return "-";
       try {
@@ -1032,14 +1048,12 @@
       const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
       try {
         const strVal = String(val).trim();
-        // ถ้าเป็นรูปแบบ YYYY-MM
         if (/^\d{4}-\d{2}$/.test(strVal)) {
           const parts = strVal.split("-");
           const mIdx = parseInt(parts[1], 10) - 1;
           const yThai = parseInt(parts[0], 10) + 543;
           return `${thaiMonths[mIdx]} ${yThai}`;
         }
-        // ถ้าเป็น Date Object หรือ Timestamp
         const d = new Date(val);
         if (!isNaN(d.getTime())) {
           return `${thaiMonths[d.getMonth()]} ${d.getFullYear() + 543}`;
@@ -1395,7 +1409,6 @@
       if (found && found.residentName) document.getElementById("form-name").value = found.residentName;
     }
 
-    // ⚡ ฟังก์ชันดึงรายการจากคิวเข้าสู่ฟอร์มรับชำระเงิน
     function fillPaymentFromQueue(unit, name, feeType, month) {
       document.getElementById("form-unit").value = unit;
       document.getElementById("form-name").value = name;
@@ -1434,7 +1447,6 @@
       } catch (error) { console.error("Load Error:", error); }
     }
 
-    // เรนเดอร์ตารางคิวรอดำเนินการรับเงิน (พร้อมจัดรูปแบบ วันที่ และ รอบบิล สวยงาม)
     function renderPendingInvoicesQueue(data) {
       const tbody = document.getElementById("pending-invoices-tbody");
       tbody.innerHTML = "";
@@ -1518,7 +1530,6 @@
       document.getElementById("queue-badge").innerText = `${queueCount} รายการ`;
     }
 
-    // ออกใบแจ้งหนี้ (ส่งงานเข้าคิวฝ่ายการเงิน)
     async function handleGenerateInvoice(event) {
       event.preventDefault();
       const unitVal = document.getElementById("inv-unit").value.trim();
@@ -1598,7 +1609,6 @@
       window.print();
     }
 
-    // บันทึกรับชำระเงิน และตัดยอดคิวอัตโนมัติ
     async function submitPayment(event) {
       event.preventDefault();
       const targetKey = cleanUnitKey(document.getElementById("form-unit").value);
@@ -1693,6 +1703,52 @@
       } finally { 
         btn.disabled = false; 
         btn.innerText = "บันทึกข้อมูล & สร้างโฟลเดอร์"; 
+      }
+    }
+
+    // 🗑️ ฟังก์ชัน Factory Reset ล้างข้อมูลสำหรับ Admin
+    async function handleAdminFactoryReset() {
+      const confirm1 = confirm("🚨 คำเตือนสำคัญ!\n\nคุณแน่ใจหรือไม่ว่าต้องการ 'ล้างข้อมูลการทดสอบทั้งหมด' ใน Google Sheets (ทะเบียนลูกบ้าน, คิวแจ้งหนี้, ประวัติรับเงิน)?\n\nข้อมูลเหล่านี้จะถูกล้างทิ้งและไม่สามารถกู้คืนได้");
+      if (!confirm1) return;
+
+      const confirm2 = prompt("กรุณาพิมพ์คำว่า 'RESET' เพื่อยืนยันการล้างข้อมูล:");
+      if (confirm2 !== "RESET") {
+        alert("❌ ยกเลิกการรีเซ็ต (คุณพิมพ์คำยืนยันไม่ถูกต้อง)");
+        return;
+      }
+
+      const btn = document.getElementById("btn-admin-reset");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังล้างข้อมูลใน Google Sheets...";
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            type: "admin_factory_reset",
+            operator: currentUser?.username,
+            operatorRole: currentUser?.role
+          })
+        });
+        const resJson = await res.json();
+
+        if (resJson.status === "success") {
+          alert("🎉 " + resJson.message);
+          // ล้างข้อมูลแคชในหน้าเว็บและโหลดข้อมูลใหม่
+          cachedPayments = [];
+          cachedResidents = [];
+          cachedPendingInvoices = [];
+          await loadDashboardData();
+          switchTab('financial');
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "🗑️ ล้างข้อมูลใน Sheet และรีเซ็ตระบบทั้งหมด (เริ่มรอบใหม่)";
       }
     }
 
