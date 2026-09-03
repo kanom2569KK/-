@@ -152,7 +152,7 @@
     .badge.pending { background: rgba(217,119,6,0.3); color: #fcd34d; border: 1px solid #d97706;}
     .badge.paid { background: rgba(5,150,105,0.3); color: #6ee7b7; border: 1px solid var(--accent-green);}
 
-    /* Wooden Buttons */
+    /* Buttons */
     .btn-primary {
       width: 100%; padding: 14px; border-radius: 12px; border: 3px solid #140803; font-size: 15px; font-weight: bold;
       background: linear-gradient(135deg, #d97706, #b45309); color: #fffbeb; cursor: pointer;
@@ -387,7 +387,7 @@
         <button onclick="switchTab('residents')">👥<span class="tooltip">ทะเบียนลูกบ้านใหม่</span></button>
       </li>
       <li class="nav-item" id="menu-billing">
-        <button onclick="switchTab('billing')">📑<span class="tooltip">ออกเอกสาร (PDF)</span></button>
+        <button onclick="switchTab('billing')">📑<span class="tooltip">ออกใบแจ้งหนี้</span></button>
       </li>
       <li class="nav-item" id="menu-exp">
         <button onclick="switchTab('exp')">🏆<span class="tooltip">สถานะ & กิลด์ EXP</span></button>
@@ -415,7 +415,7 @@
       </div>
     </div>
 
-    <!-- Tab 1: Financial -->
+    <!-- Tab 1: Financial & Cashier (รวมรับเงิน & ออกใบเสร็จ) -->
     <div id="tab-financial" class="tab-content active">
       <section class="metrics-grid">
         <div class="metric-card">
@@ -434,7 +434,7 @@
 
       <section class="content-grid">
         <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
-          <div class="card-title" style="padding: 20px 24px 0; border: none; margin-bottom: 0;">📊 รายการรับชำระเงินและประวัติสถานะ</div>
+          <div class="card-title" style="padding: 20px 24px 0; border: none; margin-bottom: 0;">📊 ประวัติการรับเงิน & พิมพ์ใบเสร็จ (ฝ่ายการเงิน)</div>
           <div class="table-container">
             <table class="data-table">
               <thead>
@@ -445,10 +445,11 @@
                   <th>ประเภท</th>
                   <th>ยอดเงิน</th>
                   <th>สถานะ</th>
+                  <th>ใบเสร็จ</th>
                 </tr>
               </thead>
               <tbody id="payments-table-body">
-                <tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--accent-gold);">กำลังโหลดข้อมูลจากเซิร์ฟเวอร์...</td></tr>
+                <tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--accent-gold);">กำลังโหลดข้อมูลจากเซิร์ฟเวอร์...</td></tr>
               </tbody>
             </table>
           </div>
@@ -547,41 +548,30 @@
       </div>
     </div>
 
-    <!-- Tab 3: Billing -->
+    <!-- Tab 3: Billing (เฉพาะออกใบแจ้งหนี้ - ตรวจสอบข้อมูล 100%) -->
     <div id="tab-billing" class="tab-content">
-      <div class="content-grid">
+      <div style="max-width: 650px; margin: 0 auto;">
         <div class="card">
-          <div class="card-title">📄 ออกใบแจ้งหนี้ (Invoice) - ก่อนชำระ</div>
+          <div class="card-title">📄 ออกใบแจ้งหนี้ (Invoice Generation)</div>
           <div class="form-group">
-            <label>เลือกยูนิต / แปลง</label>
-            <input type="text" placeholder="ระบุยูนิตเพื่อสร้างใบแจ้งหนี้">
+            <label>เลขยูนิต / แปลง (ต้องตรงกับฐานข้อมูลจริง 100%) *</label>
+            <input type="text" id="inv-unit" placeholder="ระบุเลขยูนิต เช่น 1 หรือ A01" required>
           </div>
           <div class="form-group">
             <label>ประจำเดือน</label>
-            <input type="month">
+            <input type="month" id="inv-month" required>
           </div>
           <div class="form-group">
             <label>รายการเรียกเก็บ</label>
-            <select><option>ค่าส่วนกลางประจำปี</option><option>ค่าน้ำประปา</option></select>
+            <select id="inv-fee-type">
+              <option>ค่าส่วนกลางประจำปี</option>
+              <option>ค่าน้ำประปา</option>
+              <option>ค่าบำรุงรักษาโครงการ</option>
+            </select>
           </div>
-          <button class="btn-primary" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="handlePrintAction('Invoice')">สร้างเอกสารใบแจ้งหนี้ (PDF)</button>
-        </div>
-
-        <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
-          <div class="card-title" style="padding: 20px 24px 0; border:none; margin-bottom:0;">🖨️ พิมพ์ใบเสร็จรับเงิน (Receipt)</div>
-          <div class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>ยูนิต</th>
-                  <th>รายการ</th>
-                  <th>สถานะ</th>
-                  <th>พิมพ์</th>
-                </tr>
-              </thead>
-              <tbody id="receipt-table-body"></tbody>
-            </table>
-          </div>
+          <button class="btn-primary" style="background: linear-gradient(135deg, #0284c7, #0369a1);" id="btn-generate-inv" onclick="handleGenerateInvoice(event)">
+            🖨️ ตรวจสอบ & พิมพ์ใบแจ้งหนี้ (PDF)
+          </button>
         </div>
       </div>
     </div>
@@ -655,8 +645,8 @@
 
             <div class="quest-item">
               <div>
-                <strong>📑 ออกเอกสารการเงิน (Scroll Crafter)</strong>
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">สร้างใบแจ้งหนี้ (Invoice) หรือ พิมพ์ใบเสร็จ (Receipt)</p>
+                <strong>📑 ออกใบแจ้งหนี้ & ใบเสร็จ (Scroll Crafter)</strong>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">ออกใบแจ้งหนี้ที่ข้อมูลถูกต้อง 100% หรือพิมพ์ใบเสร็จ</p>
               </div>
               <span class="quest-exp">+2 EXP / ฉบับ</span>
             </div>
@@ -890,11 +880,10 @@
 
     function renderTable(data) {
       const tableBody = document.getElementById("payments-table-body");
-      const receiptBody = document.getElementById("receipt-table-body");
-      tableBody.innerHTML = ""; receiptBody.innerHTML = "";
+      tableBody.innerHTML = "";
 
       if (!data || data.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px;">ไม่พบรายการ</td></tr>`; return;
+        tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">ไม่พบรายการ</td></tr>`; return;
       }
 
       data.forEach(item => {
@@ -904,12 +893,19 @@
         const amount = Number(item["Amount"] || item["amount"] || 0);
         const unit = item["Unit Number"] || item["unitNumber"] || "-";
 
-        tableBody.innerHTML += `<tr><td>${formattedDate}</td><td style="color: var(--accent-gold); font-weight: bold;">${unit}</td><td>${item["Resident Name"] || "-"}</td><td>${item["Fee Type"] || "ค่าส่วนกลาง"}</td><td style="color: #6ee7b7;">฿${amount.toLocaleString()}</td><td><span class="badge ${status.toLowerCase()}">${status}</span></td></tr>`;
+        const btnReceiptHtml = status.toLowerCase() === 'paid' 
+          ? `<button class="btn-action" style="background: linear-gradient(135deg, var(--accent-green), #047857);" onclick="handlePrintReceipt('${unit}')">🖨️ พิมพ์</button>` 
+          : `<span style="font-size:12px; color:var(--text-muted);">-</span>`;
 
-        const btnHtml = status.toLowerCase() === 'paid' 
-          ? `<button class="btn-action" onclick="handlePrintAction('Receipt')">🖨️ พิมพ์</button>` 
-          : `<span style="font-size:12px; color:var(--text-muted);">รอตรวจสอบ</span>`;
-        receiptBody.innerHTML += `<tr><td style="color: var(--accent-gold); font-weight: bold;">${unit}</td><td>${item["Fee Type"] || "ค่าส่วนกลาง"}</td><td><span class="badge ${status.toLowerCase()}">${status}</span></td><td>${btnHtml}</td></tr>`;
+        tableBody.innerHTML += `<tr>
+          <td>${formattedDate}</td>
+          <td style="color: var(--accent-gold); font-weight: bold;">${unit}</td>
+          <td>${item["Resident Name"] || "-"}</td>
+          <td>${item["Fee Type"] || "ค่าส่วนกลาง"}</td>
+          <td style="color: #6ee7b7;">฿${amount.toLocaleString()}</td>
+          <td><span class="badge ${status.toLowerCase()}">${status}</span></td>
+          <td>${btnReceiptHtml}</td>
+        </tr>`;
       });
     }
 
@@ -931,6 +927,63 @@
       document.getElementById("total-records").innerText = data.length.toLocaleString();
     }
 
+    // ฝ่ายจัดทำเอกสาร: ออกใบแจ้งหนี้ (ส่งตรวจกับระบบ 100%)
+    async function handleGenerateInvoice(event) {
+      event.preventDefault();
+      const unitVal = document.getElementById("inv-unit").value.trim();
+      const monthVal = document.getElementById("inv-month").value;
+      const feeVal = document.getElementById("inv-fee-type").value;
+
+      if (!unitVal) {
+        alert("⚠️ กรุณาระบุเลขยูนิต/แปลง");
+        document.getElementById("inv-unit").focus();
+        return;
+      }
+
+      const btn = document.getElementById("btn-generate-inv");
+      btn.disabled = true; btn.innerText = "⏳ กำลังตรวจสอบข้อมูลกับทะเบียนลูกบ้าน...";
+
+      try {
+        const res = await fetch(API_URL, { 
+          method: "POST", 
+          headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+          body: JSON.stringify({ 
+            type: "generate_invoice", 
+            operator: currentUser?.username,
+            operatorRole: currentUser?.role,
+            unitNumber: unitVal,
+            billingMonth: monthVal,
+            feeType: feeVal
+          }) 
+        });
+        const resJson = await res.json();
+        
+        if (resJson.status === "success") {
+          showExpToast(resJson.expAdded, "ออกใบแจ้งหนี้ (ข้อมูลถูกต้อง 100%)");
+          alert(`✅ ตรวจสอบข้อมูลถูกต้อง!\nเจ้าของร่วม: ${resJson.residentName}\nระบบได้ส่งข้อมูลบันทึกรายวันเพื่อเตรียมออกใบเสร็จเรียบร้อยแล้ว`);
+          window.print();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) { 
+        alert("⚠️ เชื่อมต่อเซิร์ฟเวอร์ขัดข้อง");
+      } finally {
+        btn.disabled = false; btn.innerText = "🖨️ ตรวจสอบ & พิมพ์ใบแจ้งหนี้ (PDF)";
+      }
+    }
+
+    // ฝ่ายการเงิน: พิมพ์ใบเสร็จรับเงิน
+    async function handlePrintReceipt(unit) {
+      showExpToast(2, "พิมพ์ใบเสร็จรับเงิน");
+      fetch(API_URL, { 
+        method: "POST", 
+        headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+        body: JSON.stringify({ type: "print_receipt", operator: currentUser?.username, unitNumber: unit }) 
+      });
+      window.print();
+    }
+
+    // ฝ่ายการเงิน: บันทึกรับเงิน
     async function submitPayment(event) {
       event.preventDefault();
       const inputUnit = document.getElementById("form-unit").value.trim().toLowerCase();
@@ -945,9 +998,16 @@
       try {
         const res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
         const resJson = await res.json();
-        showExpToast(resJson.expAdded || 5, (payload.status==="Overdue"||payload.feeType.includes("ค่าปรับ"))?"ทวงหนี้สำเร็จ":"รับชำระเงิน");
-      } catch (err) { showExpToast(5, "รับชำระเงิน"); } 
-      finally { alert("✅ บันทึกรายการสำเร็จ"); document.getElementById("payment-form").reset(); loadDashboardData(); btn.disabled = false; btn.innerText = "บันทึกรับชำระเงิน"; }
+        if(resJson.status === "success") {
+          showExpToast(resJson.expAdded || 5, (payload.status==="Overdue"||payload.feeType.includes("ค่าปรับ"))?"ทวงหนี้สำเร็จ":"รับชำระเงิน");
+          alert("✅ บันทึกรายการสำเร็จ");
+          document.getElementById("payment-form").reset();
+          loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) { alert("⚠️ เกิดข้อผิดพลาดในการบันทึก"); } 
+      finally { btn.disabled = false; btn.innerText = "บันทึกรับชำระเงิน"; }
     }
 
     function previewResidentPhoto(e) {
@@ -968,16 +1028,22 @@
         titleDeedNo: document.getElementById("res-deed").value, residentName: document.getElementById("res-name").value, phone: document.getElementById("res-phone").value, email: document.getElementById("res-email").value, idCardAddress: document.getElementById("res-id-address").value, currentAddress: document.getElementById("res-cur-address").value, moveInDate: document.getElementById("res-date").value, outstandingBalance: document.getElementById("res-balance").value, notes: document.getElementById("res-notes").value, photoData: residentPhotoBase64, photoName: residentPhotoName, photoMimeType: residentPhotoMime
       };
       try {
-        await fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
-        showExpToast(15, "ลงทะเบียนลูกบ้าน");
-      } catch (err) { showExpToast(15, "ลงทะเบียนลูกบ้าน"); } 
-      finally { alert("✅ บันทึกข้อมูลสำเร็จ!"); document.getElementById("resident-form").reset(); document.getElementById("photo-preview-box").style.display = "none"; document.getElementById("res-photo").value = ""; residentPhotoBase64 = null; loadDashboardData(); switchTab('financial'); btn.disabled = false; btn.innerText = "บันทึกข้อมูล & สร้างโฟลเดอร์"; }
-    }
-
-    async function handlePrintAction(docType) {
-      showExpToast(2, "ออกเอกสาร");
-      fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "print_doc", operator: currentUser?.username }) });
-      window.print(); 
+        const res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
+        const resJson = await res.json();
+        if(resJson.status === "success") {
+          showExpToast(15, "ลงทะเบียนลูกบ้าน");
+          alert("✅ บันทึกข้อมูลสำเร็จ!");
+          document.getElementById("resident-form").reset();
+          document.getElementById("photo-preview-box").style.display = "none";
+          document.getElementById("res-photo").value = "";
+          residentPhotoBase64 = null;
+          loadDashboardData();
+          switchTab('financial');
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) { alert("⚠️ เกิดข้อผิดพลาด"); } 
+      finally { btn.disabled = false; btn.innerText = "บันทึกข้อมูล & สร้างโฟลเดอร์"; }
     }
 
     const dropZone = document.getElementById("drop-zone");
