@@ -225,7 +225,7 @@
     .quest-exp { background: rgba(251,191,36,0.15); color: var(--accent-gold); padding: 3px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; border: 1px solid var(--accent-gold); }
 
     /* ========================================================
-       🖨️ PRINT STYLESHEET: รูปแบบใบแจ้งหนี้ทางการ A4
+       🖨️ PRINT STYLESHEET: เอกสารทางการ A4 (ตัดส่วนประกอบเว็บออกหมด 100%)
        ======================================================== */
     #printable-invoice {
       display: none;
@@ -234,75 +234,115 @@
     @media print {
       @page {
         size: A4 portrait;
-        margin: 15mm 15mm;
+        margin: 12mm 15mm;
       }
-      body {
+      html, body {
+        width: 100% !important;
+        height: auto !important;
         background: #ffffff !important;
         color: #000000 !important;
-        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
         overflow: visible !important;
       }
-      /* ซ่อนโครงสร้างเว็บทั้งหมด */
-      .sidebar, .top-bar, .tab-content, .screen-overlay, .modal-overlay, .exp-toast {
+      /* ซ่อนโครงสร้าง Web App ทั้งหมด */
+      .sidebar, .main-content, .top-bar, .tab-content, .screen-overlay, .modal-overlay, .exp-toast {
         display: none !important;
       }
-      /* แสดงเฉพาะฟอร์มเอกสารใบแจ้งหนี้ */
+      /* แสดงเฉพาะกล่องใบแจ้งหนี้ */
       #printable-invoice {
         display: block !important;
         width: 100% !important;
         background: #ffffff !important;
         color: #111827 !important;
-        font-size: 13pt;
-        line-height: 1.5;
+        font-size: 11.5pt;
+        line-height: 1.45;
       }
       .inv-header-table {
         width: 100%;
-        border-bottom: 2px solid #111827;
+        border-bottom: 2.5px solid #1e3a8a;
         padding-bottom: 12px;
-        margin-bottom: 18px;
+        margin-bottom: 16px;
       }
-      .inv-title {
-        font-size: 20pt;
+      .inv-logo-img {
+        width: 80px;
+        height: auto;
+        object-fit: contain;
+      }
+      .inv-company-name {
+        font-size: 14pt;
         font-weight: bold;
+        color: #111827;
+        margin-bottom: 3px;
+      }
+      .inv-company-sub {
+        font-size: 9.5pt;
+        color: #4b5563;
+        line-height: 1.4;
+      }
+      .inv-title-main {
+        font-size: 22pt;
+        font-weight: 800;
         color: #1e3a8a;
+        letter-spacing: 1px;
         text-align: right;
+      }
+      .inv-title-sub {
+        font-size: 10.5pt;
+        font-weight: bold;
+        color: #6b7280;
+        letter-spacing: 2px;
+        text-align: right;
+        margin-top: -2px;
+      }
+      .inv-meta-table {
+        margin-top: 8px;
+        font-size: 9.5pt;
+        float: right;
+      }
+      .inv-meta-table td {
+        padding: 2px 4px;
       }
       .inv-info-box {
         width: 100%;
-        margin-bottom: 20px;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
+        margin-bottom: 18px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
         padding: 12px 16px;
-        background: #f9fafb;
+        background: #f8fafc;
       }
       .inv-table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 25px;
+        margin-bottom: 20px;
       }
       .inv-table th, .inv-table td {
-        border: 1px solid #9ca3af;
-        padding: 10px 14px;
+        border: 1px solid #94a3b8;
+        padding: 9px 12px;
         text-align: left;
       }
       .inv-table th {
-        background-color: #f3f4f6;
+        background-color: #f1f5f9;
         font-weight: bold;
+        color: #0f172a;
+        font-size: 10.5pt;
       }
       .inv-total-row {
-        background-color: #f9fafb;
+        background-color: #f8fafc;
         font-weight: bold;
-        font-size: 14pt;
+        font-size: 12.5pt;
       }
       .inv-signatures {
         width: 100%;
-        margin-top: 40px;
+        margin-top: 35px;
       }
       .inv-sig-box {
         text-align: center;
-        width: 45%;
-        border-top: 1px dashed #4b5563;
+        width: 75%;
+        border-top: 1px dashed #64748b;
         padding-top: 8px;
+        margin: 0 auto;
+        font-size: 10pt;
       }
     }
   </style>
@@ -310,38 +350,51 @@
 <body>
 
   <!-- =======================================================
-       🖨️ PRINT TEMPLATE: เอกสารใบแจ้งหนี้ทางการ (สำหรับพิมพ์ A4)
+       🖨️ PRINT TEMPLATE: เอกสารใบแจ้งหนี้ทางการ A4
        ======================================================= -->
   <div id="printable-invoice">
     <table class="inv-header-table">
       <tr>
-        <td style="width: 60%; vertical-align: top;">
-          <h2 style="font-size: 16pt; color: #111827; margin-bottom: 4px;">บริษัท อุดมสุขกบินทร์บุรีบ้านและที่ดิน จำกัด</h2>
-          <p style="font-size: 11pt; color: #4b5563;">โครงการหมู่บ้านอุดมสุขเพลส (Udomsuk Place)</p>
-          <p style="font-size: 10pt; color: #6b7280;">หมู่ 9 ต.หนองกี่ อ.กบินทร์บุรี จ.ปราจีนบุรี 25110</p>
-          <p style="font-size: 10pt; color: #6b7280;">โทร. 089-892-2066 | Facebook: udomsukplace</p>
+        <td style="width: 15%; vertical-align: middle;">
+          <img src="logomini.png" alt="Company Logo" class="inv-logo-img">
         </td>
-        <td style="width: 40%; vertical-align: top; text-align: right;">
-          <div class="inv-title">ใบแจ้งหนี้</div>
-          <div style="font-size: 11pt; font-weight: bold; color: #4b5563; margin-top: 4px;">INVOICE</div>
-          <p style="font-size: 10pt; margin-top: 6px;"><strong>เลขที่เอกสาร:</strong> <span id="print-inv-no">INV-2026-001</span></p>
-          <p style="font-size: 10pt;"><strong>วันที่ออกเอกสาร:</strong> <span id="print-inv-date">-</span></p>
+        <td style="width: 52%; vertical-align: top; padding-left: 10px;">
+          <div class="inv-company-name">บริษัท อุดมสุขกบินทร์บุรี บ้านและที่ดิน จำกัด (สำนักงานใหญ่)</div>
+          <div class="inv-company-sub">
+            โครงการหมู่บ้านอุดมสุขเพลส (Udomsuk Place)<br>
+            ที่อยู่: 899/55-56 หมู่ 9 ตำบลหนองกี่ อำเภอกบินทร์บุรี จังหวัดปราจีนบุรี 25110<br>
+            โทร. 065-685-9898 | เลขประจำตัวผู้เสียภาษีอากร: <strong>0255552000178</strong>
+          </div>
+        </td>
+        <td style="width: 33%; vertical-align: top; text-align: right;">
+          <div class="inv-title-main">ใบแจ้งหนี้</div>
+          <div class="inv-title-sub">INVOICE</div>
+          <table class="inv-meta-table">
+            <tr>
+              <td style="text-align: right; color: #475569;">เลขที่เอกสาร:</td>
+              <td style="text-align: left; font-weight: bold; color: #1e3a8a;"><span id="print-inv-no">INV-202609-001</span></td>
+            </tr>
+            <tr>
+              <td style="text-align: right; color: #475569;">วันที่ออกเอกสาร:</td>
+              <td style="text-align: left; font-weight: bold;"><span id="print-inv-date">-</span></td>
+            </tr>
+          </table>
         </td>
       </tr>
     </table>
 
     <div class="inv-info-box">
-      <table style="width: 100%; border: none; font-size: 11pt;">
+      <table style="width: 100%; border: none; font-size: 10.5pt;">
         <tr>
-          <td style="width: 55%; padding: 4px 0;"><strong>ผู้รับใบแจ้งหนี้ (ลูกค้า):</strong> <span id="print-res-name">-</span></td>
-          <td style="width: 45%; padding: 4px 0;"><strong>เลขยูนิต / แปลง:</strong> <span id="print-res-unit" style="font-size: 12pt; font-weight: bold; color: #1e3a8a;">-</span></td>
+          <td style="width: 60%; padding: 3px 0;"><strong>ผู้รับใบแจ้งหนี้ (เจ้าของร่วม):</strong> <span id="print-res-name" style="font-weight: bold; font-size: 11pt;">-</span></td>
+          <td style="width: 40%; padding: 3px 0;"><strong>เลขยูนิต / แปลง:</strong> <span id="print-res-unit" style="font-size: 12pt; font-weight: bold; color: #1e3a8a;">-</span></td>
         </tr>
         <tr>
-          <td style="padding: 4px 0;"><strong>เลขที่โฉนดที่ดิน:</strong> <span id="print-res-deed">-</span></td>
-          <td style="padding: 4px 0;"><strong>ประจำรอบเดือน:</strong> <span id="print-inv-month" style="font-weight: bold;">-</span></td>
+          <td style="padding: 3px 0;"><strong>เลขที่โฉนดที่ดิน:</strong> <span id="print-res-deed">-</span></td>
+          <td style="padding: 3px 0;"><strong>ประจำรอบเดือน:</strong> <span id="print-inv-month" style="font-weight: bold;">-</span></td>
         </tr>
         <tr>
-          <td colspan="2" style="padding: 4px 0;"><strong>สถานที่ส่งเอกสาร:</strong> <span id="print-res-address">-</span></td>
+          <td colspan="2" style="padding: 3px 0;"><strong>สถานที่จัดส่งเอกสาร / ที่อยู่:</strong> <span id="print-res-address">-</span></td>
         </tr>
       </table>
     </div>
@@ -350,8 +403,8 @@
       <thead>
         <tr>
           <th style="width: 10%; text-align: center;">ลำดับ</th>
-          <th style="width: 60%;">รายการเรียกเก็บ (Description)</th>
-          <th style="width: 30%; text-align: right;">จำนวนเงิน (บาท)</th>
+          <th style="width: 65%;">รายการเรียกเก็บ (Description)</th>
+          <th style="width: 25%; text-align: right;">จำนวนเงิน (บาท)</th>
         </tr>
       </thead>
       <tbody>
@@ -359,7 +412,7 @@
           <td style="text-align: center;">1</td>
           <td>
             <strong id="print-fee-title">ค่าส่วนกลางประจำปี</strong>
-            <div style="font-size: 10pt; color: #4b5563;" id="print-fee-desc">บำรุงรักษาพื้นที่ส่วนกลาง, รปภ., ไฟฟ้าส่องสว่าง และการจัดการขยะ</div>
+            <div style="font-size: 9.5pt; color: #475569;" id="print-fee-desc">บำรุงรักษาพื้นที่ส่วนกลาง, รปภ., ไฟฟ้าส่องสว่าง และการจัดการขยะ</div>
           </td>
           <td style="text-align: right; font-weight: bold;" id="print-fee-amount">500.00</td>
         </tr>
@@ -367,35 +420,35 @@
           <td style="text-align: center;">2</td>
           <td>
             <strong>ค่าน้ำประปา / ค่าบริการบำรุงรักษามิเตอร์</strong>
-            <div style="font-size: 10pt; color: #4b5563;">ตามรอบบันทึกการใช้น้ำประจำเดือน</div>
+            <div style="font-size: 9.5pt; color: #475569;">ตามรอบบันทึกการใช้น้ำประจำเดือน</div>
           </td>
           <td style="text-align: right; font-weight: bold;">0.00</td>
         </tr>
         <tr class="inv-total-row">
-          <td colspan="2" style="text-align: right;">รวมยอดที่ต้องชำระทั้งสิ้น (Total Due):</td>
+          <td colspan="2" style="text-align: right; color: #0f172a;">รวมยอดที่ต้องชำระทั้งสิ้น (Total Due):</td>
           <td style="text-align: right; color: #1e3a8a;" id="print-fee-total">฿500.00</td>
         </tr>
       </tbody>
     </table>
 
-    <div style="background: #fef3c7; border: 1px solid #f59e0b; padding: 10px 14px; border-radius: 6px; font-size: 10pt; margin-bottom: 25px;">
-      <strong>📌 หมายเหตุและขั้นตอนการชำระเงิน:</strong><br>
-      1. กรุณานำใบแจ้งหนี้นี้มาชำระ ณ สำนักงานนิติบุคคล หรือสแกน QR Code เพื่อโอนเงินเข้าบัญชีโครงการ<br>
-      2. เมื่อชำระเงินเรียบร้อยแล้ว <strong>ฝ่ายการเงินจะออก "ใบเสร็จรับเงินฉบับเต็ม (Official Receipt)"</strong> ให้เป็นหลักฐานทันที
+    <div style="background: #fffbeb; border: 1px solid #fde68a; padding: 10px 14px; border-radius: 6px; font-size: 9.5pt; margin-bottom: 20px;">
+      <strong style="color: #b45309;">📌 ข้อมูลและขั้นตอนการชำระเงิน:</strong><br>
+      1. กรุณานำใบแจ้งหนี้นี้มาชำระ ณ สำนักงานนิติบุคคล หรือชำระผ่านช่องทางโอนเงินเข้าบัญชีบริษัท<br>
+      2. เมื่อชำระเงินเรียบร้อยแล้ว <strong>ฝ่ายการเงินจะดำเนินการออก "ใบเสร็จรับเงินฉบับเต็ม (Official Receipt)"</strong> ให้เป็นหลักฐานทันที
     </div>
 
     <table class="inv-signatures">
       <tr>
         <td style="width: 50%; text-align: center; vertical-align: top;">
           <br><br>
-          <div class="inv-sig-box" style="margin: 0 auto;">
+          <div class="inv-sig-box">
             (<span id="print-operator-name">ผู้จัดทำเอกสาร</span>)<br>
             <strong>เจ้าหน้าที่ฝ่ายจัดทำเอกสาร</strong>
           </div>
         </td>
         <td style="width: 50%; text-align: center; vertical-align: top;">
           <br><br>
-          <div class="inv-sig-box" style="margin: 0 auto;">
+          <div class="inv-sig-box">
             ( ............................................................ )<br>
             <strong>เจ้าหน้าที่ฝ่ายการเงิน (ผู้รับเงิน)</strong>
           </div>
@@ -808,7 +861,7 @@
       </section>
     </div>
 
-    <!-- Tab 2: Residents -->
+    <!-- Tab 2: Residents (Auto-Fill Enabled) -->
     <div id="tab-residents" class="tab-content">
       <div style="max-width: 800px; margin: 0 auto;">
         <div class="card">
@@ -1325,7 +1378,7 @@
     }
 
     // =========================================================
-    // 🖨️ ฟังก์ชันออกใบแจ้งหนี้ + เติมข้อมูลลง Print Template A4
+    // 🖨️ ฟังก์ชันออกใบแจ้งหนี้ + เติมข้อมูลลง Print Template A4 มืออาชีพ
     // =========================================================
     async function handleGenerateInvoice(event) {
       event.preventDefault();
@@ -1364,22 +1417,31 @@
         if (resJson.status === "success") {
           showExpToast(resJson.expAdded, "ออกใบแจ้งหนี้ (ข้อมูลถูกต้อง 100%)");
 
-          // 1. นำข้อมูลไปใส่ในโครงสร้าง Print Template A4
+          // จัดเตรียมข้อมูลวันที่ภาษาไทย
           const now = new Date();
-          const dStr = now.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+          const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+          const dStr = `${now.getDate()} ${thaiMonths[now.getMonth()]} ${now.getFullYear() + 543}`;
           const invCode = `INV-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}-${unitVal.padStart(3,'0')}`;
+
+          let displayMonth = monthVal;
+          if (monthVal && monthVal.includes("-")) {
+            const parts = monthVal.split("-");
+            const mIndex = parseInt(parts[1], 10) - 1;
+            const yThai = parseInt(parts[0], 10) + 543;
+            displayMonth = `${thaiMonths[mIndex]} ${yThai}`;
+          }
 
           document.getElementById("print-inv-no").innerText = invCode;
           document.getElementById("print-inv-date").innerText = dStr;
           document.getElementById("print-res-name").innerText = resJson.residentName || "-";
           document.getElementById("print-res-unit").innerText = unitVal;
           document.getElementById("print-res-deed").innerText = matchedResident?.titleDeedNo || "-";
-          document.getElementById("print-inv-month").innerText = monthVal || "ประจำเดือนปัจจุบัน";
+          document.getElementById("print-inv-month").innerText = displayMonth || "ประจำเดือนปัจจุบัน";
           document.getElementById("print-res-address").innerText = matchedResident?.currentAddress || `แปลงที่ ${unitVal} โครงการอุดมสุขเพลส`;
           document.getElementById("print-fee-title").innerText = feeVal;
           document.getElementById("print-operator-name").innerText = currentUser?.fullName || "ผู้จัดทำเอกสาร";
 
-          // 2. เรียกหน้าต่าง Print (CSS @media print จะจัดการเลย์เอาต์ A4 อัตโนมัติ)
+          // สั่งพิมพ์ออกเลย์เอาต์ A4
           window.print();
         } else {
           alert("❌ " + resJson.message);
