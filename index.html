@@ -238,25 +238,29 @@
 <body>
 
   <!-- =======================================================
-       📜 POPUP: รายชื่อลูกบ้านเฉพาะ (Customer Lookup Modal)
+       📜 POPUP: รายชื่อลูกบ้านแบบละเอียด (Residents Lookup Modal)
        ======================================================= -->
   <div id="customer-list-modal" class="modal-overlay">
-    <div class="ro-window" style="max-width: 580px;">
+    <div class="ro-window" style="max-width: 950px; width: 95%;">
       <div class="ro-header">
-        <span>📜 สารบบรายชื่อลูกบ้าน (Residents Lookup)</span>
+        <span>📜 สารบบข้อมูลลูกบ้านทั้งหมด (Residents Directory)</span>
         <span class="ro-close" onclick="closeCustomerListModal()">✕</span>
       </div>
       <div style="padding: 16px 20px 0 20px;">
-        <input type="text" id="modal-resident-search" placeholder="🔍 พิมพ์ค้นหาเลขยูนิต หรือชื่อลูกบ้าน..." onkeyup="filterModalResidentList()" 
+        <input type="text" id="modal-resident-search" placeholder="🔍 พิมพ์ค้นหาเลขยูนิต, ชื่อ-นามสกุล, เลขโฉนด, เบอร์โทร หรือที่อยู่..." onkeyup="filterModalResidentList()" 
                style="width: 100%; padding: 10px 14px; background: #231106; color: var(--text-main); border: 2px solid #140803; border-radius: 10px; outline: none; font-size: 13px;">
       </div>
       <div class="ro-body" style="padding: 14px 20px; flex-direction: column; align-items: stretch;">
-        <div style="max-height: 320px; overflow-y: auto; border: 2px solid #140803; border-radius: 10px; background: #231106;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <div style="max-height: 420px; overflow-x: auto; overflow-y: auto; border: 2px solid #140803; border-radius: 10px; background: #231106;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 800px;">
             <thead>
-              <tr style="background: #1a0c04; color: var(--accent-gold); position: sticky; top: 0;">
-                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 30%;">เลขยูนิต / แปลง</th>
-                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803;">ชื่อ-นามสกุล เจ้าของร่วม</th>
+              <tr style="background: #1a0c04; color: var(--accent-gold); position: sticky; top: 0; z-index: 2;">
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 10%;">ยูนิต</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 18%;">ชื่อ-นามสกุล</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 12%;">เลขที่โฉนด</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 13%;">เบอร์โทรศัพท์</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 23%;">ที่อยู่ตามบัตร ปชช.</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 24%;">ที่อยู่ปัจจุบัน / ส่งเอกสาร</th>
               </tr>
             </thead>
             <tbody id="modal-resident-tbody">
@@ -358,7 +362,6 @@
       </div>
       <div class="ro-body" style="gap: 20px; align-items: flex-start; max-height: 80vh; overflow-y: auto;">
          
-         <!-- ฝั่งซ้าย: ข้อมูลตัวละคร -->
          <div style="flex: 1; text-align: center; background: #231106; padding: 18px; border-radius: 14px; border: 2px solid #140803;">
            <div id="prof-avatar-display" style="width: 85px; height: 85px; background: #120602; border-radius: 50%; border: 3px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(251,191,36,0.3); margin: 0 auto; overflow: hidden;">
              <img id="prof-avatar-img" src="WIZmini.gif" style="width: 70px; height: 70px; object-fit: contain; image-rendering: pixelated;" alt="Avatar">
@@ -385,7 +388,6 @@
            </div>
          </div>
 
-         <!-- ฝั่งขวา: กระดานภารกิจ EXP -->
          <div style="flex: 1.4; display: flex; flex-direction: column; gap: 8px;">
             <div style="font-size: 14px; font-weight: bold; color: var(--accent-gold); margin-bottom: 4px;">📜 กระดานภารกิจรับ EXP (Guild Quests)</div>
             
@@ -892,14 +894,14 @@
     function closeProfileModal() { document.getElementById("profile-modal-overlay").style.display = "none"; }
 
     // ==========================================
-    // 📜 ฟังก์ชันเปิด-ปิด และล้างข้อมูลป๊อปอัปรายชื่อลูกบ้าน
+    // 📜 ฟังก์ชันเปิด-ปิด และล้างข้อมูลป๊อปอัปรายชื่อลูกบ้านแบบละเอียด
     // ==========================================
     function openCustomerListModal() {
       const tbody = document.getElementById("modal-resident-tbody");
       tbody.innerHTML = "";
       
       if (!cachedResidents || cachedResidents.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="2" style="text-align: center; padding: 20px; color: var(--text-muted);">ไม่พบข้อมูลลูกบ้านในระบบ</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--text-muted);">ไม่พบข้อมูลลูกบ้านในระบบ</td></tr>`;
       } else {
         renderModalResidents(cachedResidents);
       }
@@ -915,7 +917,11 @@
         tbody.innerHTML += `
           <tr style="border-bottom: 1px solid #140803;">
             <td style="padding: 10px 12px; font-weight: bold; color: var(--accent-gold);">${res.unitNumber.toUpperCase()}</td>
-            <td style="padding: 10px 12px; color: var(--text-main);">${res.residentName || "-"}</td>
+            <td style="padding: 10px 12px; color: var(--text-main); font-weight: 600;">${res.residentName || "-"}</td>
+            <td style="padding: 10px 12px; color: #60a5fa;">${res.titleDeedNo || "-"}</td>
+            <td style="padding: 10px 12px; color: #6ee7b7;">${res.phone || "-"}</td>
+            <td style="padding: 10px 12px; color: var(--text-muted); font-size: 12px;">${res.idCardAddress || "-"}</td>
+            <td style="padding: 10px 12px; color: var(--text-muted); font-size: 12px;">${res.currentAddress || "-"}</td>
           </tr>
         `;
       });
@@ -924,7 +930,12 @@
     function filterModalResidentList() {
       const q = document.getElementById("modal-resident-search").value.trim().toLowerCase();
       const filtered = cachedResidents.filter(r => 
-        r.unitNumber.toLowerCase().includes(q) || (r.residentName && r.residentName.toLowerCase().includes(q))
+        r.unitNumber.toLowerCase().includes(q) || 
+        (r.residentName && r.residentName.toLowerCase().includes(q)) ||
+        (r.titleDeedNo && r.titleDeedNo.toLowerCase().includes(q)) ||
+        (r.phone && r.phone.toLowerCase().includes(q)) ||
+        (r.idCardAddress && r.idCardAddress.toLowerCase().includes(q)) ||
+        (r.currentAddress && r.currentAddress.toLowerCase().includes(q))
       );
       renderModalResidents(filtered);
     }
