@@ -631,7 +631,7 @@
       </section>
     </div>
 
-    <!-- Tab 2: Residents -->
+    <!-- Tab 2: Residents (Auto-Fill Enabled) -->
     <div id="tab-residents" class="tab-content">
       <div style="max-width: 800px; margin: 0 auto;">
         <div class="card">
@@ -644,35 +644,35 @@
           <form id="resident-form" onsubmit="submitNewResident(event)">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
               <div class="form-group">
-                <label>เลขยูนิต / แปลงบ้าน *</label>
-                <input type="text" id="res-unit" placeholder="เช่น 001 หรือ แปลง 12" required>
+                <label>เลขยูนิต / แปลงบ้าน * (พิมพ์เลข เช่น 12 หรือ 899/12)</label>
+                <input type="text" id="res-unit" placeholder="เช่น 12 หรือ 899/12" oninput="autoFillRegistrationFields()" required>
               </div>
               <div class="form-group">
-                <label>เลขที่โฉนดที่ดิน (Title Deed)</label>
-                <input type="text" id="res-deed">
+                <label>เลขที่โฉนดที่ดิน (Title Deed - เติมอัตโนมัติ)</label>
+                <input type="text" id="res-deed" placeholder="เติมอัตโนมัติตามแปลง">
               </div>
               <div class="form-group" style="grid-column: span 2;">
                 <label>ชื่อ-นามสกุล เจ้าของ / ผู้พักอาศัย *</label>
-                <input type="text" id="res-name" required>
+                <input type="text" id="res-name" placeholder="ระบุชื่อ-นามสกุล" oninput="autoFillRegistrationFields()" required>
               </div>
               <div class="form-group">
                 <label>เบอร์โทรศัพท์ติดต่อ *</label>
-                <input type="tel" id="res-phone" required>
+                <input type="tel" id="res-phone" placeholder="เช่น 0812345678" required>
               </div>
               <div class="form-group">
-                <label>อีเมล</label>
-                <input type="email" id="res-email">
+                <label>อีเมล (เติมค่าเริ่มต้นอัตโนมัติ)</label>
+                <input type="email" id="res-email" placeholder="owner@udomsukplace.com">
               </div>
               <div class="form-group" style="grid-column: span 2;">
-                <label>🏠 ที่อยู่ตามบัตรประชาชน</label>
-                <textarea id="res-id-address" rows="2"></textarea>
+                <label>🏠 ที่อยู่ตามบัตรประชาชน (เติมอัตโนมัติ)</label>
+                <textarea id="res-id-address" rows="2" placeholder="ตามที่อยู่ปัจจุบัน"></textarea>
               </div>
               <div class="form-group" style="grid-column: span 2;">
-                <label>📍 ที่อยู่ปัจจุบัน / สถานที่จัดส่งเอกสาร</label>
-                <textarea id="res-cur-address" rows="2" placeholder="ระบุ 'ตามบัตรประชาชน' ได้หากเหมือนกัน"></textarea>
+                <label>📍 ที่อยู่ปัจจุบัน / สถานที่จัดส่งเอกสาร (เติมตามโครงการอัตโนมัติ)</label>
+                <textarea id="res-cur-address" rows="2" placeholder="ระบบจะดึงที่อยู่โครงการให้อัตโนมัติ"></textarea>
               </div>
               <div class="form-group" style="grid-column: span 2;">
-                <label>📷 อัปโหลดภาพถ่ายลูกค้า</label>
+                <label>📷 อัปโหลดภาพถ่ายลูกค้า (ถ้ามี)</label>
                 <input type="file" id="res-photo" accept="image/*" onchange="previewResidentPhoto(event)">
               </div>
             </div>
@@ -744,6 +744,45 @@
     let editResidentPhotoMime = "";
     let pendingUnitForRegistration = "";
     let tempSelectedAvatar = "WIZmini";
+
+    // ⚡ ฟังก์ชันดึงข้อมูลเติมลงช่องต่างๆ อัตโนมัติ (Auto-Fill System)
+    function autoFillRegistrationFields() {
+      const unitVal = document.getElementById("res-unit").value.trim();
+      const deedInput = document.getElementById("res-deed");
+      const curAddressInput = document.getElementById("res-cur-address");
+      const idAddressInput = document.getElementById("res-id-address");
+      const emailInput = document.getElementById("res-email");
+
+      if (unitVal) {
+        // 1. นำเลขแปลงไปใส่ในเลขที่โฉนดอัตโนมัติ หากยังไม่ได้พิมพ์
+        if (!deedInput.value || deedInput.dataset.autofilled === "true") {
+          deedInput.value = unitVal;
+          deedInput.dataset.autofilled = "true";
+        }
+
+        // 2. ประกอบที่อยู่โครงการอุดมสุขเพลสอัตโนมัติ
+        const houseNo = unitVal.includes("899/") ? unitVal : `899/${unitVal}`;
+        const autoAddress = `เลขที่ ${houseNo} หมู่ 9 โครงการอุดมสุขเพลส ต.หนองกี่ อ.กบินทร์บุรี จ.ปราจีนบุรี 25110`;
+        
+        if (!curAddressInput.value || curAddressInput.dataset.autofilled === "true") {
+          curAddressInput.value = autoAddress;
+          curAddressInput.dataset.autofilled = "true";
+        }
+
+        // 3. กำหนดค่าเริ่มต้นที่อยู่ตามบัตร ปชช.
+        if (!idAddressInput.value || idAddressInput.dataset.autofilled === "true") {
+          idAddressInput.value = "ตามที่อยู่ปัจจุบัน";
+          idAddressInput.dataset.autofilled = "true";
+        }
+
+        // 4. สร้าง Email ค่าเริ่มต้นให้ หากยังว่าง
+        if (!emailInput.value || emailInput.dataset.autofilled === "true") {
+          const cleanU = unitVal.replace(/[^a-zA-Z0-9]/g, '');
+          emailInput.value = `unit${cleanU}@udomsukplace.com`;
+          emailInput.dataset.autofilled = "true";
+        }
+      }
+    }
 
     function cleanUnitKey(val) {
       if (val === null || val === undefined) return "";
@@ -907,7 +946,11 @@
     function goToResidentRegistration() {
       closeRoModal(); switchTab('residents');
       const resUnitInput = document.getElementById("res-unit");
-      if (resUnitInput && pendingUnitForRegistration) { resUnitInput.value = pendingUnitForRegistration; document.getElementById("res-name").focus(); }
+      if (resUnitInput && pendingUnitForRegistration) { 
+        resUnitInput.value = pendingUnitForRegistration; 
+        autoFillRegistrationFields();
+        document.getElementById("res-name").focus(); 
+      }
     }
 
     function openProfileModal() { updateProfileUI(); document.getElementById("profile-modal-overlay").style.display = "flex"; }
@@ -965,9 +1008,6 @@
       document.getElementById("modal-resident-search").value = "";
     }
 
-    // =========================================================
-    // ✏️ ฟังก์ชันจัดการหน้าจอแก้ไขข้อมูลลูกบ้าน (Edit Profile Modal)
-    // =========================================================
     function openEditResidentModal(unitNumber) {
       const targetKey = cleanUnitKey(unitNumber);
       const res = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
