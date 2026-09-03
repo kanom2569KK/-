@@ -53,7 +53,7 @@
       font-size: 17px; font-weight: bold; margin-bottom: 18px;
       color: var(--accent-gold); text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
       border-bottom: 2px dashed #6b3414; padding-bottom: 8px;
-      display: flex; align-items: center; gap: 10px;
+      display: flex; align-items: center; justify-content: space-between;
     }
 
     /* Sidebar */
@@ -236,6 +236,40 @@
   </style>
 </head>
 <body>
+
+  <!-- =======================================================
+       📜 POPUP: รายชื่อลูกบ้านเฉพาะ (Customer Lookup Modal)
+       ======================================================= -->
+  <div id="customer-list-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 580px;">
+      <div class="ro-header">
+        <span>📜 สารบบรายชื่อลูกบ้าน (Residents Lookup)</span>
+        <span class="ro-close" onclick="closeCustomerListModal()">✕</span>
+      </div>
+      <div style="padding: 16px 20px 0 20px;">
+        <input type="text" id="modal-resident-search" placeholder="🔍 พิมพ์ค้นหาเลขยูนิต หรือชื่อลูกบ้าน..." onkeyup="filterModalResidentList()" 
+               style="width: 100%; padding: 10px 14px; background: #231106; color: var(--text-main); border: 2px solid #140803; border-radius: 10px; outline: none; font-size: 13px;">
+      </div>
+      <div class="ro-body" style="padding: 14px 20px; flex-direction: column; align-items: stretch;">
+        <div style="max-height: 320px; overflow-y: auto; border: 2px solid #140803; border-radius: 10px; background: #231106;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead>
+              <tr style="background: #1a0c04; color: var(--accent-gold); position: sticky; top: 0;">
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 30%;">เลขยูนิต / แปลง</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803;">ชื่อ-นามสกุล เจ้าของร่วม</th>
+              </tr>
+            </thead>
+            <tbody id="modal-resident-tbody">
+              <!-- ข้อมูลจะถูก render และลบทิ้งเมื่อปิดหน้าต่าง -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="ro-footer">
+        <button class="ro-btn ro-btn-cancel" onclick="closeCustomerListModal()">ปิดหน้าต่าง (ล้างข้อมูล)</button>
+      </div>
+    </div>
+  </div>
 
   <!-- RO Warning Modal -->
   <div id="ro-modal-overlay" class="modal-overlay">
@@ -562,7 +596,12 @@
     <div id="tab-residents" class="tab-content">
       <div style="max-width: 800px; margin: 0 auto;">
         <div class="card">
-          <div class="card-title">👥 แบบฟอร์มลงทะเบียนลูกบ้านใหม่</div>
+          <div class="card-title">
+            <span>👥 แบบฟอร์มลงทะเบียนลูกบ้านใหม่</span>
+            <button type="button" class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #2a1508; font-weight: bold; border: 2px solid #140803;" onclick="openCustomerListModal()">
+              📜 รายชื่อลูกบ้านทั้งหมด
+            </button>
+          </div>
           <form id="resident-form" onsubmit="submitNewResident(event)">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
               <div class="form-group">
@@ -852,6 +891,51 @@
     }
     function closeProfileModal() { document.getElementById("profile-modal-overlay").style.display = "none"; }
 
+    // ==========================================
+    // 📜 ฟังก์ชันเปิด-ปิด และล้างข้อมูลป๊อปอัปรายชื่อลูกบ้าน
+    // ==========================================
+    function openCustomerListModal() {
+      const tbody = document.getElementById("modal-resident-tbody");
+      tbody.innerHTML = "";
+      
+      if (!cachedResidents || cachedResidents.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="2" style="text-align: center; padding: 20px; color: var(--text-muted);">ไม่พบข้อมูลลูกบ้านในระบบ</td></tr>`;
+      } else {
+        renderModalResidents(cachedResidents);
+      }
+      
+      document.getElementById("modal-resident-search").value = "";
+      document.getElementById("customer-list-modal").style.display = "flex";
+    }
+
+    function renderModalResidents(list) {
+      const tbody = document.getElementById("modal-resident-tbody");
+      tbody.innerHTML = "";
+      list.forEach(res => {
+        tbody.innerHTML += `
+          <tr style="border-bottom: 1px solid #140803;">
+            <td style="padding: 10px 12px; font-weight: bold; color: var(--accent-gold);">${res.unitNumber.toUpperCase()}</td>
+            <td style="padding: 10px 12px; color: var(--text-main);">${res.residentName || "-"}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function filterModalResidentList() {
+      const q = document.getElementById("modal-resident-search").value.trim().toLowerCase();
+      const filtered = cachedResidents.filter(r => 
+        r.unitNumber.toLowerCase().includes(q) || (r.residentName && r.residentName.toLowerCase().includes(q))
+      );
+      renderModalResidents(filtered);
+    }
+
+    function closeCustomerListModal() {
+      document.getElementById("customer-list-modal").style.display = "none";
+      // ล้างข้อมูลและ Search Term ทิ้งทันทีเมื่อปิดหน้าต่าง
+      document.getElementById("modal-resident-tbody").innerHTML = "";
+      document.getElementById("modal-resident-search").value = "";
+    }
+
     function autoFillResidentName(inputUnit) {
       const cleanUnit = String(inputUnit || "").trim().toLowerCase();
       if (!cleanUnit) return;
@@ -1011,7 +1095,7 @@
       }
     }
 
-    // ลงทะเบียนลูกบ้านใหม่ (ตัดช่องที่ไม่มีออกแล้ว)
+    // ลงทะเบียนลูกบ้านใหม่
     async function submitNewResident(event) {
       event.preventDefault();
       const btn = document.getElementById("btn-submit-resident"); 
