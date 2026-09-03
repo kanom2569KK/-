@@ -225,7 +225,7 @@
     .quest-exp { background: rgba(251,191,36,0.15); color: var(--accent-gold); padding: 3px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; border: 1px solid var(--accent-gold); }
 
     /* ========================================================
-       🖨️ PRINT STYLESHEET: เอกสารทางการ A4
+       🖨️ PRINT STYLESHEET: เอกสารทางการ A4 (ตัด Web App ออก 100%)
        ======================================================== */
     #printable-invoice {
       display: none;
@@ -347,7 +347,9 @@
 </head>
 <body>
 
-  <!-- 🖨️ PRINT TEMPLATE: เอกสารใบแจ้งหนี้ทางการ A4 -->
+  <!-- =======================================================
+       🖨️ PRINT TEMPLATE: เอกสารทางการ A4 (สลับ ใบแจ้งหนี้ / ใบเสร็จรับเงิน อัตโนมัติ)
+       ======================================================= -->
   <div id="printable-invoice">
     <table class="inv-header-table">
       <tr>
@@ -363,8 +365,8 @@
           </div>
         </td>
         <td style="width: 33%; vertical-align: top; text-align: right;">
-          <div class="inv-title-main">ใบแจ้งหนี้</div>
-          <div class="inv-title-sub">INVOICE</div>
+          <div class="inv-title-main" id="print-doc-title-th">ใบแจ้งหนี้</div>
+          <div class="inv-title-sub" id="print-doc-title-en">INVOICE</div>
           <table class="inv-meta-table">
             <tr>
               <td style="text-align: right; color: #475569;">เลขที่เอกสาร:</td>
@@ -382,7 +384,7 @@
     <div class="inv-info-box">
       <table style="width: 100%; border: none; font-size: 10.5pt;">
         <tr>
-          <td style="width: 60%; padding: 3px 0;"><strong>ผู้รับใบแจ้งหนี้ (เจ้าของร่วม):</strong> <span id="print-res-name" style="font-weight: bold; font-size: 11pt;">-</span></td>
+          <td style="width: 60%; padding: 3px 0;"><strong id="print-label-customer">ผู้รับใบแจ้งหนี้ (เจ้าของร่วม):</strong> <span id="print-res-name" style="font-weight: bold; font-size: 11pt;">-</span></td>
           <td style="width: 40%; padding: 3px 0;"><strong>เลขยูนิต / แปลง:</strong> <span id="print-res-unit" style="font-size: 12pt; font-weight: bold; color: #1e3a8a;">-</span></td>
         </tr>
         <tr>
@@ -399,7 +401,7 @@
       <thead>
         <tr>
           <th style="width: 10%; text-align: center;">ลำดับ</th>
-          <th style="width: 65%;">รายการเรียกเก็บ (Description)</th>
+          <th style="width: 65%;">รายการ (Description)</th>
           <th style="width: 25%; text-align: right;">จำนวนเงิน (บาท)</th>
         </tr>
       </thead>
@@ -412,22 +414,14 @@
           </td>
           <td style="text-align: right; font-weight: bold;" id="print-fee-amount">500.00</td>
         </tr>
-        <tr>
-          <td style="text-align: center;">2</td>
-          <td>
-            <strong>ค่าน้ำประปา / ค่าบริการบำรุงรักษามิเตอร์</strong>
-            <div style="font-size: 9.5pt; color: #475569;">ตามรอบบันทึกการใช้น้ำประจำเดือน</div>
-          </td>
-          <td style="text-align: right; font-weight: bold;">0.00</td>
-        </tr>
         <tr class="inv-total-row">
-          <td colspan="2" style="text-align: right; color: #0f172a;">รวมยอดที่ต้องชำระทั้งสิ้น (Total Due):</td>
+          <td colspan="2" style="text-align: right; color: #0f172a;" id="print-total-label">รวมยอดที่ต้องชำระทั้งสิ้น (Total Due):</td>
           <td style="text-align: right; color: #1e3a8a;" id="print-fee-total">฿500.00</td>
         </tr>
       </tbody>
     </table>
 
-    <div style="background: #fffbeb; border: 1px solid #fde68a; padding: 10px 14px; border-radius: 6px; font-size: 9.5pt; margin-bottom: 20px;">
+    <div id="print-payment-note" style="background: #fffbeb; border: 1px solid #fde68a; padding: 10px 14px; border-radius: 6px; font-size: 9.5pt; margin-bottom: 20px;">
       <strong style="color: #b45309;">📌 ข้อมูลและขั้นตอนการชำระเงิน:</strong><br>
       1. กรุณานำใบแจ้งหนี้นี้มาชำระ ณ สำนักงานนิติบุคคล หรือชำระผ่านช่องทางโอนเงินเข้าบัญชีบริษัท<br>
       2. เมื่อชำระเงินเรียบร้อยแล้ว <strong>ฝ่ายการเงินจะดำเนินการออก "ใบเสร็จรับเงินฉบับเต็ม (Official Receipt)"</strong> ให้เป็นหลักฐานทันที
@@ -439,13 +433,13 @@
           <br><br>
           <div class="inv-sig-box">
             (<span id="print-operator-name">ผู้จัดทำเอกสาร</span>)<br>
-            <strong>เจ้าหน้าที่ฝ่ายจัดทำเอกสาร</strong>
+            <strong id="print-sig-left-title">เจ้าหน้าที่ฝ่ายจัดทำเอกสาร</strong>
           </div>
         </td>
         <td style="width: 50%; text-align: center; vertical-align: top;">
           <br><br>
           <div class="inv-sig-box">
-            ( ............................................................ )<br>
+            (<span id="print-finance-name"> ............................................................ </span>)<br>
             <strong>เจ้าหน้าที่ฝ่ายการเงิน (ผู้รับเงิน)</strong>
           </div>
         </td>
@@ -896,7 +890,7 @@
       </section>
     </div>
 
-    <!-- Tab 2: Residents (Custom Manual Inputs) -->
+    <!-- Tab 2: Residents -->
     <div id="tab-residents" class="tab-content">
       <div style="max-width: 800px; margin: 0 auto;">
         <div class="card">
@@ -1063,7 +1057,6 @@
       }
     }
 
-    // ⚡ Auto-fill เฉพาะช่องที่อยู่ปัจจุบันโครงการ (ยกเลิก Auto ในช่องโฉนด, อีเมล, ที่อยู่ตามบัตร ปชช.)
     function autoFillRegistrationFields() {
       const unitVal = document.getElementById("res-unit").value.trim();
       const curAddressInput = document.getElementById("res-cur-address");
@@ -1477,14 +1470,23 @@
         const status = item["Status"] || "Pending";
         const amount = Number(item["Amount"] || item["amount"] || 0);
         const unit = item["Unit Number"] || item["unitNumber"] || "-";
+        const residentName = item["Resident Name"] || "-";
+        const feeType = item["Fee Type"] || "ค่าส่วนกลาง";
+        const payMethod = item["Payment Method"] || "โอนเงิน / สแกน QR";
+
+        const u = String(unit).replace(/'/g, "\\'");
+        const r = String(residentName).replace(/'/g, "\\'");
+        const f = String(feeType).replace(/'/g, "\\'");
+        const p = String(payMethod).replace(/'/g, "\\'");
+
         const btnReceiptHtml = status.toLowerCase() === 'paid' 
-          ? `<button class="btn-action" style="background: linear-gradient(135deg, var(--accent-green), #047857);" onclick="handlePrintReceipt('${unit}')">🖨️ พิมพ์</button>` 
+          ? `<button class="btn-action" style="background: linear-gradient(135deg, var(--accent-green), #047857);" onclick="handlePrintReceipt('${u}', '${r}', '${f}', ${amount}, '${p}')">🖨️ พิมพ์ใบเสร็จ</button>` 
           : `<span style="font-size:12px; color:var(--text-muted);">-</span>`;
         tableBody.innerHTML += `<tr>
           <td>${formattedDate}</td>
           <td style="color: var(--accent-gold); font-weight: bold;">${unit}</td>
-          <td>${item["Resident Name"] || "-"}</td>
-          <td>${item["Fee Type"] || "ค่าส่วนกลาง"}</td>
+          <td>${residentName}</td>
+          <td>${feeType}</td>
           <td style="color: #6ee7b7;">฿${amount.toLocaleString()}</td>
           <td><span class="badge ${status.toLowerCase()}">${status}</span></td>
           <td>${btnReceiptHtml}</td>
@@ -1514,6 +1516,9 @@
       document.getElementById("queue-badge").innerText = `${queueCount} รายการ`;
     }
 
+    // =========================================================
+    // 📄 1. ออกใบแจ้งหนี้ (INVOICE) โดยฝ่ายขาย / ธุรการ
+    // =========================================================
     async function handleGenerateInvoice(event) {
       event.preventDefault();
       const unitVal = document.getElementById("inv-unit").value.trim();
@@ -1564,6 +1569,16 @@
             displayMonth = `${thaiMonths[mIndex]} ${yThai}`;
           }
 
+          // ตั้งค่าหัวกระดาษเป็น "ใบแจ้งหนี้"
+          document.getElementById("print-doc-title-th").innerText = "ใบแจ้งหนี้";
+          document.getElementById("print-doc-title-en").innerText = "INVOICE";
+          document.getElementById("print-label-customer").innerText = "ผู้รับใบแจ้งหนี้ (เจ้าของร่วม):";
+          document.getElementById("print-total-label").innerText = "รวมยอดที่ต้องชำระทั้งสิ้น (Total Due):";
+          document.getElementById("print-sig-left-title").innerText = "เจ้าหน้าที่ฝ่ายจัดทำเอกสาร";
+          document.getElementById("print-payment-note").style.display = "block";
+          document.getElementById("print-finance-name").innerText = " ............................................................ ";
+
+          // เติมข้อมูล
           document.getElementById("print-inv-no").innerText = invCode;
           document.getElementById("print-inv-date").innerText = dStr;
           document.getElementById("print-res-name").innerText = resJson.residentName || "-";
@@ -1572,6 +1587,8 @@
           document.getElementById("print-inv-month").innerText = displayMonth || "ประจำเดือนปัจจุบัน";
           document.getElementById("print-res-address").innerText = matchedResident?.currentAddress || `แปลงที่ ${unitVal} โครงการอุดมสุขเพลส`;
           document.getElementById("print-fee-title").innerText = feeVal;
+          document.getElementById("print-fee-amount").innerText = "500.00";
+          document.getElementById("print-fee-total").innerText = "฿500.00";
           document.getElementById("print-operator-name").innerText = currentUser?.fullName || "ผู้จัดทำเอกสาร";
 
           await loadDashboardData();
@@ -1587,9 +1604,47 @@
       }
     }
 
-    async function handlePrintReceipt(unit) {
+    // =========================================================
+    // 🧾 2. ออกใบเสร็จรับเงิน (RECEIPT) โดยฝ่ายการเงิน
+    // =========================================================
+    async function handlePrintReceipt(unit, residentName, feeType, amount, payMethod) {
       showExpToast(2, "พิมพ์ใบเสร็จรับเงิน");
-      fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "print_receipt", operator: currentUser?.username, unitNumber: unit }) });
+      
+      const targetKey = cleanUnitKey(unit);
+      const matchedResident = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
+      const now = new Date();
+      const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+      const dStr = `${now.getDate()} ${thaiMonths[now.getMonth()]} ${now.getFullYear() + 543}`;
+      const recCode = `REC-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}-${unit.padStart(3,'0')}`;
+
+      // สลับหัวกระดาษเป็น "ใบเสร็จรับเงิน"
+      document.getElementById("print-doc-title-th").innerText = "ใบเสร็จรับเงิน";
+      document.getElementById("print-doc-title-en").innerText = "RECEIPT";
+      document.getElementById("print-label-customer").innerText = "ได้รับเงินจาก (ผู้ชำระเงิน):";
+      document.getElementById("print-total-label").innerText = "จำนวนเงินที่ได้รับชำระทั้งสิ้น (Total Paid):";
+      document.getElementById("print-sig-left-title").innerText = "เจ้าหน้าที่ฝ่ายจัดทำเอกสาร";
+      document.getElementById("print-payment-note").style.display = "none";
+
+      // เติมข้อมูล
+      document.getElementById("print-inv-no").innerText = recCode;
+      document.getElementById("print-inv-date").innerText = dStr;
+      document.getElementById("print-res-name").innerText = residentName || "-";
+      document.getElementById("print-res-unit").innerText = unit;
+      document.getElementById("print-res-deed").innerText = matchedResident?.titleDeedNo || "-";
+      document.getElementById("print-inv-month").innerText = `ชำระผ่าน: ${payMethod || 'โอนเงิน / QR'}`;
+      document.getElementById("print-res-address").innerText = matchedResident?.currentAddress || `แปลงที่ ${unit} โครงการอุดมสุขเพลส`;
+      document.getElementById("print-fee-title").innerText = feeType;
+      document.getElementById("print-fee-amount").innerText = Number(amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById("print-fee-total").innerText = "฿" + Number(amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById("print-operator-name").innerText = "ฝ่ายธุรการ / ระบบ";
+      document.getElementById("print-finance-name").innerText = currentUser?.fullName || "ฝ่ายการเงิน (ผู้รับเงิน)";
+
+      fetch(API_URL, { 
+        method: "POST", 
+        headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+        body: JSON.stringify({ type: "print_receipt", operator: currentUser?.username, unitNumber: unit }) 
+      });
+
       window.print();
     }
 
