@@ -225,7 +225,7 @@
     .quest-exp { background: rgba(251,191,36,0.15); color: var(--accent-gold); padding: 3px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; border: 1px solid var(--accent-gold); }
 
     /* ========================================================
-       🖨️ PRINT STYLESHEET: เอกสารทางการ A4 (ตัดส่วนประกอบเว็บออกหมด 100%)
+       🖨️ PRINT STYLESHEET: เอกสารทางการ A4
        ======================================================== */
     #printable-invoice {
       display: none;
@@ -896,7 +896,7 @@
       </section>
     </div>
 
-    <!-- Tab 2: Residents -->
+    <!-- Tab 2: Residents (Custom Manual Inputs) -->
     <div id="tab-residents" class="tab-content">
       <div style="max-width: 800px; margin: 0 auto;">
         <div class="card">
@@ -913,24 +913,24 @@
                 <input type="text" id="res-unit" placeholder="เช่น 12 หรือ 899/12" oninput="autoFillRegistrationFields()" required>
               </div>
               <div class="form-group">
-                <label>เลขที่โฉนดที่ดิน (Title Deed - เติมอัตโนมัติ)</label>
-                <input type="text" id="res-deed" placeholder="เติมอัตโนมัติตามแปลง">
+                <label>เลขที่โฉนดที่ดิน (Title Deed)</label>
+                <input type="text" id="res-deed" placeholder="ระบุเลขที่โฉนดที่ดิน">
               </div>
               <div class="form-group" style="grid-column: span 2;">
                 <label>ชื่อ-นามสกุล เจ้าของ / ผู้พักอาศัย *</label>
-                <input type="text" id="res-name" placeholder="ระบุชื่อ-นามสกุล" oninput="autoFillRegistrationFields()" required>
+                <input type="text" id="res-name" placeholder="ระบุชื่อ-นามสกุล" required>
               </div>
               <div class="form-group">
                 <label>เบอร์โทรศัพท์ติดต่อ *</label>
                 <input type="tel" id="res-phone" placeholder="เช่น 0812345678" required>
               </div>
               <div class="form-group">
-                <label>อีเมล (เติมค่าเริ่มต้นอัตโนมัติ)</label>
-                <input type="email" id="res-email" placeholder="owner@udomsukplace.com">
+                <label>อีเมล</label>
+                <input type="email" id="res-email" placeholder="ระบุอีเมล (ถ้ามี)">
               </div>
               <div class="form-group" style="grid-column: span 2;">
-                <label>🏠 ที่อยู่ตามบัตรประชาชน (เติมอัตโนมัติ)</label>
-                <textarea id="res-id-address" rows="2" placeholder="ตามที่อยู่ปัจจุบัน"></textarea>
+                <label>🏠 ที่อยู่ตามบัตรประชาชน</label>
+                <textarea id="res-id-address" rows="2" placeholder="ระบุที่อยู่ตามบัตรประชาชน"></textarea>
               </div>
               <div class="form-group" style="grid-column: span 2;">
                 <label>📍 ที่อยู่ปัจจุบัน / สถานที่จัดส่งเอกสาร (เติมตามโครงการอัตโนมัติ)</label>
@@ -976,7 +976,7 @@
       </div>
     </div>
 
-    <!-- Tab 5: Admin Hub (เพิ่มปุ่ม Factory Reset ล้างข้อมูลทดสอบ) -->
+    <!-- Tab 5: Admin Hub -->
     <div id="tab-admin-hub" class="tab-content">
       <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
         
@@ -993,7 +993,6 @@
           </div>
         </div>
 
-        <!-- กล่องคำสั่งพิเศษสำหรับ Admin ล้างข้อมูลทดสอบ -->
         <div class="card" style="border-color: #7f1d1d; background: linear-gradient(145deg, #3d1515, #220808);">
           <div class="card-title" style="color: #fca5a5; border-bottom-color: #991b1b;">
             <span>⚠️ แดชบอร์ดรีเซ็ตระบบ (Admin Testing Reset)</span>
@@ -1064,33 +1063,18 @@
       }
     }
 
+    // ⚡ Auto-fill เฉพาะช่องที่อยู่ปัจจุบันโครงการ (ยกเลิก Auto ในช่องโฉนด, อีเมล, ที่อยู่ตามบัตร ปชช.)
     function autoFillRegistrationFields() {
       const unitVal = document.getElementById("res-unit").value.trim();
-      const deedInput = document.getElementById("res-deed");
       const curAddressInput = document.getElementById("res-cur-address");
-      const idAddressInput = document.getElementById("res-id-address");
-      const emailInput = document.getElementById("res-email");
 
       if (unitVal) {
-        if (!deedInput.value || deedInput.dataset.autofilled === "true") {
-          deedInput.value = unitVal;
-          deedInput.dataset.autofilled = "true";
-        }
         const houseNo = unitVal.includes("899/") ? unitVal : `899/${unitVal}`;
         const autoAddress = `เลขที่ ${houseNo} หมู่ 9 โครงการอุดมสุขเพลส ต.หนองกี่ อ.กบินทร์บุรี จ.ปราจีนบุรี 25110`;
         
         if (!curAddressInput.value || curAddressInput.dataset.autofilled === "true") {
           curAddressInput.value = autoAddress;
           curAddressInput.dataset.autofilled = "true";
-        }
-        if (!idAddressInput.value || idAddressInput.dataset.autofilled === "true") {
-          idAddressInput.value = "ตามที่อยู่ปัจจุบัน";
-          idAddressInput.dataset.autofilled = "true";
-        }
-        if (!emailInput.value || emailInput.dataset.autofilled === "true") {
-          const cleanU = unitVal.replace(/[^a-zA-Z0-9]/g, '');
-          emailInput.value = `unit${cleanU}@udomsukplace.com`;
-          emailInput.dataset.autofilled = "true";
         }
       }
     }
@@ -1706,7 +1690,6 @@
       }
     }
 
-    // 🗑️ ฟังก์ชัน Factory Reset ล้างข้อมูลสำหรับ Admin
     async function handleAdminFactoryReset() {
       const confirm1 = confirm("🚨 คำเตือนสำคัญ!\n\nคุณแน่ใจหรือไม่ว่าต้องการ 'ล้างข้อมูลการทดสอบทั้งหมด' ใน Google Sheets (ทะเบียนลูกบ้าน, คิวแจ้งหนี้, ประวัติรับเงิน)?\n\nข้อมูลเหล่านี้จะถูกล้างทิ้งและไม่สามารถกู้คืนได้");
       if (!confirm1) return;
@@ -1735,7 +1718,6 @@
 
         if (resJson.status === "success") {
           alert("🎉 " + resJson.message);
-          // ล้างข้อมูลแคชในหน้าเว็บและโหลดข้อมูลใหม่
           cachedPayments = [];
           cachedResidents = [];
           cachedPendingInvoices = [];
