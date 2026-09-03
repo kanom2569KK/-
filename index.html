@@ -347,9 +347,7 @@
 </head>
 <body>
 
-  <!-- =======================================================
-       🖨️ PRINT TEMPLATE: เอกสารใบแจ้งหนี้ทางการ A4
-       ======================================================= -->
+  <!-- 🖨️ PRINT TEMPLATE: เอกสารใบแจ้งหนี้ทางการ A4 -->
   <div id="printable-invoice">
     <table class="inv-header-table">
       <tr>
@@ -775,7 +773,7 @@
       </div>
     </div>
 
-    <!-- Tab 1: Financial & Cashier (เพิ่มคิวใบแจ้งหนี้รอดำเนินการ) -->
+    <!-- Tab 1: Financial & Cashier -->
     <div id="tab-financial" class="tab-content">
       <section class="metrics-grid">
         <div class="metric-card">
@@ -799,7 +797,7 @@
       <section class="content-grid">
         <div style="display: flex; flex-direction: column; gap: 20px;">
           
-          <!-- ตารางย่อ: รายการแจ้งหนี้ที่ส่งมาจากฝ่ายขาย/ธุรการ (Queue) -->
+          <!-- ตารางย่อ: รายการแจ้งหนี้รอดำเนินการรับเงิน -->
           <div class="card" style="padding: 0; overflow: hidden;">
             <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
               <span>📑 รายการแจ้งหนี้รอดำเนินการรับเงิน (Queue จากฝ่ายขาย/ธุรการ)</span>
@@ -1013,6 +1011,44 @@
     let editResidentPhotoMime = "";
     let pendingUnitForRegistration = "";
     let tempSelectedAvatar = "WIZmini";
+
+    // 📅 ฟังก์ชันแปลงวันที่และรอบบิลให้แสดงผลภาษาไทยสวยงาม
+    function formatDisplayDate(val) {
+      if (!val || val === "-" || val === "") return "-";
+      try {
+        const d = new Date(val);
+        if (isNaN(d.getTime())) return String(val).split("T")[0];
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yy = (d.getFullYear() + 543);
+        return `${dd}/${mm}/${yy}`;
+      } catch (e) {
+        return String(val);
+      }
+    }
+
+    function formatDisplayMonth(val) {
+      if (!val || val === "-" || val === "") return "-";
+      const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+      try {
+        const strVal = String(val).trim();
+        // ถ้าเป็นรูปแบบ YYYY-MM
+        if (/^\d{4}-\d{2}$/.test(strVal)) {
+          const parts = strVal.split("-");
+          const mIdx = parseInt(parts[1], 10) - 1;
+          const yThai = parseInt(parts[0], 10) + 543;
+          return `${thaiMonths[mIdx]} ${yThai}`;
+        }
+        // ถ้าเป็น Date Object หรือ Timestamp
+        const d = new Date(val);
+        if (!isNaN(d.getTime())) {
+          return `${thaiMonths[d.getMonth()]} ${d.getFullYear() + 543}`;
+        }
+        return strVal;
+      } catch (e) {
+        return String(val);
+      }
+    }
 
     function autoFillRegistrationFields() {
       const unitVal = document.getElementById("res-unit").value.trim();
@@ -1372,7 +1408,6 @@
         }
       }
 
-      // กำหนดยอดเงินแนะนำเบื้องต้น
       if (feeType.includes("500") || feeType === "ค่าส่วนกลางประจำปี") {
         document.getElementById("form-amount").value = 500;
       }
@@ -1399,7 +1434,7 @@
       } catch (error) { console.error("Load Error:", error); }
     }
 
-    // เรนเดอร์ตารางคิวรอดำเนินการรับเงิน
+    // เรนเดอร์ตารางคิวรอดำเนินการรับเงิน (พร้อมจัดรูปแบบ วันที่ และ รอบบิล สวยงาม)
     function renderPendingInvoicesQueue(data) {
       const tbody = document.getElementById("pending-invoices-tbody");
       tbody.innerHTML = "";
@@ -1415,12 +1450,15 @@
         const f = String(item.feeType).replace(/'/g, "\\'");
         const m = String(item.billingMonth).replace(/'/g, "\\'");
 
+        const formattedDate = formatDisplayDate(item.date || item.timestamp);
+        const formattedMonth = formatDisplayMonth(item.billingMonth);
+
         tbody.innerHTML += `<tr>
-          <td>${item.date}</td>
+          <td>${formattedDate}</td>
           <td style="color: var(--accent-gold); font-weight: bold;">${item.unitNumber}</td>
           <td>${item.residentName}</td>
           <td>${item.feeType}</td>
-          <td><span class="badge pending" style="font-size:10px;">${item.billingMonth}</span></td>
+          <td><span class="badge pending" style="font-size:11px;">${formattedMonth}</span></td>
           <td style="color: var(--text-muted); font-size:12px;">${item.operator}</td>
           <td style="text-align: center;">
             <button type="button" class="btn-action" style="background: linear-gradient(135deg, #059669, #047857);" onclick="fillPaymentFromQueue('${u}', '${n}', '${f}', '${m}')">
@@ -1438,8 +1476,8 @@
         tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">ไม่พบรายการ</td></tr>`; return;
       }
       data.forEach(item => {
-        const dateStr = item["Date"] || item["Timestamp"] || "-";
-        const formattedDate = dateStr !== "-" ? new Date(dateStr).toLocaleDateString('th-TH') : "-";
+        const rawDate = item["Date"] || item["Timestamp"] || "-";
+        const formattedDate = formatDisplayDate(rawDate);
         const status = item["Status"] || "Pending";
         const amount = Number(item["Amount"] || item["amount"] || 0);
         const unit = item["Unit Number"] || item["unitNumber"] || "-";
