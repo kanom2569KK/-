@@ -226,12 +226,14 @@
       80% { opacity: 1; transform: translateY(0); }
       100% { opacity: 0; transform: translateY(-30px); }
     }
+    
+    /* Quest Board Item in Profile */
     .quest-item {
-      background: #231106; border: 3px solid #140803;
-      padding: 14px 18px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s;
+      background: #231106; border: 2px solid #140803;
+      padding: 10px 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s;
     }
     .quest-item:hover { transform: scale(1.01); border-color: var(--accent-gold); }
-    .quest-exp { background: rgba(251,191,36,0.15); color: var(--accent-gold); padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; border: 2px solid var(--accent-gold); }
+    .quest-exp { background: rgba(251,191,36,0.15); color: var(--accent-gold); padding: 3px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; border: 1px solid var(--accent-gold); }
   </style>
 </head>
 <body>
@@ -314,34 +316,95 @@
     </div>
   </div>
 
-  <!-- Kafra Profile Modal -->
+  <!-- Kafra Profile Modal (รวมโปรไฟล์ & กระดานภารกิจกิลด์ EXP) -->
   <div id="profile-modal-overlay" class="modal-overlay">
-    <div class="ro-window" style="max-width: 380px;">
+    <div class="ro-window" style="max-width: 680px;">
       <div class="ro-header">
-        <span>🏅 ข้อมูลตัวละคร (Kafra Profile)</span>
+        <span>🏅 ข้อมูลตัวละคร & กระดานภารกิจกิลด์ (Kafra Profile & Quests)</span>
         <span class="ro-close" onclick="closeProfileModal()">✕</span>
       </div>
-      <div class="ro-body" style="flex-direction: column; align-items: center; text-align: center;">
-         <div id="prof-avatar-display" style="width: 80px; height: 80px; background: #231106; border-radius: 50%; border: 3px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(251,191,36,0.3); overflow: hidden;">
-           <img id="prof-avatar-img" src="WIZmini.gif" style="width: 65px; height: 65px; object-fit: contain; image-rendering: pixelated;" alt="Avatar">
-         </div>
-         <div id="prof-prestige" style="color: var(--accent-gold); font-size: 16px; margin-top: -6px; font-weight: bold; letter-spacing: 2px;"></div>
-         <h3 id="prof-name" style="color: var(--text-main); margin-top: 10px; font-size: 20px;">Admin Name</h3>
-         <div id="prof-title" style="color: var(--accent-gold); font-weight: bold; margin-bottom: 16px; font-size: 14px;">🌟 Legendary Admin</div>
+      <div class="ro-body" style="gap: 20px; align-items: flex-start; max-height: 80vh; overflow-y: auto;">
          
-         <button class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #2a1508; font-weight: bold; border: 2px solid #140803; margin-bottom: 16px; padding: 6px 16px;" onclick="openCharSelectFromProfile()">
-           🔄 เปลี่ยนตัวละคร (Change Avatar)
-         </button>
-
-         <div style="width: 100%; background: #231106; border: 3px solid #140803; border-radius: 12px; padding: 15px;">
-           <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-             <span style="font-weight: bold; font-size: 15px;">Level <span id="prof-level" style="font-size: 18px; color: var(--accent-gold);">99</span></span>
-             <span id="prof-exp-text" style="color: var(--text-muted); font-size: 12px; line-height: 22px;">29,500 / Max EXP</span>
+         <!-- ฝั่งซ้าย: ข้อมูลตัวละคร -->
+         <div style="flex: 1; text-align: center; background: #231106; padding: 18px; border-radius: 14px; border: 2px solid #140803;">
+           <div id="prof-avatar-display" style="width: 85px; height: 85px; background: #120602; border-radius: 50%; border: 3px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(251,191,36,0.3); margin: 0 auto; overflow: hidden;">
+             <img id="prof-avatar-img" src="WIZmini.gif" style="width: 70px; height: 70px; object-fit: contain; image-rendering: pixelated;" alt="Avatar">
            </div>
-           <div style="width: 100%; height: 12px; background: #120602; border-radius: 6px; overflow: hidden; border: 2px solid #140803;">
-             <div id="prof-exp-bar" style="height: 100%; width: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); box-shadow: 0 0 10px rgba(251,191,36,0.8); transition: width 1s ease-in-out;"></div>
+           <div id="prof-prestige" style="color: var(--accent-gold); font-size: 16px; margin-top: 4px; font-weight: bold; letter-spacing: 2px;"></div>
+           <h3 id="prof-name" style="color: var(--text-main); margin-top: 8px; font-size: 18px;">Admin Name</h3>
+           <div id="prof-title" style="color: var(--accent-gold); font-weight: bold; margin-bottom: 12px; font-size: 13px;">🌟 Legendary Admin</div>
+           
+           <button class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #2a1508; font-weight: bold; border: 2px solid #140803; margin-bottom: 14px; padding: 5px 14px; font-size: 12px;" onclick="openCharSelectFromProfile()">
+             🔄 เปลี่ยนตัวละคร
+           </button>
+
+           <div style="width: 100%; background: #120602; border: 1px solid #140803; border-radius: 10px; padding: 10px; text-align: left;">
+             <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+               <span style="font-weight: bold; font-size: 13px;">Level <span id="prof-level" style="font-size: 16px; color: var(--accent-gold);">99</span></span>
+               <span id="prof-exp-text" style="color: var(--text-muted); font-size: 11px; line-height: 20px;">29,500 / Max EXP</span>
+             </div>
+             <div style="width: 100%; height: 10px; background: #231106; border-radius: 5px; overflow: hidden; border: 1px solid #140803;">
+               <div id="prof-exp-bar" style="height: 100%; width: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); box-shadow: 0 0 8px rgba(251,191,36,0.8); transition: width 1s ease-in-out;"></div>
+             </div>
+             <p style="font-size: 10px; color: var(--text-muted); margin-top: 6px; text-align: center;">
+               🔄 รีเซ็ตเลเวล & รับดาวจุติ (⭐) ทุก 1 ม.ค.
+             </p>
            </div>
          </div>
+
+         <!-- ฝั่งขวา: กระดานภารกิจ EXP -->
+         <div style="flex: 1.4; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 14px; font-weight: bold; color: var(--accent-gold); margin-bottom: 4px;">📜 กระดานภารกิจรับ EXP (Guild Quests)</div>
+            
+            <div class="quest-item">
+              <div>
+                <strong style="font-size: 12px;">🌞 เช็กชื่อประจำวัน (Daily Login)</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">เข้าใช้งานระบบครั้งแรกของวัน</p>
+              </div>
+              <span class="quest-exp">+10 EXP / วัน</span>
+            </div>
+
+            <div class="quest-item">
+              <div>
+                <strong style="font-size: 12px;">💰 บันทึกรับชำระเงินปกติ (Cashier)</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">บันทึกค่าส่วนกลาง / ค่าน้ำประปา</p>
+              </div>
+              <span class="quest-exp">+5 EXP</span>
+            </div>
+
+            <div class="quest-item" style="border-color: #b91c1c;">
+              <div>
+                <strong style="font-size: 12px; color: #fca5a5;">🎯 ล่าค่าหัวลูกหนี้ (Bounty Hunter)</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">บันทึกรับเงินยูนิตค้างชำระ / ค่าปรับ</p>
+              </div>
+              <span class="quest-exp" style="background: rgba(220,38,38,0.2); color: #fca5a5; border-color: #dc2626;">+20 EXP</span>
+            </div>
+
+            <div class="quest-item">
+              <div>
+                <strong style="font-size: 12px;">👥 ทะเบียนราษฎร์ใหม่ (New Citizen)</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">ลงทะเบียนลูกบ้านใหม่พร้อมสร้างโฟลเดอร์</p>
+              </div>
+              <span class="quest-exp">+15 EXP</span>
+            </div>
+
+            <div class="quest-item">
+              <div>
+                <strong style="font-size: 12px;">📑 ออกเอกสารการเงิน (Scroll Crafter)</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">ออกใบแจ้งหนี้ข้อมูลถูกต้อง 100% / ใบเสร็จ</p>
+              </div>
+              <span class="quest-exp">+2 EXP</span>
+            </div>
+
+            <div class="quest-item">
+              <div>
+                <strong style="font-size: 12px;">🛠️ พิทักษ์ฐานข้อมูล (Data Keeper)</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">อัปโหลดไฟล์สำรองข้อมูลดิบ (Admin)</p>
+              </div>
+              <span class="quest-exp">+10 EXP</span>
+            </div>
+         </div>
+
       </div>
       <div class="ro-footer" style="justify-content: space-between;">
         <button class="ro-btn" style="background: #dc2626; color: white; border: none;" onclick="handleLogout()">🚪 ออกจากระบบ</button>
@@ -372,7 +435,7 @@
     </div>
   </div>
 
-  <!-- Sidebar -->
+  <!-- Sidebar (ไม่มีแท็บถ้วยรางวัลแล้ว) -->
   <aside class="sidebar">
     <div class="company-logo" onclick="window.open('https://www.facebook.com/udomsukplace', '_blank')">
       <img src="logomini.png" alt="Udomsuk Logo">
@@ -389,15 +452,12 @@
       <li class="nav-item" id="menu-billing">
         <button onclick="switchTab('billing')">📑<span class="tooltip">ออกใบแจ้งหนี้</span></button>
       </li>
-      <li class="nav-item" id="menu-exp">
-        <button onclick="switchTab('exp')">🏆<span class="tooltip">สถานะ & กิลด์ EXP</span></button>
-      </li>
       <li class="nav-item" id="menu-admin-hub">
         <button onclick="switchTab('admin-hub')">🛠️<span class="tooltip">แอดมิน: ไฟล์ดิบ</span></button>
       </li>
     </ul>
     
-    <div class="user-avatar" onclick="openProfileModal()" title="ข้อมูลตัวละคร (Kafra Profile)">
+    <div class="user-avatar" onclick="openProfileModal()" title="ข้อมูลตัวละคร & กิลด์ EXP (Kafra Profile)">
       <img id="sidebar-avatar-img" src="WIZmini.gif" alt="Avatar">
     </div>
   </aside>
@@ -415,7 +475,7 @@
       </div>
     </div>
 
-    <!-- Tab 1: Financial & Cashier (รวมรับเงิน & ออกใบเสร็จ) -->
+    <!-- Tab 1: Financial & Cashier -->
     <div id="tab-financial" class="tab-content active">
       <section class="metrics-grid">
         <div class="metric-card">
@@ -548,7 +608,7 @@
       </div>
     </div>
 
-    <!-- Tab 3: Billing (เฉพาะออกใบแจ้งหนี้ - ตรวจสอบข้อมูล 100%) -->
+    <!-- Tab 3: Billing (ออกใบแจ้งหนี้) -->
     <div id="tab-billing" class="tab-content">
       <div style="max-width: 650px; margin: 0 auto;">
         <div class="card">
@@ -573,94 +633,6 @@
             🖨️ ตรวจสอบ & พิมพ์ใบแจ้งหนี้ (PDF)
           </button>
         </div>
-      </div>
-    </div>
-
-    <!-- Tab 4: EXP & Guild -->
-    <div id="tab-exp" class="tab-content">
-      <div style="display: grid; grid-template-columns: 1.2fr 1.8fr; gap: 20px;">
-        
-        <div class="card" style="text-align: center;">
-          <div style="display: inline-block; position: relative;">
-            <div style="width: 90px; height: 90px; background: #231106; border-radius: 50%; border: 3px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(251,191,36,0.4); margin: 0 auto; overflow: hidden;">
-              <img id="tab-exp-avatar-img" src="WIZmini.gif" style="width: 75px; height: 75px; object-fit: contain; image-rendering: pixelated;" alt="Avatar">
-            </div>
-            <div id="tab-exp-prestige" style="position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); color: var(--accent-gold); font-size: 16px; font-weight: bold; white-space: nowrap;"></div>
-          </div>
-          <h2 id="tab-exp-name" style="margin-top: 14px; font-size: 22px; color: var(--accent-gold);">Admin</h2>
-          <p id="tab-exp-title" style="color: #60a5fa; font-weight: bold; margin-bottom: 16px; font-size: 15px;">🌟 Legendary Admin</p>
-
-          <button class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #2a1508; font-weight: bold; border: 2px solid #140803; margin-bottom: 18px; padding: 6px 18px;" onclick="openCharSelectFromProfile()">
-            🔄 เปลี่ยนตัวละคร (Change Avatar)
-          </button>
-
-          <div style="background: #231106; border: 3px solid #140803; border-radius: 14px; padding: 18px; text-align: left;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-              <span style="font-size: 16px; font-weight: bold;">Level <span id="tab-exp-level" style="color: var(--accent-gold); font-size: 20px;">99</span></span>
-              <span id="tab-exp-text" style="color: var(--text-muted); font-size: 13px; line-height: 24px;">29,500 / MAX</span>
-            </div>
-            <div style="width: 100%; height: 14px; background: #120602; border-radius: 7px; overflow: hidden; border: 2px solid #140803;">
-              <div id="tab-exp-bar" style="height: 100%; width: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); box-shadow: 0 0 10px rgba(251,191,36,0.8); transition: width 1s ease-in-out;"></div>
-            </div>
-            <p style="font-size: 12px; color: var(--text-muted); margin-top: 10px; text-align: center;">
-              🔄 รีเซ็ตเลเวลและรับดาวจุติ (⭐) ทุกวันที่ 1 มกราคมของทุกปี
-            </p>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">📜 กระดานภารกิจรับ EXP ประจำกิลด์ (Guild Quests)</div>
-          <div style="display: flex; flex-direction: column; gap: 12px;">
-            <div class="quest-item">
-              <div>
-                <strong>🌞 เช็กชื่อประจำวัน (Daily Login)</strong>
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">ล็อกอินเข้าใช้งานระบบครั้งแรกของวัน (วันละ 1 ครั้ง)</p>
-              </div>
-              <span class="quest-exp">+10 EXP / วัน</span>
-            </div>
-
-            <div class="quest-item">
-              <div>
-                <strong>💰 บันทึกรับชำระเงินปกติ (Cashier Quest)</strong>
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">บันทึกค่าส่วนกลาง / ค่าน้ำประปา</p>
-              </div>
-              <span class="quest-exp">+5 EXP / รายการ</span>
-            </div>
-
-            <div class="quest-item" style="border-color: #b91c1c;">
-              <div>
-                <strong style="color: #fca5a5;">🎯 ล่าค่าหัวลูกหนี้ (Bounty Hunter)</strong>
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">บันทึกรับเงินยูนิตที่ค้างชำระ (Overdue) หรือมีค่าปรับ</p>
-              </div>
-              <span class="quest-exp" style="background: rgba(220,38,38,0.2); color: #fca5a5; border-color: #dc2626;">+20 EXP / รายการ</span>
-            </div>
-
-            <div class="quest-item">
-              <div>
-                <strong>👥 ทะเบียนราษฎร์ใหม่ (New Citizen)</strong>
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">ลงทะเบียนลูกบ้านใหม่ พร้อมสร้างโฟลเดอร์เอกสาร</p>
-              </div>
-              <span class="quest-exp">+15 EXP / หลัง</span>
-            </div>
-
-            <div class="quest-item">
-              <div>
-                <strong>📑 ออกใบแจ้งหนี้ & ใบเสร็จ (Scroll Crafter)</strong>
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">ออกใบแจ้งหนี้ที่ข้อมูลถูกต้อง 100% หรือพิมพ์ใบเสร็จ</p>
-              </div>
-              <span class="quest-exp">+2 EXP / ฉบับ</span>
-            </div>
-
-            <div class="quest-item">
-              <div>
-                <strong>🛠️ พิทักษ์ฐานข้อมูล (Data Keeper - Admin Only)</strong>
-                <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">อัปโหลดไฟล์สำรองข้อมูลดิบเข้าเซิร์ฟเวอร์</p>
-              </div>
-              <span class="quest-exp">+10 EXP / ไฟล์</span>
-            </div>
-          </div>
-        </div>
-
       </div>
     </div>
 
@@ -735,28 +707,20 @@
       
       document.getElementById("sidebar-avatar-img").src = avatarFile;
       document.getElementById("prof-avatar-img").src = avatarFile;
-      document.getElementById("tab-exp-avatar-img").src = avatarFile;
       
       document.getElementById("prof-name").innerText = currentUser.fullName;
       document.getElementById("prof-title").innerText = stats.title;
       document.getElementById("prof-level").innerText = stats.level;
-      
-      document.getElementById("tab-exp-name").innerText = currentUser.fullName;
-      document.getElementById("tab-exp-title").innerText = stats.title;
-      document.getElementById("tab-exp-level").innerText = stats.level;
 
       let stars = "";
       for(let i=0; i<(currentUser.prestige || 0); i++) stars += "⭐";
       document.getElementById("prof-prestige").innerText = stars;
-      document.getElementById("tab-exp-prestige").innerText = stars;
 
       let expLabel = (stats.level === 99) ? `${currentUser.exp.toLocaleString()} / MAX` : `${currentUser.exp.toLocaleString()} / ${stats.nextExp.toLocaleString()} EXP`;
       let barWidth = `${stats.progressPercent}%`;
 
       document.getElementById("prof-exp-text").innerText = expLabel;
       document.getElementById("prof-exp-bar").style.width = barWidth;
-      document.getElementById("tab-exp-text").innerText = expLabel;
-      document.getElementById("tab-exp-bar").style.width = barWidth;
     }
 
     function checkAuth() {
@@ -844,7 +808,6 @@
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
       document.getElementById(`tab-${tabName}`).classList.add('active');
       document.getElementById(`menu-${tabName}`).classList.add('active');
-      if (tabName === 'exp') updateProfileUI();
     }
 
     function openRoModal(unit) {
@@ -858,7 +821,10 @@
       if (resUnitInput && pendingUnitForRegistration) { resUnitInput.value = pendingUnitForRegistration; document.getElementById("res-name").focus(); }
     }
 
-    function openProfileModal() { document.getElementById("profile-modal-overlay").style.display = "flex"; }
+    function openProfileModal() { 
+      updateProfileUI();
+      document.getElementById("profile-modal-overlay").style.display = "flex"; 
+    }
     function closeProfileModal() { document.getElementById("profile-modal-overlay").style.display = "none"; }
 
     function autoFillResidentName(inputUnit) {
@@ -927,7 +893,7 @@
       document.getElementById("total-records").innerText = data.length.toLocaleString();
     }
 
-    // ฝ่ายจัดทำเอกสาร: ออกใบแจ้งหนี้ (ส่งตรวจกับระบบ 100%)
+    // ฝ่ายจัดทำเอกสาร: ออกใบแจ้งหนี้
     async function handleGenerateInvoice(event) {
       event.preventDefault();
       const unitVal = document.getElementById("inv-unit").value.trim();
