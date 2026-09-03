@@ -225,7 +225,7 @@
     .quest-exp { background: rgba(251,191,36,0.15); color: var(--accent-gold); padding: 3px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; border: 1px solid var(--accent-gold); }
 
     /* ========================================================
-       🖨️ PRINT STYLESHEET: เอกสารทางการ A4 (ตัด Web App ออก 100%)
+       🖨️ PRINT STYLESHEET: เอกสารทางการ A4 (ตัดส่วนประกอบเว็บออกหมด 100%)
        ======================================================== */
     #printable-invoice {
       display: none;
@@ -347,9 +347,7 @@
 </head>
 <body>
 
-  <!-- =======================================================
-       🖨️ PRINT TEMPLATE: เอกสารทางการ A4 (สลับ ใบแจ้งหนี้ / ใบเสร็จรับเงิน อัตโนมัติ)
-       ======================================================= -->
+  <!-- 🖨️ PRINT TEMPLATE: เอกสารทางการ A4 (สลับ ใบแจ้งหนี้ / ใบเสร็จรับเงิน อัตโนมัติ) -->
   <div id="printable-invoice">
     <table class="inv-header-table">
       <tr>
@@ -387,9 +385,12 @@
           <td style="width: 60%; padding: 3px 0;"><strong id="print-label-customer">ผู้รับใบแจ้งหนี้ (เจ้าของร่วม):</strong> <span id="print-res-name" style="font-weight: bold; font-size: 11pt;">-</span></td>
           <td style="width: 40%; padding: 3px 0;"><strong>เลขยูนิต / แปลง:</strong> <span id="print-res-unit" style="font-size: 12pt; font-weight: bold; color: #1e3a8a;">-</span></td>
         </tr>
-        <tr>
+        <tr id="row-print-deed">
           <td style="padding: 3px 0;"><strong>เลขที่โฉนดที่ดิน:</strong> <span id="print-res-deed">-</span></td>
           <td style="padding: 3px 0;"><strong>ประจำรอบเดือน:</strong> <span id="print-inv-month" style="font-weight: bold;">-</span></td>
+        </tr>
+        <tr id="row-print-month-full" style="display:none;">
+          <td colspan="2" style="padding: 3px 0;"><strong>ประจำรอบเดือน:</strong> <span id="print-inv-month-full" style="font-weight: bold;">-</span></td>
         </tr>
         <tr>
           <td colspan="2" style="padding: 3px 0;"><strong>สถานที่จัดส่งเอกสาร / ที่อยู่:</strong> <span id="print-res-address">-</span></td>
@@ -1569,7 +1570,7 @@
             displayMonth = `${thaiMonths[mIndex]} ${yThai}`;
           }
 
-          // ตั้งค่าหัวกระดาษเป็น "ใบแจ้งหนี้"
+          // ตั้งค่าหัวกระดาษเป็น "ใบแจ้งหนี้" (แสดงโฉนด)
           document.getElementById("print-doc-title-th").innerText = "ใบแจ้งหนี้";
           document.getElementById("print-doc-title-en").innerText = "INVOICE";
           document.getElementById("print-label-customer").innerText = "ผู้รับใบแจ้งหนี้ (เจ้าของร่วม):";
@@ -1577,6 +1578,8 @@
           document.getElementById("print-sig-left-title").innerText = "เจ้าหน้าที่ฝ่ายจัดทำเอกสาร";
           document.getElementById("print-payment-note").style.display = "block";
           document.getElementById("print-finance-name").innerText = " ............................................................ ";
+          document.getElementById("row-print-deed").style.display = "table-row";
+          document.getElementById("row-print-month-full").style.display = "none";
 
           // เติมข้อมูล
           document.getElementById("print-inv-no").innerText = invCode;
@@ -1605,7 +1608,7 @@
     }
 
     // =========================================================
-    // 🧾 2. ออกใบเสร็จรับเงิน (RECEIPT) โดยฝ่ายการเงิน
+    // 🧾 2. ออกใบเสร็จรับเงิน (RECEIPT) โดยฝ่ายการเงิน (ซ่อนโฉนด)
     // =========================================================
     async function handlePrintReceipt(unit, residentName, feeType, amount, payMethod) {
       showExpToast(2, "พิมพ์ใบเสร็จรับเงิน");
@@ -1617,21 +1620,24 @@
       const dStr = `${now.getDate()} ${thaiMonths[now.getMonth()]} ${now.getFullYear() + 543}`;
       const recCode = `REC-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}-${unit.padStart(3,'0')}`;
 
-      // สลับหัวกระดาษเป็น "ใบเสร็จรับเงิน"
+      // สลับหัวกระดาษเป็น "ใบเสร็จรับเงิน" (ซ่อนโฉนด และรวมแถวรอบเดือน)
       document.getElementById("print-doc-title-th").innerText = "ใบเสร็จรับเงิน";
       document.getElementById("print-doc-title-en").innerText = "RECEIPT";
       document.getElementById("print-label-customer").innerText = "ได้รับเงินจาก (ผู้ชำระเงิน):";
       document.getElementById("print-total-label").innerText = "จำนวนเงินที่ได้รับชำระทั้งสิ้น (Total Paid):";
       document.getElementById("print-sig-left-title").innerText = "เจ้าหน้าที่ฝ่ายจัดทำเอกสาร";
       document.getElementById("print-payment-note").style.display = "none";
+      
+      // ซ่อนแถวโฉนด และแสดงแถวรอบเดือนแบบเต็มแถว
+      document.getElementById("row-print-deed").style.display = "none";
+      document.getElementById("row-print-month-full").style.display = "table-row";
 
       // เติมข้อมูล
       document.getElementById("print-inv-no").innerText = recCode;
       document.getElementById("print-inv-date").innerText = dStr;
       document.getElementById("print-res-name").innerText = residentName || "-";
       document.getElementById("print-res-unit").innerText = unit;
-      document.getElementById("print-res-deed").innerText = matchedResident?.titleDeedNo || "-";
-      document.getElementById("print-inv-month").innerText = `ชำระผ่าน: ${payMethod || 'โอนเงิน / QR'}`;
+      document.getElementById("print-inv-month-full").innerText = `ชำระค่าบริการ (${feeType}) ผ่านช่องทาง: ${payMethod || 'โอนเงิน / QR'}`;
       document.getElementById("print-res-address").innerText = matchedResident?.currentAddress || `แปลงที่ ${unit} โครงการอุดมสุขเพลส`;
       document.getElementById("print-fee-title").innerText = feeType;
       document.getElementById("print-fee-amount").innerText = Number(amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
