@@ -227,9 +227,9 @@
 </head>
 <body>
 
-  <!-- 📜 POPUP: รายชื่อลูกบ้านแบบละเอียด -->
+  <!-- 📜 POPUP: รายชื่อลูกบ้านแบบละเอียดพร้อมปุ่มแก้ไข -->
   <div id="customer-list-modal" class="modal-overlay">
-    <div class="ro-window" style="max-width: 950px; width: 95%;">
+    <div class="ro-window" style="max-width: 1020px; width: 95%;">
       <div class="ro-header">
         <span>📜 สารบบข้อมูลลูกบ้านทั้งหมด (Residents Directory)</span>
         <span class="ro-close" onclick="closeCustomerListModal()">✕</span>
@@ -240,15 +240,16 @@
       </div>
       <div class="ro-body" style="padding: 14px 20px; flex-direction: column; align-items: stretch;">
         <div style="max-height: 420px; overflow-x: auto; overflow-y: auto; border: 2px solid #140803; border-radius: 10px; background: #231106;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 800px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 880px;">
             <thead>
               <tr style="background: #1a0c04; color: var(--accent-gold); position: sticky; top: 0; z-index: 2;">
-                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 10%;">ยูนิต</th>
-                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 18%;">ชื่อ-นามสกุล</th>
-                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 12%;">เลขที่โฉนด</th>
-                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 13%;">เบอร์โทรศัพท์</th>
-                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 23%;">ที่อยู่ตามบัตร ปชช.</th>
-                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 24%;">ที่อยู่ปัจจุบัน / ส่งเอกสาร</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 8%;">ยูนิต</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 17%;">ชื่อ-นามสกุล</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 11%;">เลขที่โฉนด</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 12%;">เบอร์โทรศัพท์</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 22%;">ที่อยู่ตามบัตร ปชช.</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 22%;">ที่อยู่ปัจจุบัน / ส่งเอกสาร</th>
+                <th style="padding: 10px 12px; text-align: center; border-bottom: 2px solid #140803; width: 8%;">จัดการ</th>
               </tr>
             </thead>
             <tbody id="modal-resident-tbody"></tbody>
@@ -258,6 +259,56 @@
       <div class="ro-footer">
         <button class="ro-btn ro-btn-cancel" onclick="closeCustomerListModal()">ปิดหน้าต่าง (ล้างข้อมูล)</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ✏️ MODAL: แก้ไขข้อมูลลูกบ้านเดิม -->
+  <div id="edit-resident-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 650px; width: 90%;">
+      <div class="ro-header">
+        <span>✏️ แก้ไขข้อมูลลูกบ้าน (Unit Profile Update)</span>
+        <span class="ro-close" onclick="closeEditResidentModal()">✕</span>
+      </div>
+      <form onsubmit="submitUpdateResident(event)" style="padding: 20px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="form-group">
+            <label>เลขยูนิต / แปลงบ้าน (ไม่สามารถเปลี่ยนได้)</label>
+            <input type="text" id="edit-res-unit" readonly style="background: #180a03; color: var(--accent-gold); font-weight: bold; cursor: not-allowed;">
+          </div>
+          <div class="form-group">
+            <label>เลขที่โฉนดที่ดิน (Title Deed)</label>
+            <input type="text" id="edit-res-deed">
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label>ชื่อ-นามสกุล เจ้าของ / ผู้พักอาศัย *</label>
+            <input type="text" id="edit-res-name" required>
+          </div>
+          <div class="form-group">
+            <label>เบอร์โทรศัพท์ติดต่อ *</label>
+            <input type="tel" id="edit-res-phone" required>
+          </div>
+          <div class="form-group">
+            <label>อีเมล</label>
+            <input type="email" id="edit-res-email">
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label>🏠 ที่อยู่ตามบัตรประชาชน</label>
+            <textarea id="edit-res-id-address" rows="2"></textarea>
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label>📍 ที่อยู่ปัจจุบัน / สถานที่จัดส่งเอกสาร</label>
+            <textarea id="edit-res-cur-address" rows="2"></textarea>
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label>📷 อัปโหลดภาพถ่ายใหม่ (เว้นว่างไว้หากไม่เปลี่ยน)</label>
+            <input type="file" id="edit-res-photo" accept="image/*" onchange="previewEditResidentPhoto(event)">
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button type="button" class="ro-btn" style="flex: 1;" onclick="closeEditResidentModal()">ยกเลิก</button>
+          <button type="submit" class="btn-primary" id="btn-submit-update-resident" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #0284c7, #0369a1);">💾 บันทึกการแก้ไขข้อมูล</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -688,10 +739,12 @@
     let residentPhotoBase64 = null;
     let residentPhotoName = "";
     let residentPhotoMime = "";
+    let editResidentPhotoBase64 = null;
+    let editResidentPhotoName = "";
+    let editResidentPhotoMime = "";
     let pendingUnitForRegistration = "";
     let tempSelectedAvatar = "WIZmini";
 
-    // ฟังก์ชันจัดรูปแบบเลขยูนิตมาตรฐาน
     function cleanUnitKey(val) {
       if (val === null || val === undefined) return "";
       let s = String(val).trim().toLowerCase();
@@ -864,7 +917,7 @@
       const tbody = document.getElementById("modal-resident-tbody");
       tbody.innerHTML = "";
       if (!cachedResidents || cachedResidents.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--text-muted);">ไม่พบข้อมูลลูกบ้านในระบบ</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--text-muted);">ไม่พบข้อมูลลูกบ้านในระบบ</td></tr>`;
       } else {
         renderModalResidents(cachedResidents);
       }
@@ -876,6 +929,7 @@
       const tbody = document.getElementById("modal-resident-tbody");
       tbody.innerHTML = "";
       list.forEach(res => {
+        const uStr = String(res.unitNumber).replace(/'/g, "\\'");
         tbody.innerHTML += `
           <tr style="border-bottom: 1px solid #140803;">
             <td style="padding: 10px 12px; font-weight: bold; color: var(--accent-gold);">${String(res.unitNumber).toUpperCase()}</td>
@@ -884,6 +938,9 @@
             <td style="padding: 10px 12px; color: #6ee7b7;">${res.phone || "-"}</td>
             <td style="padding: 10px 12px; color: var(--text-muted); font-size: 12px;">${res.idCardAddress || "-"}</td>
             <td style="padding: 10px 12px; color: var(--text-muted); font-size: 12px;">${res.currentAddress || "-"}</td>
+            <td style="padding: 10px 12px; text-align: center;">
+              <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openEditResidentModal('${uStr}')">✏️ แก้ไข</button>
+            </td>
           </tr>
         `;
       });
@@ -908,6 +965,92 @@
       document.getElementById("modal-resident-search").value = "";
     }
 
+    // =========================================================
+    // ✏️ ฟังก์ชันจัดการหน้าจอแก้ไขข้อมูลลูกบ้าน (Edit Profile Modal)
+    // =========================================================
+    function openEditResidentModal(unitNumber) {
+      const targetKey = cleanUnitKey(unitNumber);
+      const res = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
+      if (!res) {
+        alert("⚠️ ไม่พบข้อมูลลูกบ้านรายนี้");
+        return;
+      }
+
+      document.getElementById("edit-res-unit").value = res.unitNumber;
+      document.getElementById("edit-res-deed").value = res.titleDeedNo !== "-" ? res.titleDeedNo : "";
+      document.getElementById("edit-res-name").value = res.residentName || "";
+      document.getElementById("edit-res-phone").value = res.phone !== "-" ? res.phone : "";
+      document.getElementById("edit-res-email").value = res.email !== "-" ? res.email : "";
+      document.getElementById("edit-res-id-address").value = res.idCardAddress !== "-" ? res.idCardAddress : "";
+      document.getElementById("edit-res-cur-address").value = res.currentAddress !== "-" ? res.currentAddress : "";
+      document.getElementById("edit-res-photo").value = "";
+      editResidentPhotoBase64 = null;
+
+      document.getElementById("edit-resident-modal").style.display = "flex";
+    }
+
+    function closeEditResidentModal() {
+      document.getElementById("edit-resident-modal").style.display = "none";
+    }
+
+    function previewEditResidentPhoto(e) {
+      const file = e.target.files[0];
+      if (file) {
+        editResidentPhotoName = file.name;
+        editResidentPhotoMime = file.type || "image/jpeg";
+        const reader = new FileReader();
+        reader.onload = function(evt) { editResidentPhotoBase64 = evt.target.result; };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function submitUpdateResident(event) {
+      event.preventDefault();
+      const btn = document.getElementById("btn-submit-update-resident");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังบันทึกการแก้ไข...";
+
+      const payload = {
+        type: "update_resident",
+        operator: currentUser?.username,
+        operatorRole: currentUser?.role,
+        unitNumber: document.getElementById("edit-res-unit").value.trim(),
+        titleDeedNo: document.getElementById("edit-res-deed").value.trim(),
+        residentName: document.getElementById("edit-res-name").value.trim(),
+        phone: document.getElementById("edit-res-phone").value.trim(),
+        email: document.getElementById("edit-res-email").value.trim(),
+        idCardAddress: document.getElementById("edit-res-id-address").value.trim(),
+        currentAddress: document.getElementById("edit-res-cur-address").value.trim(),
+        photoData: editResidentPhotoBase64,
+        photoName: editResidentPhotoName,
+        photoMimeType: editResidentPhotoMime
+      };
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        const resJson = await res.json();
+
+        if (resJson.status === "success") {
+          showExpToast(5, "อัปเดตข้อมูลลูกบ้าน");
+          alert("✅ บันทึกการแก้ไขข้อมูลเรียบร้อยแล้ว!");
+          closeEditResidentModal();
+          await loadDashboardData();
+          openCustomerListModal();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "💾 บันทึกการแก้ไขข้อมูล";
+      }
+    }
+
     function autoFillResidentName(inputUnit) {
       const targetKey = cleanUnitKey(inputUnit);
       if (!targetKey) return;
@@ -917,7 +1060,7 @@
 
     async function loadDashboardData() {
       try {
-        const fetchUrl = API_URL + "?t=" + new Date().getTime(); // บังคับไม่ใช้แคชเบราว์เซอร์
+        const fetchUrl = API_URL + "?t=" + new Date().getTime();
         const response = await fetch(fetchUrl);
         const data = await response.json();
         if (data.payments) { cachedPayments = data.payments || []; cachedResidents = data.residents || []; } 
@@ -1035,16 +1178,14 @@
       }
     }
 
-    // ลงทะเบียนลูกบ้านใหม่ (ตรวจสอบซ้ำอย่างเข้มงวด)
     async function submitNewResident(event) {
       event.preventDefault();
       const inputUnit = document.getElementById("res-unit").value.trim();
       const targetKey = cleanUnitKey(inputUnit);
 
-      // 1. ตรวจสอบยูนิตซ้ำจากแคชหน้าเว็บก่อน
       const duplicateFound = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
       if (duplicateFound) {
-        alert(`⚠️ ยูนิต/แปลง [${inputUnit}] มีข้อมูลอยู่ในระบบแล้ว (เจ้าของคือ: "${duplicateFound.residentName}") ไม่สามารถลงทะเบียนซ้ำได้!`);
+        alert(`⚠️ ยูนิต/แปลง [${inputUnit}] มีข้อมูลอยู่ในระบบแล้ว (เจ้าของคือ: "${duplicateFound.residentName}") ไม่สามารถลงทะเบียนซ้ำได้!\n\nกรุณากดปุ่ม '📜 รายชื่อลูกบ้านทั้งหมด' เพื่อทำการแก้ไขข้อมูลแทน`);
         document.getElementById("res-unit").focus();
         return;
       }
@@ -1089,7 +1230,7 @@
           await loadDashboardData();
           if (currentUser.role === 'Admin' || currentUser.role === 'Finance') { switchTab('financial'); }
         } else {
-          alert(resJson.message); // แสดงข้อความ error จากหลังบ้าน
+          alert(resJson.message);
         }
       } catch (err) { 
         alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์"); 
