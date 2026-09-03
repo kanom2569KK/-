@@ -238,7 +238,7 @@
 <body>
 
   <!-- =======================================================
-       📜 POPUP: รายชื่อลูกบ้านแบบละเอียด (Residents Lookup Modal)
+       📜 POPUP: รายชื่อลูกบ้านแบบละเอียด (Residents Directory)
        ======================================================= -->
   <div id="customer-list-modal" class="modal-overlay">
     <div class="ro-window" style="max-width: 950px; width: 95%;">
@@ -893,9 +893,7 @@
     }
     function closeProfileModal() { document.getElementById("profile-modal-overlay").style.display = "none"; }
 
-    // ==========================================
     // 📜 ฟังก์ชันเปิด-ปิด และล้างข้อมูลป๊อปอัปรายชื่อลูกบ้านแบบละเอียด
-    // ==========================================
     function openCustomerListModal() {
       const tbody = document.getElementById("modal-resident-tbody");
       tbody.innerHTML = "";
@@ -942,7 +940,6 @@
 
     function closeCustomerListModal() {
       document.getElementById("customer-list-modal").style.display = "none";
-      // ล้างข้อมูลและ Search Term ทิ้งทันทีเมื่อปิดหน้าต่าง
       document.getElementById("modal-resident-tbody").innerHTML = "";
       document.getElementById("modal-resident-search").value = "";
     }
@@ -1106,18 +1103,28 @@
       }
     }
 
-    // ลงทะเบียนลูกบ้านใหม่
+    // ลงทะเบียนลูกบ้านใหม่ (ตรวจสอบความซ้ำซ้อน 100%)
     async function submitNewResident(event) {
       event.preventDefault();
+      const inputUnit = document.getElementById("res-unit").value.trim();
+
+      // ตรวจสอบกับข้อมูลแคชในหน้าเว็บก่อนส่งคำขอ
+      const isDuplicate = cachedResidents.some(r => r.unitNumber.toLowerCase() === inputUnit.toLowerCase());
+      if (isDuplicate) {
+        alert(`⚠️ ยูนิต/แปลง [${inputUnit}] มีข้อมูลอยู่ในระบบแล้ว ไม่สามารถลงทะเบียนซ้ำได้!`);
+        document.getElementById("res-unit").focus();
+        return;
+      }
+
       const btn = document.getElementById("btn-submit-resident"); 
       btn.disabled = true; 
-      btn.innerText = "⏳ กำลังสร้างโฟลเดอร์...";
+      btn.innerText = "⏳ กำลังตรวจสอบและสร้างโฟลเดอร์...";
       
       const payload = {
         type: "new_resident", 
         operator: currentUser?.username, 
         operatorRole: currentUser?.role, 
-        unitNumber: document.getElementById("res-unit").value.trim(),
+        unitNumber: inputUnit,
         titleDeedNo: document.getElementById("res-deed").value.trim(), 
         residentName: document.getElementById("res-name").value.trim(), 
         phone: document.getElementById("res-phone").value.trim(), 
@@ -1154,7 +1161,7 @@
           alert("❌ " + resJson.message);
         }
       } catch (err) { 
-        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อ"); 
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์"); 
       } finally { 
         btn.disabled = false; 
         btn.innerText = "บันทึกข้อมูล & สร้างโฟลเดอร์"; 
