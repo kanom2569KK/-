@@ -702,18 +702,15 @@
     function calculateLevelData(exp) {
       let level = Math.floor(Math.sqrt(exp / 3)) + 1;
       if (level > 99) level = 99;
-      
       let title = "🥚 Novice Staff (พนักงานฝึกหัด)";
       if (level >= 10 && level <= 29) title = "💼 Kafra Trainee (เจ้าหน้าที่ทั่วไป)";
       else if (level >= 30 && level <= 49) title = "🛡️ Kafra Senior (เจ้าหน้าที่อาวุโส)";
       else if (level >= 50 && level <= 79) title = "⚔️ Kafra Chief (หัวหน้าหน่วยบริการ)";
       else if (level >= 80 && level <= 98) title = "👑 Kafra Master (ผู้เชี่ยวชาญระดับสูง)";
       else if (level === 99) title = "🌟 Legendary Admin (ตำนานแห่งนิติบุคคล)";
-
       let currentBaseExp = 3 * Math.pow(level - 1, 2);
       let nextExp = (level === 99) ? currentBaseExp : (3 * Math.pow(level, 2));
       let progressPercent = (level === 99) ? 100 : ((exp - currentBaseExp) / (nextExp - currentBaseExp)) * 100;
-
       return { level, title, currentBaseExp, nextExp, progressPercent };
     }
 
@@ -723,7 +720,6 @@
       toast.innerHTML = `🌟 +${amount} EXP <span style="font-size:12px; font-weight:normal;">(${actionName})</span>`;
       document.body.appendChild(toast);
       setTimeout(() => toast.remove(), 3000);
-      
       if(currentUser) {
          currentUser.exp += amount;
          sessionStorage.setItem("condo_auth_user", JSON.stringify(currentUser));
@@ -735,39 +731,29 @@
       if(!currentUser) return;
       const stats = calculateLevelData(currentUser.exp);
       const avatarFile = (currentUser.avatar || "WIZmini") + ".gif";
-      
       document.getElementById("sidebar-avatar-img").src = avatarFile;
       document.getElementById("prof-avatar-img").src = avatarFile;
-      
       document.getElementById("prof-name").innerText = currentUser.fullName;
       document.getElementById("prof-title").innerText = stats.title;
       document.getElementById("prof-level").innerText = stats.level;
-
       let stars = "";
       for(let i=0; i<(currentUser.prestige || 0); i++) stars += "⭐";
       document.getElementById("prof-prestige").innerText = stars;
-
       let expLabel = (stats.level === 99) ? `${currentUser.exp.toLocaleString()} / MAX` : `${currentUser.exp.toLocaleString()} / ${stats.nextExp.toLocaleString()} EXP`;
-      let barWidth = `${stats.progressPercent}%`;
-
       document.getElementById("prof-exp-text").innerText = expLabel;
-      document.getElementById("prof-exp-bar").style.width = barWidth;
+      document.getElementById("prof-exp-bar").style.width = `${stats.progressPercent}%`;
     }
 
     function applyRolePermissions(role) {
       document.querySelectorAll('.nav-item').forEach(el => el.style.display = 'none');
-      
       let defaultTab = 'financial';
-      
       if (role === 'Admin') {
         document.getElementById('menu-financial').style.display = 'block';
         document.getElementById('menu-residents').style.display = 'block';
         document.getElementById('menu-billing').style.display = 'block';
         document.getElementById('menu-admin-hub').style.display = 'block';
-        defaultTab = 'financial';
       } else if (role === 'Finance') {
         document.getElementById('menu-financial').style.display = 'block';
-        defaultTab = 'financial';
       } else if (role === 'AdminDoc') {
         document.getElementById('menu-residents').style.display = 'block';
         document.getElementById('menu-billing').style.display = 'block';
@@ -777,7 +763,6 @@
         document.getElementById('menu-billing').style.display = 'block';
         defaultTab = 'residents';
       }
-      
       switchTab(defaultTab);
     }
 
@@ -787,11 +772,8 @@
         currentUser = JSON.parse(savedUser);
         document.getElementById("login-overlay").style.display = "none";
         document.getElementById("char-select-screen").style.display = "none";
-        
-        const displayName = currentUser.fullName.split(' ')[0] || currentUser.username;
-        document.getElementById("current-user-display").innerText = displayName.toUpperCase();
+        document.getElementById("current-user-display").innerText = (currentUser.fullName.split(' ')[0] || currentUser.username).toUpperCase();
         document.getElementById("current-role-display").innerText = currentUser.role;
-
         applyRolePermissions(currentUser.role);
         updateProfileUI();
         loadDashboardData();
@@ -814,7 +796,6 @@
         if (resJson.status === "success") {
           tempPendingUser = resJson.user;
           if(resJson.dailyLoginBonus) tempPendingUser.gotDailyBonus = true;
-          
           document.getElementById("login-overlay").style.display = "none";
           document.getElementById("char-select-screen").style.display = "flex";
           pickAvatar(tempPendingUser.avatar || "WIZmini");
@@ -835,15 +816,12 @@
       tempPendingUser.avatar = tempSelectedAvatar;
       currentUser = tempPendingUser;
       sessionStorage.setItem("condo_auth_user", JSON.stringify(currentUser));
-      
       document.getElementById("char-select-screen").style.display = "none";
       checkAuth();
-
       if (currentUser.gotDailyBonus) {
         setTimeout(() => showExpToast(10, "Daily Login รายวัน"), 800);
         delete currentUser.gotDailyBonus;
       }
-
       fetch(API_URL, {
         method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ type: "save_avatar", username: currentUser.username, avatar: tempSelectedAvatar })
@@ -862,10 +840,8 @@
     function switchTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-      
       const targetTab = document.getElementById(`tab-${tabName}`);
       const targetMenu = document.getElementById(`menu-${tabName}`);
-      
       if (targetTab) targetTab.classList.add('active');
       if (targetMenu) targetMenu.classList.add('active');
     }
@@ -881,22 +857,17 @@
       if (resUnitInput && pendingUnitForRegistration) { resUnitInput.value = pendingUnitForRegistration; document.getElementById("res-name").focus(); }
     }
 
-    function openProfileModal() { 
-      updateProfileUI();
-      document.getElementById("profile-modal-overlay").style.display = "flex"; 
-    }
+    function openProfileModal() { updateProfileUI(); document.getElementById("profile-modal-overlay").style.display = "flex"; }
     function closeProfileModal() { document.getElementById("profile-modal-overlay").style.display = "none"; }
 
     function openCustomerListModal() {
       const tbody = document.getElementById("modal-resident-tbody");
       tbody.innerHTML = "";
-      
       if (!cachedResidents || cachedResidents.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--text-muted);">ไม่พบข้อมูลลูกบ้านในระบบ</td></tr>`;
       } else {
         renderModalResidents(cachedResidents);
       }
-      
       document.getElementById("modal-resident-search").value = "";
       document.getElementById("customer-list-modal").style.display = "flex";
     }
@@ -946,7 +917,8 @@
 
     async function loadDashboardData() {
       try {
-        const response = await fetch(API_URL);
+        const fetchUrl = API_URL + "?t=" + new Date().getTime(); // บังคับไม่ใช้แคชเบราว์เซอร์
+        const response = await fetch(fetchUrl);
         const data = await response.json();
         if (data.payments) { cachedPayments = data.payments || []; cachedResidents = data.residents || []; } 
         else if (Array.isArray(data)) { cachedPayments = data; }
@@ -957,22 +929,18 @@
     function renderTable(data) {
       const tableBody = document.getElementById("payments-table-body");
       tableBody.innerHTML = "";
-
       if (!data || data.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">ไม่พบรายการ</td></tr>`; return;
       }
-
       data.forEach(item => {
         const dateStr = item["Date"] || item["Timestamp"] || "-";
         const formattedDate = dateStr !== "-" ? new Date(dateStr).toLocaleDateString('th-TH') : "-";
         const status = item["Status"] || "Pending";
         const amount = Number(item["Amount"] || item["amount"] || 0);
         const unit = item["Unit Number"] || item["unitNumber"] || "-";
-
         const btnReceiptHtml = status.toLowerCase() === 'paid' 
           ? `<button class="btn-action" style="background: linear-gradient(135deg, var(--accent-green), #047857);" onclick="handlePrintReceipt('${unit}')">🖨️ พิมพ์</button>` 
           : `<span style="font-size:12px; color:var(--text-muted);">-</span>`;
-
         tableBody.innerHTML += `<tr>
           <td>${formattedDate}</td>
           <td style="color: var(--accent-gold); font-weight: bold;">${unit}</td>
@@ -1008,52 +976,27 @@
       const unitVal = document.getElementById("inv-unit").value.trim();
       const monthVal = document.getElementById("inv-month").value;
       const feeVal = document.getElementById("inv-fee-type").value;
-
-      if (!unitVal) {
-        alert("⚠️ กรุณาระบุเลขยูนิต/แปลง");
-        document.getElementById("inv-unit").focus();
-        return;
-      }
-
+      if (!unitVal) { alert("⚠️ กรุณาระบุเลขยูนิต/แปลง"); document.getElementById("inv-unit").focus(); return; }
       const btn = document.getElementById("btn-generate-inv");
       btn.disabled = true; btn.innerText = "⏳ กำลังตรวจสอบข้อมูลกับทะเบียนลูกบ้าน...";
-
       try {
         const res = await fetch(API_URL, { 
-          method: "POST", 
-          headers: { "Content-Type": "text/plain;charset=utf-8" }, 
-          body: JSON.stringify({ 
-            type: "generate_invoice", 
-            operator: currentUser?.username,
-            operatorRole: currentUser?.role,
-            unitNumber: unitVal,
-            billingMonth: monthVal,
-            feeType: feeVal
-          }) 
+          method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+          body: JSON.stringify({ type: "generate_invoice", operator: currentUser?.username, operatorRole: currentUser?.role, unitNumber: unitVal, billingMonth: monthVal, feeType: feeVal }) 
         });
         const resJson = await res.json();
-        
         if (resJson.status === "success") {
           showExpToast(resJson.expAdded, "ออกใบแจ้งหนี้ (ข้อมูลถูกต้อง 100%)");
           alert(`✅ ตรวจสอบข้อมูลถูกต้อง!\nเจ้าของร่วม: ${resJson.residentName}\nระบบได้ส่งข้อมูลบันทึกรายวันเพื่อเตรียมออกใบเสร็จเรียบร้อยแล้ว`);
           window.print();
-        } else {
-          alert("❌ " + resJson.message);
-        }
-      } catch (err) { 
-        alert("⚠️ เชื่อมต่อเซิร์ฟเวอร์ขัดข้อง");
-      } finally {
-        btn.disabled = false; btn.innerText = "🖨️ ตรวจสอบ & พิมพ์ใบแจ้งหนี้ (PDF)";
-      }
+        } else { alert("❌ " + resJson.message); }
+      } catch (err) { alert("⚠️ เชื่อมต่อเซิร์ฟเวอร์ขัดข้อง"); } 
+      finally { btn.disabled = false; btn.innerText = "🖨️ ตรวจสอบ & พิมพ์ใบแจ้งหนี้ (PDF)"; }
     }
 
     async function handlePrintReceipt(unit) {
       showExpToast(2, "พิมพ์ใบเสร็จรับเงิน");
-      fetch(API_URL, { 
-        method: "POST", 
-        headers: { "Content-Type": "text/plain;charset=utf-8" }, 
-        body: JSON.stringify({ type: "print_receipt", operator: currentUser?.username, unitNumber: unit }) 
-      });
+      fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "print_receipt", operator: currentUser?.username, unitNumber: unit }) });
       window.print();
     }
 
@@ -1064,13 +1007,11 @@
         openRoModal(document.getElementById("form-unit").value.trim()); 
         return; 
       }
-
       const btn = document.getElementById("btn-submit-payment"); btn.disabled = true; btn.innerText = "⏳ กำลังบันทึก...";
       const payload = {
         type: "payment", operator: currentUser?.username, operatorRole: currentUser?.role, unitNumber: document.getElementById("form-unit").value.trim(),
         residentName: document.getElementById("form-name").value, feeType: document.getElementById("form-fee-type").value, amount: document.getElementById("form-amount").value, paymentMethod: document.getElementById("form-payment-method").value, status: document.getElementById("form-status").value
       };
-
       try {
         const res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
         const resJson = await res.json();
@@ -1079,9 +1020,7 @@
           alert("✅ บันทึกรายการสำเร็จ");
           document.getElementById("payment-form").reset();
           loadDashboardData();
-        } else {
-          alert("❌ " + resJson.message);
-        }
+        } else { alert("❌ " + resJson.message); }
       } catch (err) { alert("⚠️ เกิดข้อผิดพลาดในการบันทึก"); } 
       finally { btn.disabled = false; btn.innerText = "บันทึกรับชำระเงิน"; }
     }
@@ -1096,13 +1035,13 @@
       }
     }
 
-    // ลงทะเบียนลูกบ้านใหม่ (Strict Block ป้องกันซ้ำทั้งหน้าบ้านและหลังบ้าน)
+    // ลงทะเบียนลูกบ้านใหม่ (ตรวจสอบซ้ำอย่างเข้มงวด)
     async function submitNewResident(event) {
       event.preventDefault();
       const inputUnit = document.getElementById("res-unit").value.trim();
       const targetKey = cleanUnitKey(inputUnit);
 
-      // ตรวจสอบยูนิตซ้ำจากแคชหน้าเว็บก่อน
+      // 1. ตรวจสอบยูนิตซ้ำจากแคชหน้าเว็บก่อน
       const duplicateFound = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
       if (duplicateFound) {
         alert(`⚠️ ยูนิต/แปลง [${inputUnit}] มีข้อมูลอยู่ในระบบแล้ว (เจ้าของคือ: "${duplicateFound.residentName}") ไม่สามารถลงทะเบียนซ้ำได้!`);
@@ -1148,11 +1087,9 @@
           document.getElementById("res-photo").value = "";
           residentPhotoBase64 = null;
           await loadDashboardData();
-          if (currentUser.role === 'Admin' || currentUser.role === 'Finance') {
-            switchTab('financial');
-          }
+          if (currentUser.role === 'Admin' || currentUser.role === 'Finance') { switchTab('financial'); }
         } else {
-          alert("❌ " + resJson.message);
+          alert(resJson.message); // แสดงข้อความ error จากหลังบ้าน
         }
       } catch (err) { 
         alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์"); 
