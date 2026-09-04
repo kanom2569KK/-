@@ -345,7 +345,346 @@
     }
   </style>
 </head>
-<body>
+<script>
+// ========================================
+// CONFIGURATION & GLOBALS
+// ========================================
+const SCRIPT_URL = "https://script.google.com/macros/d/YOUR_SCRIPT_ID/usercontent";
+let currentUser = null;
+let allResidents = [];
+let allPayments = [];
+
+// ========================================
+// AUTHENTICATION
+// ========================================
+function handleLogin(event) {
+  event.preventDefault();
+  const username = document.getElementById('login-user').value.trim();
+  const password = document.getElementById('login-pass').value.trim();
+  
+  if(!username || !password) {
+    alert('❌ กรุณากรอก Username และ Password');
+    return;
+  }
+
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({
+      type: 'login',
+      username: username,
+      password: password
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.status === 'success') {
+      currentUser = data.user;
+      localStorage.setItem('currentUser', JSON.stringify(data.user));
+      
+      // อัปเดต UI
+      document.getElementById('current-user-display').textContent = data.user.fullName;
+      document.getElementById('current-role-display').textContent = data.user.role;
+      document.getElementById('sidebar-avatar-img').src = data.user.avatar + '.gif';
+      
+      // ซ่อน Login, แสดง Dashboard
+      document.getElementById('login-overlay').style.display = 'none';
+      document.getElementById('char-select-screen').style.display = 'flex';
+      
+      // แสดง Toast
+      if(data.dailyLoginBonus) {
+        showExpToast('🌞 Daily Login Bonus: +10 EXP');
+      }
+    } else {
+      alert('❌ ' + data.message);
+    }
+  })
+  .catch(error => {
+    console.error('Login Error:', error);
+    alert('❌ เกิดข้อผิดพลาด: ' + error.message);
+  });
+}
+
+// ========================================
+// TAB SWITCHING
+// ========================================
+function switchTab(tabName) {
+  // ซ่อนทั้งหมด
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  
+  // แสดงอันที่เลือก
+  document.getElementById(`tab-${tabName}`).classList.add('active');
+  document.getElementById(`menu-${tabName}`).classList.add('active');
+  
+  // โหลดข้อมูลใหม่
+  if(tabName === 'financial') loadFinancialData();
+  if(tabName === 'residents') loadResidentsData();
+  if(tabName === 'billing') setBillingMonth();
+}
+
+// ========================================
+// PAYMENT RECORDING
+// ========================================
+function submitPayment(event) {
+  event.preventDefault();
+  
+  const unitNumber = document.getElementById('form-unit').value.trim();
+  const residentName = document.getElementById('form-name').value.trim();
+  const feeType = document.getElementById('form-fee-type').value;
+  const amount = Number(document.getElementById('form-amount').value);
+  const paymentMethod = document.getElementById('form-payment-method').value;
+  const status = document.getElementById('form-status').value;
+  
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({
+      type: 'payment',
+      unitNumber: unitNumber,
+      residentName: residentName,
+      feeType: feeType,
+      amount: amount,
+      paymentMethod: paymentMethod,
+      status: status,
+      operator: currentUser.username,
+      operatorRole: currentUser.role
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.status === 'success') {
+      alert('✅ บันทึกรับเงินสำเร็จ!');
+      showExpToast(`💰 +${data.expAdded} EXP`);
+      document.getElementById('payment-form').reset();
+      loadFinancialData();
+    } else {
+      alert('❌ ' + data.message);
+    }
+  })
+  .catch(error => alert('❌ Error: ' + error.message));
+}
+
+// ========================================
+// RESIDENTS MANAGEMENT
+// ========================================
+function submitNewResident(event) {
+  event.preventDefault();
+  
+  const unitNumber = document.getElementById('res-unit').value.trim();
+  const residentName = document.getElementById('res-name').value.trim();
+  const phone = document.getElementById('res-phone').value.trim();
+  const email = document.getElementById('res-email').value.trim();
+  const titleDeedNo = document.getElementById('res-deed').value.trim();
+  const idCardAddress = document.getElementById('res-id-address').value.trim();
+  const currentAddress = document.getElementById('res-cur-address').value.trim();
+  
+  let photoData = null, photoName = null, photoMimeType = null;
+  const photoInput = document.getElementById('res-photo');
+  
+  if(photoInput.files.length > 0) {
+    const file = photoInput.files[0];
+    photoName = file.name;
+    photoMimeType = file.type;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      photoData = e.target.result;
+      submitResidentData(unitNumber, residentName, phone, email, titleDeedNo, 
+                        idCardAddress, currentAddress, photoData, photoName, photoMimeType);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    submitResidentData(unitNumber, residentName, phone, email, titleDeedNo, 
+                      idCardAddress, currentAddress, null, null, null);
+  }
+}
+
+function submitResidentData(unitNumber, residentName, phone, email, titleDeedNo, 
+                            idCardAddress, currentAddress, photoData, photoName, photoMimeType) {
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({
+      type: 'new_resident',
+      unitNumber: unitNumber,
+      residentName: residentName,
+      phone: phone,
+      email: email,
+      titleDeedNo: titleDeedNo,
+      idCardAddress: idCardAddress,
+      currentAddress: currentAddress,
+      photoData: photoData,
+      photoName: photoName,
+      photoMimeType: photoMimeType,
+      operator: currentUser.username,
+      operatorRole: currentUser.role
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.status === 'success') {
+      alert('✅ ลงทะเบียนลูกบ้านสำเร็จ!');
+      showExpToast(`+${data.expAdded} EXP`);
+      document.getElementById('resident-form').reset();
+      loadResidentsData();
+    } else {
+      alert('❌ ' + data.message);
+    }
+  })
+  .catch(error => alert('❌ Error: ' + error.message));
+}
+
+// ========================================
+// INVOICE GENERATION
+// ========================================
+function handleGenerateInvoice(event) {
+  event.preventDefault();
+  
+  const unitNumber = document.getElementById('inv-unit').value.trim();
+  const billingMonth = document.getElementById('inv-month').value;
+  const feeType = document.getElementById('inv-fee-type').value;
+  
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({
+      type: 'generate_invoice',
+      unitNumber: unitNumber,
+      billingMonth: billingMonth,
+      feeType: feeType,
+      operator: currentUser.username,
+      operatorRole: currentUser.role
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.status === 'success') {
+      alert('✅ ออกใบแจ้งหนี้สำเร็จ!\nผู้พักอาศัย: ' + data.residentName);
+      showExpToast(`📑 +${data.expAdded} EXP`);
+      populateInvoiceForm(unitNumber, data.residentName, feeType, billingMonth);
+      window.print(); // พิมพ์ใบแจ้งหนี้
+    } else {
+      alert('❌ ' + data.message);
+    }
+  })
+  .catch(error => alert('❌ Error: ' + error.message));
+}
+
+// ========================================
+// DATA LOADING
+// ========================================
+function loadFinancialData() {
+  fetch(SCRIPT_URL)
+    .then(res => res.json())
+    .then(data => {
+      allPayments = data.payments;
+      updatePaymentsTables(data.payments, data.pendingInvoices);
+    })
+    .catch(error => console.error('Error loading data:', error));
+}
+
+function loadResidentsData() {
+  fetch(SCRIPT_URL)
+    .then(res => res.json())
+    .then(data => {
+      allResidents = data.residents;
+      updateResidentsTable(data.residents);
+    })
+    .catch(error => console.error('Error loading residents:', error));
+}
+
+// ========================================
+// UI HELPERS
+// ========================================
+function showExpToast(message) {
+  const toast = document.createElement('div');
+  toast.className = 'exp-toast';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function autoFillResidentName(unitNumber) {
+  const resident = allResidents.find(r => r.unitNumber === unitNumber);
+  if(resident) {
+    document.getElementById('form-name').value = resident.residentName;
+  }
+}
+
+function pickAvatar(avatarName) {
+  document.querySelectorAll('.char-option-card').forEach(el => el.classList.remove('selected'));
+  document.getElementById(`opt-${avatarName}`).classList.add('selected');
+  currentUser.avatar = avatarName;
+}
+
+function confirmCharacterSelection() {
+  if(!currentUser || !currentUser.avatar) {
+    alert('❌ กรุณาเลือกตัวละครก่อน');
+    return;
+  }
+
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({
+      type: 'save_avatar',
+      username: currentUser.username,
+      avatar: currentUser.avatar
+    })
+  });
+
+  document.getElementById('char-select-screen').style.display = 'none';
+  showMenuItems();
+}
+
+function showMenuItems() {
+  const roleMenus = {
+    'Admin': ['financial', 'residents', 'billing', 'admin-hub'],
+    'Finance': ['financial', 'billing'],
+    'AdminDoc': ['residents', 'billing'],
+    'Sales': ['residents']
+  };
+
+  const menus = roleMenus[currentUser.role] || [];
+  document.querySelectorAll('.nav-item').forEach(el => el.style.display = 'none');
+  menus.forEach(menu => {
+    const el = document.getElementById(`menu-${menu}`);
+    if(el) el.style.display = 'block';
+  });
+
+  switchTab(menus[0]);
+}
+
+function handleLogout() {
+  localStorage.removeItem('currentUser');
+  currentUser = null;
+  document.getElementById('login-overlay').style.display = 'flex';
+  document.getElementById('char-select-screen').style.display = 'none';
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+}
+
+function openProfileModal() {
+  if(!currentUser) return;
+  document.getElementById('prof-name').textContent = currentUser.fullName;
+  document.getElementById('prof-avatar-img').src = currentUser.avatar + '.gif';
+  document.getElementById('prof-level').textContent = '99'; // ต้องคำนวณจาก EXP
+  document.getElementById('profile-modal-overlay').style.display = 'flex';
+}
+
+function closeProfileModal() {
+  document.getElementById('profile-modal-overlay').style.display = 'none';
+}
+
+// ========================================
+// INITIALIZATION
+// ========================================
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('currentUser');
+  if(saved) {
+    currentUser = JSON.parse(saved);
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('char-select-screen').style.display = 'flex';
+    showMenuItems();
+  }
+});
+</script>
+  <body>
 
   <!-- 🖨️ PRINT TEMPLATE: เอกสารทางการ A4 (สลับ ใบแจ้งหนี้ / ใบเสร็จรับเงิน อัตโนมัติ) -->
   <div id="printable-invoice">
