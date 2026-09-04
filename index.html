@@ -27,7 +27,6 @@
       color: var(--text-main); overflow: hidden; position: relative;
     }
 
-    /* ⏳ ป๊อปอัปกลางหน้าจอแสดงสถานะการประมวลผล */
     .loading-modal-box {
       background: linear-gradient(145deg, #5c2c12, #3d1b0a);
       border: 6px solid #1a0c04; border-radius: 20px;
@@ -155,7 +154,6 @@
     }
     .form-group input:focus, .form-group select:focus { border-color: var(--accent-gold); }
 
-    /* 🌟 ปรับปรุงการแสดงผล Placeholder & ไอคอนปฏิทินให้สว่างสดใส 🌟 */
     .form-group input::placeholder, .form-group textarea::placeholder {
       color: rgba(254, 243, 199, 0.5) !important;
     }
@@ -253,7 +251,7 @@
     }
 
     /* ========================================================
-       🖨️ PRINT STYLESHEET: เอกสารทางการ A4 (ตัด Web App ออก 100%)
+       🖨️ PRINT STYLESHEET: เอกสารทางการ A4
        ======================================================== */
     #printable-invoice {
       display: none;
@@ -375,7 +373,7 @@
 </head>
 <body>
 
-  <!-- ⏳ ป๊อปอัปกลางหน้าจอแสดงสถานะการทำงาน (Center Loading Popup Modal) -->
+  <!-- ⏳ ป๊อปอัปกลางหน้าจอแสดงสถานะการทำงาน -->
   <div id="global-loading-modal" class="modal-overlay" style="z-index: 25000;">
     <div class="loading-modal-box">
       <div style="font-size: 38px; margin-bottom: 8px;">⏳</div>
@@ -1055,31 +1053,32 @@
       </div>
     </div>
 
-    <!-- Tab 3: Billing -->
+    <!-- Tab 3: Billing (ปรับช่องรายการเป็นกรอกเอง + เพิ่มช่องยอดเงิน) -->
     <div id="tab-billing" class="tab-content">
       <div style="max-width: 650px; margin: 0 auto;">
         <div class="card">
           <div class="card-title">📄 ออกใบแจ้งหนี้ (Invoice Generation)</div>
-          <div class="form-group">
-            <label>เลขยูนิต / แปลง (ต้องตรงกับฐานข้อมูลจริง 100%) *</label>
-            <input type="text" id="inv-unit" placeholder="ระบุเลขยูนิต เช่น 1 หรือ 12" required>
-          </div>
-          <div class="form-group">
-            <label>ประจำเดือน</label>
-            <input type="month" id="inv-month" required>
-          </div>
-          <div class="form-group">
-            <label>รายการเรียกเก็บ</label>
-            <select id="inv-fee-type">
-              <option value="ค่าส่วนกลางประจำปี">ค่าส่วนกลางประจำปี (500 บาท)</option>
-              <option value="ค่าน้ำประปาประจำเดือน">ค่าน้ำประปาประจำเดือน</option>
-              <option value="ค่าส่วนกลางและค่าน้ำประปา">ค่าส่วนกลางและค่าน้ำประปา</option>
-              <option value="ค่าบำรุงรักษาโครงการ">ค่าบำรุงรักษาโครงการ</option>
-            </select>
-          </div>
-          <button class="btn-primary" style="background: linear-gradient(135deg, #0284c7, #0369a1);" id="btn-generate-inv" onclick="handleGenerateInvoice(event)">
-            🖨️ ตรวจสอบ, ส่งงานเข้าคิว & พิมพ์ใบแจ้งหนี้ (PDF)
-          </button>
+          <form onsubmit="handleGenerateInvoice(event)">
+            <div class="form-group">
+              <label>เลขยูนิต / แปลง (ต้องตรงกับฐานข้อมูลจริง 100%) *</label>
+              <input type="text" id="inv-unit" placeholder="ระบุเลขยูนิต เช่น 1 หรือ 12" required>
+            </div>
+            <div class="form-group">
+              <label>ประจำเดือน *</label>
+              <input type="month" id="inv-month" required>
+            </div>
+            <div class="form-group">
+              <label>รายการเรียกเก็บ (พิมพ์ระบุรายละเอียดอิสระ) *</label>
+              <input type="text" id="inv-fee-type" placeholder="เช่น ค่าส่วนกลางประจำปี 2569, ค่าน้ำประปาประจำเดือน ฯลฯ" required>
+            </div>
+            <div class="form-group">
+              <label>จำนวนเงินที่ต้องชำระ (บาท) *</label>
+              <input type="number" id="inv-amount" placeholder="เช่น 500 หรือ 1200" required>
+            </div>
+            <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #0284c7, #0369a1);" id="btn-generate-inv">
+              🖨️ ตรวจสอบ, ส่งงานเข้าคิว & พิมพ์ใบแจ้งหนี้ (PDF)
+            </button>
+          </form>
         </div>
       </div>
     </div>
@@ -1592,17 +1591,22 @@
       document.getElementById("form-name").value = name;
       
       const selectFee = document.getElementById("form-fee-type");
+      let matched = false;
       for(let i=0; i<selectFee.options.length; i++) {
         if(selectFee.options[i].value === feeType) {
           selectFee.selectedIndex = i;
+          matched = true;
           break;
         }
       }
-
-      if (feeType.includes("500") || feeType === "ค่าส่วนกลางประจำปี") {
-        document.getElementById("form-amount").value = 500;
+      if (!matched && feeType) {
+        const newOpt = document.createElement("option");
+        newOpt.value = feeType;
+        newOpt.innerText = feeType;
+        selectFee.appendChild(newOpt);
+        selectFee.value = feeType;
       }
-      
+
       document.getElementById("form-amount").focus();
       showExpToast(1, `เลือกยูนิต ${unit} จากคิว`);
     }
@@ -1701,7 +1705,6 @@
       });
     }
 
-    // 💸 เรนเดอร์ตารางบันทึกรายจ่าย (พร้อมปุ่มเปิดดูลายเซ็น/สลิปแนบ)
     function renderExpensesTable(data) {
       const tbody = document.getElementById("expenses-table-body");
       tbody.innerHTML = "";
@@ -1806,16 +1809,16 @@
       }
     }
 
-    // 📄 1. ออกใบแจ้งหนี้ (INVOICE)
+    // 📄 1. ออกใบแจ้งหนี้ (INVOICE - กรอกรายการและยอดเงินอิสระ)
     async function handleGenerateInvoice(event) {
       event.preventDefault();
       const unitVal = document.getElementById("inv-unit").value.trim();
       const monthVal = document.getElementById("inv-month").value;
-      const feeVal = document.getElementById("inv-fee-type").value;
+      const feeVal = document.getElementById("inv-fee-type").value.trim();
+      const amountVal = Number(document.getElementById("inv-amount").value || 0);
 
-      if (!unitVal) {
-        alert("⚠️ กรุณาระบุเลขยูนิต/แปลง");
-        document.getElementById("inv-unit").focus();
+      if (!unitVal || !feeVal || amountVal <= 0) {
+        alert("⚠️ กรุณาระบุเลขยูนิต, รายการเรียกเก็บ และยอดเงินให้ถูกต้อง");
         return;
       }
 
@@ -1872,9 +1875,10 @@
           document.getElementById("print-res-deed").innerText = matchedResident?.titleDeedNo || "-";
           document.getElementById("print-inv-month").innerText = displayMonth || "ประจำเดือนปัจจุบัน";
           document.getElementById("print-res-address").innerText = matchedResident?.currentAddress || `แปลงที่ ${unitVal} โครงการอุดมสุขเพลส`;
+          
           document.getElementById("print-fee-title").innerText = feeVal;
-          document.getElementById("print-fee-amount").innerText = "500.00";
-          document.getElementById("print-fee-total").innerText = "฿500.00";
+          document.getElementById("print-fee-amount").innerText = amountVal.toLocaleString('en-US', { minimumFractionDigits: 2 });
+          document.getElementById("print-fee-total").innerText = "฿" + amountVal.toLocaleString('en-US', { minimumFractionDigits: 2 });
           document.getElementById("print-operator-name").innerText = currentUser?.fullName || "ผู้จัดทำเอกสาร";
 
           await loadDashboardData();
@@ -1960,7 +1964,6 @@
       finally { btn.disabled = false; btn.innerText = "บันทึกรับชำระเงิน & ตัดยอดคิว"; }
     }
 
-    // 📷 พรีวิวแนบไฟล์รายจ่าย
     function previewExpenseFile(e) {
       const file = e.target.files[0];
       if (file) {
@@ -1972,7 +1975,6 @@
       }
     }
 
-    // 💸 บันทึกรายจ่ายใหม่ (ส่งไฟล์ไปยัง Expense_Receipts)
     async function submitNewExpense(event) {
       event.preventDefault();
       const btn = document.getElementById("btn-submit-expense");
