@@ -27,14 +27,22 @@
       color: var(--text-main); overflow: hidden; position: relative;
     }
 
-    #global-progress-container {
-      position: fixed; top: 0; left: 0; width: 100%; height: 5px;
-      background: rgba(0,0,0,0.3); z-index: 20000; display: none;
+    /* ⏳ ป๊อปอัปกลางหน้าจอแสดงสถานะการประมวลผล (Center Loading Modal) */
+    .loading-modal-box {
+      background: linear-gradient(145deg, #5c2c12, #3d1b0a);
+      border: 6px solid #1a0c04; border-radius: 20px;
+      padding: 30px 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+      text-align: center; width: 90%; max-width: 420px;
     }
-    #global-progress-bar {
+    .loading-progress-track {
+      width: 100%; height: 14px; background: #1a0c04; border-radius: 10px;
+      border: 2px solid #381808; overflow: hidden; margin: 18px 0 10px 0;
+      position: relative;
+    }
+    .loading-progress-fill {
       height: 100%; width: 0%;
-      background: linear-gradient(90deg, #f59e0b, #fbbf24, #fef08a);
-      box-shadow: 0 0 10px rgba(251,191,36,0.8);
+      background: linear-gradient(90deg, #d97706, #fbbf24, #fef08a);
+      box-shadow: 0 0 12px rgba(251,191,36,0.8);
       transition: width 0.3s ease;
     }
 
@@ -227,16 +235,9 @@
       80% { opacity: 1; transform: translateY(0); }
       100% { opacity: 0; transform: translateY(-30px); }
     }
-    
-    .quest-item {
-      background: #231106; border: 2px solid #140803;
-      padding: 10px 14px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s;
-    }
-    .quest-item:hover { transform: scale(1.01); border-color: var(--accent-gold); }
-    .quest-exp { background: rgba(251,191,36,0.15); color: var(--accent-gold); padding: 3px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; border: 1px solid var(--accent-gold); }
 
     /* ========================================================
-       🖨️ PRINT STYLESHEET: เอกสารทางการ A4
+       🖨️ PRINT STYLESHEET: เอกสารทางการ A4 (ตัด Web App ออก 100%)
        ======================================================== */
     #printable-invoice {
       display: none;
@@ -256,7 +257,7 @@
         padding: 0 !important;
         overflow: visible !important;
       }
-      .sidebar, .main-content, .top-bar, .tab-content, .screen-overlay, .modal-overlay, .exp-toast, #global-progress-container {
+      .sidebar, .main-content, .top-bar, .tab-content, .screen-overlay, .modal-overlay, .exp-toast, #global-loading-modal {
         display: none !important;
       }
       #printable-invoice {
@@ -358,8 +359,19 @@
 </head>
 <body>
 
-  <!-- ⏳ หลอดแสดงสถานะการโหลดบนสุด -->
-  <div id="global-progress-container"><div id="global-progress-bar"></div></div>
+  <!-- ⏳ ป๊อปอัปกลางหน้าจอแสดงสถานะการทำงาน (Center Loading Popup Modal) -->
+  <div id="global-loading-modal" class="modal-overlay" style="z-index: 25000;">
+    <div class="loading-modal-box">
+      <div style="font-size: 38px; margin-bottom: 8px;">⏳</div>
+      <h3 style="color: var(--accent-gold); font-size: 18px; font-weight: bold;" id="loading-modal-title">กำลังประมวลผลข้อมูล...</h3>
+      <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;" id="loading-modal-subtitle">ระบบกำลังส่งคำสั่งและเชื่อมต่อ Google Sheets</p>
+      
+      <div class="loading-progress-track">
+        <div id="loading-progress-bar-fill" class="loading-progress-fill"></div>
+      </div>
+      <span style="font-size: 11px; color: #fbbf24; font-weight: bold;" id="loading-modal-status">กรุณารอสักครู่ ห้ามปิดหน้าต่างนี้</span>
+    </div>
+  </div>
 
   <!-- 🖨️ PRINT TEMPLATE: เอกสารทางการ A4 -->
   <div id="printable-invoice">
@@ -1061,51 +1073,65 @@
     let pendingUnitForRegistration = "";
     let tempSelectedAvatar = "WIZmini";
 
-    function showProgressBar() {
-      const container = document.getElementById("global-progress-container");
-      const bar = document.getElementById("global-progress-bar");
-      if (container && bar) {
-        container.style.display = "block";
-        bar.style.width = "30%";
-        setTimeout(() => { bar.style.width = "70%"; }, 200);
+    // ⏳ ฟังก์ชันแสดง/ปิด ป๊อปอัปกลางหน้าจอ (Center Loading Modal)
+    function showLoadingModal(title = "กำลังประมวลผลข้อมูล...", subtitle = "ระบบกำลังส่งคำสั่งและเชื่อมต่อ Google Sheets") {
+      const modal = document.getElementById("global-loading-modal");
+      const titleEl = document.getElementById("loading-modal-title");
+      const subEl = document.getElementById("loading-modal-subtitle");
+      const barFill = document.getElementById("loading-progress-bar-fill");
+      const statusEl = document.getElementById("loading-modal-status");
+
+      if (modal && titleEl && subEl && barFill) {
+        titleEl.innerText = title;
+        subEl.innerText = subtitle;
+        statusEl.innerText = "กรุณารอสักครู่ ห้ามปิดหน้าต่างนี้";
+        barFill.style.width = "25%";
+        modal.style.display = "flex";
+        
+        setTimeout(() => { barFill.style.width = "75%"; }, 300);
       }
     }
 
-    function hideProgressBar() {
-      const container = document.getElementById("global-progress-container");
-      const bar = document.getElementById("global-progress-bar");
-      if (container && bar) {
-        bar.style.width = "100%";
+    function hideLoadingModal() {
+      const modal = document.getElementById("global-loading-modal");
+      const barFill = document.getElementById("loading-progress-bar-fill");
+      if (modal && barFill) {
+        barFill.style.width = "100%";
         setTimeout(() => {
-          container.style.display = "none";
-          bar.style.width = "0%";
+          modal.style.display = "none";
+          barFill.style.width = "0%";
         }, 300);
       }
     }
 
-    async function fetchWithRetry(url, options = {}, retries = 3, backoff = 1500) {
-      showProgressBar();
+    // 🔄 ฟังก์ชัน fetch พร้อมระบบ Auto-Retry อัตโนมัติ 3 ครั้งเมื่อเกิด Network Error หรือเซิร์ฟเวอร์ยุ่ง
+    async function fetchWithRetry(url, options = {}, retries = 3, backoff = 1500, title = "กำลังประมวลผลข้อมูล...", subtitle = "กำลังเชื่อมต่อ Google Sheets") {
+      showLoadingModal(title, subtitle);
       for (let i = 0; i < retries; i++) {
         try {
           const response = await fetch(url, options);
           const data = await response.json();
           if (data && data.status === "error" && data.message && data.message.includes("เซิร์ฟเวอร์กำลัง")) {
             if (i < retries - 1) {
+              const statusEl = document.getElementById("loading-modal-status");
+              if (statusEl) statusEl.innerText = `เซิร์ฟเวอร์ยุ่ง กำลังลองใหม่อัตโนมัติ (ครั้งที่ ${i + 2}/${retries})...`;
               await new Promise(r => setTimeout(r, backoff));
               continue;
             }
           }
-          hideProgressBar();
+          hideLoadingModal();
           return data;
         } catch (err) {
           if (i === retries - 1) {
-            hideProgressBar();
+            hideLoadingModal();
             throw err;
           }
+          const statusEl = document.getElementById("loading-modal-status");
+          if (statusEl) statusEl.innerText = `การเชื่อมต่อติดขัด กำลังลองใหม่อัตโนมัติ (ครั้งที่ ${i + 2}/${retries})...`;
           await new Promise(r => setTimeout(r, backoff));
         }
       }
-      hideProgressBar();
+      hideLoadingModal();
       throw new Error("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง");
     }
 
@@ -1258,7 +1284,7 @@
         const resJson = await fetchWithRetry(API_URL, {
           method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({ type: "login", username: document.getElementById("login-user").value, password: document.getElementById("login-pass").value })
-        });
+        }, 3, 1500, "กำลังตรวจสอบข้อมูลล็อกอิน", "โปรดรอสักครู่...");
         if (resJson.status === "success") {
           tempPendingUser = resJson.user;
           if(resJson.dailyLoginBonus) tempPendingUser.gotDailyBonus = true;
@@ -1445,7 +1471,7 @@
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(payload)
-        });
+        }, 3, 1500, "กำลังอัปเดตข้อมูลลูกบ้าน", "กำลังบันทึกข้อมูลทับข้อมูลเดิม...");
 
         if (resJson.status === "success") {
           showExpToast(5, "อัปเดตข้อมูลลูกบ้าน");
@@ -1494,7 +1520,7 @@
     async function loadDashboardData() {
       try {
         const fetchUrl = API_URL + "?t=" + new Date().getTime();
-        const data = await fetchWithRetry(fetchUrl);
+        const data = await fetchWithRetry(fetchUrl, {}, 3, 1500, "กำลังโหลดข้อมูลระบบ...", "กำลังดึงข้อมูลล่าสุดจาก Google Sheets");
         if (data.payments) { 
           cachedPayments = data.payments || []; 
           cachedResidents = data.residents || []; 
@@ -1605,7 +1631,6 @@
       document.getElementById("queue-badge").innerText = `${queueCount} รายการ`;
     }
 
-    // 📌 Admin ตั้งค่าเลขถัดไปของเอกสาร (INV / REC)
     async function handleSetDocRunningNumber() {
       const nextInvNo = document.getElementById("admin-next-inv-no").value.trim();
       const nextRecNo = document.getElementById("admin-next-rec-no").value.trim();
@@ -1630,7 +1655,7 @@
             nextInvNo: nextInvNo,
             nextRecNo: nextRecNo
           })
-        });
+        }, 3, 1500, "กำลังตั้งค่าเลขรันเอกสาร", "กำลังอัปเดตตัวเลขถัดไปใน Google Sheets...");
 
         if (resJson.status === "success") {
           alert("✅ " + resJson.message);
@@ -1678,7 +1703,7 @@
             billingMonth: monthVal, 
             feeType: feeVal 
           }) 
-        });
+        }, 3, 1500, "กำลังออกใบแจ้งหนี้ & ส่งงานเข้าคิว", "กำลังบันทึกคิวไปยังฝ่ายการเงิน...");
 
         if (resJson.status === "success") {
           showExpToast(resJson.expAdded, "ออกใบแจ้งหนี้ & ส่งคิวสำเร็จ");
@@ -1705,7 +1730,6 @@
           document.getElementById("row-print-deed").style.display = "table-row";
           document.getElementById("row-print-month-full").style.display = "none";
 
-          // นำเลขที่รันอัตโนมัติจากเซิร์ฟเวอร์มาแสดง
           document.getElementById("print-inv-no").innerText = resJson.docNo || "INV-AUTO";
           document.getElementById("print-inv-date").innerText = dStr;
           document.getElementById("print-res-name").innerText = resJson.residentName || "-";
@@ -1767,7 +1791,7 @@
         method: "POST", 
         headers: { "Content-Type": "text/plain;charset=utf-8" }, 
         body: JSON.stringify({ type: "print_receipt", operator: currentUser?.username, unitNumber: unit }) 
-      });
+      }, 3, 1500, "กำลังเตรียมพิมพ์ใบเสร็จ", "บันทึกประวัติการพิมพ์ลงระบบ...");
 
       window.print();
     }
@@ -1785,7 +1809,12 @@
         residentName: document.getElementById("form-name").value, feeType: document.getElementById("form-fee-type").value, amount: document.getElementById("form-amount").value, paymentMethod: document.getElementById("form-payment-method").value, status: document.getElementById("form-status").value
       };
       try {
-        const resJson = await fetchWithRetry(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
+        const resJson = await fetchWithRetry(API_URL, { 
+          method: "POST", 
+          headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+          body: JSON.stringify(payload) 
+        }, 3, 1500, "กำลังบันทึกรับชำระเงิน", "กำลังออกเลขใบเสร็จ & เคลียร์คิวแจ้งหนี้...");
+
         if(resJson.status === "success") {
           showExpToast(resJson.expAdded || 5, (payload.status==="Overdue"||payload.feeType.includes("ค่าปรับ"))?"ทวงหนี้สำเร็จ":"รับชำระเงินสำเร็จ");
           alert(`✅ บันทึกรายการสำเร็จ!\nออกใบเสร็จรับเงินเลขที่: ${resJson.docNo || '-'}`);
@@ -1846,7 +1875,7 @@
           method: "POST", 
           headers: { "Content-Type": "text/plain;charset=utf-8" }, 
           body: JSON.stringify(payload) 
-        });
+        }, 3, 1500, "กำลังลงทะเบียนลูกบ้านใหม่", "กำลังสร้างโฟลเดอร์บน Google Drive & บันทึกชีต...");
         
         if (resJson.status === "success") {
           showExpToast(15, "ลงทะเบียนลูกบ้าน");
@@ -1890,7 +1919,7 @@
             operator: currentUser?.username,
             operatorRole: currentUser?.role
           })
-        });
+        }, 3, 1500, "กำลังรีเซ็ตระบบ", "กำลังล้างข้อมูลใน Google Sheets ทั้งหมด...");
 
         if (resJson.status === "success") {
           alert("🎉 " + resJson.message);
@@ -1938,7 +1967,7 @@
         const reader = new FileReader();
         reader.onload = async function(e) {
           try {
-            await fetchWithRetry(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "raw_file_upload", operator: currentUser?.username, fileName: file.name, mimeType: file.type || "application/octet-stream", fileData: e.target.result })});
+            await fetchWithRetry(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "raw_file_upload", operator: currentUser?.username, fileName: file.name, mimeType: file.type || "application/octet-stream", fileData: e.target.result })}, 3, 1500, "กำลังอัปโหลดไฟล์", "กำลังส่งไฟล์เข้า Google Drive...");
             itemEl.innerHTML = `<span>✅ ${file.name}</span> <span style="color:#6ee7b7; float:right;">สำเร็จ</span>`;
             showExpToast(10, "อัปโหลดไฟล์");
           } catch (err) { itemEl.innerHTML = `<span>✅ ${file.name}</span> <span style="color:#6ee7b7; float:right;">สำเร็จ</span>`; showExpToast(10, "อัปโหลดไฟล์"); }
