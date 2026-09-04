@@ -250,8 +250,22 @@
       100% { opacity: 0; transform: translateY(-30px); }
     }
 
+    /* 🗺️ สไตล์ของผังโครงการ Visual Unit Grid */
+    .unit-map-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px;
+      max-height: 250px; overflow-y: auto; padding: 10px; background: #231106; border-radius: 12px; border: 2px solid #140803;
+    }
+    .unit-chip {
+      background: #381808; border: 2px solid #1a0c04; border-radius: 10px; padding: 10px 5px;
+      text-align: center; cursor: pointer; transition: 0.2s;
+    }
+    .unit-chip:hover { transform: scale(1.08); border-color: var(--accent-gold); }
+    .unit-chip.vacant { border-color: var(--accent-green); background: rgba(5,150,105,0.15); }
+    .unit-chip.occupied { border-color: var(--accent-red); background: rgba(220,38,38,0.15); }
+    .unit-chip.has-pending { border-color: var(--accent-gold); background: rgba(217,119,6,0.25); }
+
     /* ========================================================
-       🖨️ PRINT STYLESHEET: เอกสารทางการ A4
+       🖨️ PRINT STYLESHEET: เอกสารทางการ A4 (ตัด Web App ออก 100%)
        ======================================================== */
     #printable-invoice {
       display: none;
@@ -573,6 +587,34 @@
     </div>
   </div>
 
+  <!-- 📝 MODAL: เพิ่มโน้ตติดตามงานลูกบ้าน (CRM Notes) -->
+  <div id="crm-note-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 550px; width: 90%;">
+      <div class="ro-header">
+        <span>📝 บันทึกติดตามงานยูนิต <span id="crm-modal-unit" style="color:var(--accent-gold);">-</span></span>
+        <span class="ro-close" onclick="closeCrmModal()">✕</span>
+      </div>
+      <div style="padding: 20px;">
+        <div class="form-group">
+          <label>เจ้าของ/ผู้พักอาศัย:</label>
+          <input type="text" id="crm-modal-name" readonly style="background:#180a03; color:var(--text-muted);">
+        </div>
+        <div class="form-group">
+          <label>📜 ประวัติโน้ตติดตามงานที่ผ่านมา:</label>
+          <textarea id="crm-modal-history" rows="4" readonly style="background:#180a03; font-size:12px; color:var(--text-muted); line-height:1.5;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>✏️ เพิ่มโน้ตติดตามงานใหม่:</label>
+          <input type="text" id="crm-modal-new-note" placeholder="เช่น ลูกค้าแจ้งขอชำระสัปดาห์หน้า, โทรติดตามแล้ว">
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button type="button" class="ro-btn" style="flex: 1;" onclick="closeCrmModal()">ปิดหน้าต่าง</button>
+          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0;" onclick="submitCrmNote()">💾 บันทึกโน้ตติดตามงาน</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- RO Warning Modal -->
   <div id="ro-modal-overlay" class="modal-overlay">
     <div class="ro-window">
@@ -783,7 +825,7 @@
         <button onclick="switchTab('residents')">👥<span class="tooltip">ทะเบียนลูกบ้านใหม่</span></button>
       </li>
       <li class="nav-item" id="menu-billing">
-        <button onclick="switchTab('billing')">📑<span class="tooltip">ออกใบแจ้งหนี้</span></button>
+        <button onclick="switchTab('billing')">📑<span class="tooltip">ฝ่ายขาย & ออกบิล</span></button>
       </li>
       <li class="nav-item" id="menu-admin-hub">
         <button onclick="switchTab('admin-hub')">🛠️<span class="tooltip">แอดมิน: ไฟล์ดิบ & ระบบ</span></button>
@@ -923,18 +965,12 @@
                 <input type="text" id="form-name" placeholder="ระบบจะดึงชื่อให้อัตโนมัติ" required>
               </div>
               <div style="display: flex; gap: 10px;">
-                <div class="form-group" style="flex: 1;">
-                  <label>ประเภทค่าใช้จ่าย</label>
-                  <select id="form-fee-type">
-                    <option value="ค่าส่วนกลางประจำปี">ค่าส่วนกลางประจำปี</option>
-                    <option value="ค่าน้ำประปาประจำเดือน">ค่าน้ำประปาประจำเดือน</option>
-                    <option value="ค่าส่วนกลางและค่าน้ำประปา">ค่าส่วนกลางและค่าน้ำประปา</option>
-                    <option value="ค่าปรับชำระล่าช้า">ค่าปรับชำระล่าช้า</option>
-                    <option value="ค่าบำรุงรักษาโครงการ">ค่าบำรุงรักษาโครงการ</option>
-                  </select>
+                <div class="form-group" style="flex: 1.2;">
+                  <label>ประเภท / รายการค่าใช้จ่าย *</label>
+                  <input type="text" id="form-fee-type" placeholder="ระบุรายการ เช่น ค่าส่วนกลางประจำปี" required>
                 </div>
-                <div class="form-group" style="flex: 1;">
-                  <label>จำนวนเงิน (฿)</label>
+                <div class="form-group" style="flex: 0.8;">
+                  <label>จำนวนเงิน (฿) *</label>
                   <input type="number" id="form-amount" placeholder="0" required>
                 </div>
               </div>
@@ -1053,34 +1089,107 @@
       </div>
     </div>
 
-    <!-- Tab 3: Billing (ปรับช่องรายการเป็นกรอกเอง + เพิ่มช่องยอดเงิน) -->
+    <!-- Tab 3: Sales Hub & Billing (เฟส 1 & 2 อัปเกรดเต็มรูปแบบ) -->
     <div id="tab-billing" class="tab-content">
-      <div style="max-width: 650px; margin: 0 auto;">
-        <div class="card">
-          <div class="card-title">📄 ออกใบแจ้งหนี้ (Invoice Generation)</div>
-          <form onsubmit="handleGenerateInvoice(event)">
-            <div class="form-group">
-              <label>เลขยูนิต / แปลง (ต้องตรงกับฐานข้อมูลจริง 100%) *</label>
-              <input type="text" id="inv-unit" placeholder="ระบุเลขยูนิต เช่น 1 หรือ 12" required>
-            </div>
-            <div class="form-group">
-              <label>ประจำเดือน *</label>
-              <input type="month" id="inv-month" required>
-            </div>
-            <div class="form-group">
-              <label>รายการเรียกเก็บ (พิมพ์ระบุรายละเอียดอิสระ) *</label>
-              <input type="text" id="inv-fee-type" placeholder="เช่น ค่าส่วนกลางประจำปี 2569, ค่าน้ำประปาประจำเดือน ฯลฯ" required>
-            </div>
-            <div class="form-group">
-              <label>จำนวนเงินที่ต้องชำระ (บาท) *</label>
-              <input type="number" id="inv-amount" placeholder="เช่น 500 หรือ 1200" required>
-            </div>
-            <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #0284c7, #0369a1);" id="btn-generate-inv">
-              🖨️ ตรวจสอบ, ส่งงานเข้าคิว & พิมพ์ใบแจ้งหนี้ (PDF)
-            </button>
-          </form>
+      
+      <!-- 📊 การ์ดสรุปยอดการขาย (Sales Mini-Cards) -->
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <div class="title">ยอดเงินรวมบิลเดือนนี้</div>
+          <div class="value" id="sales-total-amount">฿0</div>
         </div>
-      </div>
+        <div class="metric-card" style="border-color: #0284c7;">
+          <div class="title">ใบแจ้งหนี้ทั้งหมดเดือนนี้</div>
+          <div class="value" id="sales-total-count" style="color: #38bdf8;">0</div>
+        </div>
+        <div class="metric-card" style="border-color: #d97706;">
+          <div class="title">ค้างชำระ (Pending)</div>
+          <div class="value" id="sales-pending-count" style="color: #fbbf24;">0</div>
+        </div>
+        <div class="metric-card" style="border-color: #10b981;">
+          <div class="title">ชำระเงินแล้ว (Settled)</div>
+          <div class="value" id="sales-settled-count" style="color: #6ee7b7;">0</div>
+        </div>
+      </section>
+
+      <section class="content-grid" style="grid-template-columns: 1.2fr 1.8fr; gap: 20px;">
+        
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <!-- ฟอร์มออกเอกสารการขาย (Invoice / Quotation) -->
+          <div class="card">
+            <div class="card-title">
+              <span>📄 ออกเอกสารการขาย</span>
+              <select id="inv-doc-type" onchange="switchDocTypeForm(this.value)" style="width: auto; padding: 4px 8px; font-size: 12px; background: #140803;">
+                <option value="INVOICE">📑 ใบแจ้งหนี้ (Invoice)</option>
+                <option value="QUOTATION">📜 ใบเสนอราคา/ใบจอง (Quotation)</option>
+              </select>
+            </div>
+            <form onsubmit="handleGenerateInvoice(event)">
+              <div class="form-group">
+                <label>เลขยูนิต / แปลง *</label>
+                <input type="text" id="inv-unit" placeholder="เช่น 12 หรือ 899/12" onblur="autoFillResidentForSales(this.value)" required>
+              </div>
+              <div class="form-group">
+                <label>ชื่อผู้รับเอกสาร / ลูกค้า *</label>
+                <input type="text" id="inv-res-name" placeholder="ชื่อ-นามสกุล ลูกค้า" required>
+              </div>
+              <div class="form-group">
+                <label>ประจำเดือน *</label>
+                <input type="month" id="inv-month" required>
+              </div>
+              <div class="form-group">
+                <label>รายการเรียกเก็บ *</label>
+                <input type="text" id="inv-fee-type" placeholder="เช่น ค่าส่วนกลางประจำปี 2569, ค่าน้ำประปา" required>
+              </div>
+              <div class="form-group">
+                <label>จำนวนเงินที่ต้องชำระ (บาท) *</label>
+                <input type="number" id="inv-amount" placeholder="0" required>
+              </div>
+              <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #0284c7, #0369a1);" id="btn-generate-inv">
+                🖨️ ตรวจสอบ, ส่งงานเข้าคิว & พิมพ์เอกสาร (PDF)
+              </button>
+            </form>
+          </div>
+
+          <!-- 🗺️ ผังสถานะยูนิตโครงการ (Visual Property Map) -->
+          <div class="card">
+            <div class="card-title">
+              <span>🗺️ ผังสถานะยูนิตโครงการ (Property Map)</span>
+              <span style="font-size: 11px; color: var(--text-muted);">คลิกยูนิตเพื่อดูโน้ต CRM</span>
+            </div>
+            <div class="unit-map-grid" id="unit-map-container">
+              <!-- JS จะสร้างชิปยูนิตที่นี่ -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 📊 ตารางติดตามสถานะใบแจ้งหนี้ของฝ่ายขาย (Sales Invoice Tracking) -->
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
+            <span>📋 ตารางติดตามสถานะบิลทั้งหมด (Sales Tracking List)</span>
+          </div>
+          <div class="table-container" style="max-height: 600px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>เลขที่เอกสาร</th>
+                  <th>วันที่</th>
+                  <th>ยูนิต</th>
+                  <th>ชื่อลูกค้า</th>
+                  <th>รายการ</th>
+                  <th>ยอดเงิน</th>
+                  <th>สถานะ</th>
+                  <th style="text-align: center;">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="sales-tracking-tbody">
+                <tr><td colspan="8" style="text-align: center; padding: 20px; color: var(--accent-gold);">กำลังโหลดข้อมูลประวัติการออกบิล...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
     </div>
 
     <!-- Tab 5: Admin Hub -->
@@ -1150,6 +1259,8 @@
     let cachedExpenses = [];
     let cachedResidents = [];
     let cachedPendingInvoices = [];
+    let cachedAllInvoices = [];
+
     let residentPhotoBase64 = null;
     let residentPhotoName = "";
     let residentPhotoMime = "";
@@ -1163,6 +1274,7 @@
 
     let pendingUnitForRegistration = "";
     let tempSelectedAvatar = "WIZmini";
+    let activeCrmUnit = "";
 
     function showLoadingModal(title = "กำลังประมวลผลข้อมูล...", subtitle = "ระบบกำลังส่งคำสั่งและเชื่อมต่อ Google Sheets") {
       const modal = document.getElementById("global-loading-modal");
@@ -1271,6 +1383,15 @@
           curAddressInput.value = autoAddress;
           curAddressInput.dataset.autofilled = "true";
         }
+      }
+    }
+
+    function autoFillResidentForSales(unitVal) {
+      const targetKey = cleanUnitKey(unitVal);
+      if (!targetKey) return;
+      const found = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
+      if (found && found.residentName) {
+        document.getElementById("inv-res-name").value = found.residentName;
       }
     }
 
@@ -1589,24 +1710,12 @@
     function fillPaymentFromQueue(unit, name, feeType, month) {
       document.getElementById("form-unit").value = unit;
       document.getElementById("form-name").value = name;
-      
-      const selectFee = document.getElementById("form-fee-type");
-      let matched = false;
-      for(let i=0; i<selectFee.options.length; i++) {
-        if(selectFee.options[i].value === feeType) {
-          selectFee.selectedIndex = i;
-          matched = true;
-          break;
-        }
-      }
-      if (!matched && feeType) {
-        const newOpt = document.createElement("option");
-        newOpt.value = feeType;
-        newOpt.innerText = feeType;
-        selectFee.appendChild(newOpt);
-        selectFee.value = feeType;
-      }
+      document.getElementById("form-fee-type").value = feeType;
 
+      if (feeType.includes("500") || feeType === "ค่าส่วนกลางประจำปี") {
+        document.getElementById("form-amount").value = 500;
+      }
+      
       document.getElementById("form-amount").focus();
       showExpToast(1, `เลือกยูนิต ${unit} จากคิว`);
     }
@@ -1620,6 +1729,7 @@
           cachedExpenses = data.expenses || [];
           cachedResidents = data.residents || []; 
           cachedPendingInvoices = data.pendingInvoices || [];
+          cachedAllInvoices = data.allInvoices || [];
           
           if (data.nextInvNo !== undefined) document.getElementById("admin-next-inv-no").value = data.nextInvNo;
           if (data.nextRecNo !== undefined) document.getElementById("admin-next-rec-no").value = data.nextRecNo;
@@ -1629,7 +1739,9 @@
         renderTable(cachedPayments); 
         renderExpensesTable(cachedExpenses);
         renderPendingInvoicesQueue(cachedPendingInvoices);
-        calculateMetrics(cachedPayments, cachedExpenses, cachedPendingInvoices);
+        renderSalesTrackingTable(cachedAllInvoices);
+        renderPropertyMap(cachedResidents, cachedPendingInvoices);
+        calculateMetrics(cachedPayments, cachedExpenses, cachedPendingInvoices, cachedAllInvoices);
       } catch (error) { console.error("Load Error:", error); }
     }
 
@@ -1665,6 +1777,85 @@
           </td>
         </tr>`;
       });
+    }
+
+    // 📋 เรนเดอร์ตารางติดตามประวัติการออกบิลของฝ่ายขาย (Sales Tracking Table)
+    function renderSalesTrackingTable(data) {
+      const tbody = document.getElementById("sales-tracking-tbody");
+      tbody.innerHTML = "";
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีประวัติการออกเอกสาร</td></tr>`;
+        return;
+      }
+
+      data.slice().reverse().forEach(item => {
+        const formattedDate = formatDisplayDate(item.date || item.timestamp);
+        const status = item.status || "Pending";
+        const amt = Number(item.amount || 0);
+        const docNo = item.docNo || "-";
+
+        let statusBadge = `<span class="badge pending">รอดำเนินการ</span>`;
+        if (status === "Settled" || status === "Paid") statusBadge = `<span class="badge paid">ชำระแล้ว</span>`;
+        if (status === "Cancelled") statusBadge = `<span class="badge overdue">ยกเลิกแล้ว</span>`;
+        if (status === "Quotation") statusBadge = `<span class="badge pending" style="background:rgba(2,132,199,0.3); color:#38bdf8; border-color:#0284c7;">ใบเสนอราคา</span>`;
+
+        // 🔒 หากชำระแล้ว ให้ล็อกไม่ให้ยกเลิก
+        const dStr = String(docNo).replace(/'/g, "\\'");
+        const btnCancelHtml = (status === "Pending" || status === "Quotation") 
+          ? `<button type="button" class="btn-action" style="background: #dc2626;" onclick="handleCancelInvoice('${dStr}')">🚫 ยกเลิกบิล</button>` 
+          : `<span style="font-size:11px; color:var(--text-muted);">🔒 ล็อก</span>`;
+
+        tbody.innerHTML += `<tr>
+          <td style="color: var(--accent-gold); font-weight: bold;">${docNo}</td>
+          <td>${formattedDate}</td>
+          <td style="font-weight: bold;">${item.unitNumber}</td>
+          <td>${item.residentName}</td>
+          <td>${item.feeType}</td>
+          <td style="color: #6ee7b7;">฿${amt.toLocaleString()}</td>
+          <td>${statusBadge}</td>
+          <td style="text-align: center;">${btnCancelHtml}</td>
+        </tr>`;
+      });
+    }
+
+    // 🗺️ เรนเดอร์ผังยูนิตโครงการ (Visual Property Map - 20 ยูนิตจำลอง)
+    function renderPropertyMap(residents, pendingInvoices) {
+      const container = document.getElementById("unit-map-container");
+      container.innerHTML = "";
+
+      // สร้างตัวอย่างผังยูนิต 20 แปลง (1 ถึง 20)
+      for (let i = 1; i <= 20; i++) {
+        const unitKey = cleanUnitKey(i);
+        const res = residents.find(r => cleanUnitKey(r.unitNumber) === unitKey);
+        const pending = pendingInvoices.find(p => cleanUnitKey(p.unitNumber) === unitKey);
+
+        let statusClass = "vacant";
+        let statusText = "ว่าง";
+        let resName = "-";
+
+        if (res) {
+          statusClass = "occupied";
+          statusText = "มีผู้อยู่อาศัย";
+          resName = res.residentName;
+        }
+
+        if (pending) {
+          statusClass = "has-pending";
+          statusText = "มีคิวแจ้งหนี้";
+        }
+
+        const chip = document.createElement("div");
+        chip.className = `unit-chip ${statusClass}`;
+        chip.innerHTML = `
+          <div style="font-weight: bold; font-size: 13px; color: var(--text-main);">ยูนิต ${i}</div>
+          <div style="font-size: 10px; margin-top: 2px;">${statusText}</div>
+        `;
+        
+        const uStr = String(i);
+        chip.onclick = () => openCrmModal(uStr);
+        container.appendChild(chip);
+      }
     }
 
     function renderTable(data) {
@@ -1742,7 +1933,7 @@
       }));
     }
 
-    function calculateMetrics(payments, expenses, pendingInvoices) {
+    function calculateMetrics(payments, expenses, pendingInvoices, allInvoices) {
       let income = 0;
       payments.forEach(item => {
         const amount = Number(item["Amount"] || 0);
@@ -1767,6 +1958,29 @@
       document.getElementById("total-pending-invoices").innerText = queueCount.toLocaleString();
       document.getElementById("queue-badge").innerText = `${queueCount} รายการ`;
       document.getElementById("expense-badge").innerText = `${expenses ? expenses.length : 0} รายการ`;
+
+      // คำนวณยอดสรุปการขาย (Sales Metrics)
+      let salesSum = 0, salesPendingCount = 0, salesSettledCount = 0;
+      if (allInvoices && Array.isArray(allInvoices)) {
+        allInvoices.forEach(inv => {
+          salesSum += Number(inv.amount || 0);
+          if (inv.status === "Pending") salesPendingCount++;
+          if (inv.status === "Settled" || inv.status === "Paid") salesSettledCount++;
+        });
+        document.getElementById("sales-total-amount").innerText = "฿" + salesSum.toLocaleString();
+        document.getElementById("sales-total-count").innerText = allInvoices.length.toLocaleString();
+        document.getElementById("sales-pending-count").innerText = salesPendingCount.toLocaleString();
+        document.getElementById("sales-settled-count").innerText = salesSettledCount.toLocaleString();
+      }
+    }
+
+    function switchDocTypeForm(val) {
+      const btn = document.getElementById("btn-generate-inv");
+      if (val === "QUOTATION") {
+        btn.innerText = "🖨️ พิมพ์ใบเสนอราคา / ใบจอง (PDF)";
+      } else {
+        btn.innerText = "🖨️ ตรวจสอบ, ส่งงานเข้าคิว & พิมพ์ใบแจ้งหนี้ (PDF)";
+      }
     }
 
     async function handleSetDocRunningNumber() {
@@ -1809,13 +2023,15 @@
       }
     }
 
-    // 📄 1. ออกใบแจ้งหนี้ (INVOICE - กรอกรายการและยอดเงินอิสระ)
+    // 📄 1. ออกใบแจ้งหนี้ / ใบเสนอราคา
     async function handleGenerateInvoice(event) {
       event.preventDefault();
       const unitVal = document.getElementById("inv-unit").value.trim();
+      const resNameVal = document.getElementById("inv-res-name").value.trim();
       const monthVal = document.getElementById("inv-month").value;
       const feeVal = document.getElementById("inv-fee-type").value.trim();
       const amountVal = Number(document.getElementById("inv-amount").value || 0);
+      const docTypeVal = document.getElementById("inv-doc-type").value;
 
       if (!unitVal || !feeVal || amountVal <= 0) {
         alert("⚠️ กรุณาระบุเลขยูนิต, รายการเรียกเก็บ และยอดเงินให้ถูกต้อง");
@@ -1827,7 +2043,7 @@
 
       const btn = document.getElementById("btn-generate-inv");
       btn.disabled = true;
-      btn.innerText = "⏳ กำลังส่งงานเข้าคิวการเงิน & ตรวจสอบ...";
+      btn.innerText = "⏳ กำลังประมวลผล...";
 
       try {
         const resJson = await fetchWithRetry(API_URL, { 
@@ -1838,13 +2054,16 @@
             operator: currentUser?.username, 
             operatorRole: currentUser?.role, 
             unitNumber: unitVal, 
+            residentName: resNameVal,
             billingMonth: monthVal, 
-            feeType: feeVal 
+            feeType: feeVal,
+            amount: amountVal,
+            docType: docTypeVal
           }) 
-        }, 3, 1500, "กำลังออกใบแจ้งหนี้ & ส่งงานเข้าคิว", "กำลังบันทึกคิวไปยังฝ่ายการเงิน...");
+        }, 3, 1500, `กำลังออกเอกสาร ${docTypeVal}`, "กำลังบันทึกข้อมูลและรันลำดับเอกสาร...");
 
         if (resJson.status === "success") {
-          showExpToast(resJson.expAdded, "ออกใบแจ้งหนี้ & ส่งคิวสำเร็จ");
+          showExpToast(resJson.expAdded, "ออกเอกสารการขายสำเร็จ");
 
           const now = new Date();
           const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
@@ -1858,19 +2077,27 @@
             displayMonth = `${thaiMonths[mIndex]} ${yThai}`;
           }
 
-          document.getElementById("print-doc-title-th").innerText = "ใบแจ้งหนี้";
-          document.getElementById("print-doc-title-en").innerText = "INVOICE";
-          document.getElementById("print-label-customer").innerText = "ผู้รับใบแจ้งหนี้ (เจ้าของร่วม):";
-          document.getElementById("print-total-label").innerText = "รวมยอดที่ต้องชำระทั้งสิ้น (Total Due):";
+          if (docTypeVal === "QUOTATION") {
+            document.getElementById("print-doc-title-th").innerText = "ใบเสนอราคา / ใบจอง";
+            document.getElementById("print-doc-title-en").innerText = "QUOTATION";
+            document.getElementById("print-label-customer").innerText = "เสนอราคาสำหรับ (ลูกค้า):";
+            document.getElementById("print-total-label").innerText = "รวมยอดเงินทั้งสิ้น (Total Amount):";
+          } else {
+            document.getElementById("print-doc-title-th").innerText = "ใบแจ้งหนี้";
+            document.getElementById("print-doc-title-en").innerText = "INVOICE";
+            document.getElementById("print-label-customer").innerText = "ผู้รับใบแจ้งหนี้ (เจ้าของร่วม):";
+            document.getElementById("print-total-label").innerText = "รวมยอดที่ต้องชำระทั้งสิ้น (Total Due):";
+          }
+
           document.getElementById("print-sig-left-title").innerText = "เจ้าหน้าที่ฝ่ายจัดทำเอกสาร";
           document.getElementById("print-payment-note").style.display = "block";
           document.getElementById("print-finance-name").innerText = " ............................................................ ";
           document.getElementById("row-print-deed").style.display = "table-row";
           document.getElementById("row-print-month-full").style.display = "none";
 
-          document.getElementById("print-inv-no").innerText = resJson.docNo || "INV-AUTO";
+          document.getElementById("print-inv-no").innerText = resJson.docNo || "DOC-AUTO";
           document.getElementById("print-inv-date").innerText = dStr;
-          document.getElementById("print-res-name").innerText = resJson.residentName || "-";
+          document.getElementById("print-res-name").innerText = resNameVal || resJson.residentName || "-";
           document.getElementById("print-res-unit").innerText = unitVal;
           document.getElementById("print-res-deed").innerText = matchedResident?.titleDeedNo || "-";
           document.getElementById("print-inv-month").innerText = displayMonth || "ประจำเดือนปัจจุบัน";
@@ -1890,7 +2117,34 @@
         alert("⚠️ เชื่อมต่อเซิร์ฟเวอร์ขัดข้อง: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.innerText = "🖨️ ตรวจสอบ, ส่งงานเข้าคิว & พิมพ์ใบแจ้งหนี้ (PDF)";
+        switchDocTypeForm(docTypeVal);
+      }
+    }
+
+    // 🚫 ยกเลิกใบแจ้งหนี้ค้างชำระ
+    async function handleCancelInvoice(docNo) {
+      if (!confirm(`คุณแน่ใจหรือไม่ว่าต้องการยกเลิกเอกสารเลขที่ [${docNo}]?`)) return;
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            type: "cancel_invoice",
+            operator: currentUser?.username,
+            operatorRole: currentUser?.role,
+            docNo: docNo
+          })
+        }, 3, 1500, "กำลังยกเลิกเอกสาร", "กำลังอัปเดตสถานะในระบบ...");
+
+        if (resJson.status === "success") {
+          alert("✅ " + resJson.message);
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อ: " + err.message);
       }
     }
 
@@ -1945,7 +2199,7 @@
       const btn = document.getElementById("btn-submit-payment"); btn.disabled = true; btn.innerText = "⏳ กำลังบันทึกและตัดยอดคิว...";
       const payload = {
         type: "payment", operator: currentUser?.username, operatorRole: currentUser?.role, unitNumber: document.getElementById("form-unit").value.trim(),
-        residentName: document.getElementById("form-name").value, feeType: document.getElementById("form-fee-type").value, amount: document.getElementById("form-amount").value, paymentMethod: document.getElementById("form-payment-method").value, status: document.getElementById("form-status").value
+        residentName: document.getElementById("form-name").value, feeType: document.getElementById("form-fee-type").value.trim(), amount: document.getElementById("form-amount").value, paymentMethod: document.getElementById("form-payment-method").value, status: document.getElementById("form-status").value
       };
       try {
         const resJson = await fetchWithRetry(API_URL, { 
@@ -2016,6 +2270,58 @@
       } finally {
         btn.disabled = false;
         btn.innerText = "💾 บันทึกรายจ่าย";
+      }
+    }
+
+    // 📝 จัดการป๊อปอัป CRM Note ติดตามงาน
+    function openCrmModal(unitNumber) {
+      activeCrmUnit = unitNumber;
+      const targetKey = cleanUnitKey(unitNumber);
+      const res = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
+
+      document.getElementById("crm-modal-unit").innerText = unitNumber;
+      document.getElementById("crm-modal-name").value = res ? res.residentName : "ยูนิตยังไม่ลงทะเบียน";
+      document.getElementById("crm-modal-history").value = res ? (res.notes || "ไม่มีประวัติบันทึก") : "ยูนิตยังไม่ลงทะเบียน";
+      document.getElementById("crm-modal-new-note").value = "";
+
+      document.getElementById("crm-note-modal").style.display = "flex";
+    }
+
+    function closeCrmModal() {
+      document.getElementById("crm-note-modal").style.display = "none";
+      activeCrmUnit = "";
+    }
+
+    async function submitCrmNote() {
+      const noteVal = document.getElementById("crm-modal-new-note").value.trim();
+      if (!noteVal || !activeCrmUnit) {
+        alert("⚠️ กรุณาระบุข้อความโน้ตติดตามงาน");
+        return;
+      }
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            type: "update_resident",
+            operator: currentUser?.username,
+            operatorRole: currentUser?.role,
+            unitNumber: activeCrmUnit,
+            notes: noteVal,
+            crmNoteOnly: true
+          })
+        }, 3, 1500, "กำลังบันทึก CRM Note", "กำลังอัปเดตประวัติการติดตามงาน...");
+
+        if (resJson.status === "success") {
+          alert("✅ " + resJson.message);
+          closeCrmModal();
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
       }
     }
 
@@ -2121,6 +2427,7 @@
           cachedExpenses = [];
           cachedResidents = [];
           cachedPendingInvoices = [];
+          cachedAllInvoices = [];
           await loadDashboardData();
           switchTab('financial');
         } else {
