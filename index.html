@@ -16,6 +16,7 @@
       --accent-gold: #fbbf24;
       --accent-red: #dc2626;
       --accent-green: #059669;
+      --accent-blue: #0284c7;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; }
     body { 
@@ -250,9 +251,9 @@
       100% { opacity: 0; transform: translateY(-30px); }
     }
 
-    /* 🗺️ สไตล์ของผังโครงการ Visual Unit Grid */
+    /* 🗺️ สไตล์ของผังโครงการ Dynamic Unit Grid */
     .unit-map-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 10px;
       max-height: 250px; overflow-y: auto; padding: 10px; background: #231106; border-radius: 12px; border: 2px solid #140803;
     }
     .unit-chip {
@@ -260,9 +261,9 @@
       text-align: center; cursor: pointer; transition: 0.2s;
     }
     .unit-chip:hover { transform: scale(1.08); border-color: var(--accent-gold); }
-    .unit-chip.vacant { border-color: var(--accent-green); background: rgba(5,150,105,0.15); }
-    .unit-chip.occupied { border-color: var(--accent-red); background: rgba(220,38,38,0.15); }
-    .unit-chip.has-pending { border-color: var(--accent-gold); background: rgba(217,119,6,0.25); }
+    .unit-chip.owner { border-color: var(--accent-red); background: rgba(220,38,38,0.2); }
+    .unit-chip.tenant { border-color: var(--accent-blue); background: rgba(2,132,199,0.2); }
+    .unit-chip.has-pending { border-color: var(--accent-gold); background: rgba(217,119,6,0.3); }
 
     /* ========================================================
        🖨️ PRINT STYLESHEET: เอกสารทางการ A4 (ตัด Web App ออก 100%)
@@ -519,11 +520,11 @@
             <thead>
               <tr style="background: #1a0c04; color: var(--accent-gold); position: sticky; top: 0; z-index: 2;">
                 <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 8%;">ยูนิต</th>
-                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 17%;">ชื่อ-นามสกุล</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 17%;">ชื่อผู้พักอาศัย</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 10%;">ประเภท</th>
                 <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 11%;">เลขที่โฉนด</th>
                 <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 12%;">เบอร์โทรศัพท์</th>
-                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 22%;">ที่อยู่ตามบัตร ปชช.</th>
-                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 22%;">ที่อยู่ปัจจุบัน / ส่งเอกสาร</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 18%;">ที่อยู่ปัจจุบัน / ส่งเอกสาร</th>
                 <th style="padding: 10px 12px; text-align: center; border-bottom: 2px solid #140803; width: 8%;">จัดการ</th>
               </tr>
             </thead>
@@ -596,8 +597,12 @@
       </div>
       <div style="padding: 20px;">
         <div class="form-group">
-          <label>เจ้าของ/ผู้พักอาศัย:</label>
+          <label>ผู้พักอาศัยปัจจุบัน:</label>
           <input type="text" id="crm-modal-name" readonly style="background:#180a03; color:var(--text-muted);">
+        </div>
+        <div class="form-group">
+          <label>เจ้าของห้อง/บ้าน (Owner):</label>
+          <input type="text" id="crm-modal-owner" readonly style="background:#180a03; color:var(--text-muted);">
         </div>
         <div class="form-group">
           <label>📜 ประวัติโน้ตติดตามงานที่ผ่านมา:</label>
@@ -605,7 +610,7 @@
         </div>
         <div class="form-group">
           <label>✏️ เพิ่มโน้ตติดตามงานใหม่:</label>
-          <input type="text" id="crm-modal-new-note" placeholder="เช่น ลูกค้าแจ้งขอชำระสัปดาห์หน้า, โทรติดตามแล้ว">
+          <input type="text" id="crm-modal-new-note" placeholder="เช่น ลูกค้าขอเลื่อนจ่ายวันที่ 15, โทรแจ้งต่อสัญญาแล้ว">
         </div>
         <div style="display: flex; gap: 10px; margin-top: 14px;">
           <button type="button" class="ro-btn" style="flex: 1;" onclick="closeCrmModal()">ปิดหน้าต่าง</button>
@@ -1038,7 +1043,7 @@
       </section>
     </div>
 
-    <!-- Tab 2: Residents -->
+    <!-- Tab 2: Residents (เพิ่มสวิตช์เลือก เจ้าของ/ผู้เชี่ยวชาญ/ผู้เช่า) -->
     <div id="tab-residents" class="tab-content">
       <div style="max-width: 800px; margin: 0 auto;">
         <div class="card">
@@ -1051,22 +1056,43 @@
           <form id="resident-form" onsubmit="submitNewResident(event)">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
               <div class="form-group">
+                <label>ประเภทผู้พักอาศัย *</label>
+                <select id="res-type" onchange="toggleOwnerFields(this.value)" required>
+                  <option value="Owner">เจ้าของกรรมสิทธิ์ (Owner)</option>
+                  <option value="Tenant">ผู้เช่า / ผู้พักอาศัย (Tenant)</option>
+                </select>
+              </div>
+              <div class="form-group">
                 <label>เลขยูนิต / แปลงบ้าน * (พิมพ์เลข เช่น 12 หรือ 899/12)</label>
                 <input type="text" id="res-unit" placeholder="เช่น 12 หรือ 899/12" oninput="autoFillRegistrationFields()" required>
               </div>
+              
+              <div class="form-group" style="grid-column: span 2;">
+                <label id="lbl-res-name">ชื่อ-นามสกุล เจ้าของ / ผู้พักอาศัย *</label>
+                <input type="text" id="res-name" placeholder="ระบุชื่อ-นามสกุล" required>
+              </div>
+
+              <!-- ช่องเพิ่มเติมกรณีเป็นผู้เช่า -->
+              <div id="tenant-extra-fields" style="display: none; grid-column: span 2; grid-template-columns: 1fr 1fr; gap: 16px; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 10px; border: 1px dashed var(--accent-blue);">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label style="color: #38bdf8;">ชื่อ-นามสกุล เจ้าของกรรมสิทธิ์ห้อง/บ้าน</label>
+                  <input type="text" id="res-owner-name" placeholder="ระบุชื่อเจ้าของกรรมสิทธิ์">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label style="color: #38bdf8;">เบอร์โทรติดต่อเจ้าของกรรมสิทธิ์</label>
+                  <input type="tel" id="res-owner-phone" placeholder="เช่น 0812345678">
+                </div>
+              </div>
+
               <div class="form-group">
                 <label>เลขที่โฉนดที่ดิน (Title Deed)</label>
                 <input type="text" id="res-deed" placeholder="ระบุเลขที่โฉนดที่ดิน">
               </div>
-              <div class="form-group" style="grid-column: span 2;">
-                <label>ชื่อ-นามสกุล เจ้าของ / ผู้พักอาศัย *</label>
-                <input type="text" id="res-name" placeholder="ระบุชื่อ-นามสกุล" required>
-              </div>
               <div class="form-group">
-                <label>เบอร์โทรศัพท์ติดต่อ *</label>
+                <label>เบอร์โทรศัพท์ติดต่อ (ผู้พักอาศัย) *</label>
                 <input type="tel" id="res-phone" placeholder="เช่น 0812345678" required>
               </div>
-              <div class="form-group">
+              <div class="form-group" style="grid-column: span 2;">
                 <label>อีเมล</label>
                 <input type="email" id="res-email" placeholder="ระบุอีเมล (ถ้ามี)">
               </div>
@@ -1089,10 +1115,8 @@
       </div>
     </div>
 
-    <!-- Tab 3: Sales Hub & Billing (เฟส 1 & 2 อัปเกรดเต็มรูปแบบ) -->
+    <!-- Tab 3: Sales Hub & Billing -->
     <div id="tab-billing" class="tab-content">
-      
-      <!-- 📊 การ์ดสรุปยอดการขาย (Sales Mini-Cards) -->
       <section class="metrics-grid">
         <div class="metric-card">
           <div class="title">ยอดเงินรวมบิลเดือนนี้</div>
@@ -1115,7 +1139,7 @@
       <section class="content-grid" style="grid-template-columns: 1.2fr 1.8fr; gap: 20px;">
         
         <div style="display: flex; flex-direction: column; gap: 20px;">
-          <!-- ฟอร์มออกเอกสารการขาย (Invoice / Quotation) -->
+          <!-- ฟอร์มออกเอกสารการขาย -->
           <div class="card">
             <div class="card-title">
               <span>📄 ออกเอกสารการขาย</span>
@@ -1151,19 +1175,24 @@
             </form>
           </div>
 
-          <!-- 🗺️ ผังสถานะยูนิตโครงการ (Visual Property Map) -->
+          <!-- 🗺️ ผังสถานะยูนิตโครงการ Dynamic Property Map -->
           <div class="card">
             <div class="card-title">
-              <span>🗺️ ผังสถานะยูนิตโครงการ (Property Map)</span>
-              <span style="font-size: 11px; color: var(--text-muted);">คลิกยูนิตเพื่อดูโน้ต CRM</span>
+              <span>🗺️ ผังสถานะยูนิตโครงการ (Dynamic Map)</span>
+              <span style="font-size: 11px; color: var(--text-muted);">ดึงข้อมูลยูนิตจริงจากระบบ</span>
+            </div>
+            <div style="display:flex; gap:10px; font-size:10px; margin-bottom:8px;">
+              <span>🔴 เจ้าของอยู่เอง</span>
+              <span style="color:#38bdf8;">🔵 ผู้เช่า</span>
+              <span style="color:#fbbf24;">🟡 มีบิลค้าง</span>
             </div>
             <div class="unit-map-grid" id="unit-map-container">
-              <!-- JS จะสร้างชิปยูนิตที่นี่ -->
+              <!-- JS จะดึงยูนิตจากชีต Residents มาเรนเดอร์ -->
             </div>
           </div>
         </div>
 
-        <!-- 📊 ตารางติดตามสถานะใบแจ้งหนี้ของฝ่ายขาย (Sales Invoice Tracking) -->
+        <!-- 📊 ตารางติดตามสถานะใบแจ้งหนี้ของฝ่ายขาย -->
         <div class="card" style="padding: 0; overflow: hidden;">
           <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
             <span>📋 ตารางติดตามสถานะบิลทั้งหมด (Sales Tracking List)</span>
@@ -1334,6 +1363,18 @@
       }
       hideLoadingModal();
       throw new Error("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง");
+    }
+
+    function toggleOwnerFields(val) {
+      const extraDiv = document.getElementById("tenant-extra-fields");
+      const lblName = document.getElementById("lbl-res-name");
+      if (val === "Tenant") {
+        extraDiv.style.display = "grid";
+        lblName.innerText = "ชื่อ-นามสกุล ผู้เชี่ยวชาญ / ผู้เช่า (Tenant) *";
+      } else {
+        extraDiv.style.display = "none";
+        lblName.innerText = "ชื่อ-นามสกุล เจ้าของกรรมสิทธิ์ (Owner) *";
+      }
     }
 
     function formatDisplayDate(val) {
@@ -1583,13 +1624,17 @@
       tbody.innerHTML = "";
       list.forEach(res => {
         const uStr = String(res.unitNumber).replace(/'/g, "\\'");
+        const typeBadge = (res.residentType === "Tenant") 
+          ? `<span class="badge" style="background:rgba(2,132,199,0.2); color:#38bdf8; border:1px solid #0284c7;">ผู้เช่า</span>` 
+          : `<span class="badge" style="background:rgba(220,38,38,0.2); color:#fca5a5; border:1px solid #dc2626;">เจ้าของ</span>`;
+
         tbody.innerHTML += `
           <tr style="border-bottom: 1px solid #140803;">
             <td style="padding: 10px 12px; font-weight: bold; color: var(--accent-gold);">${String(res.unitNumber).toUpperCase()}</td>
             <td style="padding: 10px 12px; color: var(--text-main); font-weight: 600;">${res.residentName || "-"}</td>
+            <td style="padding: 10px 12px;">${typeBadge}</td>
             <td style="padding: 10px 12px; color: #60a5fa;">${res.titleDeedNo || "-"}</td>
             <td style="padding: 10px 12px; color: #6ee7b7;">${res.phone || "-"}</td>
-            <td style="padding: 10px 12px; color: var(--text-muted); font-size: 12px;">${res.idCardAddress || "-"}</td>
             <td style="padding: 10px 12px; color: var(--text-muted); font-size: 12px;">${res.currentAddress || "-"}</td>
             <td style="padding: 10px 12px; text-align: center;">
               <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openEditResidentModal('${uStr}')">✏️ แก้ไข</button>
@@ -1779,7 +1824,6 @@
       });
     }
 
-    // 📋 เรนเดอร์ตารางติดตามประวัติการออกบิลของฝ่ายขาย (Sales Tracking Table)
     function renderSalesTrackingTable(data) {
       const tbody = document.getElementById("sales-tracking-tbody");
       tbody.innerHTML = "";
@@ -1800,7 +1844,6 @@
         if (status === "Cancelled") statusBadge = `<span class="badge overdue">ยกเลิกแล้ว</span>`;
         if (status === "Quotation") statusBadge = `<span class="badge pending" style="background:rgba(2,132,199,0.3); color:#38bdf8; border-color:#0284c7;">ใบเสนอราคา</span>`;
 
-        // 🔒 หากชำระแล้ว ให้ล็อกไม่ให้ยกเลิก
         const dStr = String(docNo).replace(/'/g, "\\'");
         const btnCancelHtml = (status === "Pending" || status === "Quotation") 
           ? `<button type="button" class="btn-action" style="background: #dc2626;" onclick="handleCancelInvoice('${dStr}')">🚫 ยกเลิกบิล</button>` 
@@ -1819,43 +1862,39 @@
       });
     }
 
-    // 🗺️ เรนเดอร์ผังยูนิตโครงการ (Visual Property Map - 20 ยูนิตจำลอง)
+    // 🗺️ ทางเลือกที่ 1: เรนเดอร์ผังยูนิตโครงการแบบ Dynamic ดึงจากฐานข้อมูลจริง
     function renderPropertyMap(residents, pendingInvoices) {
       const container = document.getElementById("unit-map-container");
       container.innerHTML = "";
 
-      // สร้างตัวอย่างผังยูนิต 20 แปลง (1 ถึง 20)
-      for (let i = 1; i <= 20; i++) {
-        const unitKey = cleanUnitKey(i);
-        const res = residents.find(r => cleanUnitKey(r.unitNumber) === unitKey);
-        const pending = pendingInvoices.find(p => cleanUnitKey(p.unitNumber) === unitKey);
+      if (!residents || residents.length === 0) {
+        container.innerHTML = `<div style="grid-column: span 4; text-align: center; padding: 20px; color: var(--text-muted);">ยังไม่มีการลงทะเบียนยูนิตในระบบ</div>`;
+        return;
+      }
 
-        let statusClass = "vacant";
-        let statusText = "ว่าง";
-        let resName = "-";
+      residents.forEach(res => {
+        const uStr = res.unitNumber;
+        const targetKey = cleanUnitKey(uStr);
+        const pending = pendingInvoices.find(p => cleanUnitKey(p.unitNumber) === targetKey);
 
-        if (res) {
-          statusClass = "occupied";
-          statusText = "มีผู้อยู่อาศัย";
-          resName = res.residentName;
-        }
+        let statusClass = (res.residentType === "Tenant") ? "tenant" : "owner";
+        let statusText = (res.residentType === "Tenant") ? "ผู้เช่า" : "เจ้าของ";
 
         if (pending) {
           statusClass = "has-pending";
-          statusText = "มีคิวแจ้งหนี้";
+          statusText = "มีบิลค้าง";
         }
 
         const chip = document.createElement("div");
         chip.className = `unit-chip ${statusClass}`;
         chip.innerHTML = `
-          <div style="font-weight: bold; font-size: 13px; color: var(--text-main);">ยูนิต ${i}</div>
+          <div style="font-weight: bold; font-size: 13px; color: var(--text-main);">${uStr}</div>
           <div style="font-size: 10px; margin-top: 2px;">${statusText}</div>
         `;
         
-        const uStr = String(i);
         chip.onclick = () => openCrmModal(uStr);
         container.appendChild(chip);
-      }
+      });
     }
 
     function renderTable(data) {
@@ -1959,7 +1998,6 @@
       document.getElementById("queue-badge").innerText = `${queueCount} รายการ`;
       document.getElementById("expense-badge").innerText = `${expenses ? expenses.length : 0} รายการ`;
 
-      // คำนวณยอดสรุปการขาย (Sales Metrics)
       let salesSum = 0, salesPendingCount = 0, salesSettledCount = 0;
       if (allInvoices && Array.isArray(allInvoices)) {
         allInvoices.forEach(inv => {
@@ -2273,7 +2311,7 @@
       }
     }
 
-    // 📝 จัดการป๊อปอัป CRM Note ติดตามงาน
+    // 📝 ป๊อปอัปแสดงรายละเอียด CRM Note พร้อมแสดงชื่อเจ้าของ
     function openCrmModal(unitNumber) {
       activeCrmUnit = unitNumber;
       const targetKey = cleanUnitKey(unitNumber);
@@ -2281,6 +2319,7 @@
 
       document.getElementById("crm-modal-unit").innerText = unitNumber;
       document.getElementById("crm-modal-name").value = res ? res.residentName : "ยูนิตยังไม่ลงทะเบียน";
+      document.getElementById("crm-modal-owner").value = res ? (res.ownerName || res.residentName) : "-";
       document.getElementById("crm-modal-history").value = res ? (res.notes || "ไม่มีประวัติบันทึก") : "ยูนิตยังไม่ลงทะเบียน";
       document.getElementById("crm-modal-new-note").value = "";
 
@@ -2335,6 +2374,7 @@
       }
     }
 
+    // 👥 ลงทะเบียนลูกบ้านใหม่ (ส่งประเภท Owner/Tenant และข้อมูลเจ้าของ)
     async function submitNewResident(event) {
       event.preventDefault();
       const inputUnit = document.getElementById("res-unit").value.trim();
@@ -2342,7 +2382,7 @@
 
       const duplicateFound = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
       if (duplicateFound) {
-        alert(`⚠️ ยูนิต/แปลง [${inputUnit}] มีข้อมูลอยู่ในระบบแล้ว (เจ้าของคือ: "${duplicateFound.residentName}") ไม่สามารถลงทะเบียนซ้ำได้!\n\nกรุณากดปุ่ม '📜 รายชื่อลูกบ้านทั้งหมด' เพื่อทำการแก้ไขข้อมูลแทน`);
+        alert(`⚠️ ยูนิต/แปลง [${inputUnit}] มีข้อมูลอยู่ในระบบแล้ว (เจ้าของ/ผู้เช่าเดิมคือ: "${duplicateFound.residentName}") ไม่สามารถลงทะเบียนซ้ำได้!\n\nกรุณากดปุ่ม '📜 รายชื่อลูกบ้านทั้งหมด' เพื่อทำการแก้ไขข้อมูลแทน`);
         document.getElementById("res-unit").focus();
         return;
       }
@@ -2355,9 +2395,12 @@
         type: "new_resident", 
         operator: currentUser?.username, 
         operatorRole: currentUser?.role, 
+        residentType: document.getElementById("res-type").value,
         unitNumber: inputUnit,
-        titleDeedNo: document.getElementById("res-deed").value.trim(), 
         residentName: document.getElementById("res-name").value.trim(), 
+        ownerName: document.getElementById("res-owner-name") ? document.getElementById("res-owner-name").value.trim() : "",
+        ownerPhone: document.getElementById("res-owner-phone") ? document.getElementById("res-owner-phone").value.trim() : "",
+        titleDeedNo: document.getElementById("res-deed").value.trim(), 
         phone: document.getElementById("res-phone").value.trim(), 
         email: document.getElementById("res-email").value.trim(), 
         idCardAddress: document.getElementById("res-id-address").value.trim(), 
@@ -2382,6 +2425,7 @@
           alert("✅ บันทึกข้อมูลและสร้างโฟลเดอร์สำเร็จ!");
           document.getElementById("resident-form").reset();
           document.getElementById("res-photo").value = "";
+          toggleOwnerFields("Owner");
           residentPhotoBase64 = null;
           await loadDashboardData();
           if (currentUser.role === 'Admin' || currentUser.role === 'Finance') { switchTab('financial'); }
