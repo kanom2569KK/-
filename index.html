@@ -27,7 +27,6 @@
       color: var(--text-main); overflow: hidden; position: relative;
     }
 
-    /* ⏳ ป๊อปอัปกลางหน้าจอแสดงสถานะการประมวลผล */
     .loading-modal-box {
       background: linear-gradient(145deg, #5c2c12, #3d1b0a);
       border: 6px solid #1a0c04; border-radius: 20px;
@@ -794,7 +793,7 @@
       </div>
     </div>
 
-    <!-- Tab 1: Financial & Cashier (เพิ่มฟอร์ม & ตารางรายจ่าย) -->
+    <!-- Tab 1: Financial & Cashier -->
     <div id="tab-financial" class="tab-content">
       <section class="metrics-grid">
         <div class="metric-card">
@@ -867,7 +866,7 @@
             </div>
           </div>
 
-          <!-- 💸 ตารางประวัติการบันทึกรายจ่าย (แยกชีต Expenses) -->
+          <!-- 💸 ตารางประวัติการบันทึกรายจ่าย -->
           <div class="card" style="padding: 0; overflow: hidden; border-color: #7f1d1d;">
             <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0; color: #fca5a5;">
               <span>💸 ประวัติบันทึกรายจ่ายโครงการ (Expenses Record)</span>
@@ -882,11 +881,12 @@
                     <th>รายละเอียด</th>
                     <th>จำนวนเงิน</th>
                     <th>ช่องทาง</th>
+                    <th>หลักฐาน</th>
                     <th>ผู้บันทึก</th>
                   </tr>
                 </thead>
                 <tbody id="expenses-table-body">
-                  <tr><td colspan="6" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีรายการบันทึกรายจ่าย</td></tr>
+                  <tr><td colspan="7" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีรายการบันทึกรายจ่าย</td></tr>
                 </tbody>
               </table>
             </div>
@@ -927,7 +927,7 @@
                 <div class="form-group" style="flex: 1;">
                   <label>ช่องทาง</label>
                   <select id="form-payment-method">
-                    <option>โอนเงิน / สแกน QR</option><option>เงินสด</option><option>บัตรเครดิต</option>
+                    <option>โอนเงิน / สแกน QR</option><option>เงินสด</option><option>เช็คธนาคาร</option><option>บัตรเครดิต</option>
                   </select>
                 </div>
                 <div class="form-group" style="flex: 1;">
@@ -942,7 +942,7 @@
             </form>
           </div>
 
-          <!-- ฟอร์ม 2: บันทึกรายจ่าย (แยกชีต Expenses) -->
+          <!-- ฟอร์ม 2: บันทึกรายจ่าย (เพิ่มตัวเลือกเช็ค + ปุ่มอัปโหลดสลิป/เช็ค) -->
           <div class="card" style="border-color: #991b1b;">
             <div class="card-title" style="color: #fca5a5;">💸 บันทึกรายจ่ายโครงการ</div>
             <form id="expense-form" onsubmit="submitNewExpense(event)">
@@ -971,8 +971,13 @@
                   <select id="exp-method">
                     <option value="เงินสด">เงินสด</option>
                     <option value="โอนเงิน/บัญชีบริษัท">โอนเงิน / บัญชีบริษัท</option>
+                    <option value="เช็คธนาคาร">เช็คธนาคาร</option>
                   </select>
                 </div>
+              </div>
+              <div class="form-group">
+                <label>📎 อัปโหลดหลักฐานการจ่ายเงิน (สลิป / หน้าเช็ค)</label>
+                <input type="file" id="exp-file" accept="image/*,application/pdf" onchange="previewExpenseFile(event)">
               </div>
               <button type="submit" class="btn-primary" id="btn-submit-expense" style="background: linear-gradient(135deg, #dc2626, #991b1b);">💾 บันทึกรายจ่าย</button>
             </form>
@@ -1135,6 +1140,12 @@
     let editResidentPhotoBase64 = null;
     let editResidentPhotoName = "";
     let editResidentPhotoMime = "";
+    
+    // 변แนบไฟล์รายจ่าย
+    let expenseFileBase64 = null;
+    let expenseFileName = "";
+    let expenseFileMime = "";
+
     let pendingUnitForRegistration = "";
     let tempSelectedAvatar = "WIZmini";
 
@@ -1674,19 +1685,24 @@
       });
     }
 
-    // 💸 เรนเดอร์ตารางบันทึกรายจ่าย (Expenses Table)
+    // 💸 เรนเดอร์ตารางบันทึกรายจ่าย (พร้อมปุ่มเปิดดูลายเซ็น/สลิปแนบ)
     function renderExpensesTable(data) {
       const tbody = document.getElementById("expenses-table-body");
       tbody.innerHTML = "";
 
       if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีรายการบันทึกรายจ่าย</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีรายการบันทึกรายจ่าย</td></tr>`;
         return;
       }
 
       data.forEach(item => {
         const formattedDate = formatDisplayDate(item.Date);
         const amt = Number(item.Amount || 0);
+        const attachUrl = item.AttachmentUrl || item.Attachment || "-";
+        
+        const attachHtml = (attachUrl && attachUrl !== "-" && attachUrl.startsWith("http"))
+          ? `<a href="${attachUrl}" target="_blank" class="btn-action" style="background: #0284c7; text-decoration: none; display: inline-block;">📎 เปิดแนบ</a>`
+          : `<span style="font-size:11px; color:var(--text-muted);">-</span>`;
 
         tbody.innerHTML += `<tr>
           <td>${formattedDate}</td>
@@ -1694,6 +1710,7 @@
           <td>${item.Description || '-'}</td>
           <td style="color: #fca5a5; font-weight: bold;">฿${amt.toLocaleString()}</td>
           <td>${item['Payment Method'] || '-'}</td>
+          <td style="text-align: center;">${attachHtml}</td>
           <td style="color: var(--text-muted); font-size:12px;">${item.Operator || '-'}</td>
         </tr>`;
       });
@@ -1773,7 +1790,7 @@
       }
     }
 
-    // 📄 1. ออกใบแจ้งหนี้ (INVOICE - Auto Running Number)
+    // 📄 1. ออกใบแจ้งหนี้ (INVOICE)
     async function handleGenerateInvoice(event) {
       event.preventDefault();
       const unitVal = document.getElementById("inv-unit").value.trim();
@@ -1857,7 +1874,7 @@
       }
     }
 
-    // 🧾 2. ออกใบเสร็จรับเงิน (RECEIPT - Auto Running Number)
+    // 🧾 2. ออกใบเสร็จรับเงิน (RECEIPT)
     async function handlePrintReceipt(unit, residentName, feeType, amount, payMethod, existingDocNo) {
       showExpToast(2, "พิมพ์ใบเสร็จรับเงิน");
       
@@ -1927,7 +1944,19 @@
       finally { btn.disabled = false; btn.innerText = "บันทึกรับชำระเงิน & ตัดยอดคิว"; }
     }
 
-    // 💸 บันทึกรายจ่ายใหม่ (New Expense)
+    // 📷 พรีวิวแนบไฟล์รายจ่าย
+    function previewExpenseFile(e) {
+      const file = e.target.files[0];
+      if (file) {
+        expenseFileName = file.name;
+        expenseFileMime = file.type || "image/jpeg";
+        const reader = new FileReader();
+        reader.onload = function(evt) { expenseFileBase64 = evt.target.result; };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // 💸 บันทึกรายจ่ายใหม่ (ส่งไฟล์ไปยัง Expense_Receipts)
     async function submitNewExpense(event) {
       event.preventDefault();
       const btn = document.getElementById("btn-submit-expense");
@@ -1941,7 +1970,10 @@
         category: document.getElementById("exp-category").value,
         description: document.getElementById("exp-desc").value.trim(),
         amount: document.getElementById("exp-amount").value,
-        paymentMethod: document.getElementById("exp-method").value
+        paymentMethod: document.getElementById("exp-method").value,
+        fileData: expenseFileBase64,
+        fileName: expenseFileName,
+        mimeType: expenseFileMime
       };
 
       try {
@@ -1949,12 +1981,14 @@
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(payload)
-        }, 3, 1500, "กำลังบันทึกรายจ่าย", "กำลังบันทึกข้อมูลลงชีต Expenses...");
+        }, 3, 1500, "กำลังบันทึกรายจ่าย", "อัปโหลดหลักฐานไปยัง Expense_Receipts & บันทึกชีต...");
 
         if (resJson.status === "success") {
           showExpToast(5, "บันทึกรายจ่ายโครงการ");
           alert("✅ บันทึกรายการรายจ่ายเรียบร้อยแล้ว!");
           document.getElementById("expense-form").reset();
+          document.getElementById("exp-file").value = "";
+          expenseFileBase64 = null;
           await loadDashboardData();
         } else {
           alert("❌ " + resJson.message);
