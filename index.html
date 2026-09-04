@@ -24,7 +24,19 @@
       background-image: 
         radial-gradient(circle at 50% 50%, rgba(74, 37, 17, 0.6) 0%, rgba(26, 21, 8, 0.95) 100%),
         repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 2px, transparent 2px, transparent 4px);
-      color: var(--text-main); overflow: hidden; 
+      color: var(--text-main); overflow: hidden; position: relative;
+    }
+
+    /* ⏳ หลอดแสดงสถานะการโหลดบนสุด (Top Progress Bar) */
+    #global-progress-container {
+      position: fixed; top: 0; left: 0; width: 100%; height: 5px;
+      background: rgba(0,0,0,0.3); z-index: 20000; display: none;
+    }
+    #global-progress-bar {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #f59e0b, #fbbf24, #fef08a);
+      box-shadow: 0 0 10px rgba(251,191,36,0.8);
+      transition: width 0.3s ease;
     }
 
     .screen-overlay {
@@ -225,7 +237,7 @@
     .quest-exp { background: rgba(251,191,36,0.15); color: var(--accent-gold); padding: 3px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; border: 1px solid var(--accent-gold); }
 
     /* ========================================================
-       🖨️ PRINT STYLESHEET: เอกสารทางการ A4 (ตัดส่วนประกอบเว็บออกหมด 100%)
+       🖨️ PRINT STYLESHEET: เอกสารทางการ A4 (ตัด Web App ออก 100%)
        ======================================================== */
     #printable-invoice {
       display: none;
@@ -245,7 +257,7 @@
         padding: 0 !important;
         overflow: visible !important;
       }
-      .sidebar, .main-content, .top-bar, .tab-content, .screen-overlay, .modal-overlay, .exp-toast {
+      .sidebar, .main-content, .top-bar, .tab-content, .screen-overlay, .modal-overlay, .exp-toast, #global-progress-container {
         display: none !important;
       }
       #printable-invoice {
@@ -347,7 +359,10 @@
 </head>
 <body>
 
-  <!-- 🖨️ PRINT TEMPLATE: เอกสารทางการ A4 (สลับ ใบแจ้งหนี้ / ใบเสร็จรับเงิน อัตโนมัติ) -->
+  <!-- ⏳ หลอดแสดงสถานะการโหลดบนสุด -->
+  <div id="global-progress-container"><div id="global-progress-bar"></div></div>
+
+  <!-- 🖨️ PRINT TEMPLATE: เอกสารทางการ A4 -->
   <div id="printable-invoice">
     <table class="inv-header-table">
       <tr>
@@ -448,7 +463,7 @@
     </table>
   </div>
 
-  <!-- 📜 POPUP: รายชื่อลูกบ้านแบบละเอียดพร้อมปุ่มแก้ไข -->
+  <!-- 📜 POPUP: รายชื่อลูกบ้านแบบรายละเอียด -->
   <div id="customer-list-modal" class="modal-overlay">
     <div class="ro-window" style="max-width: 1020px; width: 95%;">
       <div class="ro-header">
@@ -1023,6 +1038,57 @@
     let pendingUnitForRegistration = "";
     let tempSelectedAvatar = "WIZmini";
 
+    // ⏳ ฟังก์ชันควบคุม Progress Bar แบบสวมงาม
+    function showProgressBar() {
+      const container = document.getElementById("global-progress-container");
+      const bar = document.getElementById("global-progress-bar");
+      if (container && bar) {
+        container.style.display = "block";
+        bar.style.width = "30%";
+        setTimeout(() => { bar.style.width = "70%"; }, 200);
+      }
+    }
+
+    function hideProgressBar() {
+      const container = document.getElementById("global-progress-container");
+      const bar = document.getElementById("global-progress-bar");
+      if (container && bar) {
+        bar.style.width = "100%";
+        setTimeout(() => {
+          container.style.display = "none";
+          bar.style.width = "0%";
+        }, 300);
+      }
+    }
+
+    // 🔄 ฟังก์ชัน fetch พร้อมระบบ Auto-Retry อัตโนมัติ 3 ครั้งเมื่อเกิด Network Error หรือเซิร์ฟเวอร์ยุ่ง
+    async function fetchWithRetry(url, options = {}, retries = 3, backoff = 1500) {
+      showProgressBar();
+      for (let i = 0; i < retries; i++) {
+        try {
+          const response = await fetch(url, options);
+          const data = await response.json();
+          if (data && data.status === "error" && data.message && data.message.includes("เซิร์ฟเวอร์กำลัง")) {
+            // หากเป็น Error เซิร์ฟเวอร์ยุ่ง ให้รอแล้ว Retry
+            if (i < retries - 1) {
+              await new Promise(r => setTimeout(r, backoff));
+              continue;
+            }
+          }
+          hideProgressBar();
+          return data;
+        } catch (err) {
+          if (i === retries - 1) {
+            hideProgressBar();
+            throw err;
+          }
+          await new Promise(r => setTimeout(r, backoff));
+        }
+      }
+      hideProgressBar();
+      throw new Error("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง");
+    }
+
     function formatDisplayDate(val) {
       if (!val || val === "-" || val === "") return "-";
       try {
@@ -1169,11 +1235,10 @@
       const btn = document.getElementById("btn-login");
       btn.disabled = true; btn.innerText = "กำลังตรวจสอบ...";
       try {
-        const res = await fetch(API_URL, {
+        const resJson = await fetchWithRetry(API_URL, {
           method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({ type: "login", username: document.getElementById("login-user").value, password: document.getElementById("login-pass").value })
         });
-        const resJson = await res.json();
         if (resJson.status === "success") {
           tempPendingUser = resJson.user;
           if(resJson.dailyLoginBonus) tempPendingUser.gotDailyBonus = true;
@@ -1181,7 +1246,7 @@
           document.getElementById("char-select-screen").style.display = "flex";
           pickAvatar(tempPendingUser.avatar || "WIZmini");
         } else alert("❌ " + resJson.message);
-      } catch (err) { alert("⚠️ เชื่อมต่อขัดข้อง"); } 
+      } catch (err) { alert("⚠️ เชื่อมต่อขัดข้อง: " + err.message); } 
       finally { btn.disabled = false; btn.innerText = "เข้าสู่ระบบ"; }
     }
 
@@ -1203,7 +1268,7 @@
         setTimeout(() => showExpToast(10, "Daily Login รายวัน"), 800);
         delete currentUser.gotDailyBonus;
       }
-      fetch(API_URL, {
+      fetchWithRetry(API_URL, {
         method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({ type: "save_avatar", username: currentUser.username, avatar: tempSelectedAvatar })
       });
@@ -1356,12 +1421,11 @@
       };
 
       try {
-        const res = await fetch(API_URL, {
+        const resJson = await fetchWithRetry(API_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(payload)
         });
-        const resJson = await res.json();
 
         if (resJson.status === "success") {
           showExpToast(5, "อัปเดตข้อมูลลูกบ้าน");
@@ -1373,7 +1437,7 @@
           alert("❌ " + resJson.message);
         }
       } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
       } finally {
         btn.disabled = false;
         btn.innerText = "💾 บันทึกการแก้ไขข้อมูล";
@@ -1410,8 +1474,7 @@
     async function loadDashboardData() {
       try {
         const fetchUrl = API_URL + "?t=" + new Date().getTime();
-        const response = await fetch(fetchUrl);
-        const data = await response.json();
+        const data = await fetchWithRetry(fetchUrl);
         if (data.payments) { 
           cachedPayments = data.payments || []; 
           cachedResidents = data.residents || []; 
@@ -1517,9 +1580,7 @@
       document.getElementById("queue-badge").innerText = `${queueCount} รายการ`;
     }
 
-    // =========================================================
-    // 📄 1. ออกใบแจ้งหนี้ (INVOICE) โดยฝ่ายขาย / ธุรการ
-    // =========================================================
+    // 📄 1. ออกใบแจ้งหนี้ (INVOICE)
     async function handleGenerateInvoice(event) {
       event.preventDefault();
       const unitVal = document.getElementById("inv-unit").value.trim();
@@ -1540,7 +1601,7 @@
       btn.innerText = "⏳ กำลังส่งงานเข้าคิวการเงิน & ตรวจสอบ...";
 
       try {
-        const res = await fetch(API_URL, { 
+        const resJson = await fetchWithRetry(API_URL, { 
           method: "POST", 
           headers: { "Content-Type": "text/plain;charset=utf-8" }, 
           body: JSON.stringify({ 
@@ -1552,7 +1613,6 @@
             feeType: feeVal 
           }) 
         });
-        const resJson = await res.json();
 
         if (resJson.status === "success") {
           showExpToast(resJson.expAdded, "ออกใบแจ้งหนี้ & ส่งคิวสำเร็จ");
@@ -1570,7 +1630,6 @@
             displayMonth = `${thaiMonths[mIndex]} ${yThai}`;
           }
 
-          // ตั้งค่าหัวกระดาษเป็น "ใบแจ้งหนี้" (แสดงโฉนด)
           document.getElementById("print-doc-title-th").innerText = "ใบแจ้งหนี้";
           document.getElementById("print-doc-title-en").innerText = "INVOICE";
           document.getElementById("print-label-customer").innerText = "ผู้รับใบแจ้งหนี้ (เจ้าของร่วม):";
@@ -1581,7 +1640,6 @@
           document.getElementById("row-print-deed").style.display = "table-row";
           document.getElementById("row-print-month-full").style.display = "none";
 
-          // เติมข้อมูล
           document.getElementById("print-inv-no").innerText = invCode;
           document.getElementById("print-inv-date").innerText = dStr;
           document.getElementById("print-res-name").innerText = resJson.residentName || "-";
@@ -1600,16 +1658,14 @@
           alert("❌ " + resJson.message);
         }
       } catch (err) {
-        alert("⚠️ เชื่อมต่อเซิร์ฟเวอร์ขัดข้อง");
+        alert("⚠️ เชื่อมต่อเซิร์ฟเวอร์ขัดข้อง: " + err.message);
       } finally {
         btn.disabled = false;
         btn.innerText = "🖨️ ตรวจสอบ, ส่งงานเข้าคิว & พิมพ์ใบแจ้งหนี้ (PDF)";
       }
     }
 
-    // =========================================================
-    // 🧾 2. ออกใบเสร็จรับเงิน (RECEIPT) โดยฝ่ายการเงิน (ซ่อนโฉนด)
-    // =========================================================
+    // 🧾 2. ออกใบเสร็จรับเงิน (RECEIPT)
     async function handlePrintReceipt(unit, residentName, feeType, amount, payMethod) {
       showExpToast(2, "พิมพ์ใบเสร็จรับเงิน");
       
@@ -1620,7 +1676,6 @@
       const dStr = `${now.getDate()} ${thaiMonths[now.getMonth()]} ${now.getFullYear() + 543}`;
       const recCode = `REC-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}-${unit.padStart(3,'0')}`;
 
-      // สลับหัวกระดาษเป็น "ใบเสร็จรับเงิน" (ซ่อนโฉนด และรวมแถวรอบเดือน)
       document.getElementById("print-doc-title-th").innerText = "ใบเสร็จรับเงิน";
       document.getElementById("print-doc-title-en").innerText = "RECEIPT";
       document.getElementById("print-label-customer").innerText = "ได้รับเงินจาก (ผู้ชำระเงิน):";
@@ -1628,11 +1683,9 @@
       document.getElementById("print-sig-left-title").innerText = "เจ้าหน้าที่ฝ่ายจัดทำเอกสาร";
       document.getElementById("print-payment-note").style.display = "none";
       
-      // ซ่อนแถวโฉนด และแสดงแถวรอบเดือนแบบเต็มแถว
       document.getElementById("row-print-deed").style.display = "none";
       document.getElementById("row-print-month-full").style.display = "table-row";
 
-      // เติมข้อมูล
       document.getElementById("print-inv-no").innerText = recCode;
       document.getElementById("print-inv-date").innerText = dStr;
       document.getElementById("print-res-name").innerText = residentName || "-";
@@ -1645,7 +1698,7 @@
       document.getElementById("print-operator-name").innerText = "ฝ่ายธุรการ / ระบบ";
       document.getElementById("print-finance-name").innerText = currentUser?.fullName || "ฝ่ายการเงิน (ผู้รับเงิน)";
 
-      fetch(API_URL, { 
+      fetchWithRetry(API_URL, { 
         method: "POST", 
         headers: { "Content-Type": "text/plain;charset=utf-8" }, 
         body: JSON.stringify({ type: "print_receipt", operator: currentUser?.username, unitNumber: unit }) 
@@ -1667,15 +1720,14 @@
         residentName: document.getElementById("form-name").value, feeType: document.getElementById("form-fee-type").value, amount: document.getElementById("form-amount").value, paymentMethod: document.getElementById("form-payment-method").value, status: document.getElementById("form-status").value
       };
       try {
-        const res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
-        const resJson = await res.json();
+        const resJson = await fetchWithRetry(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
         if(resJson.status === "success") {
           showExpToast(resJson.expAdded || 5, (payload.status==="Overdue"||payload.feeType.includes("ค่าปรับ"))?"ทวงหนี้สำเร็จ":"รับชำระเงินสำเร็จ");
           alert("✅ บันทึกรายการรับเงินและตัดยอดออกจากคิวสำเร็จ!");
           document.getElementById("payment-form").reset();
           await loadDashboardData();
         } else { alert("❌ " + resJson.message); }
-      } catch (err) { alert("⚠️ เกิดข้อผิดพลาดในการบันทึก"); } 
+      } catch (err) { alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message); } 
       finally { btn.disabled = false; btn.innerText = "บันทึกรับชำระเงิน & ตัดยอดคิว"; }
     }
 
@@ -1725,12 +1777,11 @@
       };
 
       try {
-        const res = await fetch(API_URL, { 
+        const resJson = await fetchWithRetry(API_URL, { 
           method: "POST", 
           headers: { "Content-Type": "text/plain;charset=utf-8" }, 
           body: JSON.stringify(payload) 
         });
-        const resJson = await res.json();
         
         if (resJson.status === "success") {
           showExpToast(15, "ลงทะเบียนลูกบ้าน");
@@ -1744,7 +1795,7 @@
           alert(resJson.message);
         }
       } catch (err) { 
-        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์"); 
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message); 
       } finally { 
         btn.disabled = false; 
         btn.innerText = "บันทึกข้อมูล & สร้างโฟลเดอร์"; 
@@ -1766,7 +1817,7 @@
       btn.innerText = "⏳ กำลังล้างข้อมูลใน Google Sheets...";
 
       try {
-        const res = await fetch(API_URL, {
+        const resJson = await fetchWithRetry(API_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({
@@ -1775,7 +1826,6 @@
             operatorRole: currentUser?.role
           })
         });
-        const resJson = await res.json();
 
         if (resJson.status === "success") {
           alert("🎉 " + resJson.message);
@@ -1788,7 +1838,7 @@
           alert("❌ " + resJson.message);
         }
       } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
       } finally {
         btn.disabled = false;
         btn.innerText = "🗑️ ล้างข้อมูลใน Sheet และรีเซ็ตระบบทั้งหมด (เริ่มรอบใหม่)";
@@ -1823,7 +1873,7 @@
         const reader = new FileReader();
         reader.onload = async function(e) {
           try {
-            await fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "raw_file_upload", operator: currentUser?.username, fileName: file.name, mimeType: file.type || "application/octet-stream", fileData: e.target.result })});
+            await fetchWithRetry(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "raw_file_upload", operator: currentUser?.username, fileName: file.name, mimeType: file.type || "application/octet-stream", fileData: e.target.result })});
             itemEl.innerHTML = `<span>✅ ${file.name}</span> <span style="color:#6ee7b7; float:right;">สำเร็จ</span>`;
             showExpToast(10, "อัปโหลดไฟล์");
           } catch (err) { itemEl.innerHTML = `<span>✅ ${file.name}</span> <span style="color:#6ee7b7; float:right;">สำเร็จ</span>`; showExpToast(10, "อัปโหลดไฟล์"); }
