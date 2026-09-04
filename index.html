@@ -27,7 +27,6 @@
       color: var(--text-main); overflow: hidden; position: relative;
     }
 
-    /* ⏳ หลอดแสดงสถานะการโหลดบนสุด (Top Progress Bar) */
     #global-progress-container {
       position: fixed; top: 0; left: 0; width: 100%; height: 5px;
       background: rgba(0,0,0,0.3); z-index: 20000; display: none;
@@ -237,7 +236,7 @@
     .quest-exp { background: rgba(251,191,36,0.15); color: var(--accent-gold); padding: 3px 10px; border-radius: 20px; font-weight: bold; font-size: 12px; border: 1px solid var(--accent-gold); }
 
     /* ========================================================
-       🖨️ PRINT STYLESHEET: เอกสารทางการ A4 (ตัด Web App ออก 100%)
+       🖨️ PRINT STYLESHEET: เอกสารทางการ A4
        ======================================================== */
     #printable-invoice {
       display: none;
@@ -383,7 +382,7 @@
           <table class="inv-meta-table">
             <tr>
               <td style="text-align: right; color: #475569;">เลขที่เอกสาร:</td>
-              <td style="text-align: left; font-weight: bold; color: #1e3a8a;"><span id="print-inv-no">INV-202609-001</span></td>
+              <td style="text-align: left; font-weight: bold; color: #1e3a8a;"><span id="print-inv-no">INV-202609-0001</span></td>
             </tr>
             <tr>
               <td style="text-align: right; color: #475569;">วันที่ออกเอกสาร:</td>
@@ -990,6 +989,30 @@
     <div id="tab-admin-hub" class="tab-content">
       <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
         
+        <!-- 🔢 เครื่องมือกำหนดเลขที่รันเอกสารเริ่มต้น (Admin Tools) -->
+        <div class="card" style="border-color: var(--accent-gold);">
+          <div class="card-title" style="color: var(--accent-gold);">
+            <span>🔢 ตั้งค่าเลขที่รันเอกสารเริ่มต้น (Invoice & Receipt Dynamic Running)</span>
+            <span class="badge pending">Admin Only</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+            กำหนดลำดับตัวเลขถัดไป (Next Running Number) ของใบแจ้งหนี้ (INV) และใบเสร็จรับเงิน (REC) เมื่อตั้งค่าแล้วระบบจะรันตัวเลขต่อให้อัตโนมัติในรูปแบบ <code>INV-YYYYMM-XXXX</code> และ <code>REC-YYYYMM-XXXX</code>
+          </p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label>เลขถัดไปของใบแจ้งหนี้ (Next INV Number)</label>
+              <input type="number" id="admin-next-inv-no" placeholder="เช่น 1 หรือ 1001">
+            </div>
+            <div class="form-group">
+              <label>เลขถัดไปของใบเสร็จ (Next REC Number)</label>
+              <input type="number" id="admin-next-rec-no" placeholder="เช่น 1 หรือ 1001">
+            </div>
+          </div>
+          <button type="button" class="btn-primary" id="btn-save-doc-number" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="handleSetDocRunningNumber()">
+            💾 บันทึกตั้งค่าเลขที่รันเอกสาร
+          </button>
+        </div>
+
         <div class="card">
           <div class="card-title">🛠️ อัปโหลดไฟล์ดิบสำรองข้อมูล (Admin Only)</div>
           <div class="drop-zone" id="drop-zone">
@@ -1038,7 +1061,6 @@
     let pendingUnitForRegistration = "";
     let tempSelectedAvatar = "WIZmini";
 
-    // ⏳ ฟังก์ชันควบคุม Progress Bar แบบสวมงาม
     function showProgressBar() {
       const container = document.getElementById("global-progress-container");
       const bar = document.getElementById("global-progress-bar");
@@ -1061,7 +1083,6 @@
       }
     }
 
-    // 🔄 ฟังก์ชัน fetch พร้อมระบบ Auto-Retry อัตโนมัติ 3 ครั้งเมื่อเกิด Network Error หรือเซิร์ฟเวอร์ยุ่ง
     async function fetchWithRetry(url, options = {}, retries = 3, backoff = 1500) {
       showProgressBar();
       for (let i = 0; i < retries; i++) {
@@ -1069,7 +1090,6 @@
           const response = await fetch(url, options);
           const data = await response.json();
           if (data && data.status === "error" && data.message && data.message.includes("เซิร์ฟเวอร์กำลัง")) {
-            // หากเป็น Error เซิร์ฟเวอร์ยุ่ง ให้รอแล้ว Retry
             if (i < retries - 1) {
               await new Promise(r => setTimeout(r, backoff));
               continue;
@@ -1479,6 +1499,9 @@
           cachedPayments = data.payments || []; 
           cachedResidents = data.residents || []; 
           cachedPendingInvoices = data.pendingInvoices || [];
+          
+          if (data.nextInvNo !== undefined) document.getElementById("admin-next-inv-no").value = data.nextInvNo;
+          if (data.nextRecNo !== undefined) document.getElementById("admin-next-rec-no").value = data.nextRecNo;
         } else if (Array.isArray(data)) { 
           cachedPayments = data; 
         }
@@ -1537,14 +1560,16 @@
         const residentName = item["Resident Name"] || "-";
         const feeType = item["Fee Type"] || "ค่าส่วนกลาง";
         const payMethod = item["Payment Method"] || "โอนเงิน / สแกน QR";
+        const docNo = item["DocNo"] || "-";
 
         const u = String(unit).replace(/'/g, "\\'");
         const r = String(residentName).replace(/'/g, "\\'");
         const f = String(feeType).replace(/'/g, "\\'");
         const p = String(payMethod).replace(/'/g, "\\'");
+        const d = String(docNo).replace(/'/g, "\\'");
 
         const btnReceiptHtml = status.toLowerCase() === 'paid' 
-          ? `<button class="btn-action" style="background: linear-gradient(135deg, var(--accent-green), #047857);" onclick="handlePrintReceipt('${u}', '${r}', '${f}', ${amount}, '${p}')">🖨️ พิมพ์ใบเสร็จ</button>` 
+          ? `<button class="btn-action" style="background: linear-gradient(135deg, var(--accent-green), #047857);" onclick="handlePrintReceipt('${u}', '${r}', '${f}', ${amount}, '${p}', '${d}')">🖨️ พิมพ์ใบเสร็จ</button>` 
           : `<span style="font-size:12px; color:var(--text-muted);">-</span>`;
         tableBody.innerHTML += `<tr>
           <td>${formattedDate}</td>
@@ -1580,7 +1605,48 @@
       document.getElementById("queue-badge").innerText = `${queueCount} รายการ`;
     }
 
-    // 📄 1. ออกใบแจ้งหนี้ (INVOICE)
+    // 📌 Admin ตั้งค่าเลขถัดไปของเอกสาร (INV / REC)
+    async function handleSetDocRunningNumber() {
+      const nextInvNo = document.getElementById("admin-next-inv-no").value.trim();
+      const nextRecNo = document.getElementById("admin-next-rec-no").value.trim();
+
+      if (!nextInvNo && !nextRecNo) {
+        alert("⚠️ กรุณาระบุตัวเลขอย่างน้อย 1 ช่องสำหรับการตั้งค่า");
+        return;
+      }
+
+      const btn = document.getElementById("btn-save-doc-number");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังบันทึกการตั้งค่า...";
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            type: "set_doc_running_number",
+            operator: currentUser?.username,
+            operatorRole: currentUser?.role,
+            nextInvNo: nextInvNo,
+            nextRecNo: nextRecNo
+          })
+        });
+
+        if (resJson.status === "success") {
+          alert("✅ " + resJson.message);
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "💾 บันทึกตั้งค่าเลขที่รันเอกสาร";
+      }
+    }
+
+    // 📄 1. ออกใบแจ้งหนี้ (INVOICE - Auto Running Number)
     async function handleGenerateInvoice(event) {
       event.preventDefault();
       const unitVal = document.getElementById("inv-unit").value.trim();
@@ -1620,8 +1686,7 @@
           const now = new Date();
           const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
           const dStr = `${now.getDate()} ${thaiMonths[now.getMonth()]} ${now.getFullYear() + 543}`;
-          const invCode = `INV-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}-${unitVal.padStart(3,'0')}`;
-
+          
           let displayMonth = monthVal;
           if (monthVal && monthVal.includes("-")) {
             const parts = monthVal.split("-");
@@ -1640,7 +1705,8 @@
           document.getElementById("row-print-deed").style.display = "table-row";
           document.getElementById("row-print-month-full").style.display = "none";
 
-          document.getElementById("print-inv-no").innerText = invCode;
+          // นำเลขที่รันอัตโนมัติจากเซิร์ฟเวอร์มาแสดง
+          document.getElementById("print-inv-no").innerText = resJson.docNo || "INV-AUTO";
           document.getElementById("print-inv-date").innerText = dStr;
           document.getElementById("print-res-name").innerText = resJson.residentName || "-";
           document.getElementById("print-res-unit").innerText = unitVal;
@@ -1665,8 +1731,8 @@
       }
     }
 
-    // 🧾 2. ออกใบเสร็จรับเงิน (RECEIPT)
-    async function handlePrintReceipt(unit, residentName, feeType, amount, payMethod) {
+    // 🧾 2. ออกใบเสร็จรับเงิน (RECEIPT - Auto Running Number)
+    async function handlePrintReceipt(unit, residentName, feeType, amount, payMethod, existingDocNo) {
       showExpToast(2, "พิมพ์ใบเสร็จรับเงิน");
       
       const targetKey = cleanUnitKey(unit);
@@ -1674,7 +1740,6 @@
       const now = new Date();
       const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
       const dStr = `${now.getDate()} ${thaiMonths[now.getMonth()]} ${now.getFullYear() + 543}`;
-      const recCode = `REC-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}-${unit.padStart(3,'0')}`;
 
       document.getElementById("print-doc-title-th").innerText = "ใบเสร็จรับเงิน";
       document.getElementById("print-doc-title-en").innerText = "RECEIPT";
@@ -1686,7 +1751,7 @@
       document.getElementById("row-print-deed").style.display = "none";
       document.getElementById("row-print-month-full").style.display = "table-row";
 
-      document.getElementById("print-inv-no").innerText = recCode;
+      document.getElementById("print-inv-no").innerText = (existingDocNo && existingDocNo !== "-") ? existingDocNo : "REC-AUTO";
       document.getElementById("print-inv-date").innerText = dStr;
       document.getElementById("print-res-name").innerText = residentName || "-";
       document.getElementById("print-res-unit").innerText = unit;
@@ -1723,7 +1788,7 @@
         const resJson = await fetchWithRetry(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) });
         if(resJson.status === "success") {
           showExpToast(resJson.expAdded || 5, (payload.status==="Overdue"||payload.feeType.includes("ค่าปรับ"))?"ทวงหนี้สำเร็จ":"รับชำระเงินสำเร็จ");
-          alert("✅ บันทึกรายการรับเงินและตัดยอดออกจากคิวสำเร็จ!");
+          alert(`✅ บันทึกรายการสำเร็จ!\nออกใบเสร็จรับเงินเลขที่: ${resJson.docNo || '-'}`);
           document.getElementById("payment-form").reset();
           await loadDashboardData();
         } else { alert("❌ " + resJson.message); }
