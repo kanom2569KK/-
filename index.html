@@ -587,7 +587,7 @@
     </div>
   </div>
 
-  <!-- 📖 MODAL: สมุดบัญชีการเงินรายลูกบ้าน (Individual Ledger - Admin & Finance Only) -->
+  <!-- 📖 MODAL: สมุดบัญชีการเงินรายลูกบ้าน (Individual Ledger) -->
   <div id="unit-ledger-modal" class="modal-overlay">
     <div class="ro-window" style="max-width: 950px; width: 95%;">
       <div class="ro-header">
@@ -595,7 +595,6 @@
         <span class="ro-close" onclick="closeLedgerModal()">✕</span>
       </div>
       <div style="padding: 20px;">
-        <!-- พิมพ์ค้นหายูนิต ป้องกันการใช้ Dropdown -->
         <div style="display: flex; gap: 10px; margin-bottom: 16px;">
           <input type="text" id="ledger-search-unit" placeholder="🔍 พิมพ์เลขยูนิต เช่น 12 หรือ 899/12 แล้วกดค้นหา" style="flex: 1; padding: 10px 14px; background: #231106; color: var(--text-main); border: 2px solid #140803; border-radius: 10px; outline: none;">
           <button type="button" class="btn-primary" style="margin: 0; width: 140px; background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="searchUnitLedger()">🔍 ค้นหา</button>
@@ -636,6 +635,40 @@
       </div>
       <div class="ro-footer">
         <button class="ro-btn ro-btn-cancel" onclick="closeLedgerModal()">ปิดหน้าต่าง</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📦 MODAL: ปรับแต่งสต็อกพัสดุหน้างาน (Stock Quantity Adjustment) -->
+  <div id="stock-adjust-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 500px; width: 90%;">
+      <div class="ro-header">
+        <span>📦 ปรับแก้ไขสต็อกพัสดุหน้างาน</span>
+        <span class="ro-close" onclick="closeStockModal()">✕</span>
+      </div>
+      <div style="padding: 20px;">
+        <div class="form-group">
+          <label>รหัส / ชื่อพัสดุ:</label>
+          <input type="text" id="stock-modal-code" readonly style="background:#180a03; color:var(--accent-gold); font-weight:bold;">
+        </div>
+        <div class="form-group">
+          <label>ชื่อพัสดุ:</label>
+          <input type="text" id="stock-modal-name" readonly style="background:#180a03; color:var(--text-main);">
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <div class="form-group" style="flex: 1;">
+            <label>จำนวนคงเหลือหน้างานจริง *</label>
+            <input type="number" id="stock-modal-qty" required>
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>จุดแจ้งเตือนขั้นต่ำ (Min Alert) *</label>
+            <input type="number" id="stock-modal-min" required>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button type="button" class="ro-btn" style="flex: 1;" onclick="closeStockModal()">ยกเลิก</button>
+          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #059669, #047857);" onclick="submitStockAdjustment()">💾 บันทึกปรับสต็อก</button>
+        </div>
       </div>
     </div>
   </div>
@@ -867,7 +900,7 @@
     </div>
   </div>
 
-  <!-- Sidebar -->
+  <!-- Sidebar (เพิ่มเมนู จัดซื้อ & สต็อกพัสดุ) -->
   <aside class="sidebar">
     <div class="company-logo" onclick="window.open('https://www.facebook.com/udomsukplace', '_blank')">
       <img src="logomini.png" alt="Udomsuk Logo">
@@ -883,6 +916,9 @@
       </li>
       <li class="nav-item" id="menu-billing">
         <button onclick="switchTab('billing')">📑<span class="tooltip">ฝ่ายขาย & ออกบิล</span></button>
+      </li>
+      <li class="nav-item" id="menu-procurement">
+        <button onclick="switchTab('procurement')">📦<span class="tooltip">จัดซื้อ & สต็อกพัสดุ</span></button>
       </li>
       <li class="nav-item" id="menu-admin-hub">
         <button onclick="switchTab('admin-hub')">🛠️<span class="tooltip">แอดมิน: ไฟล์ดิบ & ระบบ</span></button>
@@ -907,7 +943,7 @@
       </div>
     </div>
 
-    <!-- Tab 1: Financial & Cashier (เพิ่มปุ่มเปิดสมุดบัญชีรายยูนิต) -->
+    <!-- Tab 1: Financial & Cashier -->
     <div id="tab-financial" class="tab-content">
       <section class="metrics-grid">
         <div class="metric-card">
@@ -931,7 +967,6 @@
       <section class="content-grid">
         <div style="display: flex; flex-direction: column; gap: 20px;">
           
-          <!-- ตารางย่อ: รายการแจ้งหนี้รอดำเนินการรับเงิน -->
           <div class="card" style="padding: 0; overflow: hidden;">
             <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
               <span>📑 รายการแจ้งหนี้รอดำเนินการรับเงิน (Queue จากฝ่ายขาย/ธุรการ)</span>
@@ -957,11 +992,9 @@
             </div>
           </div>
 
-          <!-- ตารางประวัติการรับเงิน & พิมพ์ใบเสร็จ -->
           <div class="card" style="padding: 0; overflow: hidden;">
             <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
               <span>📊 ประวัติการรับเงิน & พิมพ์ใบเสร็จ (ฝ่ายการเงิน)</span>
-              <!-- ปุ่มเปิดสมุดบัญชีรายยูนิตสำหรับ Admin/Finance -->
               <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: bold;" onclick="openLedgerModal()">
                 📖 สมุดบัญชีรายยูนิต (Ledger)
               </button>
@@ -986,7 +1019,6 @@
             </div>
           </div>
 
-          <!-- 💸 ตารางประวัติการบันทึกรายจ่าย -->
           <div class="card" style="padding: 0; overflow: hidden; border-color: #7f1d1d;">
             <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0; color: #fca5a5;">
               <span>💸 ประวัติบันทึกรายจ่ายโครงการ (Expenses Record)</span>
@@ -1015,7 +1047,6 @@
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 20px;">
-          <!-- ฟอร์ม 1: บันทึกรับเงิน -->
           <div class="card">
             <div class="card-title">📥 บันทึกรับชำระเงิน</div>
             <form id="payment-form" onsubmit="submitPayment(event)">
@@ -1056,7 +1087,6 @@
             </form>
           </div>
 
-          <!-- ฟอร์ม 2: บันทึกรายจ่าย -->
           <div class="card" style="border-color: #991b1b;">
             <div class="card-title" style="color: #fca5a5;">💸 บันทึกรายจ่ายโครงการ</div>
             <form id="expense-form" onsubmit="submitNewExpense(event)">
@@ -1196,7 +1226,6 @@
       <section class="content-grid" style="grid-template-columns: 1.2fr 1.8fr; gap: 20px;">
         
         <div style="display: flex; flex-direction: column; gap: 20px;">
-          <!-- ฟอร์มออกเอกสารการขาย -->
           <div class="card">
             <div class="card-title">
               <span>📄 ออกเอกสารการขาย</span>
@@ -1232,7 +1261,6 @@
             </form>
           </div>
 
-          <!-- 🗺️ ผังสถานะยูนิตโครงการ Dynamic Property Map -->
           <div class="card">
             <div class="card-title">
               <span>🗺️ ผังสถานะยูนิตโครงการ (Dynamic Map)</span>
@@ -1243,13 +1271,10 @@
               <span style="color:#38bdf8;">🔵 ผู้เช่า</span>
               <span style="color:#fbbf24;">🟡 มีบิลค้าง</span>
             </div>
-            <div class="unit-map-grid" id="unit-map-container">
-              <!-- JS จะดึงยูนิตจากชีต Residents มาเรนเดอร์ -->
-            </div>
+            <div class="unit-map-grid" id="unit-map-container"></div>
           </div>
         </div>
 
-        <!-- 📊 ตารางติดตามสถานะใบแจ้งหนี้ของฝ่ายขาย -->
         <div class="card" style="padding: 0; overflow: hidden;">
           <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
             <span>📋 ตารางติดตามสถานะบิลทั้งหมด (Sales Tracking List)</span>
@@ -1275,6 +1300,87 @@
           </div>
         </div>
 
+      </section>
+    </div>
+
+    <!-- 📦 Tab 4: Procurement & Inventory (เฉพาะ Admin/Finance) -->
+    <div id="tab-procurement" class="tab-content">
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <div class="title">รายการพัสดุทั้งหมด</div>
+          <div class="value" id="proc-total-items">0</div>
+        </div>
+        <div class="metric-card" style="border-color: #ef4444;">
+          <div class="title">🔴 พัสดุต้องสั่งเพิ่ม (Below Min)</div>
+          <div class="value" id="proc-alert-count" style="color: #fca5a5;">0</div>
+        </div>
+        <div class="metric-card" style="border-color: #10b981;">
+          <div class="title">มูลค่าสต็อกพัสดุรวม</div>
+          <div class="value" id="proc-total-value" style="color: #6ee7b7;">฿0</div>
+        </div>
+      </section>
+
+      <section class="content-grid" style="grid-template-columns: 1.1fr 1.9fr; gap: 20px;">
+        <!-- ฟอร์มบันทึกรับพัสดุ/จัดซื้อใหม่ -->
+        <div class="card">
+          <div class="card-title">📦 บันทึกพัสดุจัดซื้อใหม่</div>
+          <form id="procurement-form" onsubmit="submitNewProcurement(event)">
+            <div class="form-group">
+              <label>ชื่อพัสดุ / สินค้า *</label>
+              <input type="text" id="proc-item-name" placeholder="เช่น หลอดไฟ LED 12W, น้ำยาถูพื้น" required>
+            </div>
+            <div class="form-group">
+              <label>หมวดหมู่พัสดุ *</label>
+              <input type="text" id="proc-category" placeholder="เช่น อุปกรณ์ไฟฟ้า, เครื่องเขียน, ทำความสะอาด" required>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <div class="form-group" style="flex: 1;">
+                <label>จำนวนเริ่มต้น *</label>
+                <input type="number" id="proc-qty" placeholder="0" required>
+              </div>
+              <div class="form-group" style="flex: 1;">
+                <label>หน่วยนับ *</label>
+                <input type="text" id="proc-unit" placeholder="เช่น หลอด, แกลลอน, กล่อง" required>
+              </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <div class="form-group" style="flex: 1;">
+                <label>จุดเตือนขั้นต่ำ (Min Alert) *</label>
+                <input type="number" id="proc-min-alert" placeholder="5" value="5" required>
+              </div>
+              <div class="form-group" style="flex: 1;">
+                <label>ราคาต่อหน่วย (฿)</label>
+                <input type="number" id="proc-unit-price" placeholder="0">
+              </div>
+            </div>
+            <button type="submit" class="btn-primary" id="btn-submit-proc" style="background: linear-gradient(135deg, #0284c7, #0369a1);">💾 บันทึกรับพัสดุใหม่เข้าสต็อก</button>
+          </form>
+        </div>
+
+        <!-- ตารางแสดงรายการสต็อกพัสดุ -->
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
+            <span>📦 รายการสต็อกพัสดุทั้งหมด (Inventory List)</span>
+          </div>
+          <div class="table-container" style="max-height: 520px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>รหัส</th>
+                  <th>ชื่อพัสดุ</th>
+                  <th>หมวดหมู่</th>
+                  <th>คงเหลือ</th>
+                  <th>ราคา/หน่วย</th>
+                  <th>สถานะ</th>
+                  <th style="text-align: center;">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="procurement-tbody">
+                <tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--accent-gold);">กำลังโหลดรายการสต็อก...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </section>
     </div>
 
@@ -1344,6 +1450,7 @@
     let cachedPayments = [];
     let cachedExpenses = [];
     let cachedResidents = [];
+    let cachedProcurement = [];
     let cachedPendingInvoices = [];
     let cachedAllInvoices = [];
 
@@ -1361,6 +1468,7 @@
     let pendingUnitForRegistration = "";
     let tempSelectedAvatar = "WIZmini";
     let activeCrmUnit = "";
+    let activeStockItemCode = "";
 
     function showLoadingModal(title = "กำลังประมวลผลข้อมูล...", subtitle = "ระบบกำลังส่งคำสั่งและเชื่อมต่อ Google Sheets") {
       const modal = document.getElementById("global-loading-modal");
@@ -1545,16 +1653,20 @@
       document.getElementById("prof-exp-bar").style.width = `${stats.progressPercent}%`;
     }
 
+    // 🔒 กำหนดสิทธิ์เมนู Sidebar (เฉพาะ Admin และ Finance สำหรับ Procurement)
     function applyRolePermissions(role) {
       document.querySelectorAll('.nav-item').forEach(el => el.style.display = 'none');
       let defaultTab = 'financial';
+
       if (role === 'Admin') {
         document.getElementById('menu-financial').style.display = 'block';
         document.getElementById('menu-residents').style.display = 'block';
         document.getElementById('menu-billing').style.display = 'block';
+        document.getElementById('menu-procurement').style.display = 'block';
         document.getElementById('menu-admin-hub').style.display = 'block';
       } else if (role === 'Finance') {
         document.getElementById('menu-financial').style.display = 'block';
+        document.getElementById('menu-procurement').style.display = 'block'; // 🟢 ปลดล็อกให้ Finance เห็น
       } else if (role === 'AdminDoc') {
         document.getElementById('menu-residents').style.display = 'block';
         document.getElementById('menu-billing').style.display = 'block';
@@ -1664,7 +1776,6 @@
     function openProfileModal() { updateProfileUI(); document.getElementById("profile-modal-overlay").style.display = "flex"; }
     function closeProfileModal() { document.getElementById("profile-modal-overlay").style.display = "none"; }
 
-    // 📖 จัดการโมดอลสมุดบัญชีการเงินรายยูนิต (Individual Ledger)
     function openLedgerModal() {
       document.getElementById("ledger-search-unit").value = "";
       document.getElementById("ledger-content-box").style.display = "none";
@@ -1882,6 +1993,7 @@
           cachedPayments = data.payments || []; 
           cachedExpenses = data.expenses || [];
           cachedResidents = data.residents || []; 
+          cachedProcurement = data.procurement || [];
           cachedPendingInvoices = data.pendingInvoices || [];
           cachedAllInvoices = data.allInvoices || [];
           
@@ -1895,7 +2007,8 @@
         renderPendingInvoicesQueue(cachedPendingInvoices);
         renderSalesTrackingTable(cachedAllInvoices);
         renderPropertyMap(cachedResidents, cachedPendingInvoices);
-        calculateMetrics(cachedPayments, cachedExpenses, cachedPendingInvoices, cachedAllInvoices);
+        renderProcurementTable(cachedProcurement);
+        calculateMetrics(cachedPayments, cachedExpenses, cachedPendingInvoices, cachedAllInvoices, cachedProcurement);
       } catch (error) { console.error("Load Error:", error); }
     }
 
@@ -1967,6 +2080,41 @@
           <td style="color: #6ee7b7;">฿${amt.toLocaleString()}</td>
           <td>${statusBadge}</td>
           <td style="text-align: center;">${btnCancelHtml}</td>
+        </tr>`;
+      });
+    }
+
+    // 📦 เรนเดอร์ตารางจัดซื้อพัสดุ (Procurement Table)
+    function renderProcurementTable(data) {
+      const tbody = document.getElementById("procurement-tbody");
+      tbody.innerHTML = "";
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีรายการพัสดุในระบบ</td></tr>`;
+        return;
+      }
+
+      data.forEach(item => {
+        const qty = Number(item.quantity || 0);
+        const minAlert = Number(item.minAlert || 5);
+        const price = Number(item.unitPrice || 0);
+        const codeStr = String(item.itemCode).replace(/'/g, "\\'");
+
+        let statusBadge = `<span class="badge paid">ปกติ</span>`;
+        if (qty <= minAlert) {
+          statusBadge = `<span class="badge overdue" style="animation: pulse 1.5s infinite;">🔴 ต้องสั่งเพิ่ม</span>`;
+        }
+
+        tbody.innerHTML += `<tr>
+          <td style="color: var(--accent-gold); font-weight: bold;">${item.itemCode}</td>
+          <td style="font-weight: bold; color: var(--text-main);">${item.itemName}</td>
+          <td>${item.category}</td>
+          <td style="font-size: 14px; font-weight: bold; color: ${qty <= minAlert ? '#fca5a5' : '#6ee7b7'};">${qty} ${item.unit}</td>
+          <td>฿${price.toLocaleString()}</td>
+          <td>${statusBadge}</td>
+          <td style="text-align: center;">
+            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openStockModal('${codeStr}')">⚙️ ปรับสต็อก</button>
+          </td>
         </tr>`;
       });
     }
@@ -2080,7 +2228,7 @@
       }));
     }
 
-    function calculateMetrics(payments, expenses, pendingInvoices, allInvoices) {
+    function calculateMetrics(payments, expenses, pendingInvoices, allInvoices, procurement) {
       let income = 0;
       payments.forEach(item => {
         const amount = Number(item["Amount"] || 0);
@@ -2117,6 +2265,122 @@
         document.getElementById("sales-total-count").innerText = allInvoices.length.toLocaleString();
         document.getElementById("sales-pending-count").innerText = salesPendingCount.toLocaleString();
         document.getElementById("sales-settled-count").innerText = salesSettledCount.toLocaleString();
+      }
+
+      // คำนวณยอดสต็อกพัสดุ (Procurement Metrics)
+      let procAlertCount = 0, procTotalVal = 0;
+      if (procurement && Array.isArray(procurement)) {
+        procurement.forEach(item => {
+          const qty = Number(item.quantity || 0);
+          const minAlert = Number(item.minAlert || 5);
+          const price = Number(item.unitPrice || 0);
+
+          if (qty <= minAlert) procAlertCount++;
+          procTotalVal += (qty * price);
+        });
+        document.getElementById("proc-total-items").innerText = procurement.length.toLocaleString();
+        document.getElementById("proc-alert-count").innerText = procAlertCount.toLocaleString();
+        document.getElementById("proc-total-value").innerText = "฿" + procTotalVal.toLocaleString();
+      }
+    }
+
+    // 📦 บันทึกพัสดุจัดซื้อรายการใหม่
+    async function submitNewProcurement(event) {
+      event.preventDefault();
+      const btn = document.getElementById("btn-submit-proc");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังบันทึกพัสดุ...";
+
+      const payload = {
+        type: "new_procurement",
+        operator: currentUser?.username,
+        operatorRole: currentUser?.role,
+        itemName: document.getElementById("proc-item-name").value.trim(),
+        category: document.getElementById("proc-category").value.trim(),
+        quantity: document.getElementById("proc-qty").value,
+        unit: document.getElementById("proc-unit").value.trim(),
+        minAlert: document.getElementById("proc-min-alert").value,
+        unitPrice: document.getElementById("proc-unit-price").value
+      };
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        }, 3, 1500, "กำลังบันทึกพัสดุจัดซื้อ", "กำลังเพิ่มข้อมูลลงชีต Procurement...");
+
+        if (resJson.status === "success") {
+          showExpToast(10, "เพิ่มรายการจัดซื้อพัสดุ");
+          alert("✅ " + resJson.message);
+          document.getElementById("procurement-form").reset();
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "💾 บันทึกรับพัสดุใหม่เข้าสต็อก";
+      }
+    }
+
+    // ⚙️ เปิด/ปิด Modal ปรับสต็อกพัสดุหน้างาน
+    function openStockModal(itemCode) {
+      activeStockItemCode = itemCode;
+      const item = cachedProcurement.find(p => String(p.itemCode).trim() === String(itemCode).trim());
+      if (!item) {
+        alert("⚠️ ไม่พบข้อมูลรายการพัสดุนี้");
+        return;
+      }
+
+      document.getElementById("stock-modal-code").value = item.itemCode;
+      document.getElementById("stock-modal-name").value = `${item.itemName} (${item.category})`;
+      document.getElementById("stock-modal-qty").value = item.quantity;
+      document.getElementById("stock-modal-min").value = item.minAlert;
+
+      document.getElementById("stock-adjust-modal").style.display = "flex";
+    }
+
+    function closeStockModal() {
+      document.getElementById("stock-adjust-modal").style.display = "none";
+      activeStockItemCode = "";
+    }
+
+    // 💾 บันทึกการปรับเปลี่ยนสต็อกหน้างาน
+    async function submitStockAdjustment() {
+      const newQty = document.getElementById("stock-modal-qty").value;
+      const newMin = document.getElementById("stock-modal-min").value;
+
+      if (newQty === "" || newMin === "" || !activeStockItemCode) {
+        alert("⚠️ กรุณาระบุจำนวนพัสดุและจุดแจ้งเตือนขั้นต่ำ");
+        return;
+      }
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            type: "update_stock_quantity",
+            operator: currentUser?.username,
+            operatorRole: currentUser?.role,
+            itemCode: activeStockItemCode,
+            newQuantity: newQty,
+            newMinAlert: newMin
+          })
+        }, 3, 1500, "กำลังปรับสต็อกพัสดุ", "กำลังอัปเดตจำนวนคงเหลือในชีต...");
+
+        if (resJson.status === "success") {
+          alert("✅ " + resJson.message);
+          closeStockModal();
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
       }
     }
 
@@ -2573,6 +2837,7 @@
           cachedPayments = [];
           cachedExpenses = [];
           cachedResidents = [];
+          cachedProcurement = [];
           cachedPendingInvoices = [];
           cachedAllInvoices = [];
           await loadDashboardData();
