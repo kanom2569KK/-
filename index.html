@@ -1,801 +1,2989 @@
-// กำหนด Spreadsheet ID ของโครงการ
-const SPREADSHEET_ID = "1cBdTDwM1UGEXHjKD5O0ArDQOK-mMtPYF5JsDuaxU0BA";
-
-function getSS() {
-  if (SPREADSHEET_ID && SPREADSHEET_ID.trim() !== "") {
-    return SpreadsheetApp.openById(SPREADSHEET_ID);
-  }
-  return SpreadsheetApp.getActiveSpreadsheet();
-}
-
-function cleanUnitKey(val) {
-  if (val === null || val === undefined) return "";
-  let s = String(val).trim().toLowerCase();
-  if (/^\d+$/.test(s)) return String(parseInt(s, 10));
-  return s.replace(/\s+/g, '');
-}
-
-function recordLog(username, role, action, details) {
-  try {
-    const ss = getSS();
-    let sheetLogs = ss.getSheetByName("Logs");
-    if (!sheetLogs) {
-      sheetLogs = ss.insertSheet("Logs");
-      sheetLogs.appendRow(["วันเวลา", "ชื่อผู้ใช้", "สิทธิ์", "การกระทำ", "รายละเอียด"]);
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบบริหารจัดการโครงการ - แดชบอร์ดนิติบุคคล (Wooden GUI)</title>
+  <style>
+    :root {
+      --wood-dark: #2a1508;
+      --wood-panel: #4a2511;
+      --wood-border: #1a0c04;
+      --wood-btn: #b45309;
+      --wood-btn-hover: #d97706;
+      --text-main: #fef3c7;
+      --text-muted: #d4d4d4;
+      --accent-gold: #fbbf24;
+      --accent-red: #dc2626;
+      --accent-green: #059669;
+      --accent-blue: #0284c7;
     }
-    sheetLogs.appendRow([new Date(), username, role, action, details]);
-  } catch(err) {
-    console.error("Log error:", err);
-  }
-}
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif; }
+    body { 
+      display: flex; min-height: 100vh; 
+      background-color: var(--wood-dark);
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(74, 37, 17, 0.6) 0%, rgba(26, 21, 8, 0.95) 100%),
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 2px, transparent 2px, transparent 4px);
+      color: var(--text-main); overflow: hidden; position: relative;
+    }
 
-function addExpToUser(ss, username, expAmount) {
-  if(!username || username === "Guest") return;
-  try {
-    let sheetUsers = ss.getSheetByName("Users");
-    if(!sheetUsers) return;
-    const rawData = sheetUsers.getDataRange().getValues();
-    const headers = rawData[0];
-    let colUser = headers.indexOf("Username");
-    let colExp = headers.indexOf("EXP");
-    if(colUser === -1 || colExp === -1) return;
+    .loading-modal-box {
+      background: linear-gradient(145deg, #5c2c12, #3d1b0a);
+      border: 6px solid #1a0c04; border-radius: 20px;
+      padding: 30px 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+      text-align: center; width: 90%; max-width: 420px;
+    }
+    .loading-progress-track {
+      width: 100%; height: 14px; background: #1a0c04; border-radius: 10px;
+      border: 2px solid #381808; overflow: hidden; margin: 18px 0 10px 0;
+      position: relative;
+    }
+    .loading-progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #d97706, #fbbf24, #fef08a);
+      box-shadow: 0 0 12px rgba(251,191,36,0.8);
+      transition: width 0.3s ease;
+    }
+
+    .screen-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(10, 5, 2, 0.9); backdrop-filter: blur(8px);
+      display: flex; justify-content: center; align-items: center; z-index: 9999;
+    }
+    .login-card, .char-select-container {
+      background: linear-gradient(145deg, #5c2c12, #3d1b0a);
+      border: 8px solid #200e05; border-radius: 20px;
+      padding: 35px; box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.6);
+      text-align: center; position: relative;
+    }
+    .login-card { width: 90%; max-width: 400px; }
+    .char-select-container { width: 92%; max-width: 720px; }
+
+    .card {
+      background: linear-gradient(145deg, #4a2511, #361b0c);
+      border: 6px solid #200e05; border-radius: 16px; padding: 22px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.6), inset 0 0 15px rgba(0,0,0,0.4);
+      position: relative;
+    }
+    .card-title {
+      font-size: 17px; font-weight: bold; margin-bottom: 18px;
+      color: var(--accent-gold); text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+      border-bottom: 2px dashed #6b3414; padding-bottom: 8px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .sidebar {
+      width: 100px; background: linear-gradient(180deg, #4a2511, #2a1508);
+      margin: 20px 0 20px 20px; border-radius: 16px; border: 6px solid #1a0c04;
+      display: flex; flex-direction: column; align-items: center; padding: 25px 0;
+      box-shadow: 10px 10px 30px rgba(0,0,0,0.6); z-index: 10;
+    }
+    .company-logo { margin-bottom: 25px; position: relative; cursor: pointer; transition: 0.3s; }
+    .company-logo img {
+      width: 60px; height: 60px; object-fit: contain; border-radius: 12px;
+      border: 3px solid var(--accent-gold); background: #231106; box-shadow: 0 0 10px rgba(251,191,36,0.5);
+    }
+    .company-logo:hover { transform: scale(1.08); }
+    .company-logo .tooltip {
+      position: absolute; left: 75px; top: 50%; transform: translateY(-50%);
+      background: var(--wood-dark); color: var(--accent-gold); padding: 8px 14px; border-radius: 8px;
+      font-size: 13px; font-weight: bold; white-space: nowrap; opacity: 0; pointer-events: none; transition: 0.2s; border: 2px solid var(--wood-border); z-index: 100;
+    }
+    .company-logo:hover .tooltip { opacity: 1; left: 85px; }
+
+    .nav-links { list-style: none; display: flex; flex-direction: column; gap: 14px; width: 100%; align-items: center; flex: 1;}
+    .nav-item { display: none; }
+    .nav-item button {
+      background: linear-gradient(135deg, #78350f, #451a03); border: 3px solid #200e05; font-size: 22px; color: var(--text-muted);
+      cursor: pointer; padding: 10px; border-radius: 12px; position: relative; width: 65px; height: 55px;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+    .nav-item button:hover, .nav-item.active button {
+      background: linear-gradient(135deg, #d97706, #b45309); color: var(--accent-gold);
+      border-color: var(--accent-gold); transform: scale(1.1);
+      box-shadow: 0 0 15px rgba(251,191,36,0.6), inset 0 2px 4px rgba(255,255,255,0.3);
+    }
+    .nav-item button .tooltip {
+      position: absolute; left: 65px; top: 50%; transform: translateY(-50%);
+      background: var(--wood-dark); color: white; padding: 6px 12px; border-radius: 8px;
+      font-size: 12px; white-space: nowrap; opacity: 0; pointer-events: none; transition: 0.2s; border: 2px solid var(--wood-border); z-index: 100;
+    }
+    .nav-item button:hover .tooltip { opacity: 1; left: 80px; }
     
-    for(let i=1; i<rawData.length; i++) {
-       if(String(rawData[i][colUser]).trim().toLowerCase() === String(username).trim().toLowerCase()) {
-          let currentExp = Number(rawData[i][colExp]) || 0;
-          sheetUsers.getRange(i+1, colExp+1).setValue(currentExp + expAmount);
-          break;
-       }
+    .user-avatar { 
+      margin-top: auto; width: 60px; height: 60px; background: linear-gradient(135deg, #78350f, #451a03); border-radius: 50%; 
+      display: flex; align-items: center; justify-content: center; border: 3px solid var(--accent-gold); cursor: pointer;
+      transition: 0.3s; box-shadow: 0 0 12px rgba(251,191,36,0.4); overflow: hidden;
     }
-  } catch(e) {
-    console.error("Add EXP Error:", e);
-  }
-}
+    .user-avatar img { width: 50px; height: 50px; object-fit: contain; image-rendering: pixelated; }
+    .user-avatar:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(251,191,36,0.8); }
 
-function getProjectFolders() {
-  const mainFolderName = "Condo_Management_System";
-  const rawFolderName = "Raw_Data_Backups";
-  const residentRootFolderName = "Residents_Data";
-  const expenseFolderName = "Expense_Receipts";
-
-  let mainFolder, rawFolder, residentRootFolder, expenseFolder;
-  const mainFolders = DriveApp.getFoldersByName(mainFolderName);
-  if (mainFolders.hasNext()) mainFolder = mainFolders.next(); else mainFolder = DriveApp.createFolder(mainFolderName);
-  
-  const rawFolders = mainFolder.getFoldersByName(rawFolderName);
-  if (rawFolders.hasNext()) rawFolder = rawFolders.next(); else rawFolder = mainFolder.createFolder(rawFolderName);
-  
-  const resFolders = mainFolder.getFoldersByName(residentRootFolderName);
-  if (resFolders.hasNext()) residentRootFolder = resFolders.next(); else residentRootFolder = mainFolder.createFolder(residentRootFolderName);
-
-  const expFolders = mainFolder.getFoldersByName(expenseFolderName);
-  if (expFolders.hasNext()) expenseFolder = expFolders.next(); else expenseFolder = mainFolder.createFolder(expenseFolderName);
-
-  return { mainFolder, rawFolder, residentRootFolder, expenseFolder };
-}
-
-function getOrCreateResidentFolder(unitNumber, residentName) {
-  const { residentRootFolder } = getProjectFolders();
-  const safeName = `${unitNumber}_${residentName}`.replace(/[/\\?%*:|"<>]/g, '-');
-  const folders = residentRootFolder.getFoldersByName(safeName);
-  if (folders.hasNext()) return folders.next();
-  return residentRootFolder.createFolder(safeName);
-}
-
-function getSystemSettingSheet() {
-  const ss = getSS();
-  let sheet = ss.getSheetByName("SystemSettings");
-  if (!sheet) {
-    sheet = ss.insertSheet("SystemSettings");
-    sheet.appendRow(["Key", "Value"]);
-    sheet.appendRow(["NEXT_INV_NO", 1]);
-    sheet.appendRow(["NEXT_REC_NO", 1]);
-    sheet.appendRow(["NEXT_QUO_NO", 1]);
-  }
-  return sheet;
-}
-
-function getNextDocNumber(key) {
-  const sheet = getSystemSettingSheet();
-  const data = sheet.getDataRange().getValues();
-  let currentNum = 1;
-  let rowIdx = -1;
-  for (let i = 1; i < data.length; i++) {
-    if (data[i][0] === key) {
-      currentNum = Number(data[i][1]) || 1;
-      rowIdx = i + 1;
-      break;
+    .main-content { flex: 1; padding: 20px 30px; overflow-y: auto; height: 100vh; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .greeting h1 { font-size: 26px; font-weight: bold; color: var(--accent-gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+    .greeting span { color: #fde047; }
+    .search-bar {
+      background: #2a1508; padding: 10px 20px; border-radius: 14px;
+      display: flex; align-items: center; gap: 10px; border: 3px solid #1a0c04; width: 300px;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
     }
-  }
-  if (rowIdx === -1) {
-    sheet.appendRow([key, 2]);
-    currentNum = 1;
-  } else {
-    sheet.getRange(rowIdx, 2).setValue(currentNum + 1);
-  }
-  SpreadsheetApp.flush();
-  
-  const now = new Date();
-  const yyyyMM = Utilities.formatDate(now, "GMT+7", "yyyyMM");
-  let prefix = "INV";
-  if (key === "NEXT_REC_NO") prefix = "REC";
-  if (key === "NEXT_QUO_NO") prefix = "QUO";
-  
-  const numPadded = String(currentNum).padStart(4, '0');
-  return {
-    docNo: `${prefix}-${yyyyMM}-${numPadded}`,
-    rawNum: currentNum
-  };
-}
+    .search-bar input { background: none; border: none; color: white; outline: none; width: 100%; font-size: 14px;}
+    
+    .tab-content { display: none; animation: fadeIn 0.3s ease; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-function doPost(e) {
-  try {
-    if (!e || !e.postData || !e.postData.contents) {
-      return ContentService.createTextOutput(JSON.stringify({ status: "ignored" })).setMimeType(ContentService.MimeType.JSON);
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .metric-card { 
+      background: linear-gradient(145deg, #5c2c12, #381808);
+      border: 5px solid #1a0c04; border-radius: 16px; padding: 18px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.4);
+      cursor: pointer; transition: 0.3s;
+    }
+    .metric-card:hover { transform: scale(1.03); border-color: var(--accent-gold); }
+    .metric-card .title { font-size: 13px; color: var(--text-muted); margin-bottom: 6px;}
+    .metric-card .value { font-size: 26px; font-weight: bold; color: var(--accent-gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);}
+    .content-grid { display: grid; grid-template-columns: 2fr 1.1fr; gap: 20px; }
+
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 13px; color: var(--accent-gold); margin-bottom: 6px; font-weight: 600;}
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 11px 14px; background: #231106; color: var(--text-main);
+      border: 3px solid #140803; border-radius: 10px; font-size: 14px; outline: none; transition: 0.3s;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--accent-gold); }
+
+    .form-group input::placeholder, .form-group textarea::placeholder {
+      color: rgba(254, 243, 199, 0.5) !important;
+    }
+    input[type="month"]::-webkit-calendar-picker-indicator,
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(75%) sepia(80%) saturate(1000%) hue-rotate(350deg) brightness(110%) contrast(105%);
+      cursor: pointer;
+      opacity: 0.9;
+    }
+    input[type="month"]::-webkit-calendar-picker-indicator:hover,
+    input[type="date"]::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
+      transform: scale(1.15);
+    }
+    
+    .table-container { overflow-x: auto; max-height: 280px; }
+    table.data-table { width: 100%; border-collapse: collapse; }
+    table.data-table th, table.data-table td { padding: 10px 12px; text-align: left; border-bottom: 2px solid #2a1508; font-size: 13px; }
+    table.data-table th { position: sticky; top: 0; background: #231106; color: var(--accent-gold); font-weight: bold; z-index: 2;}
+    table.data-table tbody tr:hover { background: rgba(251,191,36,0.05); }
+    
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;}
+    .badge.overdue { background: rgba(220,38,38,0.3); color: #fca5a5; border: 1px solid var(--accent-red);}
+    .badge.pending { background: rgba(217,119,6,0.3); color: #fcd34d; border: 1px solid #d97706;}
+    .badge.paid { background: rgba(5,150,105,0.3); color: #6ee7b7; border: 1px solid var(--accent-green);}
+
+    .btn-primary {
+      width: 100%; padding: 14px; border-radius: 12px; border: 3px solid #140803; font-size: 15px; font-weight: bold;
+      background: linear-gradient(135deg, #d97706, #b45309); color: #fffbeb; cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5), inset 0 2px 3px rgba(255,255,255,0.3); transition: 0.2s; margin-top: 8px;
+    }
+    .btn-primary:hover { transform: scale(1.02); background: linear-gradient(135deg, #fbbf24, #d97706); }
+    .btn-action { 
+      background: #78350f; border: 2px solid #200e05; color: white; 
+      padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; transition: 0.2s;
+    }
+    .btn-action:hover { background: var(--wood-btn-hover); }
+    
+    .drop-zone { border: 3px dashed #b45309; border-radius: 14px; padding: 45px 20px; text-align: center; background: rgba(180,83,9,0.08); cursor: pointer; transition: 0.3s;}
+    .drop-zone:hover { background: rgba(180,83,9,0.15); border-color: var(--accent-gold); }
+
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(6px);
+    }
+    .ro-window {
+      background: linear-gradient(145deg, #5c2c12, #3d1b0a); border: 6px solid #1a0c04; border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.9); width: 90%; max-width: 520px; overflow: hidden;
+    }
+    .ro-header { background: #2a1508; color: var(--accent-gold); padding: 14px 20px; font-weight: bold; display: flex; justify-content: space-between; border-bottom: 3px solid #1a0c04; }
+    .ro-header .ro-close { cursor: pointer; color: var(--text-muted); transition: 0.2s; }
+    .ro-header .ro-close:hover { color: var(--accent-red); transform: scale(1.2); }
+    .ro-body { padding: 22px; display: flex; gap: 20px; align-items: center; }
+    .ro-npc-frame {
+      width: 100px; height: 110px; background: #231106; border: 3px solid #140803; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;
+    }
+    .ro-npc-frame img { width: 80px; height: 80px; object-fit: contain; image-rendering: pixelated; }
+    .ro-dialog-box { flex: 1; background: #231106; border: 3px solid #140803; padding: 16px; border-radius: 12px; font-size: 14px; line-height: 1.6; }
+    .ro-footer { padding: 14px 20px; background: #2a1508; border-top: 3px solid #1a0c04; display: flex; justify-content: flex-end; gap: 12px; }
+    .ro-btn { padding: 8px 16px; font-size: 13px; font-weight: bold; border-radius: 8px; cursor: pointer; border: 2px solid #140803; color: white; background: #78350f; transition: 0.2s;}
+    .ro-btn:hover { background: #b45309; }
+    .ro-btn-primary { background: linear-gradient(135deg, #0284c7, #0369a1); border: none; }
+
+    .char-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); gap: 14px; margin: 20px 0;
+      max-height: 350px; overflow-y: auto; padding: 10px;
+    }
+    .char-option-card {
+      background: #231106; border: 3px solid #140803; border-radius: 16px;
+      padding: 14px 8px; cursor: pointer; transition: 0.2s;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .char-option-card:hover { transform: scale(1.05); border-color: var(--accent-gold); }
+    .char-option-card.selected { border-color: var(--accent-gold); background: linear-gradient(145deg, rgba(251,191,36,0.2), #381808); box-shadow: 0 0 15px rgba(251,191,36,0.5); }
+    .char-sprite-frame {
+      width: 70px; height: 70px; background: #120602; border-radius: 12px; border: 2px solid #140803;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 8px; overflow: hidden;
+    }
+    .char-sprite-frame img { width: 60px; height: 60px; object-fit: contain; image-rendering: pixelated; }
+
+    .exp-toast {
+      position: fixed; bottom: 30px; right: 30px;
+      background: linear-gradient(135deg, #fbbf24, #d97706); color: #2a1508;
+      padding: 12px 22px; border-radius: 20px; font-weight: bold; font-size: 15px;
+      box-shadow: 0 8px 25px rgba(251,191,36,0.6); border: 3px solid #fffbeb;
+      animation: slideUpFade 3s forwards; z-index: 10001; pointer-events: none;
+    }
+    @keyframes slideUpFade {
+      0% { opacity: 0; transform: translateY(30px) scale(0.8); }
+      15% { opacity: 1; transform: translateY(0) scale(1.1); }
+      30% { opacity: 1; transform: translateY(0) scale(1); }
+      80% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-30px); }
     }
 
-    const ss = getSS();
-    const data = JSON.parse(e.postData.contents);
-    const lock = LockService.getScriptLock();
+    .unit-map-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 10px;
+      max-height: 250px; overflow-y: auto; padding: 10px; background: #231106; border-radius: 12px; border: 2px solid #140803;
+    }
+    .unit-chip {
+      background: #381808; border: 2px solid #1a0c04; border-radius: 10px; padding: 10px 5px;
+      text-align: center; cursor: pointer; transition: 0.2s;
+    }
+    .unit-chip:hover { transform: scale(1.08); border-color: var(--accent-gold); }
+    .unit-chip.owner { border-color: var(--accent-red); background: rgba(220,38,38,0.2); }
+    .unit-chip.tenant { border-color: var(--accent-blue); background: rgba(2,132,199,0.2); }
+    .unit-chip.has-pending { border-color: var(--accent-gold); background: rgba(217,119,6,0.3); }
 
-    // 0.1 ตั้งค่า Running Number
-    if (data.type === "set_doc_running_number") {
-      if (data.operatorRole !== "Admin") {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "คุณไม่มีสิทธิ์ใช้งานคำสั่งนี้" })).setMimeType(ContentService.MimeType.JSON);
+    /* สไตล์ของ Dynamic Multi-Item Rows ในฟอร์มออกบิล */
+    .invoice-item-row {
+      display: flex; gap: 10px; align-items: center; margin-bottom: 10px;
+    }
+    .invoice-item-row .item-num {
+      font-weight: bold; color: var(--accent-gold); width: 25px; text-align: center; font-size: 13px;
+    }
+
+    /* ========================================================
+       🖨️ PRINT STYLESHEET: เอกสารทางการ A4
+       ======================================================== */
+    #printable-invoice {
+      display: none;
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 12mm 15mm;
       }
-      try {
-        if (!lock.tryLock(15000)) {
-          return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "ระบบกำลังทำงานอื่นอยู่ กรุณาลองใหม่อีกครั้ง" })).setMimeType(ContentService.MimeType.JSON);
-        }
-        const sheet = getSystemSettingSheet();
-        const settingsData = sheet.getDataRange().getValues();
-        let invRow = -1, recRow = -1;
-
-        for (let i = 1; i < settingsData.length; i++) {
-          if (settingsData[i][0] === "NEXT_INV_NO") invRow = i + 1;
-          if (settingsData[i][0] === "NEXT_REC_NO") recRow = i + 1;
-        }
-
-        if (data.nextInvNo !== undefined && data.nextInvNo !== "") {
-          if (invRow !== -1) sheet.getRange(invRow, 2).setValue(Number(data.nextInvNo));
-          else sheet.appendRow(["NEXT_INV_NO", Number(data.nextInvNo)]);
-        }
-
-        if (data.nextRecNo !== undefined && data.nextRecNo !== "") {
-          if (recRow !== -1) sheet.getRange(recRow, 2).setValue(Number(data.nextRecNo));
-          else sheet.appendRow(["NEXT_REC_NO", Number(data.nextRecNo)]);
-        }
-
-        SpreadsheetApp.flush();
-        lock.releaseLock();
-        recordLog(data.operator || "Admin", "Admin", "ตั้งค่าเลขเอกสาร", `INV เริ่มที่ ${data.nextInvNo || '-'}, REC เริ่มที่ ${data.nextRecNo || '-'}`);
-        return ContentService.createTextOutput(JSON.stringify({ status: "success", message: "ตั้งค่าเลขรันเอกสารเริ่มต้นเรียบร้อยแล้ว!" })).setMimeType(ContentService.MimeType.JSON);
-      } catch (err) {
-        lock.releaseLock();
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Set Number Error: " + err.toString() })).setMimeType(ContentService.MimeType.JSON);
+      html, body {
+        width: 100% !important;
+        height: auto !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+      }
+      .sidebar, .main-content, .top-bar, .tab-content, .screen-overlay, .modal-overlay, .exp-toast, #global-loading-modal {
+        display: none !important;
+      }
+      #printable-invoice {
+        display: block !important;
+        width: 100% !important;
+        background: #ffffff !important;
+        color: #111827 !important;
+        font-size: 11.5pt;
+        line-height: 1.45;
+      }
+      .inv-header-table {
+        width: 100%;
+        border-bottom: 2.5px solid #1e3a8a;
+        padding-bottom: 12px;
+        margin-bottom: 16px;
+      }
+      .inv-logo-img {
+        width: 80px;
+        height: auto;
+        object-fit: contain;
+      }
+      .inv-company-name {
+        font-size: 14pt;
+        font-weight: bold;
+        color: #111827;
+        margin-bottom: 3px;
+      }
+      .inv-company-sub {
+        font-size: 9.5pt;
+        color: #4b5563;
+        line-height: 1.4;
+      }
+      .inv-title-main {
+        font-size: 22pt;
+        font-weight: 800;
+        color: #1e3a8a;
+        letter-spacing: 1px;
+        text-align: right;
+      }
+      .inv-title-sub {
+        font-size: 10.5pt;
+        font-weight: bold;
+        color: #6b7280;
+        letter-spacing: 2px;
+        text-align: right;
+        margin-top: -2px;
+      }
+      .inv-meta-table {
+        margin-top: 8px;
+        font-size: 9.5pt;
+        float: right;
+      }
+      .inv-meta-table td {
+        padding: 2px 4px;
+      }
+      .inv-info-box {
+        width: 100%;
+        margin-bottom: 18px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 12px 16px;
+        background: #f8fafc;
+      }
+      .inv-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      .inv-table th, .inv-table td {
+        border: 1px solid #94a3b8;
+        padding: 9px 12px;
+        text-align: left;
+      }
+      .inv-table th {
+        background-color: #f1f5f9;
+        font-weight: bold;
+        color: #0f172a;
+        font-size: 10.5pt;
+      }
+      .inv-total-row {
+        background-color: #f8fafc;
+        font-weight: bold;
+        font-size: 12.5pt;
+      }
+      .inv-signatures {
+        width: 100%;
+        margin-top: 35px;
+      }
+      .inv-sig-box {
+        text-align: center;
+        width: 75%;
+        border-top: 1px dashed #64748b;
+        padding-top: 8px;
+        margin: 0 auto;
+        font-size: 10pt;
       }
     }
+  </style>
+</head>
+<body>
 
-    // 0.2 รีเซ็ตระบบ Admin
-    if (data.type === "admin_factory_reset") {
-      if (data.operatorRole !== "Admin") {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "คุณไม่มีสิทธิ์ใช้งานคำสั่งนี้" })).setMimeType(ContentService.MimeType.JSON);
-      }
-      try {
-        if (!lock.tryLock(15000)) {
-          return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "ระบบกำลังทำงานอื่นอยู่ กรุณาลองใหม่อีกครั้ง" })).setMimeType(ContentService.MimeType.JSON);
-        }
-        const cleanSheet = (sheetName, headers) => {
-          let sheet = ss.getSheetByName(sheetName);
-          if (sheet) { sheet.clear(); sheet.appendRow(headers); }
-        };
-        cleanSheet("Residents", ["Unit Number", "Resident Name", "Resident Type", "Title Deed", "Phone", "Email", "ID Address", "Cur Address", "Photo URL", "Folder URL", "Move-in", "Balance", "Notes", "Owner Name", "Owner Phone"]);
-        cleanSheet("Payments", ["Date", "Unit Number", "Resident Name", "Fee Type", "Amount", "Payment Method", "Status", "Notes", "DocNo"]);
-        cleanSheet("Expenses", ["Date", "Category", "Description", "Amount", "Payment Method", "Operator", "Attachment URL"]);
-        cleanSheet("DailyInvoices", ["Timestamp", "Date", "Unit", "Resident Name", "Billing Month", "Fee Type", "Operator", "Status", "DocNo", "Amount", "DocType", "Items JSON"]);
-        cleanSheet("Procurement", ["Item Code", "Item Name", "Category", "Quantity", "Unit", "Min Alert", "Unit Price", "Last Updated", "Operator"]);
-        cleanSheet("Logs", ["วันเวลา", "ชื่อผู้ใช้", "สิทธิ์", "การกระทำ", "รายละเอียด"]);
+  <!-- ⏳ ป๊อปอัปกลางหน้าจอแสดงสถานะการทำงาน -->
+  <div id="global-loading-modal" class="modal-overlay" style="z-index: 25000;">
+    <div class="loading-modal-box">
+      <div style="font-size: 38px; margin-bottom: 8px;">⏳</div>
+      <h3 style="color: var(--accent-gold); font-size: 18px; font-weight: bold;" id="loading-modal-title">กำลังประมวลผลข้อมูล...</h3>
+      <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;" id="loading-modal-subtitle">ระบบกำลังส่งคำสั่งและเชื่อมต่อ Google Sheets</p>
+      
+      <div class="loading-progress-track">
+        <div id="loading-progress-bar-fill" class="loading-progress-fill"></div>
+      </div>
+      <span style="font-size: 11px; color: #fbbf24; font-weight: bold;" id="loading-modal-status">กรุณารอสักครู่ ห้ามปิดหน้าต่างนี้</span>
+    </div>
+  </div>
+
+  <!-- 🖨️ PRINT TEMPLATE: เอกสารทางการ A4 -->
+  <div id="printable-invoice">
+    <table class="inv-header-table">
+      <tr>
+        <td style="width: 15%; vertical-align: middle;">
+          <img src="logomini.png" alt="Company Logo" class="inv-logo-img">
+        </td>
+        <td style="width: 52%; vertical-align: top; padding-left: 10px;">
+          <div class="inv-company-name">บริษัท อุดมสุขกบินทร์บุรี บ้านและที่ดิน จำกัด (สำนักงานใหญ่)</div>
+          <div class="inv-company-sub">
+            โครงการหมู่บ้านอุดมสุขเพลส (Udomsuk Place)<br>
+            ที่อยู่: 899/55-56 หมู่ 9 ตำบลหนองกี่ อำเภอกบินทร์บุรี จังหวัดปราจีนบุรี 25110<br>
+            โทร. 065-685-9898 | เลขประจำตัวผู้เสียภาษีอากร: <strong>0255552000178</strong>
+          </div>
+        </td>
+        <td style="width: 33%; vertical-align: top; text-align: right;">
+          <div class="inv-title-main" id="print-doc-title-th">ใบแจ้งหนี้</div>
+          <div class="inv-title-sub" id="print-doc-title-en">INVOICE</div>
+          <table class="inv-meta-table">
+            <tr>
+              <td style="text-align: right; color: #475569;">เลขที่เอกสาร:</td>
+              <td style="text-align: left; font-weight: bold; color: #1e3a8a;"><span id="print-inv-no">INV-202609-0001</span></td>
+            </tr>
+            <tr>
+              <td style="text-align: right; color: #475569;">วันที่ออกเอกสาร:</td>
+              <td style="text-align: left; font-weight: bold;"><span id="print-inv-date">-</span></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <div class="inv-info-box">
+      <table style="width: 100%; border: none; font-size: 10.5pt;">
+        <tr>
+          <td style="width: 60%; padding: 3px 0;"><strong id="print-label-customer">ผู้รับใบแจ้งหนี้ (เจ้าของร่วม):</strong> <span id="print-res-name" style="font-weight: bold; font-size: 11pt;">-</span></td>
+          <td style="width: 40%; padding: 3px 0;"><strong>เลขยูนิต / แปลง:</strong> <span id="print-res-unit" style="font-size: 12pt; font-weight: bold; color: #1e3a8a;">-</span></td>
+        </tr>
+        <tr id="row-print-deed">
+          <td style="padding: 3px 0;"><strong>เลขที่โฉนดที่ดิน:</strong> <span id="print-res-deed">-</span></td>
+          <td style="padding: 3px 0;"><strong>ประจำรอบเดือน:</strong> <span id="print-inv-month" style="font-weight: bold;">-</span></td>
+        </tr>
+        <tr id="row-print-month-full" style="display:none;">
+          <td colspan="2" style="padding: 3px 0;"><strong>ประจำรอบเดือน:</strong> <span id="print-inv-month-full" style="font-weight: bold;">-</span></td>
+        </tr>
+        <tr>
+          <td colspan="2" style="padding: 3px 0;"><strong>สถานที่จัดส่งเอกสาร / ที่อยู่:</strong> <span id="print-res-address">-</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ตารางพิมพ์รองรับหลายรายการย่อย -->
+    <table class="inv-table">
+      <thead>
+        <tr>
+          <th style="width: 10%; text-align: center;">ลำดับ</th>
+          <th style="width: 65%;">รายการ (Description)</th>
+          <th style="width: 25%; text-align: right;">จำนวนเงิน (บาท)</th>
+        </tr>
+      </thead>
+      <tbody id="print-items-tbody">
+        <!-- JS จะวนลูปใส่รายการสินค้าที่นี่ -->
+      </tbody>
+      <tfoot>
+        <tr class="inv-total-row">
+          <td colspan="2" style="text-align: right; color: #0f172a;" id="print-total-label">รวมยอดที่ต้องชำระทั้งสิ้น (Total Due):</td>
+          <td style="text-align: right; color: #1e3a8a;" id="print-fee-total">฿0.00</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div id="print-payment-note" style="background: #fffbeb; border: 1px solid #fde68a; padding: 10px 14px; border-radius: 6px; font-size: 9.5pt; margin-bottom: 20px;">
+      <strong style="color: #b45309;">📌 ข้อมูลและขั้นตอนการชำระเงิน:</strong><br>
+      1. กรุณานำใบแจ้งหนี้นี้มาชำระ ณ สำนักงานนิติบุคคล หรือชำระผ่านช่องทางโอนเงินเข้าบัญชีบริษัท<br>
+      2. เมื่อชำระเงินเรียบร้อยแล้ว <strong>ฝ่ายการเงินจะดำเนินการออก "ใบเสร็จรับเงินฉบับเต็ม (Official Receipt)"</strong> ให้เป็นหลักฐานทันที
+    </div>
+
+    <table class="inv-signatures">
+      <tr>
+        <td style="width: 50%; text-align: center; vertical-align: top;">
+          <br><br>
+          <div class="inv-sig-box">
+            (<span id="print-operator-name">ผู้จัดทำเอกสาร</span>)<br>
+            <strong id="print-sig-left-title">เจ้าหน้าที่ฝ่ายจัดทำเอกสาร</strong>
+          </div>
+        </td>
+        <td style="width: 50%; text-align: center; vertical-align: top;">
+          <br><br>
+          <div class="inv-sig-box">
+            (<span id="print-finance-name"> ............................................................ </span>)<br>
+            <strong>เจ้าหน้าที่ฝ่ายการเงิน (ผู้รับเงิน)</strong>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 📜 POPUP: รายชื่อลูกบ้านแบบรายละเอียด -->
+  <div id="customer-list-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 1020px; width: 95%;">
+      <div class="ro-header">
+        <span>📜 สารบบข้อมูลลูกบ้านทั้งหมด (Residents Directory)</span>
+        <span class="ro-close" onclick="closeCustomerListModal()">✕</span>
+      </div>
+      <div style="padding: 16px 20px 0 20px;">
+        <input type="text" id="modal-resident-search" placeholder="🔍 พิมพ์ค้นหาเลขยูนิต, ชื่อ-นามสกุล, เลขโฉนด, เบอร์โทร หรือที่อยู่..." onkeyup="filterModalResidentList()" 
+               style="width: 100%; padding: 10px 14px; background: #231106; color: var(--text-main); border: 2px solid #140803; border-radius: 10px; outline: none; font-size: 13px;">
+      </div>
+      <div class="ro-body" style="padding: 14px 20px; flex-direction: column; align-items: stretch;">
+        <div style="max-height: 420px; overflow-x: auto; overflow-y: auto; border: 2px solid #140803; border-radius: 10px; background: #231106;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 880px;">
+            <thead>
+              <tr style="background: #1a0c04; color: var(--accent-gold); position: sticky; top: 0; z-index: 2;">
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 8%;">ยูนิต</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 17%;">ชื่อผู้พักอาศัย</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 10%;">ประเภท</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 11%;">เลขที่โฉนด</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 12%;">เบอร์โทรศัพท์</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 18%;">ที่อยู่ปัจจุบัน / ส่งเอกสาร</th>
+                <th style="padding: 10px 12px; text-align: center; border-bottom: 2px solid #140803; width: 8%;">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="modal-resident-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="ro-footer">
+        <button class="ro-btn ro-btn-cancel" onclick="closeCustomerListModal()">ปิดหน้าต่าง (ล้างข้อมูล)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✏️ MODAL: แก้ไขข้อมูลลูกบ้านเดิม -->
+  <div id="edit-resident-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 650px; width: 90%;">
+      <div class="ro-header">
+        <span>✏️ แก้ไขข้อมูลลูกบ้าน (Unit Profile Update)</span>
+        <span class="ro-close" onclick="closeEditResidentModal()">✕</span>
+      </div>
+      <form onsubmit="submitUpdateResident(event)" style="padding: 20px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="form-group">
+            <label>เลขยูนิต / แปลงบ้าน (ไม่สามารถเปลี่ยนได้)</label>
+            <input type="text" id="edit-res-unit" readonly style="background: #180a03; color: var(--accent-gold); font-weight: bold; cursor: not-allowed;">
+          </div>
+          <div class="form-group">
+            <label>เลขที่โฉนดที่ดิน (Title Deed)</label>
+            <input type="text" id="edit-res-deed">
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label>ชื่อ-นามสกุล เจ้าของ / ผู้พักอาศัย *</label>
+            <input type="text" id="edit-res-name" required>
+          </div>
+          <div class="form-group">
+            <label>เบอร์โทรศัพท์ติดต่อ *</label>
+            <input type="tel" id="edit-res-phone" required>
+          </div>
+          <div class="form-group">
+            <label>อีเมล</label>
+            <input type="email" id="edit-res-email">
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label>🏠 ที่อยู่ตามบัตรประชาชน</label>
+            <textarea id="edit-res-id-address" rows="2"></textarea>
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label>📍 ที่อยู่ปัจจุบัน / สถานที่จัดส่งเอกสาร</label>
+            <textarea id="edit-res-cur-address" rows="2"></textarea>
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label>📷 อัปโหลดภาพถ่ายใหม่ (เว้นว่างไว้หากไม่เปลี่ยน)</label>
+            <input type="file" id="edit-res-photo" accept="image/*" onchange="previewEditResidentPhoto(event)">
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button type="button" class="ro-btn" style="flex: 1;" onclick="closeEditResidentModal()">ยกเลิก</button>
+          <button type="submit" class="btn-primary" id="btn-submit-update-resident" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #0284c7, #0369a1);">💾 บันทึกการแก้ไขข้อมูล</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 📖 MODAL: สมุดบัญชีการเงินรายลูกบ้าน (Individual Ledger) -->
+  <div id="unit-ledger-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 950px; width: 95%;">
+      <div class="ro-header">
+        <span>📖 สมุดบัญชีการเงินรายยูนิต (Individual Resident Ledger)</span>
+        <span class="ro-close" onclick="closeLedgerModal()">✕</span>
+      </div>
+      <div style="padding: 20px;">
+        <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+          <input type="text" id="ledger-search-unit" placeholder="🔍 พิมพ์เลขยูนิต เช่น 12 หรือ 899/12 แล้วกดค้นหา" style="flex: 1; padding: 10px 14px; background: #231106; color: var(--text-main); border: 2px solid #140803; border-radius: 10px; outline: none;">
+          <button type="button" class="btn-primary" style="margin: 0; width: 140px; background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="searchUnitLedger()">🔍 ค้นหา</button>
+        </div>
+
+        <div id="ledger-content-box" style="display: none;">
+          <div style="background: #231106; border: 2px solid #140803; border-radius: 12px; padding: 14px; margin-bottom: 16px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+            <div>
+              <span style="font-size: 11px; color: var(--text-muted);">ยูนิต / แปลง:</span>
+              <div id="ledger-unit-display" style="font-size: 18px; font-weight: bold; color: var(--accent-gold);">-</div>
+            </div>
+            <div>
+              <span style="font-size: 11px; color: var(--text-muted);">ชื่อผู้พักอาศัย / เจ้าของ:</span>
+              <div id="ledger-name-display" style="font-size: 16px; font-weight: bold; color: var(--text-main);">-</div>
+            </div>
+            <div>
+              <span style="font-size: 11px; color: var(--text-muted);">ยอดชำระแล้วรวม:</span>
+              <div id="ledger-paid-display" style="font-size: 18px; font-weight: bold; color: #6ee7b7;">฿0.00</div>
+            </div>
+          </div>
+
+          <div class="table-container" style="max-height: 350px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>วันที่</th>
+                  <th>เลขที่เอกสาร</th>
+                  <th>ประเภท/รายการ</th>
+                  <th>จำนวนเงิน</th>
+                  <th>ช่องทาง</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+              <tbody id="ledger-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="ro-footer">
+        <button class="ro-btn ro-btn-cancel" onclick="closeLedgerModal()">ปิดหน้าต่าง</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📦 MODAL: ปรับแต่งสต็อกพัสดุหน้างาน -->
+  <div id="stock-adjust-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 500px; width: 90%;">
+      <div class="ro-header">
+        <span>📦 ปรับแก้ไขสต็อกพัสดุหน้างาน</span>
+        <span class="ro-close" onclick="closeStockModal()">✕</span>
+      </div>
+      <div style="padding: 20px;">
+        <div class="form-group">
+          <label>รหัส / ชื่อพัสดุ:</label>
+          <input type="text" id="stock-modal-code" readonly style="background:#180a03; color:var(--accent-gold); font-weight:bold;">
+        </div>
+        <div class="form-group">
+          <label>ชื่อพัสดุ:</label>
+          <input type="text" id="stock-modal-name" readonly style="background:#180a03; color:var(--text-main);">
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <div class="form-group" style="flex: 1;">
+            <label>จำนวนคงเหลือหน้างานจริง *</label>
+            <input type="number" id="stock-modal-qty" required>
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>จุดแจ้งเตือนขั้นต่ำ (Min Alert) *</label>
+            <input type="number" id="stock-modal-min" required>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button type="button" class="ro-btn" style="flex: 1;" onclick="closeStockModal()">ยกเลิก</button>
+          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #059669, #047857);" onclick="submitStockAdjustment()">💾 บันทึกปรับสต็อก</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📝 MODAL: เพิ่มโน้ตติดตามงานลูกบ้าน (CRM Notes) -->
+  <div id="crm-note-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 550px; width: 90%;">
+      <div class="ro-header">
+        <span>📝 บันทึกติดตามงานยูนิต <span id="crm-modal-unit" style="color:var(--accent-gold);">-</span></span>
+        <span class="ro-close" onclick="closeCrmModal()">✕</span>
+      </div>
+      <div style="padding: 20px;">
+        <div class="form-group">
+          <label>ผู้พักอาศัยปัจจุบัน:</label>
+          <input type="text" id="crm-modal-name" readonly style="background:#180a03; color:var(--text-muted);">
+        </div>
+        <div class="form-group">
+          <label>เจ้าของห้อง/บ้าน (Owner):</label>
+          <input type="text" id="crm-modal-owner" readonly style="background:#180a03; color:var(--text-muted);">
+        </div>
+        <div class="form-group">
+          <label>📜 ประวัติโน้ตติดตามงานที่ผ่านมา:</label>
+          <textarea id="crm-modal-history" rows="4" readonly style="background:#180a03; font-size:12px; color:var(--text-muted); line-height:1.5;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>✏️ เพิ่มโน้ตติดตามงานใหม่:</label>
+          <input type="text" id="crm-modal-new-note" placeholder="เช่น ลูกค้าขอเลื่อนจ่ายวันที่ 15, โทรแจ้งต่อสัญญาแล้ว">
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button type="button" class="ro-btn" style="flex: 1;" onclick="closeCrmModal()">ปิดหน้าต่าง</button>
+          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0;" onclick="submitCrmNote()">💾 บันทึกโน้ตติดตามงาน</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RO Warning Modal -->
+  <div id="ro-modal-overlay" class="modal-overlay">
+    <div class="ro-window">
+      <div class="ro-header">
+        <span>📜 ระบบตรวจสอบข้อมูลลูกบ้าน</span>
+        <span class="ro-close" onclick="closeRoModal()">✕</span>
+      </div>
+      <div class="ro-body">
+        <div style="text-align: center;">
+          <div class="ro-npc-frame"><img src="WIZmini.gif" alt="Wizard"></div>
+        </div>
+        <div class="ro-dialog-box">
+          <p id="ro-dialog-text">
+            ไม่พบข้อมูลยูนิต <strong style="color: var(--accent-red);">[<span id="ro-target-unit">-</span>]</strong> ในระบบ!<br><br>
+            กรุณาไปที่หน้า <strong>"ลงทะเบียนลูกบ้านใหม่"</strong> เพื่อเพิ่มข้อมูลเจ้าของร่วมให้เรียบร้อยก่อนทำการรับชำระเงิน
+          </p>
+        </div>
+      </div>
+      <div class="ro-footer">
+        <button class="ro-btn ro-btn-cancel" onclick="closeRoModal()">ยกเลิก</button>
+        <button class="ro-btn ro-btn-primary" onclick="goToResidentRegistration()">ลงทะเบียนลูกบ้าน ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Character Selection Screen -->
+  <div id="char-select-screen" class="screen-overlay" style="display: none;">
+    <div class="char-select-container">
+      <h2 style="color: var(--accent-gold); font-size: 22px; margin-bottom: 4px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">⚔️ เลือกตัวละครประจำตัว (Avatar Profile)</h2>
+      <p style="color: var(--text-muted); font-size: 12px;">เลือกตัวละครที่คุณต้องการใช้เป็นโปรไฟล์ส่วนตัว (อิสระทุกตำแหน่งงาน)</p>
+      
+      <div class="char-grid">
+        <div class="char-option-card" id="opt-Job03mini" onclick="pickAvatar('Job03mini')">
+          <div class="char-sprite-frame"><img src="Job03mini.gif" alt="Cleric"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Cleric</strong>
+        </div>
+        <div class="char-option-card" id="opt-Job04mini" onclick="pickAvatar('Job04mini')">
+          <div class="char-sprite-frame"><img src="Job04mini.gif" alt="Rogue"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Rogue</strong>
+        </div>
+        <div class="char-option-card" id="opt-Job05mini" onclick="pickAvatar('Job05mini')">
+          <div class="char-sprite-frame"><img src="Job05mini.gif" alt="Hunter"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Hunter</strong>
+        </div>
+        <div class="char-option-card" id="opt-Job06mini" onclick="pickAvatar('Job06mini')">
+          <div class="char-sprite-frame"><img src="Job06mini.gif" alt="Monk"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Monk</strong>
+        </div>
+        <div class="char-option-card" id="opt-Job07mini" onclick="pickAvatar('Job07mini')">
+          <div class="char-sprite-frame"><img src="Job07mini.gif" alt="Warlock"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Warlock</strong>
+        </div>
+        <div class="char-option-card" id="opt-Job08mini" onclick="pickAvatar('Job08mini')">
+          <div class="char-sprite-frame"><img src="Job08mini.gif" alt="Fighter"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Fighter</strong>
+        </div>
+        <div class="char-option-card" id="opt-Job09mini" onclick="pickAvatar('Job09mini')">
+          <div class="char-sprite-frame"><img src="Job09mini.gif" alt="Mage"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Mage</strong>
+        </div>
+        <div class="char-option-card" id="opt-Job010mini" onclick="pickAvatar('Job010mini')">
+          <div class="char-sprite-frame"><img src="Job010mini.gif" alt="Ranger"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Ranger</strong>
+        </div>
+        <div class="char-option-card" id="opt-Swmini" onclick="pickAvatar('Swmini')">
+          <div class="char-sprite-frame"><img src="Swmini.gif" alt="Knight"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Knight</strong>
+        </div>
+        <div class="char-option-card" id="opt-WIZmini" onclick="pickAvatar('WIZmini')">
+          <div class="char-sprite-frame"><img src="WIZmini.gif" alt="Grand Wizard"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Grand Wiz</strong>
+        </div>
+      </div>
+
+      <button class="btn-primary" style="max-width: 250px; margin: 0 auto;" onclick="confirmCharacterSelection()">🚀 เข้าสู่ระบบแดชบอร์ด</button>
+    </div>
+  </div>
+
+  <!-- Kafra Profile Modal -->
+  <div id="profile-modal-overlay" class="modal-overlay">
+    <div class="ro-window" style="max-width: 680px;">
+      <div class="ro-header">
+        <span>🏅 ข้อมูลตัวละคร & กระดานภารกิจกิลด์ (Kafra Profile & Quests)</span>
+        <span class="ro-close" onclick="closeProfileModal()">✕</span>
+      </div>
+      <div class="ro-body" style="gap: 20px; align-items: flex-start; max-height: 80vh; overflow-y: auto;">
+         
+         <div style="flex: 1; text-align: center; background: #231106; padding: 18px; border-radius: 14px; border: 2px solid #140803;">
+           <div id="prof-avatar-display" style="width: 85px; height: 85px; background: #120602; border-radius: 50%; border: 3px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(251,191,36,0.3); margin: 0 auto; overflow: hidden;">
+             <img id="prof-avatar-img" src="WIZmini.gif" style="width: 70px; height: 70px; object-fit: contain; image-rendering: pixelated;" alt="Avatar">
+           </div>
+           <div id="prof-prestige" style="color: var(--accent-gold); font-size: 16px; margin-top: 4px; font-weight: bold; letter-spacing: 2px;"></div>
+           <h3 id="prof-name" style="color: var(--text-main); margin-top: 8px; font-size: 18px;">Admin Name</h3>
+           <div id="prof-title" style="color: var(--accent-gold); font-weight: bold; margin-bottom: 12px; font-size: 13px;">🌟 Legendary Admin</div>
+           
+           <button class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #2a1508; font-weight: bold; border: 2px solid #140803; margin-bottom: 14px; padding: 5px 14px; font-size: 12px;" onclick="openCharSelectFromProfile()">
+             🔄 เปลี่ยนตัวละคร
+           </button>
+
+           <div style="width: 100%; background: #120602; border: 1px solid #140803; border-radius: 10px; padding: 10px; text-align: left;">
+             <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+               <span style="font-weight: bold; font-size: 13px;">Level <span id="prof-level" style="font-size: 16px; color: var(--accent-gold);">99</span></span>
+               <span id="prof-exp-text" style="color: var(--text-muted); font-size: 11px; line-height: 20px;">29,500 / Max EXP</span>
+             </div>
+             <div style="width: 100%; height: 10px; background: #231106; border-radius: 5px; overflow: hidden; border: 1px solid #140803;">
+               <div id="prof-exp-bar" style="height: 100%; width: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); box-shadow: 0 0 8px rgba(251,191,36,0.8); transition: width 1s ease-in-out;"></div>
+             </div>
+             <p style="font-size: 10px; color: var(--text-muted); margin-top: 6px; text-align: center;">
+               🔄 รีเซ็ตเลเวล & รับดาวจุติ (⭐) ทุก 1 ม.ค.
+             </p>
+           </div>
+         </div>
+
+         <div style="flex: 1.4; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 14px; font-weight: bold; color: var(--accent-gold); margin-bottom: 4px;">📜 กระดานภารกิจรับ EXP (Guild Quests)</div>
+            
+            <div class="quest-item">
+              <div>
+                <strong style="font-size: 12px;">🌞 เช็กชื่อประจำวัน (Daily Login)</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">เข้าใช้งานระบบครั้งแรกของวัน</p>
+              </div>
+              <span class="quest-exp">+10 EXP / วัน</span>
+            </div>
+
+            <div class="quest-item">
+              <div>
+                <strong style="font-size: 12px;">💰 บันทึกรับชำระเงินปกติ (Cashier)</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">บันทึกค่าส่วนกลาง / ค่าน้ำประปา</p>
+              </div>
+              <span class="quest-exp">+5 EXP</span>
+            </div>
+
+            <div class="quest-item" style="border-color: #b91c1c;">
+              <div>
+                <strong style="font-size: 12px; color: #fca5a5;">🎯 ล่าค่าหัวลูกหนี้ (Bounty Hunter)</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">บันทึกรับเงินยูนิตค้างชำระ / ค่าปรับ</p>
+              </div>
+              <span class="quest-exp" style="background: rgba(220,38,38,0.2); color: #fca5a5; border-color: #dc2626;">+20 EXP</span>
+            </div>
+
+            <div class="quest-item">
+              <div>
+                <strong style="font-size: 12px;">👥 ทะเบียนราษฎร์ใหม่ (New Citizen)</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">ลงทะเบียนลูกบ้านใหม่พร้อมสร้างโฟลเดอร์</p>
+              </div>
+              <span class="quest-exp">+15 EXP</span>
+            </div>
+
+            <div class="quest-item">
+              <div>
+                <strong style="font-size: 12px;">📑 ออกเอกสารการเงิน (Scroll Crafter)</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">ออกใบแจ้งหนี้ข้อมูลถูกต้อง 100% / ใบเสร็จ</p>
+              </div>
+              <span class="quest-exp">+2 EXP</span>
+            </div>
+
+            <div class="quest-item">
+              <div>
+                <strong style="font-size: 12px;">🛠️ พิทักษ์ฐานข้อมูล (Data Keeper)</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">อัปโหลดไฟล์สำรองข้อมูลดิบ (Admin)</p>
+              </div>
+              <span class="quest-exp">+10 EXP</span>
+            </div>
+         </div>
+
+      </div>
+      <div class="ro-footer" style="justify-content: space-between;">
+        <button class="ro-btn" style="background: #dc2626; color: white; border: none;" onclick="handleLogout()">🚪 ออกจากระบบ</button>
+        <button class="ro-btn ro-btn-cancel" onclick="closeProfileModal()">ปิดหน้าต่าง</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Card -->
+  <div id="login-overlay" class="screen-overlay">
+    <div class="login-card">
+      <div style="width: 65px; height: 65px; background: #231106; border-radius: 50%; border: 3px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(251,191,36,0.4); margin: 0 auto 12px; overflow: hidden;">
+        <img src="logomini.png" style="width: 50px; height: 50px; object-fit: contain;" alt="Logo">
+      </div>
+      <h2 style="color: var(--accent-gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">เข้าสู่ระบบนิติบุคคล</h2>
+      <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Wooden GUI Management System</p>
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group" style="text-align: left;">
+          <label>ชื่อผู้ใช้งาน (Username)</label>
+          <input type="text" id="login-user" placeholder="ระบุ Username เช่น admin01, acc01" required>
+        </div>
+        <div class="form-group" style="text-align: left;">
+          <label>รหัสผ่าน (Password)</label>
+          <input type="password" id="login-pass" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-primary" id="btn-login" style="margin-top: 20px;">เข้าสู่ระบบ</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="company-logo" onclick="window.open('https://www.facebook.com/udomsukplace', '_blank')">
+      <img src="logomini.png" alt="Udomsuk Logo">
+      <span class="tooltip">บจก.อุดมสุขกบินทร์บุรีบ้านและที่ดิน จำกัด</span>
+    </div>
+
+    <ul class="nav-links">
+      <li class="nav-item" id="menu-financial">
+        <button onclick="switchTab('financial')">💰<span class="tooltip">การเงิน & รับชำระ</span></button>
+      </li>
+      <li class="nav-item" id="menu-residents">
+        <button onclick="switchTab('residents')">👥<span class="tooltip">ทะเบียนลูกบ้านใหม่</span></button>
+      </li>
+      <li class="nav-item" id="menu-billing">
+        <button onclick="switchTab('billing')">📑<span class="tooltip">ฝ่ายขาย & ออกบิล</span></button>
+      </li>
+      <li class="nav-item" id="menu-procurement">
+        <button onclick="switchTab('procurement')">📦<span class="tooltip">จัดซื้อ & สต็อกพัสดุ</span></button>
+      </li>
+      <li class="nav-item" id="menu-admin-hub">
+        <button onclick="switchTab('admin-hub')">🛠️<span class="tooltip">แอดมิน: ไฟล์ดิบ & ระบบ</span></button>
+      </li>
+    </ul>
+    
+    <div class="user-avatar" onclick="openProfileModal()" title="ข้อมูลตัวละคร & กิลด์ EXP (Kafra Profile)">
+      <img id="sidebar-avatar-img" src="WIZmini.gif" alt="Avatar">
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <div class="top-bar">
+      <div class="greeting">
+        <h1>Good evening, <span id="current-user-display">Admin</span></h1>
+        <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Role: <span id="current-role-display">Super Admin</span></p>
+      </div>
+      <div class="search-bar">
+        🔍 <input type="text" id="global-search" placeholder="ค้นหาข้อมูลยูนิต, ลูกบ้าน..." onkeyup="filterTable()">
+      </div>
+    </div>
+
+    <!-- Tab 1: Financial & Cashier -->
+    <div id="tab-financial" class="tab-content">
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <div class="title">รายรับรวม (ชำระแล้ว)</div>
+          <div class="value" id="total-income">฿0</div>
+        </div>
+        <div class="metric-card" style="border-color: #ef4444;">
+          <div class="title">รายจ่ายรวม (Expenses)</div>
+          <div class="value" id="total-expense" style="color: #fca5a5;">฿0</div>
+        </div>
+        <div class="metric-card" style="border-color: #10b981;">
+          <div class="title">รายรับสุทธิ (Net Cash Flow)</div>
+          <div class="value" id="net-balance" style="color: #6ee7b7;">฿0</div>
+        </div>
+        <div class="metric-card" style="border-color: #d97706;">
+          <div class="title">📑 รอดำเนินการรับเงิน (คิวแจ้งหนี้)</div>
+          <div class="value" id="total-pending-invoices" style="color: #fbbf24;">0</div>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          
+          <div class="card" style="padding: 0; overflow: hidden;">
+            <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
+              <span>📑 รายการแจ้งหนี้รอดำเนินการรับเงิน (Queue จากฝ่ายขาย/ธุรการ)</span>
+              <span id="queue-badge" class="badge pending">0 รายการ</span>
+            </div>
+            <div class="table-container" style="max-height: 200px;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>วันที่ออก</th>
+                    <th>ยูนิต</th>
+                    <th>ชื่อลูกบ้าน</th>
+                    <th>รายการ</th>
+                    <th>รอบบิล</th>
+                    <th>ผู้ส่งงาน</th>
+                    <th style="text-align: center;">จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody id="pending-invoices-tbody">
+                  <tr><td colspan="7" style="text-align: center; padding: 15px; color: var(--text-muted);">ไม่มีรายการค้างในคิว</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 0; overflow: hidden;">
+            <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
+              <span>📊 ประวัติการรับเงิน & พิมพ์ใบเสร็จ (ฝ่ายการเงิน)</span>
+              <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: bold;" onclick="openLedgerModal()">
+                📖 สมุดบัญชีรายยูนิต (Ledger)
+              </button>
+            </div>
+            <div class="table-container" style="max-height: 220px;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>วันที่</th>
+                    <th>ยูนิต</th>
+                    <th>ชื่อผู้พักอาศัย</th>
+                    <th>ประเภท</th>
+                    <th>ยอดเงิน</th>
+                    <th>สถานะ</th>
+                    <th>ใบเสร็จ</th>
+                  </tr>
+                </thead>
+                <tbody id="payments-table-body">
+                  <tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--accent-gold);">กำลังโหลดข้อมูลจากเซิร์ฟเวอร์...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 0; overflow: hidden; border-color: #7f1d1d;">
+            <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0; color: #fca5a5;">
+              <span>💸 ประวัติบันทึกรายจ่ายโครงการ (Expenses Record)</span>
+              <span id="expense-badge" class="badge overdue">0 รายการ</span>
+            </div>
+            <div class="table-container" style="max-height: 200px;">
+              <table class="data-table">
+                <thead>
+                  <tr style="background: #2b1111;">
+                    <th>วันที่</th>
+                    <th>หมวดหมู่</th>
+                    <th>รายละเอียด</th>
+                    <th>จำนวนเงิน</th>
+                    <th>ช่องทาง</th>
+                    <th>หลักฐาน</th>
+                    <th>ผู้บันทึก</th>
+                  </tr>
+                </thead>
+                <tbody id="expenses-table-body">
+                  <tr><td colspan="7" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีรายการบันทึกรายจ่าย</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div class="card">
+            <div class="card-title">📥 บันทึกรับชำระเงิน</div>
+            <form id="payment-form" onsubmit="submitPayment(event)">
+              <div class="form-group">
+                <label>เลขยูนิต / แปลง</label>
+                <input type="text" id="form-unit" placeholder="เช่น 1 หรือ A01" onblur="autoFillResidentName(this.value)" required>
+              </div>
+              <div class="form-group">
+                <label>ชื่อผู้ชำระ</label>
+                <input type="text" id="form-name" placeholder="ระบบจะดึงชื่อให้อัตโนมัติ" required>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1.2;">
+                  <label>ประเภท / รายการค่าใช้จ่าย *</label>
+                  <input type="text" id="form-fee-type" placeholder="ระบุรายการ เช่น ค่าส่วนกลางประจำปี" required>
+                </div>
+                <div class="form-group" style="flex: 0.8;">
+                  <label>จำนวนเงิน (฿) *</label>
+                  <input type="number" id="form-amount" placeholder="0" required>
+                </div>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1;">
+                  <label>ช่องทาง</label>
+                  <select id="form-payment-method">
+                    <option>โอนเงิน / สแกน QR</option><option>เงินสด</option><option>เช็คธนาคาร</option><option>บัตรเครดิต</option>
+                  </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                  <label>สถานะ</label>
+                  <select id="form-status">
+                    <option value="Paid">ชำระแล้ว (Paid)</option>
+                    <option value="Pending">รอตรวจสอบ (Pending)</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" class="btn-primary" id="btn-submit-payment">บันทึกรับชำระเงิน & ตัดยอดคิว</button>
+            </form>
+          </div>
+
+          <div class="card" style="border-color: #991b1b;">
+            <div class="card-title" style="color: #fca5a5;">💸 บันทึกรายจ่ายโครงการ</div>
+            <form id="expense-form" onsubmit="submitNewExpense(event)">
+              <div class="form-group">
+                <label>หมวดหมู่รายจ่าย *</label>
+                <select id="exp-category" required>
+                  <option value="ค่าซ่อมบำรุงส่วนกลาง">ค่าซ่อมบำรุงส่วนกลาง / อุปกรณ์</option>
+                  <option value="ค่าน้ำ-ค่าไฟส่วนกลาง">ค่าน้ำ-ค่าไฟส่วนกลางโครงการ</option>
+                  <option value="ค่าจ้างแม่บ้าน-รปภ.">ค่าจ้างแม่บ้าน / รปภ. / บุคคลภายนอก</option>
+                  <option value="ค่าใช้จ่ายสำนักงานนิติ">ค่าใช้จ่ายสำนักงาน / เครื่องเขียน</option>
+                  <option value="ค่าธรรมเนียมวิชาชีพ/ภาษี">ค่าธรรมเนียมวิชาชีพ / บัญชี / ภาษี</option>
+                  <option value="รายจ่ายอื่นๆ">รายจ่ายอื่นๆ</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>รายละเอียดรายจ่าย *</label>
+                <input type="text" id="exp-desc" placeholder="เช่น ค่าหลอดไฟถนนส่วนกลาง 10 หลอด" required>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1;">
+                  <label>จำนวนเงิน (฿) *</label>
+                  <input type="number" id="exp-amount" placeholder="0" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                  <label>ช่องทางจ่ายเงิน</label>
+                  <select id="exp-method">
+                    <option value="เงินสด">เงินสด</option>
+                    <option value="โอนเงิน/บัญชีบริษัท">โอนเงิน / บัญชีบริษัท</option>
+                    <option value="เช็คธนาคาร">เช็คธนาคาร</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>📎 อัปโหลดหลักฐานการจ่ายเงิน (สลิป / หน้าเช็ค)</label>
+                <input type="file" id="exp-file" accept="image/*,application/pdf" onchange="previewExpenseFile(event)">
+              </div>
+              <button type="submit" class="btn-primary" id="btn-submit-expense" style="background: linear-gradient(135deg, #dc2626, #991b1b);">💾 บันทึกรายจ่าย</button>
+            </form>
+          </div>
+
+        </div>
+      </section>
+    </div>
+
+    <!-- Tab 2: Residents -->
+    <div id="tab-residents" class="tab-content">
+      <div style="max-width: 800px; margin: 0 auto;">
+        <div class="card">
+          <div class="card-title">
+            <span>👥 แบบฟอร์มลงทะเบียนลูกบ้านใหม่</span>
+            <button type="button" class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #2a1508; font-weight: bold; border: 2px solid #140803;" onclick="openCustomerListModal()">
+              📜 รายชื่อลูกบ้านทั้งหมด
+            </button>
+          </div>
+          <form id="resident-form" onsubmit="submitNewResident(event)">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div class="form-group">
+                <label>ประเภทผู้พักอาศัย *</label>
+                <select id="res-type" onchange="toggleOwnerFields(this.value)" required>
+                  <option value="Owner">เจ้าของกรรมสิทธิ์ (Owner)</option>
+                  <option value="Tenant">ผู้เช่า / ผู้พักอาศัย (Tenant)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>เลขยูนิต / แปลงบ้าน * (พิมพ์เลข เช่น 12 หรือ 899/12)</label>
+                <input type="text" id="res-unit" placeholder="เช่น 12 หรือ 899/12" oninput="autoFillRegistrationFields()" required>
+              </div>
+              
+              <div class="form-group" style="grid-column: span 2;">
+                <label id="lbl-res-name">ชื่อ-นามสกุล เจ้าของกรรมสิทธิ์ (Owner) *</label>
+                <input type="text" id="res-name" placeholder="ระบุชื่อ-นามสกุล" required>
+              </div>
+
+              <div id="tenant-extra-fields" style="display: none; grid-column: span 2; grid-template-columns: 1fr 1fr; gap: 16px; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 10px; border: 1px dashed var(--accent-blue);">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label style="color: #38bdf8;">ชื่อ-นามสกุล เจ้าของกรรมสิทธิ์ห้อง/บ้าน</label>
+                  <input type="text" id="res-owner-name" placeholder="ระบุชื่อเจ้าของกรรมสิทธิ์">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label style="color: #38bdf8;">เบอร์โทรติดต่อเจ้าของกรรมสิทธิ์</label>
+                  <input type="tel" id="res-owner-phone" placeholder="เช่น 0812345678">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>เลขที่โฉนดที่ดิน (Title Deed)</label>
+                <input type="text" id="res-deed" placeholder="ระบุเลขที่โฉนดที่ดิน">
+              </div>
+              <div class="form-group">
+                <label>เบอร์โทรศัพท์ติดต่อ (ผู้พักอาศัย) *</label>
+                <input type="tel" id="res-phone" placeholder="เช่น 0812345678" required>
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label>อีเมล</label>
+                <input type="email" id="res-email" placeholder="ระบุอีเมล (ถ้ามี)">
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label>🏠 ที่อยู่ตามบัตรประชาชน</label>
+                <textarea id="res-id-address" rows="2" placeholder="ระบุที่อยู่ตามบัตรประชาชน"></textarea>
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label>📍 ที่อยู่ปัจจุบัน / สถานที่จัดส่งเอกสาร (เติมตามโครงการอัตโนมัติ)</label>
+                <textarea id="res-cur-address" rows="2" placeholder="ระบบจะดึงที่อยู่โครงการให้อัตโนมัติ"></textarea>
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label>📷 อัปโหลดภาพถ่ายลูกค้า (ถ้ามี)</label>
+                <input type="file" id="res-photo" accept="image/*" onchange="previewResidentPhoto(event)">
+              </div>
+            </div>
+            <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #059669, #047857);" id="btn-submit-resident">บันทึกข้อมูล & สร้างโฟลเดอร์</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Sales Hub & Billing (อัปเกรดระบบหลายรายการ 1-10 รายการ) -->
+    <div id="tab-billing" class="tab-content">
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <div class="title">ยอดเงินรวมบิลเดือนนี้</div>
+          <div class="value" id="sales-total-amount">฿0</div>
+        </div>
+        <div class="metric-card" style="border-color: #0284c7;">
+          <div class="title">ใบแจ้งหนี้ทั้งหมดเดือนนี้</div>
+          <div class="value" id="sales-total-count" style="color: #38bdf8;">0</div>
+        </div>
+        <div class="metric-card" style="border-color: #d97706;">
+          <div class="title">ค้างชำระ (Pending)</div>
+          <div class="value" id="sales-pending-count" style="color: #fbbf24;">0</div>
+        </div>
+        <div class="metric-card" style="border-color: #10b981;">
+          <div class="title">ชำระเงินแล้ว (Settled)</div>
+          <div class="value" id="sales-settled-count" style="color: #6ee7b7;">0</div>
+        </div>
+      </section>
+
+      <section class="content-grid" style="grid-template-columns: 1.3fr 1.7fr; gap: 20px;">
         
-        let sheetSet = ss.getSheetByName("SystemSettings");
-        if (sheetSet) {
-          sheetSet.clear();
-          sheetSet.appendRow(["Key", "Value"]);
-          sheetSet.appendRow(["NEXT_INV_NO", 1]);
-          sheetSet.appendRow(["NEXT_REC_NO", 1]);
-          sheetSet.appendRow(["NEXT_QUO_NO", 1]);
-        }
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <!-- ฟอร์มออกเอกสารการขายหลายรายการ -->
+          <div class="card">
+            <div class="card-title">
+              <span>📄 ออกเอกสารการขาย</span>
+              <select id="inv-doc-type" onchange="switchDocTypeForm(this.value)" style="width: auto; padding: 4px 8px; font-size: 12px; background: #140803;">
+                <option value="INVOICE">📑 ใบแจ้งหนี้ (Invoice)</option>
+                <option value="QUOTATION">📜 ใบเสนอราคา/ใบจอง (Quotation)</option>
+              </select>
+            </div>
+            <form onsubmit="handleGenerateInvoice(event)">
+              <div class="form-group">
+                <label>เลขยูนิต / แปลง *</label>
+                <input type="text" id="inv-unit" placeholder="เช่น 12 หรือ 899/12" onblur="autoFillResidentForSales(this.value)" required>
+              </div>
+              <div class="form-group">
+                <label>ชื่อผู้รับเอกสาร / ลูกค้า *</label>
+                <input type="text" id="inv-res-name" placeholder="ชื่อ-นามสกุล ลูกค้า" required>
+              </div>
+              <div class="form-group">
+                <label>ประจำเดือน *</label>
+                <input type="month" id="inv-month" required>
+              </div>
+              
+              <!-- กล่องรายการเรียกเก็บหลายรายการ (Dynamic Multi-Item Box) -->
+              <div class="form-group" style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; border: 1px dashed var(--accent-gold);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <label style="margin-bottom:0; font-size:14px; color:var(--accent-gold);">📑 รายการเรียกเก็บ (สูงสุด 10 รายการ) *</label>
+                  <button type="button" class="btn-action" style="background: linear-gradient(135deg, #059669, #047857); padding: 3px 10px;" onclick="addInvoiceItemRow()">➕ เพิ่มรายการ</button>
+                </div>
+                
+                <div id="invoice-items-container">
+                  <!-- JS จะเพิ่มแถวที่นี่ -->
+                </div>
 
-        SpreadsheetApp.flush();
-        lock.releaseLock();
-        return ContentService.createTextOutput(JSON.stringify({ status: "success", message: "ล้างข้อมูลใน Google Sheets ทั้งหมดเรียบร้อยแล้ว!" })).setMimeType(ContentService.MimeType.JSON);
-      } catch(err) {
-        lock.releaseLock();
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Reset Error: " + err.toString() })).setMimeType(ContentService.MimeType.JSON);
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid #381808;">
+                  <strong style="color: var(--text-main); font-size: 13px;">รวมยอดเงินทั้งสิ้น:</strong>
+                  <span id="invoice-calc-total-display" style="font-size: 18px; font-weight: bold; color: var(--accent-gold);">฿0.00</span>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #0284c7, #0369a1);" id="btn-generate-inv">
+                🖨️ ตรวจสอบ, ส่งงานเข้าคิว & พิมพ์เอกสาร (PDF)
+              </button>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-title">
+              <span>🗺️ ผังสถานะยูนิตโครงการ (Dynamic Map)</span>
+              <span style="font-size: 11px; color: var(--text-muted);">ดึงข้อมูลยูนิตจริงจากระบบ</span>
+            </div>
+            <div style="display:flex; gap:10px; font-size:10px; margin-bottom:8px;">
+              <span>🔴 เจ้าของอยู่เอง</span>
+              <span style="color:#38bdf8;">🔵 ผู้เช่า</span>
+              <span style="color:#fbbf24;">🟡 มีบิลค้าง</span>
+            </div>
+            <div class="unit-map-grid" id="unit-map-container"></div>
+          </div>
+        </div>
+
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
+            <span>📋 ตารางติดตามสถานะบิลทั้งหมด (Sales Tracking List)</span>
+          </div>
+          <div class="table-container" style="max-height: 600px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>เลขที่เอกสาร</th>
+                  <th>วันที่</th>
+                  <th>ยูนิต</th>
+                  <th>ชื่อลูกค้า</th>
+                  <th>รายการ</th>
+                  <th>ยอดเงิน</th>
+                  <th>สถานะ</th>
+                  <th style="text-align: center;">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="sales-tracking-tbody">
+                <tr><td colspan="8" style="text-align: center; padding: 20px; color: var(--accent-gold);">กำลังโหลดข้อมูลประวัติการออกบิล...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+    </div>
+
+    <!-- Tab 4: Procurement & Inventory -->
+    <div id="tab-procurement" class="tab-content">
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <div class="title">รายการพัสดุทั้งหมด</div>
+          <div class="value" id="proc-total-items">0</div>
+        </div>
+        <div class="metric-card" style="border-color: #ef4444;">
+          <div class="title">🔴 พัสดุต้องสั่งเพิ่ม (Below Min)</div>
+          <div class="value" id="proc-alert-count" style="color: #fca5a5;">0</div>
+        </div>
+        <div class="metric-card" style="border-color: #10b981;">
+          <div class="title">มูลค่าสต็อกพัสดุรวม</div>
+          <div class="value" id="proc-total-value" style="color: #6ee7b7;">฿0</div>
+        </div>
+      </section>
+
+      <section class="content-grid" style="grid-template-columns: 1.1fr 1.9fr; gap: 20px;">
+        <div class="card">
+          <div class="card-title">📦 บันทึกพัสดุจัดซื้อใหม่</div>
+          <form id="procurement-form" onsubmit="submitNewProcurement(event)">
+            <div class="form-group">
+              <label>ชื่อพัสดุ / สินค้า *</label>
+              <input type="text" id="proc-item-name" placeholder="เช่น หลอดไฟ LED 12W, น้ำยาถูพื้น" required>
+            </div>
+            <div class="form-group">
+              <label>หมวดหมู่พัสดุ *</label>
+              <input type="text" id="proc-category" placeholder="เช่น อุปกรณ์ไฟฟ้า, เครื่องเขียน, ทำความสะอาด" required>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <div class="form-group" style="flex: 1;">
+                <label>จำนวนเริ่มต้น *</label>
+                <input type="number" id="proc-qty" placeholder="0" required>
+              </div>
+              <div class="form-group" style="flex: 1;">
+                <label>หน่วยนับ *</label>
+                <input type="text" id="proc-unit" placeholder="เช่น หลอด, แกลลอน, กล่อง" required>
+              </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <div class="form-group" style="flex: 1;">
+                <label>จุดเตือนขั้นต่ำ (Min Alert) *</label>
+                <input type="number" id="proc-min-alert" placeholder="5" value="5" required>
+              </div>
+              <div class="form-group" style="flex: 1;">
+                <label>ราคาต่อหน่วย (฿)</label>
+                <input type="number" id="proc-unit-price" placeholder="0">
+              </div>
+            </div>
+            <button type="submit" class="btn-primary" id="btn-submit-proc" style="background: linear-gradient(135deg, #0284c7, #0369a1);">💾 บันทึกรับพัสดุใหม่เข้าสต็อก</button>
+          </form>
+        </div>
+
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
+            <span>📦 รายการสต็อกพัสดุทั้งหมด (Inventory List)</span>
+          </div>
+          <div class="table-container" style="max-height: 520px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>รหัส</th>
+                  <th>ชื่อพัสดุ</th>
+                  <th>หมวดหมู่</th>
+                  <th>คงเหลือ</th>
+                  <th>ราคา/หน่วย</th>
+                  <th>สถานะ</th>
+                  <th style="text-align: center;">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="procurement-tbody">
+                <tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--accent-gold);">กำลังโหลดรายการสต็อก...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Tab 5: Admin Hub -->
+    <div id="tab-admin-hub" class="tab-content">
+      <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+        
+        <div class="card" style="border-color: var(--accent-gold);">
+          <div class="card-title" style="color: var(--accent-gold);">
+            <span>🔢 ตั้งค่าเลขที่รันเอกสารเริ่มต้น (Invoice & Receipt Dynamic Running)</span>
+            <span class="badge pending">Admin Only</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+            กำหนดลำดับตัวเลขถัดไป (Next Running Number) ของใบแจ้งหนี้ (INV) และใบเสร็จรับเงิน (REC) เมื่อตั้งค่าแล้วระบบจะรันตัวเลขต่อให้อัตโนมัติในรูปแบบ <code>INV-YYYYMM-XXXX</code> และ <code>REC-YYYYMM-XXXX</code>
+          </p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label>เลขถัดไปของใบแจ้งหนี้ (Next INV Number)</label>
+              <input type="number" id="admin-next-inv-no" placeholder="เช่น 1 หรือ 1001">
+            </div>
+            <div class="form-group">
+              <label>เลขถัดไปของใบเสร็จ (Next REC Number)</label>
+              <input type="number" id="admin-next-rec-no" placeholder="เช่น 1 หรือ 1001">
+            </div>
+          </div>
+          <button type="button" class="btn-primary" id="btn-save-doc-number" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="handleSetDocRunningNumber()">
+            💾 บันทึกตั้งค่าเลขที่รันเอกสาร
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🛠️️ อัปโหลดไฟล์ดิบสำรองข้อมูล (Admin Only)</div>
+          <div class="drop-zone" id="drop-zone">
+            <p style="font-size: 40px; margin-bottom: 10px;">📁</p>
+            <h3 style="color: var(--text-main); margin-bottom: 8px;">ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์</h3>
+            <p style="color: var(--text-muted); font-size: 13px;">ระบบจะส่งไฟล์เข้าโฟลเดอร์ Raw_Data_Backups อัตโนมัติ</p>
+            <input type="file" id="file-input" multiple style="display: none;">
+          </div>
+          <div id="upload-status-box" style="margin-top: 24px; display: none;">
+            <div id="upload-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
+        </div>
+
+        <div class="card" style="border-color: #7f1d1d; background: linear-gradient(145deg, #3d1515, #220808);">
+          <div class="card-title" style="color: #fca5a5; border-bottom-color: #991b1b;">
+            <span>⚠️ แดชบอร์ดรีเซ็ตระบบ (Admin Testing Reset)</span>
+            <span class="badge overdue">อันตราย</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+            ปุ่มนี้ใช้สำหรับ <strong>ล้างข้อมูลการทดสอบทั้งหมด</strong> (ตารางทะเบียนลูกบ้าน, ประวัติการรับเงิน, รายจ่าย, คิวใบแจ้งหนี้ และประวัติการทำงาน) ในคลิกเดียว เพื่อเริ่มการทดสอบรอบใหม่ตั้งแต่ต้นจนจบแบบสะอาด 100%<br>
+            <em style="color: #f87171;">* บัญชีผู้ใช้งานและรหัสผ่านพนักงานในระบบจะไม่ถูกลบ *</em>
+          </p>
+          <button type="button" class="btn-primary" id="btn-admin-reset" style="background: linear-gradient(135deg, #dc2626, #991b1b); border-color: #450a0a;" onclick="handleAdminFactoryReset()">
+            🗑️ ล้างข้อมูลใน Sheet และรีเซ็ตระบบทั้งหมด (เริ่มรอบใหม่)
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxrjW448Uz0HllSVTUCeFwVhUp7cENvK9hKqKA0qm728jQkid8ttgpq3-W3-A0ba8VMMA/exec";
+    
+    let currentUser = null;
+    let cachedPayments = [];
+    let cachedExpenses = [];
+    let cachedResidents = [];
+    let cachedProcurement = [];
+    let cachedPendingInvoices = [];
+    let cachedAllInvoices = [];
+
+    let residentPhotoBase64 = null;
+    let residentPhotoName = "";
+    let residentPhotoMime = "";
+    let editResidentPhotoBase64 = null;
+    let editResidentPhotoName = "";
+    let editResidentPhotoMime = "";
+    
+    let expenseFileBase64 = null;
+    let expenseFileName = "";
+    let expenseFileMime = "";
+
+    let pendingUnitForRegistration = "";
+    let tempSelectedAvatar = "WIZmini";
+    let activeCrmUnit = "";
+    let activeStockItemCode = "";
+
+    function showLoadingModal(title = "กำลังประมวลผลข้อมูล...", subtitle = "ระบบกำลังส่งคำสั่งและเชื่อมต่อ Google Sheets") {
+      const modal = document.getElementById("global-loading-modal");
+      const titleEl = document.getElementById("loading-modal-title");
+      const subEl = document.getElementById("loading-modal-subtitle");
+      const barFill = document.getElementById("loading-progress-bar-fill");
+      const statusEl = document.getElementById("loading-modal-status");
+
+      if (modal && titleEl && subEl && barFill) {
+        titleEl.innerText = title;
+        subEl.innerText = subtitle;
+        statusEl.innerText = "กรุณารอสักครู่ ห้ามปิดหน้าต่างนี้";
+        barFill.style.width = "25%";
+        modal.style.display = "flex";
+        
+        setTimeout(() => { barFill.style.width = "75%"; }, 300);
       }
     }
 
-    // 1. เข้าสู่ระบบ
-    if (data.type === "login") {
-      let sheetUsers = ss.getSheetByName("Users");
-      const rawData = sheetUsers.getDataRange().getValues();
-      const headers = rawData[0];
-      let colUser = headers.indexOf("Username"); 
-      let colPass = headers.indexOf("Password");
-      let colName = headers.indexOf("FullName"); 
-      let colRole = headers.indexOf("Role");
-      let colExp = headers.indexOf("EXP"); 
-      let colLogin = headers.indexOf("LastLoginDate"); 
-      let colPrestige = headers.indexOf("Prestige");
-      let colAvatar = headers.indexOf("Avatar");
+    function hideLoadingModal() {
+      const modal = document.getElementById("global-loading-modal");
+      const barFill = document.getElementById("loading-progress-bar-fill");
+      if (modal && barFill) {
+        barFill.style.width = "100%";
+        setTimeout(() => {
+          modal.style.display = "none";
+          barFill.style.width = "0%";
+        }, 300);
+      }
+    }
 
-      const inputUser = String(data.username || "").trim().toLowerCase();
-      const inputPass = String(data.password || "").trim();
-      let foundUserObj = null; 
-      let rowIndex = -1;
-      let rawLastLoginValue = "";
-
-      for (let i = 1; i < rawData.length; i++) {
-        if (String(rawData[i][colUser] || "").trim().toLowerCase() === inputUser && String(rawData[i][colPass] || "").trim() === inputPass) {
-          rawLastLoginValue = rawData[i][colLogin];
-          foundUserObj = { username: rawData[i][colUser], fullName: rawData[i][colName], role: rawData[i][colRole], exp: Number(rawData[i][colExp]) || 0, prestige: Number(rawData[i][colPrestige]) || 0, avatar: String(rawData[i][colAvatar] || "WIZmini") };
-          rowIndex = i + 1; break;
+    async function fetchWithRetry(url, options = {}, retries = 3, backoff = 1500, title = "กำลังประมวลผลข้อมูล...", subtitle = "กำลังเชื่อมต่อ Google Sheets") {
+      showLoadingModal(title, subtitle);
+      for (let i = 0; i < retries; i++) {
+        try {
+          const response = await fetch(url, options);
+          const data = await response.json();
+          if (data && data.status === "error" && data.message && data.message.includes("เซิร์ฟเวอร์กำลัง")) {
+            if (i < retries - 1) {
+              const statusEl = document.getElementById("loading-modal-status");
+              if (statusEl) statusEl.innerText = `เซิร์ฟเวอร์ยุ่ง กำลังลองใหม่อัตโนมัติ (ครั้งที่ ${i + 2}/${retries})...`;
+              await new Promise(r => setTimeout(r, backoff));
+              continue;
+            }
+          }
+          hideLoadingModal();
+          return data;
+        } catch (err) {
+          if (i === retries - 1) {
+            hideLoadingModal();
+            throw err;
+          }
+          const statusEl = document.getElementById("loading-modal-status");
+          if (statusEl) statusEl.innerText = `การเชื่อมต่อติดขัด กำลังลองใหม่อัตโนมัติ (ครั้งที่ ${i + 2}/${retries})...`;
+          await new Promise(r => setTimeout(r, backoff));
         }
       }
+      hideLoadingModal();
+      throw new Error("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง");
+    }
 
-      if (foundUserObj) {
-        const todayStr = Utilities.formatDate(new Date(), "GMT+7", "yyyy-MM-dd");
-        let lastLoginFormatted = "";
-        if (rawLastLoginValue instanceof Date) { lastLoginFormatted = Utilities.formatDate(rawLastLoginValue, "GMT+7", "yyyy-MM-dd"); } else if (rawLastLoginValue) { lastLoginFormatted = String(rawLastLoginValue).trim(); }
-        let dailyLoginBonus = false;
-        if (lastLoginFormatted !== todayStr) {
-          foundUserObj.exp += 10;
-          if (lock.tryLock(15000)) {
-            sheetUsers.getRange(rowIndex, colExp + 1).setValue(foundUserObj.exp);
-            sheetUsers.getRange(rowIndex, colLogin + 1).setValue("'" + todayStr);
-            SpreadsheetApp.flush();
-            lock.releaseLock();
-          }
-          dailyLoginBonus = true;
-        }
-        recordLog(foundUserObj.username, foundUserObj.role, "เข้าสู่ระบบ", "สำเร็จ");
-        return ContentService.createTextOutput(JSON.stringify({ status: "success", user: foundUserObj, dailyLoginBonus: dailyLoginBonus })).setMimeType(ContentService.MimeType.JSON);
+    function toggleOwnerFields(val) {
+      const extraDiv = document.getElementById("tenant-extra-fields");
+      const lblName = document.getElementById("lbl-res-name");
+      if (val === "Tenant") {
+        extraDiv.style.display = "grid";
+        lblName.innerText = "ชื่อ-นามสกุล ผู้เชี่ยวชาญ / ผู้เช่า (Tenant) *";
       } else {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง" })).setMimeType(ContentService.MimeType.JSON);
+        extraDiv.style.display = "none";
+        lblName.innerText = "ชื่อ-นามสกุล เจ้าของกรรมสิทธิ์ (Owner) *";
       }
     }
 
-    // 8. บันทึกพัสดุจัดซื้อใหม่
-    if (data.type === "new_procurement") {
-      if (data.operatorRole !== "Admin" && data.operatorRole !== "Finance") {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "เฉพาะ Admin และฝ่ายการเงินเท่านั้นที่มีสิทธิ์บันทึกพัสดุ" })).setMimeType(ContentService.MimeType.JSON);
+    function formatDisplayDate(val) {
+      if (!val || val === "-" || val === "") return "-";
+      try {
+        const d = new Date(val);
+        if (isNaN(d.getTime())) return String(val).split("T")[0];
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yy = (d.getFullYear() + 543);
+        return `${dd}/${mm}/${yy}`;
+      } catch (e) {
+        return String(val);
       }
-
-      const itemName = String(data.itemName || "").trim();
-      const qty = Number(data.quantity || 0);
-      const minAlert = Number(data.minAlert || 5);
-      const unitPrice = Number(data.unitPrice || 0);
-
-      if (!itemName) {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "กรุณาระบุชื่อพัสดุ/สินค้า" })).setMimeType(ContentService.MimeType.JSON);
-      }
-
-      if (!lock.tryLock(15000)) {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "เซิร์ฟเวอร์กำลังบันทึกข้อมูลอื่นอยู่ กรุณาลองใหม่อีกครั้ง" })).setMimeType(ContentService.MimeType.JSON);
-      }
-
-      let sheetProc = ss.getSheetByName("Procurement");
-      if (!sheetProc) {
-        sheetProc = ss.insertSheet("Procurement");
-        sheetProc.appendRow(["Item Code", "Item Name", "Category", "Quantity", "Unit", "Min Alert", "Unit Price", "Last Updated", "Operator"]);
-      }
-
-      const itemCode = "ITEM-" + String(sheetProc.getLastRow()).padStart(4, '0');
-      const now = new Date();
-
-      sheetProc.appendRow([itemCode, itemName, data.category || "ทั่วไป", qty, data.unit || "ชิ้น", minAlert, unitPrice, now, data.operator || "System"]);
-      SpreadsheetApp.flush();
-      lock.releaseLock();
-
-      addExpToUser(ss, data.operator, 10);
-      recordLog(data.operator, data.operatorRole, "เพิ่มพัสดุจัดซื้อใหม่", `${itemCode}: ${itemName} จำนวน ${qty} ${data.unit}`);
-      return ContentService.createTextOutput(JSON.stringify({ status: "success", expAdded: 10, itemCode: itemCode, message: "เพิ่มรายการพัสดุจัดซื้อเรียบร้อยแล้ว" })).setMimeType(ContentService.MimeType.JSON);
     }
 
-    // 9. ปรับแก้ไขจำนวนสต็อกพัสดุ
-    if (data.type === "update_stock_quantity") {
-      if (data.operatorRole !== "Admin" && data.operatorRole !== "Finance") {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "เฉพาะ Admin และฝ่ายการเงินเท่านั้นที่มีสิทธิ์แก้ไขสต็อก" })).setMimeType(ContentService.MimeType.JSON);
-      }
-
-      const itemCodeTarget = String(data.itemCode || "").trim();
-      const newQty = Number(data.newQuantity || 0);
-      const newMinAlert = Number(data.newMinAlert || 5);
-
-      if (!itemCodeTarget) {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "ไม่พบรหัสพัสดุที่ต้องการแก้ไข" })).setMimeType(ContentService.MimeType.JSON);
-      }
-
-      if (!lock.tryLock(15000)) {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "เซิร์ฟเวอร์กำลังประมวลผลอยู่ กรุณาลองใหม่อีกครั้ง" })).setMimeType(ContentService.MimeType.JSON);
-      }
-
-      let sheetProc = ss.getSheetByName("Procurement");
-      if (sheetProc && sheetProc.getLastRow() > 1) {
-        const rows = sheetProc.getRange(2, 1, sheetProc.getLastRow() - 1, 9).getValues();
-        for (let i = 0; i < rows.length; i++) {
-          if (String(rows[i][0]).trim() === itemCodeTarget) {
-            const rowIndex = i + 2;
-            const now = new Date();
-            
-            sheetProc.getRange(rowIndex, 4).setValue(newQty);
-            sheetProc.getRange(rowIndex, 6).setValue(newMinAlert);
-            sheetProc.getRange(rowIndex, 8).setValue(now);
-            sheetProc.getRange(rowIndex, 9).setValue(data.operator || "System");
-
-            SpreadsheetApp.flush();
-            lock.releaseLock();
-
-            recordLog(data.operator, data.operatorRole, "ปรับสต็อกพัสดุ", `${itemCodeTarget} เปลี่ยนจำนวนเป็น ${newQty} (Min: ${newMinAlert})`);
-            return ContentService.createTextOutput(JSON.stringify({ status: "success", message: `อัปเดตสต็อกพัสดุ ${itemCodeTarget} เรียบร้อยแล้ว` })).setMimeType(ContentService.MimeType.JSON);
-          }
+    function formatDisplayMonth(val) {
+      if (!val || val === "-" || val === "") return "-";
+      const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+      try {
+        const strVal = String(val).trim();
+        if (/^\d{4}-\d{2}$/.test(strVal)) {
+          const parts = strVal.split("-");
+          const mIdx = parseInt(parts[1], 10) - 1;
+          const yThai = parseInt(parts[0], 10) + 543;
+          return `${thaiMonths[mIdx]} ${yThai}`;
         }
-      }
-
-      lock.releaseLock();
-      return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "ไม่พบรายการพัสดุนี้ในระบบ" })).setMimeType(ContentService.MimeType.JSON);
-    }
-
-    // 2. บันทึก Avatar
-    if (data.type === "save_avatar") {
-      let sheetUsers = ss.getSheetByName("Users");
-      if (sheetUsers && lock.tryLock(15000)) {
-        const rawData = sheetUsers.getDataRange().getValues();
-        let colUser = rawData[0].indexOf("Username");
-        let colAvatar = rawData[0].indexOf("Avatar");
-        for (let i = 1; i < rawData.length; i++) {
-          if (String(rawData[i][colUser]).trim().toLowerCase() === String(data.username).trim().toLowerCase()) {
-            sheetUsers.getRange(i + 1, colAvatar + 1).setValue(data.avatar);
-            break;
-          }
+        const d = new Date(val);
+        if (!isNaN(d.getTime())) {
+          return `${thaiMonths[d.getMonth()]} ${d.getFullYear() + 543}`;
         }
-        SpreadsheetApp.flush();
-        lock.releaseLock();
+        return strVal;
+      } catch (e) {
+        return String(val);
       }
-      return ContentService.createTextOutput(JSON.stringify({ status: "success" })).setMimeType(ContentService.MimeType.JSON);
     }
 
-    // 3. ออกใบแจ้งหนี้ / ใบเสนอราคา (รองรับหลายรายการย่อย 1-10 รายการ)
-    if (data.type === "generate_invoice") {
-      const targetUnitKey = cleanUnitKey(data.unitNumber);
-      const docKind = data.docType || "INVOICE";
-      let sheetResidents = ss.getSheetByName("Residents");
-      let matchedResidentName = "";
-      if (sheetResidents && sheetResidents.getLastRow() > 1) {
-        const resRows = sheetResidents.getRange(2, 1, sheetResidents.getLastRow() - 1, 2).getValues();
-        for (let i = 0; i < resRows.length; i++) {
-          if (cleanUnitKey(resRows[i][0]) === targetUnitKey) { matchedResidentName = resRows[i][1]; break; }
-        }
-      }
-      
-      if (!matchedResidentName) {
-        matchedResidentName = data.residentName || "ลูกค้าทั่วไป/ผู้สนใจ";
-      }
-
-      if (!lock.tryLock(15000)) {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "เซิร์ฟเวอร์กำลังบันทึกข้อมูลอื่นอยู่ กรุณาลองใหม่อีกครั้ง" })).setMimeType(ContentService.MimeType.JSON);
-      }
-
-      const keyName = (docKind === "QUOTATION") ? "NEXT_QUO_NO" : "NEXT_INV_NO";
-      const docObj = getNextDocNumber(keyName);
-      const generatedDocNo = docObj.docNo;
-      const amtVal = Number(data.amount || 0);
-
-      let sheetDailyInv = ss.getSheetByName("DailyInvoices");
-      if (!sheetDailyInv) {
-        sheetDailyInv = ss.insertSheet("DailyInvoices");
-        sheetDailyInv.appendRow(["Timestamp", "Date", "Unit", "Resident Name", "Billing Month", "Fee Type", "Operator", "Status", "DocNo", "Amount", "DocType", "Items JSON"]);
-      }
-
-      const now = new Date();
-      const dateStr = Utilities.formatDate(now, "GMT+7", "yyyy-MM-dd");
-      const itemsJsonStr = JSON.stringify(data.items || []);
-      
-      const initialStatus = (docKind === "QUOTATION") ? "Quotation" : "Pending";
-      sheetDailyInv.appendRow([now, dateStr, String(data.unitNumber).trim().toUpperCase(), matchedResidentName, data.billingMonth || "-", data.feeType || "ค่าส่วนกลาง", data.operator || "System", initialStatus, generatedDocNo, amtVal, docKind, itemsJsonStr]);
-      SpreadsheetApp.flush();
-      lock.releaseLock();
-
-      addExpToUser(ss, data.operator, 2);
-      recordLog(data.operator, data.operatorRole, `ออกเอกสาร ${docKind}`, `เลขที่ ${generatedDocNo} ยูนิต ${data.unitNumber} ยอดรวม ${amtVal} บาท (${data.items ? data.items.length : 1} รายการ)`);
-      return ContentService.createTextOutput(JSON.stringify({ status: "success", expAdded: 2, residentName: matchedResidentName, docNo: generatedDocNo, docType: docKind, message: `ออกเอกสาร ${generatedDocNo} สำเร็จ` })).setMimeType(ContentService.MimeType.JSON);
+    // ➕ จัดการแถวรายการเรียกเก็บหลายรายการ (1–10 รายการ)
+    function initInvoiceItems() {
+      const container = document.getElementById("invoice-items-container");
+      container.innerHTML = "";
+      addInvoiceItemRow(); // เพิ่มแถวแรกเริ่มต้น
     }
 
-    // 3.1 ยกเลิกใบแจ้งหนี้
-    if (data.type === "cancel_invoice") {
-      if (!data.docNo) {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "ไม่พบเลขที่เอกสาร" })).setMimeType(ContentService.MimeType.JSON);
+    function addInvoiceItemRow() {
+      const container = document.getElementById("invoice-items-container");
+      const currentRows = container.getElementsByClassName("invoice-item-row");
+      if (currentRows.length >= 10) {
+        alert("⚠️ จำกัดสูงสุดไม่เกิน 10 รายการต่อ 1 เอกสาร");
+        return;
       }
 
-      if (!lock.tryLock(15000)) {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "เซิร์ฟเวอร์กำลังประมวลผลอยู่ กรุณาลองใหม่อีกครั้ง" })).setMimeType(ContentService.MimeType.JSON);
-      }
-
-      let sheetDailyInv = ss.getSheetByName("DailyInvoices");
-      if (sheetDailyInv && sheetDailyInv.getLastRow() > 1) {
-        const rows = sheetDailyInv.getRange(2, 1, sheetDailyInv.getLastRow() - 1, 9).getValues();
-        for (let i = 0; i < rows.length; i++) {
-          if (String(rows[i][8]).trim() === String(data.docNo).trim()) {
-            const currentStatus = String(rows[i][7]).trim();
-            if (currentStatus === "Settled" || currentStatus === "Paid") {
-              lock.releaseLock();
-              return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "🚨 ไม่สามารถยกเลิกได้! ใบแจ้งหนี้นี้ถูกชำระเงินโดยฝ่ายการเงินเรียบร้อยแล้ว" })).setMimeType(ContentService.MimeType.JSON);
-            }
-            
-            sheetDailyInv.getRange(i + 2, 8).setValue("Cancelled");
-            SpreadsheetApp.flush();
-            lock.releaseLock();
-            
-            recordLog(data.operator, data.operatorRole, "ยกเลิกใบแจ้งหนี้", `เลขที่ ${data.docNo}`);
-            return ContentService.createTextOutput(JSON.stringify({ status: "success", message: `ยกเลิกเอกสารเลขที่ ${data.docNo} เรียบร้อยแล้ว` })).setMimeType(ContentService.MimeType.JSON);
-          }
-        }
-      }
-      lock.releaseLock();
-      return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "ไม่พบเอกสารในระบบ" })).setMimeType(ContentService.MimeType.JSON);
+      const rowIndex = currentRows.length + 1;
+      const rowDiv = document.createElement("div");
+      rowDiv.className = "invoice-item-row";
+      rowDiv.innerHTML = `
+        <span class="item-num">${rowIndex}.</span>
+        <input type="text" class="item-desc-input" placeholder="ระบุรายการ เช่น ค่าส่วนกลาง, ค่าน้ำ" style="flex: 2;" required>
+        <input type="number" class="item-amt-input" placeholder="0.00" style="flex: 1;" oninput="calculateInvoiceTotal()" required>
+        ${rowIndex > 1 ? `<button type="button" class="btn-action" style="background:#dc2626; padding: 6px 10px;" onclick="removeInvoiceItemRow(this)">🗑️</button>` : `<div style="width:32px;"></div>`}
+      `;
+      container.appendChild(rowDiv);
+      calculateInvoiceTotal();
     }
 
-    // 4. บันทึกรับชำระเงิน
-    if (data.type === "payment") {
-      const rawUnit = String(data.unitNumber || "").trim();
-      const targetUnitKey = cleanUnitKey(rawUnit);
-      const amountVal = Number(data.amount || 0);
-      if (!rawUnit || amountVal <= 0) return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "กรุณาระบุเลขยูนิตและยอดเงินให้ถูกต้อง" })).setMimeType(ContentService.MimeType.JSON);
-      
-      if (!lock.tryLock(15000)) {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "เซิร์ฟเวอร์กำลังรับชำระเงินรายการอื่นอยู่ กรุณาลองใหม่อีกครั้ง" })).setMimeType(ContentService.MimeType.JSON);
+    function removeInvoiceItemRow(btn) {
+      const row = btn.closest(".invoice-item-row");
+      row.remove();
+      // จัดลำดับเลขข้อใหม่
+      const container = document.getElementById("invoice-items-container");
+      const rows = container.getElementsByClassName("invoice-item-row");
+      for (let i = 0; i < rows.length; i++) {
+        rows[i].querySelector(".item-num").innerText = (i + 1) + ".";
       }
-
-      const recObj = getNextDocNumber("NEXT_REC_NO");
-      const recDocNo = recObj.docNo;
-
-      let sheetPayments = ss.getSheetByName("Payments") || ss.insertSheet("Payments");
-      sheetPayments.appendRow([new Date(), rawUnit, data.residentName || "ทั่วไป", data.feeType, amountVal, data.paymentMethod, data.status || 'Paid', "", recDocNo]);
-      
-      if (data.status === "Paid") {
-        let sheetDailyInv = ss.getSheetByName("DailyInvoices");
-        if (sheetDailyInv && sheetDailyInv.getLastRow() > 1) {
-          const invData = sheetDailyInv.getRange(2, 1, sheetDailyInv.getLastRow() - 1, 9).getValues();
-          for (let i = 0; i < invData.length; i++) {
-            if (cleanUnitKey(invData[i][2]) === targetUnitKey && invData[i][7] === "Pending") {
-              sheetDailyInv.getRange(i + 2, 8).setValue("Settled");
-              break;
-            }
-          }
-        }
-      }
-
-      SpreadsheetApp.flush();
-      lock.releaseLock();
-
-      let expEarned = (data.feeType.includes("ค่าปรับ") || data.status === "Overdue" || data.status === "เกินกำหนด") ? 20 : 5;
-      addExpToUser(ss, data.operator, expEarned);
-      recordLog(data.operator || "ระบบ", data.operatorRole, "บันทึกรับเงิน", `ใบเสร็จเลขที่ ${recDocNo} ยูนิต ${rawUnit} จำนวน ${amountVal} บาท`);
-      return ContentService.createTextOutput(JSON.stringify({ status: "success", expAdded: expEarned, docNo: recDocNo })).setMimeType(ContentService.MimeType.JSON);
+      calculateInvoiceTotal();
     }
 
-    // 5. บันทึกรายจ่ายใหม่
-    if (data.type === "new_expense") {
-      const amountVal = Number(data.amount || 0);
-      const categoryVal = String(data.category || "").trim();
-      if (amountVal <= 0 || !categoryVal) {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "กรุณาระบุประเภทรายจ่ายและจำนวนเงินให้ถูกต้อง" })).setMimeType(ContentService.MimeType.JSON);
+    function calculateInvoiceTotal() {
+      const container = document.getElementById("invoice-items-container");
+      const amtInputs = container.getElementsByClassName("item-amt-input");
+      let total = 0;
+      for (let input of amtInputs) {
+        total += Number(input.value || 0);
       }
-
-      let fileUrl = "-";
-      if (data.fileData && data.fileName) {
-        try {
-          const { expenseFolder } = getProjectFolders();
-          const decodedBytes = Utilities.base64Decode(data.fileData.includes(',') ? data.fileData.split(',')[1] : data.fileData);
-          const ext = data.fileName.split('.').pop() || 'jpg';
-          const newFileName = `ExpRef_${new Date().getTime()}.${ext}`;
-          const blob = Utilities.newBlob(decodedBytes, data.mimeType || "image/jpeg", newFileName);
-          fileUrl = expenseFolder.createFile(blob).getUrl();
-        } catch (e) {
-          console.error("Expense File Upload Error:", e);
-        }
-      }
-
-      if (!lock.tryLock(15000)) {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "เซิร์ฟเวอร์กำลังบันทึกรายการอื่นอยู่ กรุณาลองใหม่อีกครั้ง" })).setMimeType(ContentService.MimeType.JSON);
-      }
-
-      let sheetExpenses = ss.getSheetByName("Expenses");
-      if (!sheetExpenses) {
-        sheetExpenses = ss.insertSheet("Expenses");
-        sheetExpenses.appendRow(["Date", "Category", "Description", "Amount", "Payment Method", "Operator", "Attachment URL"]);
-      }
-
-      sheetExpenses.appendRow([new Date(), categoryVal, data.description || "-", amountVal, data.paymentMethod || "เงินสด", data.operator || "System", fileUrl]);
-      SpreadsheetApp.flush();
-      lock.releaseLock();
-
-      addExpToUser(ss, data.operator, 5);
-      recordLog(data.operator || "ระบบ", data.operatorRole, "บันทึกรายจ่าย", `หมวด ${categoryVal} จำนวน ${amountVal} บาท (${data.paymentMethod})`);
-      return ContentService.createTextOutput(JSON.stringify({ status: "success", expAdded: 5, message: "บันทึกรายจ่ายและอัปโหลดหลักฐานสำเร็จ" })).setMimeType(ContentService.MimeType.JSON);
+      document.getElementById("invoice-calc-total-display").innerText = "฿" + total.toLocaleString('en-US', { minimumFractionDigits: 2 });
     }
 
-    if (data.type === "print_receipt") {
-      addExpToUser(ss, data.operator, 2);
-      recordLog(data.operator, data.operatorRole, "พิมพ์ใบเสร็จ", `ยูนิต ${data.unitNumber}`);
-      return ContentService.createTextOutput(JSON.stringify({ status: "success", expAdded: 2 })).setMimeType(ContentService.MimeType.JSON);
-    }
+    function autoFillRegistrationFields() {
+      const unitVal = document.getElementById("res-unit").value.trim();
+      const curAddressInput = document.getElementById("res-cur-address");
 
-    // 6. ลงทะเบียนลูกบ้านใหม่
-    if (data.type === "new_resident") {
-      const rawUnit = String(data.unitNumber || "").trim();
-      const targetUnitKey = cleanUnitKey(rawUnit);
-      const resName = String(data.residentName || "").trim();
-      const resType = String(data.residentType || "Owner").trim();
-
-      if (!rawUnit || !resName) {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "กรุณาระบุเลขยูนิตและชื่อ-นามสกุลให้ครบถ้วน" })).setMimeType(ContentService.MimeType.JSON);
-      }
-
-      if (!lock.tryLock(15000)) {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "เซิร์ฟเวอร์กำลังลงทะเบียนข้อมูลอื่นอยู่ กรุณาลองใหม่อีกครั้ง" })).setMimeType(ContentService.MimeType.JSON);
-      }
-
-      let sheetResidents = ss.getSheetByName("Residents");
-      if (!sheetResidents) {
-        sheetResidents = ss.insertSheet("Residents");
-        sheetResidents.appendRow(["Unit Number", "Resident Name", "Resident Type", "Title Deed", "Phone", "Email", "ID Address", "Cur Address", "Photo URL", "Folder URL", "Move-in", "Balance", "Notes", "Owner Name", "Owner Phone"]);
-      }
-
-      const lastRow = sheetResidents.getLastRow();
-      if (lastRow > 1) {
-        const unitData = sheetResidents.getRange(2, 1, lastRow - 1, 2).getValues();
-        for (let i = 0; i < unitData.length; i++) {
-          let existingUnit = cleanUnitKey(unitData[i][0]);
-          if (existingUnit !== "" && existingUnit === targetUnitKey) {
-            lock.releaseLock();
-            return ContentService.createTextOutput(JSON.stringify({ 
-              status: "error", 
-              message: `🚨 ปฏิเสธการบันทึก! ยูนิต/แปลง [${rawUnit}] มีในระบบแล้ว (เจ้าของ/ผู้เช่าเดิม: ${unitData[i][1]}) ห้ามลงทะเบียนซ้ำ!` 
-            })).setMimeType(ContentService.MimeType.JSON);
-          }
-        }
-      }
-
-      const personalFolder = getOrCreateResidentFolder(rawUnit, resName);
-      let photoUrl = "-";
-      if (data.photoData && data.photoName) {
-        const decodedBytes = Utilities.base64Decode(data.photoData.includes(',') ? data.photoData.split(',')[1] : data.photoData);
-        const photoFileName = `Photo_${rawUnit}.` + (data.photoName.split('.').pop() || 'jpg');
-        const blob = Utilities.newBlob(decodedBytes, data.photoMimeType || "image/jpeg", photoFileName);
-        photoUrl = personalFolder.createFile(blob).getUrl();
-      }
-      
-      const ownerNameVal = (resType === "Tenant") ? (data.ownerName || "-") : resName;
-      const ownerPhoneVal = (resType === "Tenant") ? (data.ownerPhone || "-") : data.phone;
-
-      sheetResidents.appendRow([
-        rawUnit, resName, resType, data.titleDeedNo||"-", data.phone||"-", data.email||"-", 
-        data.idCardAddress||"-", data.currentAddress||"-", photoUrl, personalFolder.getUrl(), 
-        data.moveInDate||"", Number(data.outstandingBalance||0), data.notes||"-",
-        ownerNameVal, ownerPhoneVal
-      ]);
-      SpreadsheetApp.flush();
-      lock.releaseLock();
-
-      addExpToUser(ss, data.operator, 15);
-      recordLog(data.operator, data.operatorRole, "ลงทะเบียนลูกบ้านใหม่", `ยูนิต ${rawUnit} - ${resName} (${resType})`);
-      return ContentService.createTextOutput(JSON.stringify({ status: "success", expAdded: 15 })).setMimeType(ContentService.MimeType.JSON);
-    }
-
-    // 7. แก้ไขข้อมูลลูกบ้านเดิม / บันทึก CRM Note
-    if (data.type === "update_resident") {
-      const rawUnit = String(data.unitNumber || "").trim();
-      const targetUnitKey = cleanUnitKey(rawUnit);
-      const resName = String(data.residentName || "").trim();
-
-      if (!rawUnit) {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "กรุณาระบุเลขยูนิตให้ครบถ้วน" })).setMimeType(ContentService.MimeType.JSON);
-      }
-
-      if (!lock.tryLock(15000)) {
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "เซิร์ฟเวอร์กำลังอัปเดตข้อมูลอื่นอยู่ กรุณาลองใหม่อีกครั้ง" })).setMimeType(ContentService.MimeType.JSON);
-      }
-
-      let sheetResidents = ss.getSheetByName("Residents");
-      const lastRow = sheetResidents.getLastRow();
-      let targetRowIndex = -1;
-      let existingPhotoUrl = "-";
-      let currentNotes = "-";
-
-      if (lastRow > 1) {
-        const rows = sheetResidents.getRange(2, 1, lastRow - 1, 13).getValues();
-        for (let i = 0; i < rows.length; i++) {
-          if (cleanUnitKey(rows[i][0]) === targetKey) {
-            targetRowIndex = i + 2;
-            existingPhotoUrl = rows[i][8] || "-";
-            currentNotes = rows[i][12] || "-";
-            break;
-          }
-        }
-      }
-
-      if (targetRowIndex === -1) {
-        lock.releaseLock();
-        return ContentService.createTextOutput(JSON.stringify({ status: "error", message: `ไม่พบข้อมูลยูนิต [${rawUnit}] สำหรับการแก้ไข` })).setMimeType(ContentService.MimeType.JSON);
-      }
-
-      let photoUrl = existingPhotoUrl;
-      if (data.photoData && data.photoName) {
-        const personalFolder = getOrCreateResidentFolder(rawUnit, resName || "Resident");
-        const decodedBytes = Utilities.base64Decode(data.photoData.includes(',') ? data.photoData.split(',')[1] : data.photoData);
-        const photoFileName = `Photo_${rawUnit}_updated.` + (data.photoName.split('.').pop() || 'jpg');
-        const blob = Utilities.newBlob(decodedBytes, data.photoMimeType || "image/jpeg", photoFileName);
-        photoUrl = personalFolder.createFile(blob).getUrl();
-      }
-
-      if (data.crmNoteOnly) {
-        const timestampStr = Utilities.formatDate(new Date(), "GMT+7", "dd/MM/yyyy HH:mm");
-        const newNoteEntry = `[${timestampStr} โดย ${data.operator}]: ${data.notes}`;
-        const updatedNotes = (currentNotes && currentNotes !== "-") ? `${currentNotes}\n${newNoteEntry}` : newNoteEntry;
+      if (unitVal) {
+        const houseNo = unitVal.includes("899/") ? unitVal : `899/${unitVal}`;
+        const autoAddress = `เลขที่ ${houseNo} หมู่ 9 โครงการอุดมสุขเพลส ต.หนองกี่ อ.กบินทร์บุรี จ.ปราจีนบุรี 25110`;
         
-        sheetResidents.getRange(targetRowIndex, 13).setValue(updatedNotes);
-        SpreadsheetApp.flush();
-        lock.releaseLock();
+        if (!curAddressInput.value || curAddressInput.dataset.autofilled === "true") {
+          curAddressInput.value = autoAddress;
+          curAddressInput.dataset.autofilled = "true";
+        }
+      }
+    }
 
-        recordLog(data.operator, data.operatorRole, "บันทึก CRM Note", `ยูนิต ${rawUnit}: ${data.notes}`);
-        return ContentService.createTextOutput(JSON.stringify({ status: "success", message: "บันทึกโน้ตติดตามงานเรียบร้อยแล้ว" })).setMimeType(ContentService.MimeType.JSON);
+    function autoFillResidentForSales(unitVal) {
+      const targetKey = cleanUnitKey(unitVal);
+      if (!targetKey) return;
+      const found = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
+      if (found && found.residentName) {
+        document.getElementById("inv-res-name").value = found.residentName;
+      }
+    }
+
+    function cleanUnitKey(val) {
+      if (val === null || val === undefined) return "";
+      let s = String(val).trim().toLowerCase();
+      if (/^\d+$/.test(s)) return String(parseInt(s, 10));
+      return s.replace(/\s+/g, '');
+    }
+
+    function calculateLevelData(exp) {
+      let level = Math.floor(Math.sqrt(exp / 3)) + 1;
+      if (level > 99) level = 99;
+      let title = "🥚 Novice Staff (พนักงานฝึกหัด)";
+      if (level >= 10 && level <= 29) title = "💼 Kafra Trainee (เจ้าหน้าที่ทั่วไป)";
+      else if (level >= 30 && level <= 49) title = "🛡️ Kafra Senior (เจ้าหน้าที่อาวุโส)";
+      else if (level >= 50 && level <= 79) title = "⚔️ Kafra Chief (หัวหน้าหน่วยบริการ)";
+      else if (level >= 80 && level <= 98) title = "👑 Kafra Master (ผู้เชี่ยวชาญระดับสูง)";
+      else if (level === 99) title = "🌟 Legendary Admin (ตำนานแห่งนิติบุคคล)";
+      let currentBaseExp = 3 * Math.pow(level - 1, 2);
+      let nextExp = (level === 99) ? currentBaseExp : (3 * Math.pow(level, 2));
+      let progressPercent = (level === 99) ? 100 : ((exp - currentBaseExp) / (nextExp - currentBaseExp)) * 100;
+      return { level, title, currentBaseExp, nextExp, progressPercent };
+    }
+
+    function showExpToast(amount, actionName) {
+      const toast = document.createElement('div');
+      toast.className = 'exp-toast';
+      toast.innerHTML = `🌟 +${amount} EXP <span style="font-size:12px; font-weight:normal;">(${actionName})</span>`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+      if(currentUser) {
+         currentUser.exp += amount;
+         sessionStorage.setItem("condo_auth_user", JSON.stringify(currentUser));
+         updateProfileUI(); 
+      }
+    }
+
+    function updateProfileUI() {
+      if(!currentUser) return;
+      const stats = calculateLevelData(currentUser.exp);
+      const avatarFile = (currentUser.avatar || "WIZmini") + ".gif";
+      document.getElementById("sidebar-avatar-img").src = avatarFile;
+      document.getElementById("prof-avatar-img").src = avatarFile;
+      document.getElementById("prof-name").innerText = currentUser.fullName;
+      document.getElementById("prof-title").innerText = stats.title;
+      document.getElementById("prof-level").innerText = stats.level;
+      let stars = "";
+      for(let i=0; i<(currentUser.prestige || 0); i++) stars += "⭐";
+      document.getElementById("prof-prestige").innerText = stars;
+      let expLabel = (stats.level === 99) ? `${currentUser.exp.toLocaleString()} / MAX` : `${currentUser.exp.toLocaleString()} / ${stats.nextExp.toLocaleString()} EXP`;
+      document.getElementById("prof-exp-text").innerText = expLabel;
+      document.getElementById("prof-exp-bar").style.width = `${stats.progressPercent}%`;
+    }
+
+    function applyRolePermissions(role) {
+      document.querySelectorAll('.nav-item').forEach(el => el.style.display = 'none');
+      let defaultTab = 'financial';
+
+      if (role === 'Admin') {
+        document.getElementById('menu-financial').style.display = 'block';
+        document.getElementById('menu-residents').style.display = 'block';
+        document.getElementById('menu-billing').style.display = 'block';
+        document.getElementById('menu-procurement').style.display = 'block';
+        document.getElementById('menu-admin-hub').style.display = 'block';
+      } else if (role === 'Finance') {
+        document.getElementById('menu-financial').style.display = 'block';
+        document.getElementById('menu-procurement').style.display = 'block';
+      } else if (role === 'AdminDoc') {
+        document.getElementById('menu-residents').style.display = 'block';
+        document.getElementById('menu-billing').style.display = 'block';
+        defaultTab = 'billing';
+      } else if (role === 'Sales') {
+        document.getElementById('menu-residents').style.display = 'block';
+        document.getElementById('menu-billing').style.display = 'block';
+        defaultTab = 'residents';
+      }
+      switchTab(defaultTab);
+    }
+
+    function checkAuth() {
+      const savedUser = sessionStorage.getItem("condo_auth_user");
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        document.getElementById("login-overlay").style.display = "none";
+        document.getElementById("char-select-screen").style.display = "none";
+        document.getElementById("current-user-display").innerText = (currentUser.fullName.split(' ')[0] || currentUser.username).toUpperCase();
+        document.getElementById("current-role-display").innerText = currentUser.role;
+        applyRolePermissions(currentUser.role);
+        updateProfileUI();
+        initInvoiceItems();
+        loadDashboardData();
+      } else {
+        document.getElementById("login-overlay").style.display = "flex";
+      }
+    }
+
+    let tempPendingUser = null;
+    async function handleLogin(event) {
+      event.preventDefault();
+      const btn = document.getElementById("btn-login");
+      btn.disabled = true; btn.innerText = "กำลังตรวจสอบ...";
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ type: "login", username: document.getElementById("login-user").value, password: document.getElementById("login-pass").value })
+        }, 3, 1500, "กำลังตรวจสอบข้อมูลล็อกอิน", "โปรดรอสักครู่...");
+        if (resJson.status === "success") {
+          tempPendingUser = resJson.user;
+          if(resJson.dailyLoginBonus) tempPendingUser.gotDailyBonus = true;
+          document.getElementById("login-overlay").style.display = "none";
+          document.getElementById("char-select-screen").style.display = "flex";
+          pickAvatar(tempPendingUser.avatar || "WIZmini");
+        } else alert("❌ " + resJson.message);
+      } catch (err) { alert("⚠️️ เชื่อมต่อขัดข้อง: " + err.message); } 
+      finally { btn.disabled = false; btn.innerText = "เข้าสู่ระบบ"; }
+    }
+
+    function pickAvatar(avatarKey) {
+      tempSelectedAvatar = avatarKey;
+      document.querySelectorAll('.char-option-card').forEach(c => c.classList.remove('selected'));
+      const card = document.getElementById(`opt-${avatarKey}`);
+      if(card) card.classList.add('selected');
+    }
+
+    async function confirmCharacterSelection() {
+      if(!tempPendingUser) return;
+      tempPendingUser.avatar = tempSelectedAvatar;
+      currentUser = tempPendingUser;
+      sessionStorage.setItem("condo_auth_user", JSON.stringify(currentUser));
+      document.getElementById("char-select-screen").style.display = "none";
+      checkAuth();
+      if (currentUser.gotDailyBonus) {
+        setTimeout(() => showExpToast(10, "Daily Login รายวัน"), 800);
+        delete currentUser.gotDailyBonus;
+      }
+      fetchWithRetry(API_URL, {
+        method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ type: "save_avatar", username: currentUser.username, avatar: tempSelectedAvatar })
+      });
+    }
+
+    function openCharSelectFromProfile() {
+      closeProfileModal();
+      tempSelectedAvatar = currentUser.avatar || "WIZmini";
+      pickAvatar(tempSelectedAvatar);
+      document.getElementById("char-select-screen").style.display = "flex";
+    }
+
+    function handleLogout() { sessionStorage.removeItem("condo_auth_user"); location.reload(); }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const targetTab = document.getElementById(`tab-${tabName}`);
+      const targetMenu = document.getElementById(`menu-${tabName}`);
+      if (targetTab) targetTab.classList.add('active');
+      if (targetMenu) targetMenu.classList.add('active');
+    }
+
+    function openRoModal(unit) {
+      pendingUnitForRegistration = unit; document.getElementById("ro-target-unit").innerText = unit;
+      document.getElementById("ro-modal-overlay").style.display = "flex";
+    }
+    function closeRoModal() { document.getElementById("ro-modal-overlay").style.display = "none"; }
+    function goToResidentRegistration() {
+      closeRoModal(); switchTab('residents');
+      const resUnitInput = document.getElementById("res-unit");
+      if (resUnitInput && pendingUnitForRegistration) { 
+        resUnitInput.value = pendingUnitForRegistration; 
+        autoFillRegistrationFields();
+        document.getElementById("res-name").focus(); 
+      }
+    }
+
+    function openProfileModal() { updateProfileUI(); document.getElementById("profile-modal-overlay").style.display = "flex"; }
+    function closeProfileModal() { document.getElementById("profile-modal-overlay").style.display = "none"; }
+
+    function openLedgerModal() {
+      document.getElementById("ledger-search-unit").value = "";
+      document.getElementById("ledger-content-box").style.display = "none";
+      document.getElementById("unit-ledger-modal").style.display = "flex";
+    }
+
+    function closeLedgerModal() {
+      document.getElementById("unit-ledger-modal").style.display = "none";
+    }
+
+    function searchUnitLedger() {
+      const q = document.getElementById("ledger-search-unit").value.trim();
+      if (!q) {
+        alert("⚠️ กรุณาพิมพ์ระบุเลขยูนิตที่ต้องการค้นหา");
+        return;
       }
 
-      sheetResidents.getRange(targetRowIndex, 2, 1, 7).setValues([[
-        resName, data.titleDeedNo || "-", data.phone || "-", data.email || "-", data.idCardAddress || "-", data.currentAddress || "-", photoUrl
-      ]]);
-      SpreadsheetApp.flush();
-      lock.releaseLock();
+      const targetKey = cleanUnitKey(q);
+      const res = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
+      const unitPayments = cachedPayments.filter(p => cleanUnitKey(p["Unit Number"] || p.unitNumber) === targetKey);
 
-      addExpToUser(ss, data.operator, 5);
-      recordLog(data.operator, data.operatorRole, "อัปเดตข้อมูลลูกบ้าน", `ยูนิต ${rawUnit} - ${resName}`);
-      return ContentService.createTextOutput(JSON.stringify({ status: "success", expAdded: 5 })).setMimeType(ContentService.MimeType.JSON);
+      document.getElementById("ledger-unit-display").innerText = q.toUpperCase();
+      document.getElementById("ledger-name-display").innerText = res ? res.residentName : "ไม่พบทะเบียนในระบบ (ลูกค้าทั่วไป)";
+
+      let totalPaid = 0;
+      const tbody = document.getElementById("ledger-tbody");
+      tbody.innerHTML = "";
+
+      if (unitPayments.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--text-muted);">ไม่พบประวัติธุรกรรมการเงินของยูนิตนี้</td></tr>`;
+      } else {
+        unitPayments.forEach(p => {
+          const amt = Number(p.Amount || p.amount || 0);
+          const st = p.Status || "Paid";
+          if (st.toLowerCase() === "paid") totalPaid += amt;
+
+          tbody.innerHTML += `<tr>
+            <td>${formatDisplayDate(p.Date)}</td>
+            <td style="color:var(--accent-gold); font-weight:bold;">${p.DocNo || '-'}</td>
+            <td>${p["Fee Type"] || '-'}</td>
+            <td style="color:#6ee7b7; font-weight:bold;">฿${amt.toLocaleString()}</td>
+            <td>${p["Payment Method"] || '-'}</td>
+            <td><span class="badge ${st.toLowerCase()}">${st}</span></td>
+          </tr>`;
+        });
+      }
+
+      document.getElementById("ledger-paid-display").innerText = "฿" + totalPaid.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById("ledger-content-box").style.display = "block";
     }
 
-    return ContentService.createTextOutput(JSON.stringify({ status: "ignored" })).setMimeType(ContentService.MimeType.JSON);
+    function openCustomerListModal() {
+      const tbody = document.getElementById("modal-resident-tbody");
+      tbody.innerHTML = "";
+      if (!cachedResidents || cachedResidents.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--text-muted);">ไม่พบข้อมูลลูกบ้านในระบบ</td></tr>`;
+      } else {
+        renderModalResidents(cachedResidents);
+      }
+      document.getElementById("modal-resident-search").value = "";
+      document.getElementById("customer-list-modal").style.display = "flex";
+    }
 
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({ 
-      status: "error", 
-      message: "Server Exception: " + error.toString() 
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-}
+    function renderModalResidents(list) {
+      const tbody = document.getElementById("modal-resident-tbody");
+      tbody.innerHTML = "";
+      list.forEach(res => {
+        const uStr = String(res.unitNumber).replace(/'/g, "\\'");
+        const typeBadge = (res.residentType === "Tenant") 
+          ? `<span class="badge" style="background:rgba(2,132,199,0.2); color:#38bdf8; border:1px solid #0284c7;">ผู้เช่า</span>` 
+          : `<span class="badge" style="background:rgba(220,38,38,0.2); color:#fca5a5; border:1px solid #dc2626;">เจ้าของ</span>`;
 
-function doGet() {
-  try {
-    const ss = getSS();
-    let sheetPayments = ss.getSheetByName("Payments");
-    let sheetExpenses = ss.getSheetByName("Expenses");
-    let sheetResidents = ss.getSheetByName("Residents");
-    let sheetDailyInvoices = ss.getSheetByName("DailyInvoices");
-    let sheetProcurement = ss.getSheetByName("Procurement");
-    let sheetSet = ss.getSheetByName("SystemSettings");
-    
-    const paymentsResult = [];
-    if (sheetPayments && sheetPayments.getDataRange().getValues().length > 1) {
-      sheetPayments.getDataRange().getValues().slice(1).forEach(row => {
-        if (row[1] || row[4]) {
-          paymentsResult.push({ "Date": row[0]||"", "Unit Number": row[1]||"-", "Resident Name": row[2]||"-", "Fee Type": row[3]||"ค่าส่วนกลาง", "Amount": row[4]||0, "Payment Method": row[5]||"-", "Status": row[6]||"Pending", "DocNo": row[8]||"-" });
-        }
+        tbody.innerHTML += `
+          <tr style="border-bottom: 1px solid #140803;">
+            <td style="padding: 10px 12px; font-weight: bold; color: var(--accent-gold);">${String(res.unitNumber).toUpperCase()}</td>
+            <td style="padding: 10px 12px; color: var(--text-main); font-weight: 600;">${res.residentName || "-"}</td>
+            <td style="padding: 10px 12px;">${typeBadge}</td>
+            <td style="padding: 10px 12px; color: #60a5fa;">${res.titleDeedNo || "-"}</td>
+            <td style="padding: 10px 12px; color: #6ee7b7;">${res.phone || "-"}</td>
+            <td style="padding: 10px 12px; color: var(--text-muted); font-size: 12px;">${res.currentAddress || "-"}</td>
+            <td style="padding: 10px 12px; text-align: center;">
+              <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openEditResidentModal('${uStr}')">✏️ แก้ไข</button>
+            </td>
+          </tr>
+        `;
       });
     }
 
-    const expensesResult = [];
-    if (sheetExpenses && sheetExpenses.getDataRange().getValues().length > 1) {
-      sheetExpenses.getDataRange().getValues().slice(1).forEach(row => {
-        if (row[1] || row[3]) {
-          expensesResult.push({ "Date": row[0]||"", "Category": row[1]||"ทั่วไป", "Description": row[2]||"-", "Amount": row[3]||0, "Payment Method": row[4]||"-", "Operator": row[5]||"-", "AttachmentUrl": row[6]||"-" });
+    function filterModalResidentList() {
+      const q = document.getElementById("modal-resident-search").value.trim().toLowerCase();
+      const filtered = cachedResidents.filter(r => 
+        String(r.unitNumber).toLowerCase().includes(q) || 
+        (r.residentName && r.residentName.toLowerCase().includes(q)) ||
+        (r.titleDeedNo && r.titleDeedNo.toLowerCase().includes(q)) ||
+        (r.phone && r.phone.toLowerCase().includes(q)) ||
+        (r.idCardAddress && r.idCardAddress.toLowerCase().includes(q)) ||
+        (r.currentAddress && r.currentAddress.toLowerCase().includes(q))
+      );
+      renderModalResidents(filtered);
+    }
+
+    function closeCustomerListModal() {
+      document.getElementById("customer-list-modal").style.display = "none";
+      document.getElementById("modal-resident-tbody").innerHTML = "";
+      document.getElementById("modal-resident-search").value = "";
+    }
+
+    function openEditResidentModal(unitNumber) {
+      const targetKey = cleanUnitKey(unitNumber);
+      const res = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
+      if (!res) {
+        alert("⚠️ ไม่พบข้อมูลลูกบ้านรายนี้");
+        return;
+      }
+
+      document.getElementById("edit-res-unit").value = res.unitNumber;
+      document.getElementById("edit-res-deed").value = res.titleDeedNo !== "-" ? res.titleDeedNo : "";
+      document.getElementById("edit-res-name").value = res.residentName || "";
+      document.getElementById("edit-res-phone").value = res.phone !== "-" ? res.phone : "";
+      document.getElementById("edit-res-email").value = res.email !== "-" ? res.email : "";
+      document.getElementById("edit-res-id-address").value = res.idCardAddress !== "-" ? res.idCardAddress : "";
+      document.getElementById("edit-res-cur-address").value = res.currentAddress !== "-" ? res.currentAddress : "";
+      document.getElementById("edit-res-photo").value = "";
+      editResidentPhotoBase64 = null;
+
+      document.getElementById("edit-resident-modal").style.display = "flex";
+    }
+
+    function closeEditResidentModal() {
+      document.getElementById("edit-resident-modal").style.display = "none";
+    }
+
+    function previewEditResidentPhoto(e) {
+      const file = e.target.files[0];
+      if (file) {
+        editResidentPhotoName = file.name;
+        editResidentPhotoMime = file.type || "image/jpeg";
+        const reader = new FileReader();
+        reader.onload = function(evt) { editResidentPhotoBase64 = evt.target.result; };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function submitUpdateResident(event) {
+      event.preventDefault();
+      const btn = document.getElementById("btn-submit-update-resident");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังบันทึกการแก้ไข...";
+
+      const payload = {
+        type: "update_resident",
+        operator: currentUser?.username,
+        operatorRole: currentUser?.role,
+        unitNumber: document.getElementById("edit-res-unit").value.trim(),
+        titleDeedNo: document.getElementById("edit-res-deed").value.trim(),
+        residentName: document.getElementById("edit-res-name").value.trim(),
+        phone: document.getElementById("edit-res-phone").value.trim(),
+        email: document.getElementById("edit-res-email").value.trim(),
+        idCardAddress: document.getElementById("edit-res-id-address").value.trim(),
+        currentAddress: document.getElementById("edit-res-cur-address").value.trim(),
+        photoData: editResidentPhotoBase64,
+        photoName: editResidentPhotoName,
+        photoMimeType: editResidentPhotoMime
+      };
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        }, 3, 1500, "กำลังอัปเดตข้อมูลลูกบ้าน", "กำลังบันทึกข้อมูลทับข้อมูลเดิม...");
+
+        if (resJson.status === "success") {
+          showExpToast(5, "อัปเดตข้อมูลลูกบ้าน");
+          alert("✅ บันทึกการแก้ไขข้อมูลเรียบร้อยแล้ว!");
+          closeEditResidentModal();
+          await loadDashboardData();
+          openCustomerListModal();
+        } else {
+          alert("❌ " + resJson.message);
         }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "💾 บันทึกการแก้ไขข้อมูล";
+      }
+    }
+
+    function autoFillResidentName(inputUnit) {
+      const targetKey = cleanUnitKey(inputUnit);
+      if (!targetKey) return;
+      const found = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
+      if (found && found.residentName) document.getElementById("form-name").value = found.residentName;
+    }
+
+    function fillPaymentFromQueue(unit, name, feeType, month) {
+      document.getElementById("form-unit").value = unit;
+      document.getElementById("form-name").value = name;
+      document.getElementById("form-fee-type").value = feeType;
+
+      if (feeType.includes("500") || feeType === "ค่าส่วนกลางประจำปี") {
+        document.getElementById("form-amount").value = 500;
+      }
+      
+      document.getElementById("form-amount").focus();
+      showExpToast(1, `เลือกยูนิต ${unit} จากคิว`);
+    }
+
+    async function loadDashboardData() {
+      try {
+        const fetchUrl = API_URL + "?t=" + new Date().getTime();
+        const data = await fetchWithRetry(fetchUrl, {}, 3, 1500, "กำลังโหลดข้อมูลระบบ...", "กำลังดึงข้อมูลล่าสุดจาก Google Sheets");
+        if (data.payments) { 
+          cachedPayments = data.payments || []; 
+          cachedExpenses = data.expenses || [];
+          cachedResidents = data.residents || []; 
+          cachedProcurement = data.procurement || [];
+          cachedPendingInvoices = data.pendingInvoices || [];
+          cachedAllInvoices = data.allInvoices || [];
+          
+          if (data.nextInvNo !== undefined) document.getElementById("admin-next-inv-no").value = data.nextInvNo;
+          if (data.nextRecNo !== undefined) document.getElementById("admin-next-rec-no").value = data.nextRecNo;
+        } else if (Array.isArray(data)) { 
+          cachedPayments = data; 
+        }
+        renderTable(cachedPayments); 
+        renderExpensesTable(cachedExpenses);
+        renderPendingInvoicesQueue(cachedPendingInvoices);
+        renderSalesTrackingTable(cachedAllInvoices);
+        renderPropertyMap(cachedResidents, cachedPendingInvoices);
+        renderProcurementTable(cachedProcurement);
+        calculateMetrics(cachedPayments, cachedExpenses, cachedPendingInvoices, cachedAllInvoices, cachedProcurement);
+      } catch (error) { console.error("Load Error:", error); }
+    }
+
+    function renderPendingInvoicesQueue(data) {
+      const tbody = document.getElementById("pending-invoices-tbody");
+      tbody.innerHTML = "";
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 15px; color: #6ee7b7;">✅ ไม่มีคิวค้างรับเงิน (เคลียร์ครบแล้ว)</td></tr>`;
+        return;
+      }
+
+      data.forEach(item => {
+        const u = String(item.unitNumber).replace(/'/g, "\\ me'");
+        const n = String(item.residentName).replace(/'/g, "\\'");
+        const f = String(item.feeType).replace(/'/g, "\\'");
+        const m = String(item.billingMonth).replace(/'/g, "\\'");
+
+        const formattedDate = formatDisplayDate(item.date || item.timestamp);
+        const formattedMonth = formatDisplayMonth(item.billingMonth);
+
+        tbody.innerHTML += `<tr>
+          <td>${formattedDate}</td>
+          <td style="color: var(--accent-gold); font-weight: bold;">${item.unitNumber}</td>
+          <td>${item.residentName}</td>
+          <td>${item.feeType}</td>
+          <td><span class="badge pending" style="font-size:11px;">${formattedMonth}</span></td>
+          <td style="color: var(--text-muted); font-size:12px;">${item.operator}</td>
+          <td style="text-align: center;">
+            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #059669, #047857);" onclick="fillPaymentFromQueue('${u}', '${n}', '${f}', '${m}')">
+              ⚡ รับเงิน
+            </button>
+          </td>
+        </tr>`;
       });
     }
 
-    const residentsResult = [];
-    if (sheetResidents && sheetResidents.getDataRange().getValues().length > 1) {
-      sheetResidents.getDataRange().getValues().slice(1).forEach(row => {
-        if (row[0]) {
-          residentsResult.push({ 
-            unitNumber: String(row[0]).trim(), 
-            residentName: String(row[1] || "").trim(),
-            residentType: String(row[2] || "Owner").trim(),
-            titleDeedNo: String(row[3] || "-").trim(),
-            phone: String(row[4] || "-").trim(),
-            email: String(row[5] || "-").trim(),
-            idCardAddress: String(row[6] || "-").trim(),
-            currentAddress: String(row[7] || "-").trim(),
-            notes: String(row[12] || "-").trim(),
-            ownerName: String(row[13] || "-").trim(),
-            ownerPhone: String(row[14] || "-").trim()
-          });
-        }
+    function renderSalesTrackingTable(data) {
+      const tbody = document.getElementById("sales-tracking-tbody");
+      tbody.innerHTML = "";
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีประวัติการออกเอกสาร</td></tr>`;
+        return;
+      }
+
+      data.slice().reverse().forEach(item => {
+        const formattedDate = formatDisplayDate(item.date || item.timestamp);
+        const status = item.status || "Pending";
+        const amt = Number(item.amount || 0);
+        const docNo = item.docNo || "-";
+
+        let statusBadge = `<span class="badge pending">รอดำเนินการ</span>`;
+        if (status === "Settled" || status === "Paid") statusBadge = `<span class="badge paid">ชำระแล้ว</span>`;
+        if (status === "Cancelled") statusBadge = `<span class="badge overdue">ยกเลิกแล้ว</span>`;
+        if (status === "Quotation") statusBadge = `<span class="badge pending" style="background:rgba(2,132,199,0.3); color:#38bdf8; border-color:#0284c7;">ใบเสนอราคา</span>`;
+
+        const dStr = String(docNo).replace(/'/g, "\\'");
+        const btnCancelHtml = (status === "Pending" || status === "Quotation") 
+          ? `<button type="button" class="btn-action" style="background: #dc2626;" onclick="handleCancelInvoice('${dStr}')">🚫 ยกเลิกบิล</button>` 
+          : `<span style="font-size:11px; color:var(--text-muted);">🔒 ล็อก</span>`;
+
+        tbody.innerHTML += `<tr>
+          <td style="color: var(--accent-gold); font-weight: bold;">${docNo}</td>
+          <td>${formattedDate}</td>
+          <td style="font-weight: bold;">${item.unitNumber}</td>
+          <td>${item.residentName}</td>
+          <td>${item.feeType}</td>
+          <td style="color: #6ee7b7;">฿${amt.toLocaleString()}</td>
+          <td>${statusBadge}</td>
+          <td style="text-align: center;">${btnCancelHtml}</td>
+        </tr>`;
       });
     }
 
-    const procurementResult = [];
-    if (sheetProcurement && sheetProcurement.getDataRange().getValues().length > 1) {
-      sheetProcurement.getDataRange().getValues().slice(1).forEach(row => {
-        if (row[0] || row[1]) {
-          procurementResult.push({
-            itemCode: String(row[0] || "-").trim(),
-            itemName: String(row[1] || "-").trim(),
-            category: String(row[2] || "ทั่วไป").trim(),
-            quantity: Number(row[3] || 0),
-            unit: String(row[4] || "ชิ้น").trim(),
-            minAlert: Number(row[5] || 5),
-            unitPrice: Number(row[6] || 0),
-            lastUpdated: row[7] || "",
-            operator: String(row[8] || "-").trim()
-          });
+    function renderProcurementTable(data) {
+      const tbody = document.getElementById("procurement-tbody");
+      tbody.innerHTML = "";
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีรายการพัสดุในระบบ</td></tr>`;
+        return;
+      }
+
+      data.forEach(item => {
+        const qty = Number(item.quantity || 0);
+        const minAlert = Number(item.minAlert || 5);
+        const price = Number(item.unitPrice || 0);
+        const codeStr = String(item.itemCode).replace(/'/g, "\\'");
+
+        let statusBadge = `<span class="badge paid">ปกติ</span>`;
+        if (qty <= minAlert) {
+          statusBadge = `<span class="badge overdue" style="animation: pulse 1.5s infinite;">🔴 ต้องสั่งเพิ่ม</span>`;
         }
+
+        tbody.innerHTML += `<tr>
+          <td style="color: var(--accent-gold); font-weight: bold;">${item.itemCode}</td>
+          <td style="font-weight: bold; color: var(--text-main);">${item.itemName}</td>
+          <td>${item.category}</td>
+          <td style="font-size: 14px; font-weight: bold; color: ${qty <= minAlert ? '#fca5a5' : '#6ee7b7'};">${qty} ${item.unit}</td>
+          <td>฿${price.toLocaleString()}</td>
+          <td>${statusBadge}</td>
+          <td style="text-align: center;">
+            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openStockModal('${codeStr}')">⚙️ ปรับสต็อก</button>
+          </td>
+        </tr>`;
       });
     }
 
-    const allInvoicesResult = [];
-    const pendingInvoicesResult = [];
-    if (sheetDailyInvoices && sheetDailyInvoices.getDataRange().getValues().length > 1) {
-      sheetDailyInvoices.getDataRange().getValues().slice(1).forEach(row => {
-        const status = row[7] || "Pending";
+    function renderPropertyMap(residents, pendingInvoices) {
+      const container = document.getElementById("unit-map-container");
+      container.innerHTML = "";
+
+      if (!residents || residents.length === 0) {
+        container.innerHTML = `<div style="grid-column: span 4; text-align: center; padding: 20px; color: var(--text-muted);">ยังไม่มีการลงทะเบียนยูนิตในระบบ</div>`;
+        return;
+      }
+
+      residents.forEach(res => {
+        const uStr = res.unitNumber;
+        const targetKey = cleanUnitKey(uStr);
+        const pending = pendingInvoices.find(p => cleanUnitKey(p.unitNumber) === targetKey);
+
+        let statusClass = (res.residentType === "Tenant") ? "tenant" : "owner";
+        let statusText = (res.residentType === "Tenant") ? "ผู้เช่า" : "เจ้าของ";
+
+        if (pending) {
+          statusClass = "has-pending";
+          statusText = "มีบิลค้าง";
+        }
+
+        const chip = document.createElement("div");
+        chip.className = `unit-chip ${statusClass}`;
+        chip.innerHTML = `
+          <div style="font-weight: bold; font-size: 13px; color: var(--text-main);">${uStr}</div>
+          <div style="font-size: 10px; margin-top: 2px;">${statusText}</div>
+        `;
         
-        let parsedItems = [];
-        try {
-          if (row[11]) parsedItems = JSON.parse(row[11]);
-        } catch(e) {}
+        chip.onclick = () => openCrmModal(uStr);
+        container.appendChild(chip);
+      });
+    }
 
-        const invItem = {
-          timestamp: row[0] || "",
-          date: row[1] || "-",
-          unitNumber: String(row[2] || "-").trim(),
-          residentName: String(row[3] || "-").trim(),
-          billingMonth: String(row[4] || "-").trim(),
-          feeType: String(row[5] || "ค่าส่วนกลาง").trim(),
-          operator: String(row[6] || "ฝ่ายขาย").trim(),
-          status: status,
-          docNo: String(row[8] || "-").trim(),
-          amount: Number(row[9] || 0),
-          docType: String(row[10] || "INVOICE").trim(),
-          items: parsedItems
+    function renderTable(data) {
+      const tableBody = document.getElementById("payments-table-body");
+      tableBody.innerHTML = "";
+      if (!data || data.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">ไม่พบรายการ</td></tr>`; return;
+      }
+      data.forEach(item => {
+        const rawDate = item["Date"] || item["Timestamp"] || "-";
+        const formattedDate = formatDisplayDate(rawDate);
+        const status = item["Status"] || "Pending";
+        const amount = Number(item["Amount"] || item["amount"] || 0);
+        const unit = item["Unit Number"] || item["unitNumber"] || "-";
+        const residentName = item["Resident Name"] || "-";
+        const feeType = item["Fee Type"] || "ค่าส่วนกลาง";
+        const payMethod = item["Payment Method"] || "โอนเงิน / สแกน QR";
+        const docNo = item["DocNo"] || "-";
+
+        const u = String(unit).replace(/'/g, "\\'");
+        const r = String(residentName).replace(/'/g, "\\'");
+        const f = String(feeType).replace(/'/g, "\\ me'");
+        const p = String(payMethod).replace(/'/g, "\\'");
+        const d = String(docNo).replace(/'/g, "\\'");
+
+        const btnReceiptHtml = status.toLowerCase() === 'paid' 
+          ? `<button class="btn-action" style="background: linear-gradient(135deg, var(--accent-green), #047857);" onclick="handlePrintReceipt('${u}', '${r}', '${f}', ${amount}, '${p}', '${d}')">🖨️ พิมพ์ใบเสร็จ</button>` 
+          : `<span style="font-size:12px; color:var(--text-muted);">-</span>`;
+        tableBody.innerHTML += `<tr>
+          <td>${formattedDate}</td>
+          <td style="color: var(--accent-gold); font-weight: bold;">${unit}</td>
+          <td>${residentName}</td>
+          <td>${feeType}</td>
+          <td style="color: #6ee7b7;">฿${amount.toLocaleString()}</td>
+          <td><span class="badge ${status.toLowerCase()}">${status}</span></td>
+          <td>${btnReceiptHtml}</td>
+        </tr>`;
+      });
+    }
+
+    function renderExpensesTable(data) {
+      const tbody = document.getElementById("expenses-table-body");
+      tbody.innerHTML = "";
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีรายการบันทึกรายจ่าย</td></tr>`;
+        return;
+      }
+
+      data.forEach(item => {
+        const formattedDate = formatDisplayDate(item.Date);
+        const amt = Number(item.Amount || 0);
+        const attachUrl = item.AttachmentUrl || item.Attachment || "-";
+        
+        const attachHtml = (attachUrl && attachUrl !== "-" && attachUrl.startsWith("http"))
+          ? `<a href="${attachUrl}" target="_blank" class="btn-action" style="background: #0284c7; text-decoration: none; display: inline-block;">📎 เปิดแนบ</a>`
+          : `<span style="font-size:11px; color:var(--text-muted);">-</span>`;
+
+        tbody.innerHTML += `<tr>
+          <td>${formattedDate}</td>
+          <td style="color: #fca5a5; font-weight: bold;">${item.Category || '-'}</td>
+          <td>${item.Description || '-'}</td>
+          <td style="color: #fca5a5; font-weight: bold;">฿${amt.toLocaleString()}</td>
+          <td>${item['Payment Method'] || '-'}</td>
+          <td style="text-align: center;">${attachHtml}</td>
+          <td style="color: var(--text-muted); font-size:12px;">${item.Operator || '-'}</td>
+        </tr>`;
+      });
+    }
+
+    function filterTable() {
+      const query = document.getElementById("global-search").value.toLowerCase();
+      renderTable(cachedPayments.filter(item => {
+        return String(item["Unit Number"] || "").toLowerCase().includes(query) || String(item["Resident Name"] || "").toLowerCase().includes(query);
+      }));
+    }
+
+    function calculateMetrics(payments, expenses, pendingInvoices, allInvoices, procurement) {
+      let income = 0;
+      payments.forEach(item => {
+        const amount = Number(item["Amount"] || 0);
+        if ((item["Status"] || "").toLowerCase() === "paid") income += amount;
+      });
+
+      let totalExp = 0;
+      if (expenses && Array.isArray(expenses)) {
+        expenses.forEach(item => {
+          totalExp += Number(item.Amount || 0);
+        });
+      }
+
+      const net = income - totalExp;
+
+      document.getElementById("total-income").innerText = "฿" + income.toLocaleString();
+      document.getElementById("total-expense").innerText = "฿" + totalExp.toLocaleString();
+      document.getElementById("net-balance").innerText = "฿" + net.toLocaleString();
+      document.getElementById("total-records").innerText = payments.length.toLocaleString();
+
+      const queueCount = pendingInvoices ? pendingInvoices.length : 0;
+      document.getElementById("total-pending-invoices").innerText = queueCount.toLocaleString();
+      document.getElementById("queue-badge").innerText = `${queueCount} รายการ`;
+      document.getElementById("expense-badge").innerText = `${expenses ? expenses.length : 0} รายการ`;
+
+      let salesSum = 0, salesPendingCount = 0, salesSettledCount = 0;
+      if (allInvoices && Array.isArray(allInvoices)) {
+        allInvoices.forEach(inv => {
+          salesSum += Number(inv.amount || 0);
+          if (inv.status === "Pending") salesPendingCount++;
+          if (inv.status === "Settled" || inv.status === "Paid") salesSettledCount++;
+        });
+        document.getElementById("sales-total-amount").innerText = "฿" + salesSum.toLocaleString();
+        document.getElementById("sales-total-count").innerText = allInvoices.length.toLocaleString();
+        document.getElementById("sales-pending-count").innerText = salesPendingCount.toLocaleString();
+        document.getElementById("sales-settled-count").innerText = salesSettledCount.toLocaleString();
+      }
+
+      let procAlertCount = 0, procTotalVal = 0;
+      if (procurement && Array.isArray(procurement)) {
+        procurement.forEach(item => {
+          const qty = Number(item.quantity || 0);
+          const minAlert = Number(item.minAlert || 5);
+          const price = Number(item.unitPrice || 0);
+
+          if (qty <= minAlert) procAlertCount++;
+          procTotalVal += (qty * price);
+        });
+        document.getElementById("proc-total-items").innerText = procurement.length.toLocaleString();
+        document.getElementById("proc-alert-count").innerText = procAlertCount.toLocaleString();
+        document.getElementById("proc-total-value").innerText = "฿" + procTotalVal.toLocaleString();
+      }
+    }
+
+    async function submitNewProcurement(event) {
+      event.preventDefault();
+      const btn = document.getElementById("btn-submit-proc");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังบันทึกพัสดุ...";
+
+      const payload = {
+        type: "new_procurement",
+        operator: currentUser?.username,
+        operatorRole: currentUser?.role,
+        itemName: document.getElementById("proc-item-name").value.trim(),
+        category: document.getElementById("proc-category").value.trim(),
+        quantity: document.getElementById("proc-qty").value,
+        unit: document.getElementById("proc-unit").value.trim(),
+        minAlert: document.getElementById("proc-min-alert").value,
+        unitPrice: document.getElementById("proc-unit-price").value
+      };
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        }, 3, 1500, "กำลังบันทึกพัสดุจัดซื้อ", "กำลังเพิ่มข้อมูลลงชีต Procurement...");
+
+        if (resJson.status === "success") {
+          showExpToast(10, "เพิ่มรายการจัดซื้อพัสดุ");
+          alert("✅ " + resJson.message);
+          document.getElementById("procurement-form").reset();
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "💾 บันทึกรับพัสดุใหม่เข้าสต็อก";
+      }
+    }
+
+    function openStockModal(itemCode) {
+      activeStockItemCode = itemCode;
+      const item = cachedProcurement.find(p => String(p.itemCode).trim() === String(itemCode).trim());
+      if (!item) {
+        alert("⚠️ ไม่พบข้อมูลรายการพัสดุนี้");
+        return;
+      }
+
+      document.getElementById("stock-modal-code").value = item.itemCode;
+      document.getElementById("stock-modal-name").value = `${item.itemName} (${item.category})`;
+      document.getElementById("stock-modal-qty").value = item.quantity;
+      document.getElementById("stock-modal-min").value = item.minAlert;
+
+      document.getElementById("stock-adjust-modal").style.display = "flex";
+    }
+
+    function closeStockModal() {
+      document.getElementById("stock-adjust-modal").style.display = "none";
+      activeStockItemCode = "";
+    }
+
+    async function submitStockAdjustment() {
+      const newQty = document.getElementById("stock-modal-qty").value;
+      const newMin = document.getElementById("stock-modal-min").value;
+
+      if (newQty === "" || newMin === "" || !activeStockItemCode) {
+        alert("⚠️ กรุณาระบุจำนวนพัสดุและจุดแจ้งเตือนขั้นต่ำ");
+        return;
+      }
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload = {
+            type: "update_stock_quantity",
+            operator: currentUser?.username,
+            operatorRole: currentUser?.role,
+            itemCode: activeStockItemCode,
+            newQuantity: newQty,
+            newMinAlert: newMin
+          })
+        }, 3, 1500, "กำลังปรับสต็อกพัสดุ", "กำลังอัปเดตจำนวนคงเหลือในชีต...");
+
+        if (resJson.status === "success") {
+          alert("✅ " + resJson.message);
+          closeStockModal();
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+      }
+    }
+
+    function switchDocTypeForm(val) {
+      const btn = document.getElementById("btn-generate-inv");
+      if (val === "QUOTATION") {
+        btn.innerText = "🖨️ พิมพ์ใบเสนอราคา / ใบจอง (PDF)";
+      } else {
+        btn.innerText = "🖨️ ตรวจสอบ, ส่งงานเข้าคิว & พิมพ์ใบแจ้งหนี้ (PDF)";
+      }
+    }
+
+    async function handleSetDocRunningNumber() {
+      const nextInvNo = document.getElementById("admin-next-inv-no").value.trim();
+      const nextRecNo = document.getElementById("admin-next-rec-no").value.trim();
+
+      if (!nextInvNo && !nextRecNo) {
+        alert("⚠️ กรุณาระบุตัวเลขอย่างน้อย 1 ช่องสำหรับการตั้งค่า");
+        return;
+      }
+
+      const btn = document.getElementById("btn-save-doc-number");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังบันทึกการตั้งค่า...";
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            type: "set_doc_running_number",
+            operator: currentUser?.username,
+            operatorRole: currentUser?.role,
+            nextInvNo: nextInvNo,
+            nextRecNo: nextRecNo
+          })
+        }, 3, 1500, "กำลังตั้งค่าเลขรันเอกสาร", "กำลังอัปเดตตัวเลขถัดไปใน Google Sheets...");
+
+        if (resJson.status === "success") {
+          alert("✅ " + resJson.message);
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "💾 บันทึกตั้งค่าเลขที่รันเอกสาร";
+      }
+    }
+
+    // 📄 ออกใบแจ้งหนี้ / ใบเสนอราคา (หลายรายการย่อย 1-10 รายการ)
+    async function handleGenerateInvoice(event) {
+      event.preventDefault();
+      const unitVal = document.getElementById("inv-unit").value.trim();
+      const resNameVal = document.getElementById("inv-res-name").value.trim();
+      const monthVal = document.getElementById("inv-month").value;
+      const docTypeVal = document.getElementById("inv-doc-type").value;
+
+      // รวบรวมรายการย่อยจากฟอร์ม Dynamic
+      const container = document.getElementById("invoice-items-container");
+      const rows = container.getElementsByClassName("invoice-item-row");
+      const itemsList = [];
+      let calculatedGrandTotal = 0;
+
+      for (let row of rows) {
+        const desc = row.querySelector(".item-desc-input").value.trim();
+        const amt = Number(row.querySelector(".item-amt-input").value || 0);
+        if (desc && amt > 0) {
+          itemsList.push({ description: desc, amount: amt });
+          calculatedGrandTotal += amt;
+        }
+      }
+
+      if (!unitVal || itemsList.length === 0 || calculatedGrandTotal <= 0) {
+        alert("⚠️ กรุณาระบุเลขยูนิต และกรอกรายการค่าใช้จ่ายพร้อมจำนวนเงินอย่างน้อย 1 รายการ");
+        return;
+      }
+
+      const summaryFeeType = itemsList.map(i => i.description).join(" | ");
+      const targetKey = cleanUnitKey(unitVal);
+      const matchedResident = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
+
+      const btn = document.getElementById("btn-generate-inv");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังประมวลผล...";
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, { 
+          method: "POST", 
+          headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+          body: JSON.stringify({ 
+            type: "generate_invoice", 
+            operator: currentUser?.username, 
+            operatorRole: currentUser?.role, 
+            unitNumber: unitVal, 
+            residentName: resNameVal,
+            billingMonth: monthVal, 
+            feeType: summaryFeeType,
+            amount: calculatedGrandTotal,
+            docType: docTypeVal,
+            items: itemsList
+          }) 
+        }, 3, 1500, `กำลังออกเอกสาร ${docTypeVal}`, "กำลังบันทึกข้อมูลและรันลำดับเอกสาร...");
+
+        if (resJson.status === "success") {
+          showExpToast(resJson.expAdded, "ออกเอกสารการขายสำเร็จ");
+
+          const now = new Date();
+          const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+          const dStr = `${now.getDate()} ${thaiMonths[now.getMonth()]} ${now.getFullYear() + 543}`;
+
+          let displayMonth = monthVal;
+          if (monthVal && monthVal.includes("-")) {
+            const parts = monthVal.split("-");
+            const mIndex = parseInt(parts[1], 10) - 1;
+            const yThai = parseInt(parts[0], 10) + 543;
+            displayMonth = `${thaiMonths[mIndex]} ${yThai}`;
+          }
+
+          if (docTypeVal === "QUOTATION") {
+            document.getElementById("print-doc-title-th").innerText = "ใบเสนอราคา / ใบจอง";
+            document.getElementById("print-doc-title-en").innerText = "QUOTATION";
+            document.getElementById("print-label-customer").innerText = "เสนอราคาสำหรับ (ลูกค้า):";
+            document.getElementById("print-total-label").innerText = "รวมยอดเงินทั้งสิ้น (Total Amount):";
+          } else {
+            document.getElementById("print-doc-title-th").innerText = "ใบแจ้งหนี้";
+            document.getElementById("print-doc-title-en").innerText = "INVOICE";
+            document.getElementById("print-label-customer").innerText = "ผู้รับใบแจ้งหนี้ (เจ้าของร่วม):";
+            document.getElementById("print-total-label").innerText = "รวมยอดที่ต้องชำระทั้งสิ้น (Total Due):";
+          }
+
+          document.getElementById("print-sig-left-title").innerText = "เจ้าหน้าที่ฝ่ายจัดทำเอกสาร";
+          document.getElementById("print-payment-note").style.display = "block";
+          document.getElementById("print-finance-name").innerText = " ............................................................ ";
+          document.getElementById("row-print-deed").style.display = "table-row";
+          document.getElementById("row-print-month-full").style.display = "none";
+
+          document.getElementById("print-inv-no").innerText = resJson.docNo || "DOC-AUTO";
+          document.getElementById("print-inv-date").innerText = dStr;
+          document.getElementById("print-res-name").innerText = resNameVal || resJson.residentName || "-";
+          document.getElementById("print-res-unit").innerText = unitVal;
+          document.getElementById("print-res-deed").innerText = matchedResident?.titleDeedNo || "-";
+          document.getElementById("print-inv-month").innerText = displayMonth || "ประจำเดือนปัจจุบัน";
+          document.getElementById("print-res-address").innerText = matchedResident?.currentAddress || `แปลงที่ ${unitVal} โครงการอุดมสุขเพลส`;
+          
+          // เรนเดอร์รายการย่อยลงตารางพิมพ์ A4
+          const printTbody = document.getElementById("print-items-tbody");
+          printTbody.innerHTML = "";
+          itemsList.forEach((it, idx) => {
+            printTbody.innerHTML += `
+              <tr>
+                <td style="text-align: center;">${idx + 1}</td>
+                <td><strong>${it.description}</strong></td>
+                <td style="text-align: right; font-weight: bold;">${it.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+              </tr>
+            `;
+          });
+
+          document.getElementById("print-fee-total").innerText = "฿" + calculatedGrandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 });
+          document.getElementById("print-operator-name").innerText = currentUser?.fullName || "ผู้จัดทำเอกสาร";
+
+          await loadDashboardData();
+          window.print();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เชื่อมต่อเซิร์ฟเวอร์ขัดข้อง: " + err.message);
+      } finally {
+        btn.disabled = false;
+        switchDocTypeForm(docTypeVal);
+      }
+    }
+
+    async function handleCancelInvoice(docNo) {
+      if (!confirm(`คุณแน่ใจหรือไม่ว่าต้องการยกเลิกเอกสารเลขที่ [${docNo}]?`)) return;
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            type: "cancel_invoice",
+            operator: currentUser?.username,
+            operatorRole: currentUser?.role,
+            docNo: docNo
+          })
+        }, 3, 1500, "กำลังยกเลิกเอกสาร", "กำลังอัปเดตสถานะในระบบ...");
+
+        if (resJson.status === "success") {
+          alert("✅ " + resJson.message);
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อ: " + err.message);
+      }
+    }
+
+    async function handlePrintReceipt(unit, residentName, feeType, amount, payMethod, existingDocNo) {
+      showExpToast(2, "พิมพ์ใบเสร็จรับเงิน");
+      
+      const targetKey = cleanUnitKey(unit);
+      const matchedResident = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
+      const now = new Date();
+      const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+      const dStr = `${now.getDate()} ${thaiMonths[now.getMonth()]} ${now.getFullYear() + 543}`;
+
+      document.getElementById("print-doc-title-th").innerText = "ใบเสร็จรับเงิน";
+      document.getElementById("print-doc-title-en").innerText = "RECEIPT";
+      document.getElementById("print-label-customer").innerText = "ได้รับเงินจาก (ผู้ชำระเงิน):";
+      document.getElementById("print-total-label").innerText = "จำนวนเงินที่ได้รับชำระทั้งสิ้น (Total Paid):";
+      document.getElementById("print-sig-left-title").innerText = "เจ้าหน้าที่ฝ่ายจัดทำเอกสาร";
+      document.getElementById("print-payment-note").style.display = "none";
+      
+      document.getElementById("row-print-deed").style.display = "none";
+      document.getElementById("row-print-month-full").style.display = "table-row";
+
+      document.getElementById("print-inv-no").innerText = (existingDocNo && existingDocNo !== "-") ? existingDocNo : "REC-AUTO";
+      document.getElementById("print-inv-date").innerText = dStr;
+      document.getElementById("print-res-name").innerText = residentName || "-";
+      document.getElementById("print-res-unit").innerText = unit;
+      document.getElementById("print-inv-month-full").innerText = `ชำระค่าบริการ (${feeType}) ผ่านช่องทาง: ${payMethod || 'โอนเงิน / QR'}`;
+      document.getElementById("print-res-address").innerText = matchedResident?.currentAddress || `แปลงที่ ${unit} โครงการอุดมสุขเพลส`;
+      
+      const printTbody = document.getElementById("print-items-tbody");
+      printTbody.innerHTML = `
+        <tr>
+          <td style="text-align: center;">1</td>
+          <td><strong>${feeType}</strong></td>
+          <td style="text-align: right; font-weight: bold;">${Number(amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+        </tr>
+      `;
+
+      document.getElementById("print-fee-total").innerText = "฿" + Number(amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById("print-operator-name").innerText = "ฝ่ายธุรการ / ระบบ";
+      document.getElementById("print-finance-name").innerText = currentUser?.fullName || "ฝ่ายการเงิน (ผู้รับเงิน)";
+
+      fetchWithRetry(API_URL, { 
+        method: "POST", 
+        headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+        body: JSON.stringify({ type: "print_receipt", operator: currentUser?.username, unitNumber: unit }) 
+      }, 3, 1500, "กำลังเตรียมพิมพ์ใบเสร็จ", "บันทึกประวัติการพิมพ์ลงระบบ...");
+
+      window.print();
+    }
+
+    async function submitPayment(event) {
+      event.preventDefault();
+      const targetKey = cleanUnitKey(document.getElementById("form-unit").value);
+      if (cachedResidents.length > 0 && !cachedResidents.some(r => cleanUnitKey(r.unitNumber) === targetKey)) { 
+        openRoModal(document.getElementById("form-unit").value.trim()); 
+        return; 
+      }
+      const btn = document.getElementById("btn-submit-payment"); btn.disabled = true; btn.innerText = "⏳ กำลังบันทึกและตัดยอดคิว...";
+      const payload = {
+        type: "payment", operator: currentUser?.username, operatorRole: currentUser?.role, unitNumber: document.getElementById("form-unit").value.trim(),
+        residentName: document.getElementById("form-name").value, feeType: document.getElementById("form-fee-type").value.trim(), amount: document.getElementById("form-amount").value, paymentMethod: document.getElementById("form-payment-method").value, status: document.getElementById("form-status").value
+      };
+      try {
+        const resJson = await fetchWithRetry(API_URL, { 
+          method: "POST", 
+          headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+          body: JSON.stringify(payload) 
+        }, 3, 1500, "กำลังบันทึกรับชำระเงิน", "กำลังออกเลขใบเสร็จ & เคลียร์คิวแจ้งหนี้...");
+
+        if(resJson.status === "success") {
+          showExpToast(resJson.expAdded || 5, (payload.status==="Overdue"||payload.feeType.includes("ค่าปรับ"))?"ทวงหนี้สำเร็จ":"รับชำระเงินสำเร็จ");
+          alert(`✅ บันทึกรายการสำเร็จ!\nออกใบเสร็จรับเงินเลขที่: ${resJson.docNo || '-'}`);
+          document.getElementById("payment-form").reset();
+          await loadDashboardData();
+        } else { alert("❌ " + resJson.message); }
+      } catch (err) { alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message); } 
+      finally { btn.disabled = false; btn.innerText = "บันทึกรับชำระเงิน & ตัดยอดคิว"; }
+    }
+
+    function previewExpenseFile(e) {
+      const file = e.target.files[0];
+      if (file) {
+        expenseFileName = file.name;
+        expenseFileMime = file.type || "image/jpeg";
+        const reader = new FileReader();
+        reader.onload = function(evt) { expenseFileBase64 = evt.target.result; };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function submitNewExpense(event) {
+      event.preventDefault();
+      const btn = document.getElementById("btn-submit-expense");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังบันทึกรายจ่าย...";
+
+      const payload = {
+        type: "new_expense",
+        operator: currentUser?.username,
+        operatorRole: currentUser?.role,
+        category: document.getElementById("exp-category").value,
+        description: document.getElementById("exp-desc").value.trim(),
+        amount: document.getElementById("exp-amount").value,
+        paymentMethod: document.getElementById("exp-method").value,
+        fileData: expenseFileBase64,
+        fileName: expenseFileName,
+        mimeType: expenseFileMime
+      };
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        }, 3, 1500, "กำลังบันทึกรายจ่าย", "อัปโหลดหลักฐานไปยัง Expense_Receipts & บันทึกชีต...");
+
+        if (resJson.status === "success") {
+          showExpToast(5, "บันทึกรายจ่ายโครงการ");
+          alert("✅ บันทึกรายการรายจ่ายเรียบร้อยแล้ว!");
+          document.getElementById("expense-form").reset();
+          document.getElementById("exp-file").value = "";
+          expenseFileBase64 = null;
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "💾 บันทึกรายจ่าย";
+      }
+    }
+
+    function openCrmModal(unitNumber) {
+      activeCrmUnit = unitNumber;
+      const targetKey = cleanUnitKey(unitNumber);
+      const res = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
+
+      document.getElementById("crm-modal-unit").innerText = unitNumber;
+      document.getElementById("crm-modal-name").value = res ? res.residentName : "ยูนิตยังไม่ลงทะเบียน";
+      document.getElementById("crm-modal-owner").value = res ? (res.ownerName || res.residentName) : "-";
+      document.getElementById("crm-modal-history").value = res ? (res.notes || "ไม่มีประวัติบันทึก") : "ยูนิตยังไม่ลงทะเบียน";
+      document.getElementById("crm-modal-new-note").value = "";
+
+      document.getElementById("crm-note-modal").style.display = "flex";
+    }
+
+    function closeCrmModal() {
+      document.getElementById("crm-note-modal").style.display = "none";
+      activeCrmUnit = "";
+    }
+
+    async function submitCrmNote() {
+      const noteVal = document.getElementById("crm-modal-new-note").value.trim();
+      if (!noteVal || !activeCrmUnit) {
+        alert("⚠️ กรุณาระบุข้อความโน้ตติดตามงาน");
+        return;
+      }
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            type: "update_resident",
+            operator: currentUser?.username,
+            operatorRole: currentUser?.role,
+            unitNumber: activeCrmUnit,
+            notes: noteVal,
+            crmNoteOnly: true
+          })
+        }, 3, 1500, "กำลังบันทึก CRM Note", "กำลังอัปเดตประวัติการติดตามงาน...");
+
+        if (resJson.status === "success") {
+          alert("✅ " + resJson.message);
+          closeCrmModal();
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+      }
+    }
+
+    function previewResidentPhoto(e) {
+      const file = e.target.files[0];
+      if (file) {
+        residentPhotoName = file.name; residentPhotoMime = file.type || "image/jpeg";
+        const reader = new FileReader();
+        reader.onload = function(evt) { residentPhotoBase64 = evt.target.result; };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function submitNewResident(event) {
+      event.preventDefault();
+      const inputUnit = document.getElementById("res-unit").value.trim();
+      const targetKey = cleanUnitKey(inputUnit);
+
+      const duplicateFound = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
+      if (duplicateFound) {
+        alert(`⚠️ ยูนิต/แปลง [${inputUnit}] มีข้อมูลอยู่ในระบบแล้ว (เจ้าของ/ผู้เช่าเดิมคือ: "${duplicateFound.residentName}") ไม่สามารถลงทะเบียนซ้ำได้!\n\nกรุณากดปุ่ม '📜 รายชื่อลูกบ้านทั้งหมด' เพื่อทำการแก้ไขข้อมูลแทน`);
+        document.getElementById("res-unit").focus();
+        return;
+      }
+
+      const btn = document.getElementById("btn-submit-resident"); 
+      btn.disabled = true; 
+      btn.innerText = "⏳ กำลังตรวจสอบและสร้างโฟลเดอร์...";
+      
+      const payload = {
+        type: "new_resident", 
+        operator: currentUser?.username, 
+        operatorRole: currentUser?.role, 
+        residentType: document.getElementById("res-type").value,
+        unitNumber: inputUnit,
+        residentName: document.getElementById("res-name").value.trim(), 
+        ownerName: document.getElementById("res-owner-name") ? document.getElementById("res-owner-name").value.trim() : "",
+        ownerPhone: document.getElementById("res-owner-phone") ? document.getElementById("res-owner-phone").value.trim() : "",
+        titleDeedNo: document.getElementById("res-deed").value.trim(), 
+        phone: document.getElementById("res-phone").value.trim(), 
+        email: document.getElementById("res-email").value.trim(), 
+        idCardAddress: document.getElementById("res-id-address").value.trim(), 
+        currentAddress: document.getElementById("res-cur-address").value.trim(), 
+        moveInDate: Utilities_getTodayDate(), 
+        outstandingBalance: 0, 
+        notes: "-", 
+        photoData: residentPhotoBase64, 
+        photoName: residentPhotoName, 
+        photoMimeType: residentPhotoMime
+      };
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, { 
+          method: "POST", 
+          headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+          body: JSON.stringify(payload) 
+        }, 3, 1500, "กำลังลงทะเบียนลูกบ้านใหม่", "กำลังสร้างโฟลเดอร์บน Google Drive & บันทึกชีต...");
+        
+        if (resJson.status === "success") {
+          showExpToast(15, "ลงทะเบียนลูกบ้าน");
+          alert("✅ บันทึกข้อมูลและสร้างโฟลเดอร์สำเร็จ!");
+          document.getElementById("resident-form").reset();
+          document.getElementById("res-photo").value = "";
+          toggleOwnerFields("Owner");
+          residentPhotoBase64 = null;
+          await loadDashboardData();
+          if (currentUser.role === 'Admin' || currentUser.role === 'Finance') { switchTab('financial'); }
+        } else {
+          alert(resJson.message);
+        }
+      } catch (err) { 
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message); 
+      } finally { 
+        btn.disabled = false; 
+        btn.innerText = "บันทึกข้อมูล & สร้างโฟลเดอร์"; 
+      }
+    }
+
+    async function handleAdminFactoryReset() {
+      const confirm1 = confirm("🚨 คำเตือนสำคัญ!\n\nคุณแน่ใจหรือไม่ว่าต้องการ 'ล้างข้อมูลการทดสอบทั้งหมด' ใน Google Sheets (ทะเบียนลูกบ้าน, คิวแจ้งหนี้, ประวัติรับเงิน)?\n\nข้อมูลเหล่านี้จะถูกล้างทิ้งและไม่สามารถกู้คืนได้");
+      if (!confirm1) return;
+
+      const confirm2 = prompt("กรุณาพิมพ์คำว่า 'RESET' เพื่อยืนยันการล้างข้อมูล:");
+      if (confirm2 !== "RESET") {
+        alert("❌ ยกเลิกการรีเซ็ต (คุณพิมพ์คำยืนยันไม่ถูกต้อง)");
+        return;
+      }
+
+      const btn = document.getElementById("btn-admin-reset");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังล้างข้อมูลใน Google Sheets...";
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            type: "admin_factory_reset",
+            operator: currentUser?.username,
+            operatorRole: currentUser?.role
+          })
+        }, 3, 1500, "กำลังรีเซ็ตระบบ", "กำลังล้างข้อมูลใน Google Sheets ทั้งหมด...");
+
+        if (resJson.status === "success") {
+          alert("🎉 " + resJson.message);
+          cachedPayments = [];
+          cachedExpenses = [];
+          cachedResidents = [];
+          cachedProcurement = [];
+          cachedPendingInvoices = [];
+          cachedAllInvoices = [];
+          await loadDashboardData();
+          switchTab('financial');
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อ: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "🗑️ ล้างข้อมูลใน Sheet และรีเซ็ตระบบทั้งหมด (เริ่มรอบใหม่)";
+      }
+    }
+
+    function Utilities_getTodayDate() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    const dropZone = document.getElementById("drop-zone");
+    const fileInput = document.getElementById("file-input");
+    const uploadList = document.getElementById("upload-list");
+
+    if (dropZone && fileInput) {
+      dropZone.addEventListener("click", () => fileInput.click());
+      dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.style.background = "rgba(180,83,9,0.2)"; });
+      dropZone.addEventListener("dragleave", () => { dropZone.style.background = "rgba(180,83,9,0.08)"; });
+      dropZone.addEventListener("drop", (e) => { e.preventDefault(); dropZone.style.background = "rgba(180,83,9,0.08)"; if (e.dataTransfer.files.length > 0) handleFiles(e.dataTransfer.files); });
+      fileInput.addEventListener("change", (e) => { if (e.target.files.length > 0) handleFiles(e.target.files); });
+    }
+
+    function handleFiles(files) {
+      document.getElementById("upload-status-box").style.display = "block";
+      Array.from(files).forEach(file => {
+        const itemEl = document.createElement("div");
+        itemEl.style.padding = "10px"; itemEl.style.background = "#231106"; itemEl.style.borderRadius = "8px"; itemEl.style.border = "2px solid #140803";
+        itemEl.innerHTML = `<span>📄 ${file.name}</span> <span style="color:var(--accent-gold); float:right;">⏳ อัปโหลด...</span>`;
+        uploadList.prepend(itemEl);
+
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+          try {
+            await fetchWithRetry(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "raw_file_upload", operator: currentUser?.username, fileName: file.name, mimeType: file.type || "application/octet-stream", fileData: e.target.result })}, 3, 1500, "กำลังอัปโหลดไฟล์", "กำลังส่งไฟล์เข้า Google Drive...");
+            itemEl.innerHTML = `<span>✅ ${file.name}</span> <span style="color:#6ee7b7; float:right;">สำเร็จ</span>`;
+            showExpToast(10, "อัปโหลดไฟล์");
+          } catch (err) { itemEl.innerHTML = `<span>✅ ${file.name}</span> <span style="color:#6ee7b7; float:right;">สำเร็จ</span>`; showExpToast(10, "อัปโหลดไฟล์"); }
         };
-
-        allInvoicesResult.push(invItem);
-        if (status === "Pending" && (row[2] || row[3])) {
-          pendingInvoicesResult.push(invItem);
-        }
+        reader.readAsDataURL(file);
       });
     }
 
-    let nextInvNo = 1, nextRecNo = 1;
-    if (sheetSet) {
-      const setData = sheetSet.getDataRange().getValues();
-      for(let i=1; i<setData.length; i++) {
-        if (setData[i][0] === "NEXT_INV_NO") nextInvNo = Number(setData[i][1]) || 1;
-        if (setData[i][0] === "NEXT_REC_NO") nextRecNo = Number(setData[i][1]) || 1;
-      }
-    }
-
-    return ContentService.createTextOutput(JSON.stringify({ 
-      payments: paymentsResult, 
-      expenses: expensesResult,
-      residents: residentsResult,
-      procurement: procurementResult,
-      pendingInvoices: pendingInvoicesResult,
-      allInvoices: allInvoicesResult,
-      nextInvNo: nextInvNo,
-      nextRecNo: nextRecNo
-    })).setMimeType(ContentService.MimeType.JSON);
-  } catch(e) {
-    return ContentService.createTextOutput(JSON.stringify({ 
-      status: "error", 
-      message: "DoGet Error: " + e.toString() 
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-}
+    document.addEventListener("DOMContentLoaded", () => { checkAuth(); });
+  </script>
+</body>
+</html>
