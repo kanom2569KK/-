@@ -264,7 +264,6 @@
     .unit-chip.tenant { border-color: var(--accent-blue); background: rgba(2,132,199,0.2); }
     .unit-chip.has-pending { border-color: var(--accent-gold); background: rgba(217,119,6,0.3); }
 
-    /* สไตล์ของ Dynamic Multi-Item Rows ในฟอร์มออกบิล */
     .invoice-item-row {
       display: flex; gap: 10px; align-items: center; margin-bottom: 10px;
     }
@@ -273,7 +272,7 @@
     }
 
     /* ========================================================
-       🖨️ PRINT STYLESHEET: เอกสารทางการ A4
+       🖨️ PRINT STYLESHEET: เอกสารทางการ A4 (ตัด Web App ออก 100%)
        ======================================================== */
     #printable-invoice {
       display: none;
@@ -460,7 +459,6 @@
       </table>
     </div>
 
-    <!-- ตารางพิมพ์รองรับหลายรายการย่อย -->
     <table class="inv-table">
       <thead>
         <tr>
@@ -469,9 +467,7 @@
           <th style="width: 25%; text-align: right;">จำนวนเงิน (บาท)</th>
         </tr>
       </thead>
-      <tbody id="print-items-tbody">
-        <!-- JS จะวนลูปใส่รายการสินค้าที่นี่ -->
-      </tbody>
+      <tbody id="print-items-tbody"></tbody>
       <tfoot>
         <tr class="inv-total-row">
           <td colspan="2" style="text-align: right; color: #0f172a;" id="print-total-label">รวมยอดที่ต้องชำระทั้งสิ้น (Total Due):</td>
@@ -643,6 +639,65 @@
     </div>
   </div>
 
+  <!-- 💸 MODAL: อัปเดตไฟล์หลักฐาน / แก้ไขรายการรายจ่าย (รองรับ Admin Override) -->
+  <div id="expense-update-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 600px; width: 90%;">
+      <div class="ro-header">
+        <span id="expense-modal-title">📎 แนบไฟล์หลักฐานการจ่ายเงิน</span>
+        <span class="ro-close" onclick="closeExpenseUpdateModal()">✕</span>
+      </div>
+      <div style="padding: 20px;">
+        <input type="hidden" id="exp-modal-id">
+        
+        <div id="exp-modal-admin-fields" style="display: none;">
+          <div class="form-group">
+            <label>หมวดหมู่รายจ่าย *</label>
+            <select id="exp-modal-category">
+              <option value="ค่าซ่อมบำรุงส่วนกลาง">ค่าซ่อมบำรุงส่วนกลาง / อุปกรณ์</option>
+              <option value="ค่าน้ำ-ค่าไฟส่วนกลาง">ค่าน้ำ-ค่าไฟส่วนกลางโครงการ</option>
+              <option value="ค่าจ้างแม่บ้าน-รปภ.">ค่าจ้างแม่บ้าน / รปภ. / บุคคลภายนอก</option>
+              <option value="ค่าใช้จ่ายสำนักงานนิติ">ค่าใช้จ่ายสำนักงาน / เครื่องเขียน</option>
+              <option value="ค่าธรรมเนียมวิชาชีพ/ภาษี">ค่าธรรมเนียมวิชาชีพ / บัญชี / ภาษี</option>
+              <option value="รายจ่ายอื่นๆ">รายจ่ายอื่นๆ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>รายละเอียดรายจ่าย *</label>
+            <input type="text" id="exp-modal-desc">
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <div class="form-group" style="flex: 1;">
+              <label>จำนวนเงิน (฿) *</label>
+              <input type="number" id="exp-modal-amount">
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label>ช่องทางจ่ายเงิน</label>
+              <select id="exp-modal-method">
+                <option value="เงินสด">เงินสด</option>
+                <option value="โอนเงิน/บัญชีบริษัท">โอนเงิน / บัญชีบริษัท</option>
+                <option value="เช็คธนาคาร">เช็คธนาคาร</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="exp-modal-info-summary" style="background:#180a03; border:1px solid #381808; padding:12px; border-radius:10px; margin-bottom:14px;">
+          <div style="font-size:12px; color:var(--text-muted);" id="exp-modal-summary-text">-</div>
+        </div>
+
+        <div class="form-group">
+          <label>📎 อัปโหลดไฟล์หลักฐาน (สลิปโอนเงิน / หน้าเช็ค / ใบเสร็จ) *</label>
+          <input type="file" id="exp-modal-file" accept="image/*,application/pdf" onchange="previewExpenseModalFile(event)">
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button type="button" class="ro-btn" style="flex: 1;" onclick="closeExpenseUpdateModal()">ยกเลิก</button>
+          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #059669, #047857);" onclick="submitExpenseUpdateRecord()">💾 บันทึกข้อมูล</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- 📦 MODAL: ปรับแต่งสต็อกพัสดุหน้างาน -->
   <div id="stock-adjust-modal" class="modal-overlay">
     <div class="ro-window" style="max-width: 500px; width: 90%;">
@@ -737,7 +792,7 @@
   <!-- Character Selection Screen -->
   <div id="char-select-screen" class="screen-overlay" style="display: none;">
     <div class="char-select-container">
-      <h2 style="color: var(--accent-gold); font-size: 22px; margin-bottom: 4px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">⚔️ เลือกตัวละครประจำตัว (Avatar Profile)</h2>
+      <h2 style="color: var(--accent-gold); font-size: 22px; margin-bottom: 4px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">⚔️️ เลือกตัวละครประจำตัว (Avatar Profile)</h2>
       <p style="color: var(--text-muted); font-size: 12px;">เลือกตัวละครที่คุณต้องการใช้เป็นโปรไฟล์ส่วนตัว (อิสระทุกตำแหน่งงาน)</p>
       
       <div class="char-grid">
@@ -1023,12 +1078,13 @@
             </div>
           </div>
 
+          <!-- 💸 ตารางประวัติการบันทึกรายจ่าย (รองรับอัปเดตไฟล์ย้อนหลัง & Admin Override) -->
           <div class="card" style="padding: 0; overflow: hidden; border-color: #7f1d1d;">
             <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0; color: #fca5a5;">
               <span>💸 ประวัติบันทึกรายจ่ายโครงการ (Expenses Record)</span>
               <span id="expense-badge" class="badge overdue">0 รายการ</span>
             </div>
-            <div class="table-container" style="max-height: 200px;">
+            <div class="table-container" style="max-height: 250px;">
               <table class="data-table">
                 <thead>
                   <tr style="background: #2b1111;">
@@ -1039,10 +1095,11 @@
                     <th>ช่องทาง</th>
                     <th>หลักฐาน</th>
                     <th>ผู้บันทึก</th>
+                    <th style="text-align: center;">จัดการ</th>
                   </tr>
                 </thead>
                 <tbody id="expenses-table-body">
-                  <tr><td colspan="7" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีรายการบันทึกรายจ่าย</td></tr>
+                  <tr><td colspan="8" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีรายการบันทึกรายจ่าย</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1206,7 +1263,7 @@
       </div>
     </div>
 
-    <!-- Tab 3: Sales Hub & Billing (อัปเกรดระบบหลายรายการ 1-10 รายการ) -->
+    <!-- Tab 3: Sales Hub & Billing -->
     <div id="tab-billing" class="tab-content">
       <section class="metrics-grid">
         <div class="metric-card">
@@ -1230,7 +1287,6 @@
       <section class="content-grid" style="grid-template-columns: 1.3fr 1.7fr; gap: 20px;">
         
         <div style="display: flex; flex-direction: column; gap: 20px;">
-          <!-- ฟอร์มออกเอกสารการขายหลายรายการ -->
           <div class="card">
             <div class="card-title">
               <span>📄 ออกเอกสารการขาย</span>
@@ -1253,16 +1309,13 @@
                 <input type="month" id="inv-month" required>
               </div>
               
-              <!-- กล่องรายการเรียกเก็บหลายรายการ (Dynamic Multi-Item Box) -->
               <div class="form-group" style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; border: 1px dashed var(--accent-gold);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                   <label style="margin-bottom:0; font-size:14px; color:var(--accent-gold);">📑 รายการเรียกเก็บ (สูงสุด 10 รายการ) *</label>
                   <button type="button" class="btn-action" style="background: linear-gradient(135deg, #059669, #047857); padding: 3px 10px;" onclick="addInvoiceItemRow()">➕ เพิ่มรายการ</button>
                 </div>
                 
-                <div id="invoice-items-container">
-                  <!-- JS จะเพิ่มแถวที่นี่ -->
-                </div>
+                <div id="invoice-items-container"></div>
 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid #381808;">
                   <strong style="color: var(--text-main); font-size: 13px;">รวมยอดเงินทั้งสิ้น:</strong>
@@ -1425,7 +1478,7 @@
         </div>
 
         <div class="card">
-          <div class="card-title">🛠️️ อัปโหลดไฟล์ดิบสำรองข้อมูล (Admin Only)</div>
+          <div class="card-title">🛠️ อัปโหลดไฟล์ดิบสำรองข้อมูล (Admin Only)</div>
           <div class="drop-zone" id="drop-zone">
             <p style="font-size: 40px; margin-bottom: 10px;">📁</p>
             <h3 style="color: var(--text-main); margin-bottom: 8px;">ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์</h3>
@@ -1477,6 +1530,10 @@
     let expenseFileBase64 = null;
     let expenseFileName = "";
     let expenseFileMime = "";
+
+    let expenseUpdateFileBase64 = null;
+    let expenseUpdateFileName = "";
+    let expenseUpdateFileMime = "";
 
     let pendingUnitForRegistration = "";
     let tempSelectedAvatar = "WIZmini";
@@ -1590,11 +1647,10 @@
       }
     }
 
-    // ➕ จัดการแถวรายการเรียกเก็บหลายรายการ (1–10 รายการ)
     function initInvoiceItems() {
       const container = document.getElementById("invoice-items-container");
       container.innerHTML = "";
-      addInvoiceItemRow(); // เพิ่มแถวแรกเริ่มต้น
+      addInvoiceItemRow();
     }
 
     function addInvoiceItemRow() {
@@ -1621,7 +1677,6 @@
     function removeInvoiceItemRow(btn) {
       const row = btn.closest(".invoice-item-row");
       row.remove();
-      // จัดลำดับเลขข้อใหม่
       const container = document.getElementById("invoice-items-container");
       const rows = container.getElementsByClassName("invoice-item-row");
       for (let i = 0; i < rows.length; i++) {
@@ -1775,7 +1830,7 @@
           document.getElementById("char-select-screen").style.display = "flex";
           pickAvatar(tempPendingUser.avatar || "WIZmini");
         } else alert("❌ " + resJson.message);
-      } catch (err) { alert("⚠️️ เชื่อมต่อขัดข้อง: " + err.message); } 
+      } catch (err) { alert("⚠️ เชื่อมต่อขัดข้อง: " + err.message); } 
       finally { btn.disabled = false; btn.innerText = "เข้าสู่ระบบ"; }
     }
 
@@ -2130,7 +2185,7 @@
         if (status === "Quotation") statusBadge = `<span class="badge pending" style="background:rgba(2,132,199,0.3); color:#38bdf8; border-color:#0284c7;">ใบเสนอราคา</span>`;
 
         const dStr = String(docNo).replace(/'/g, "\\'");
-        const btnCancelHtml = (status === "Pending" || status === "Quotation") 
+        const btnCancelHtml = (status === "Pending" || status === "Quotation" || currentUser?.role === "Admin") 
           ? `<button type="button" class="btn-action" style="background: #dc2626;" onclick="handleCancelInvoice('${dStr}')">🚫 ยกเลิกบิล</button>` 
           : `<span style="font-size:11px; color:var(--text-muted);">🔒 ล็อก</span>`;
 
@@ -2253,12 +2308,13 @@
       });
     }
 
+    // 💸 เรนเดอร์ตารางบันทึกรายจ่าย (พร้อมระบบแนบหลักฐานย้อนหลัง & Admin Full Override)
     function renderExpensesTable(data) {
       const tbody = document.getElementById("expenses-table-body");
       tbody.innerHTML = "";
 
       if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีรายการบันทึกรายจ่าย</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีรายการบันทึกรายจ่าย</td></tr>`;
         return;
       }
 
@@ -2266,10 +2322,22 @@
         const formattedDate = formatDisplayDate(item.Date);
         const amt = Number(item.Amount || 0);
         const attachUrl = item.AttachmentUrl || item.Attachment || "-";
-        
-        const attachHtml = (attachUrl && attachUrl !== "-" && attachUrl.startsWith("http"))
-          ? `<a href="${attachUrl}" target="_blank" class="btn-action" style="background: #0284c7; text-decoration: none; display: inline-block;">📎 เปิดแนบ</a>`
-          : `<span style="font-size:11px; color:var(--text-muted);">-</span>`;
+        const expId = item.ExpenseId || "";
+        const expIdStr = String(expId).replace(/'/g, "\\'");
+
+        let attachHtml = `<button type="button" class="btn-action" style="background: #d97706;" onclick="openExpenseUpdateModal('${expIdStr}')">📤 แนบหลักฐาน</button>`;
+        if (attachUrl && attachUrl !== "-" && attachUrl.startsWith("http")) {
+          attachHtml = `
+            <a href="${attachUrl}" target="_blank" class="btn-action" style="background: #0284c7; text-decoration: none; display: inline-block;">📎 เปิดแนบ</a>
+            <button type="button" class="btn-action" style="background: #78350f; padding: 2px 6px; font-size: 10px;" onclick="openExpenseUpdateModal('${expIdStr}')">✏️️ เปลี่ยน</button>
+          `;
+        }
+
+        // ปุ่มจัดการของ Admin (Admin Full Override)
+        const isAdmin = (currentUser?.role === "Admin");
+        const adminBtnHtml = isAdmin
+          ? `<button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openExpenseUpdateModal('${expIdStr}', true)">🛠️ แก้ไข (Admin)</button>`
+          : attachHtml;
 
         tbody.innerHTML += `<tr>
           <td>${formattedDate}</td>
@@ -2279,6 +2347,7 @@
           <td>${item['Payment Method'] || '-'}</td>
           <td style="text-align: center;">${attachHtml}</td>
           <td style="color: var(--text-muted); font-size:12px;">${item.Operator || '-'}</td>
+          <td style="text-align: center;">${adminBtnHtml}</td>
         </tr>`;
       });
     }
@@ -2390,7 +2459,7 @@
       activeStockItemCode = itemCode;
       const item = cachedProcurement.find(p => String(p.itemCode).trim() === String(itemCode).trim());
       if (!item) {
-        alert("⚠️ ไม่พบข้อมูลรายการพัสดุนี้");
+        alert("⚠️️ ไม่พบข้อมูลรายการพัสดุนี้");
         return;
       }
 
@@ -2420,7 +2489,7 @@
         const resJson = await fetchWithRetry(API_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload = {
+          body: JSON.stringify({
             type: "update_stock_quantity",
             operator: currentUser?.username,
             operatorRole: currentUser?.role,
@@ -2433,6 +2502,101 @@
         if (resJson.status === "success") {
           alert("✅ " + resJson.message);
           closeStockModal();
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+      }
+    }
+
+    // 💸 ป๊อปอัปแนบหลักฐาน / แก้ไขข้อมูลรายจ่าย
+    let isCurrentExpenseAdminOverride = false;
+    function openExpenseUpdateModal(expId, isAdminOverride = false) {
+      isCurrentExpenseAdminOverride = isAdminOverride;
+      const item = cachedExpenses.find(e => String(e.ExpenseId).trim() === String(expId).trim());
+      if (!item) {
+        alert("⚠️ ไม่พบข้อมูลรายการรายจ่ายนี้");
+        return;
+      }
+
+      document.getElementById("exp-modal-id").value = expId;
+      document.getElementById("exp-modal-summary-text").innerHTML = `
+        <strong>วันที่:</strong> ${formatDisplayDate(item.Date)}<br>
+        <strong>หมวดหมู่:</strong> ${item.Category}<br>
+        <strong>รายละเอียด:</strong> ${item.Description}<br>
+        <strong>จำนวนเงิน:</strong> ฿${Number(item.Amount).toLocaleString()} (${item['Payment Method']})
+      `;
+
+      const adminDiv = document.getElementById("exp-modal-admin-fields");
+      const titleEl = document.getElementById("expense-modal-title");
+
+      if (isAdminOverride && currentUser?.role === "Admin") {
+        titleEl.innerText = "🛠️ แก้ไขรายการรายจ่าย (Admin Full Override)";
+        adminDiv.style.display = "block";
+        document.getElementById("exp-modal-category").value = item.Category;
+        document.getElementById("exp-modal-desc").value = item.Description;
+        document.getElementById("exp-modal-amount").value = item.Amount;
+        document.getElementById("exp-modal-method").value = item['Payment Method'];
+      } else {
+        titleEl.innerText = "📎 แนบไฟล์หลักฐานการจ่ายเงิน";
+        adminDiv.style.display = "none";
+      }
+
+      document.getElementById("exp-modal-file").value = "";
+      expenseUpdateFileBase64 = null;
+      document.getElementById("expense-update-modal").style.display = "flex";
+    }
+
+    function closeExpenseUpdateModal() {
+      document.getElementById("expense-update-modal").style.display = "none";
+      expenseUpdateFileBase64 = null;
+    }
+
+    function previewExpenseModalFile(e) {
+      const file = e.target.files[0];
+      if (file) {
+        expenseUpdateFileName = file.name;
+        expenseUpdateFileMime = file.type || "image/jpeg";
+        const reader = new FileReader();
+        reader.onload = function(evt) { expenseUpdateFileBase64 = evt.target.result; };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function submitExpenseUpdateRecord() {
+      const expId = document.getElementById("exp-modal-id").value;
+      if (!expId) return;
+
+      const payload = {
+        type: "update_expense_record",
+        operator: currentUser?.username,
+        operatorRole: currentUser?.role,
+        expenseId: expId,
+        fileData: expenseUpdateFileBase64,
+        fileName: expenseUpdateFileName,
+        mimeType: expenseUpdateFileMime,
+        isFullOverride: isCurrentExpenseAdminOverride
+      };
+
+      if (isCurrentExpenseAdminOverride) {
+        payload.category = document.getElementById("exp-modal-category").value;
+        payload.description = document.getElementById("exp-modal-desc").value.trim();
+        payload.amount = document.getElementById("exp-modal-amount").value;
+        payload.paymentMethod = document.getElementById("exp-modal-method").value;
+      }
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        }, 3, 1500, "กำลังอัปเดตข้อมูลรายจ่าย", "อัปโหลดไฟล์หลักฐานไปยัง Expense_Receipts...");
+
+        if (resJson.status === "success") {
+          alert("✅ " + resJson.message);
+          closeExpenseUpdateModal();
           await loadDashboardData();
         } else {
           alert("❌ " + resJson.message);
@@ -2484,14 +2648,13 @@
           alert("❌ " + resJson.message);
         }
       } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
+        alert("⚠️️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
       } finally {
         btn.disabled = false;
         btn.innerText = "💾 บันทึกตั้งค่าเลขที่รันเอกสาร";
       }
     }
 
-    // 📄 ออกใบแจ้งหนี้ / ใบเสนอราคา (หลายรายการย่อย 1-10 รายการ)
     async function handleGenerateInvoice(event) {
       event.preventDefault();
       const unitVal = document.getElementById("inv-unit").value.trim();
@@ -2499,7 +2662,6 @@
       const monthVal = document.getElementById("inv-month").value;
       const docTypeVal = document.getElementById("inv-doc-type").value;
 
-      // รวบรวมรายการย่อยจากฟอร์ม Dynamic
       const container = document.getElementById("invoice-items-container");
       const rows = container.getElementsByClassName("invoice-item-row");
       const itemsList = [];
@@ -2586,7 +2748,6 @@
           document.getElementById("print-inv-month").innerText = displayMonth || "ประจำเดือนปัจจุบัน";
           document.getElementById("print-res-address").innerText = matchedResident?.currentAddress || `แปลงที่ ${unitVal} โครงการอุดมสุขเพลส`;
           
-          // เรนเดอร์รายการย่อยลงตารางพิมพ์ A4
           const printTbody = document.getElementById("print-items-tbody");
           printTbody.innerHTML = "";
           itemsList.forEach((it, idx) => {
