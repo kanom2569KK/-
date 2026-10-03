@@ -272,123 +272,39 @@
     }
 
     /* ========================================================
-       🖨️ PRINT STYLESHEET: เอกสารทางการ A4 (ตัด Web App ออก 100%)
+       🖨️ PRINT STYLESHEET: โหมดพิมพ์สำหรับ Invoices และ Vouchers
        ======================================================== */
-    #printable-invoice {
+    #printable-invoice, #printable-voucher {
       display: none;
     }
 
     @media print {
-      @page {
-        size: A4 portrait;
-        margin: 12mm 15mm;
-      }
+      @page { size: A4 portrait; margin: 12mm 15mm; }
       html, body {
-        width: 100% !important;
-        height: auto !important;
-        background: #ffffff !important;
-        color: #000000 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        overflow: visible !important;
+        width: 100% !important; height: auto !important; background: #ffffff !important;
+        color: #000000 !important; margin: 0 !important; padding: 0 !important; overflow: visible !important;
       }
       .sidebar, .main-content, .top-bar, .tab-content, .screen-overlay, .modal-overlay, .exp-toast, #global-loading-modal {
         display: none !important;
       }
-      #printable-invoice {
-        display: block !important;
-        width: 100% !important;
-        background: #ffffff !important;
-        color: #111827 !important;
-        font-size: 11.5pt;
-        line-height: 1.45;
-      }
-      .inv-header-table {
-        width: 100%;
-        border-bottom: 2.5px solid #1e3a8a;
-        padding-bottom: 12px;
-        margin-bottom: 16px;
-      }
-      .inv-logo-img {
-        width: 80px;
-        height: auto;
-        object-fit: contain;
-      }
-      .inv-company-name {
-        font-size: 14pt;
-        font-weight: bold;
-        color: #111827;
-        margin-bottom: 3px;
-      }
-      .inv-company-sub {
-        font-size: 9.5pt;
-        color: #4b5563;
-        line-height: 1.4;
-      }
-      .inv-title-main {
-        font-size: 22pt;
-        font-weight: 800;
-        color: #1e3a8a;
-        letter-spacing: 1px;
-        text-align: right;
-      }
-      .inv-title-sub {
-        font-size: 10.5pt;
-        font-weight: bold;
-        color: #6b7280;
-        letter-spacing: 2px;
-        text-align: right;
-        margin-top: -2px;
-      }
-      .inv-meta-table {
-        margin-top: 8px;
-        font-size: 9.5pt;
-        float: right;
-      }
-      .inv-meta-table td {
-        padding: 2px 4px;
-      }
-      .inv-info-box {
-        width: 100%;
-        margin-bottom: 18px;
-        border: 1px solid #cbd5e1;
-        border-radius: 8px;
-        padding: 12px 16px;
-        background: #f8fafc;
-      }
-      .inv-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 20px;
-      }
-      .inv-table th, .inv-table td {
-        border: 1px solid #94a3b8;
-        padding: 9px 12px;
-        text-align: left;
-      }
-      .inv-table th {
-        background-color: #f1f5f9;
-        font-weight: bold;
-        color: #0f172a;
-        font-size: 10.5pt;
-      }
-      .inv-total-row {
-        background-color: #f8fafc;
-        font-weight: bold;
-        font-size: 12.5pt;
-      }
-      .inv-signatures {
-        width: 100%;
-        margin-top: 35px;
-      }
-      .inv-sig-box {
-        text-align: center;
-        width: 75%;
-        border-top: 1px dashed #64748b;
-        padding-top: 8px;
-        margin: 0 auto;
-        font-size: 10pt;
-      }
+      body.print-mode-inv #printable-invoice { display: block !important; width: 100% !important; background: #ffffff !important; color: #111827 !important; font-size: 11.5pt; line-height: 1.45; }
+      body.print-mode-voc #printable-voucher { display: block !important; width: 100% !important; background: #ffffff !important; color: #111827 !important; font-size: 11.5pt; line-height: 1.45; }
+      
+      .inv-header-table { width: 100%; border-bottom: 2.5px solid #1e3a8a; padding-bottom: 12px; margin-bottom: 16px; }
+      .inv-logo-img { width: 80px; height: auto; object-fit: contain; }
+      .inv-company-name { font-size: 14pt; font-weight: bold; color: #111827; margin-bottom: 3px; }
+      .inv-company-sub { font-size: 9.5pt; color: #4b5563; line-height: 1.4; }
+      .inv-title-main { font-size: 22pt; font-weight: 800; color: #1e3a8a; letter-spacing: 1px; text-align: right; }
+      .inv-title-sub { font-size: 10.5pt; font-weight: bold; color: #6b7280; letter-spacing: 2px; text-align: right; margin-top: -2px; }
+      .inv-meta-table { margin-top: 8px; font-size: 9.5pt; float: right; }
+      .inv-meta-table td { padding: 2px 4px; }
+      .inv-info-box { width: 100%; margin-bottom: 18px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 16px; background: #f8fafc; }
+      .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+      .inv-table th, .inv-table td { border: 1px solid #94a3b8; padding: 9px 12px; text-align: left; }
+      .inv-table th { background-color: #f1f5f9; font-weight: bold; color: #0f172a; font-size: 10.5pt; }
+      .inv-total-row { background-color: #f8fafc; font-weight: bold; font-size: 12.5pt; }
+      .inv-signatures { width: 100%; margin-top: 35px; }
+      .inv-sig-box { text-align: center; width: 75%; border-top: 1px dashed #64748b; padding-top: 8px; margin: 0 auto; font-size: 10pt; }
     }
   </style>
 </head>
@@ -408,7 +324,7 @@
     </div>
   </div>
 
-  <!-- 🖨️ PRINT TEMPLATE: เอกสารทางการ A4 -->
+  <!-- 🖨️ PRINT TEMPLATE 1: เอกสารทางการ INVOICE / QUOTATION / RECEIPT -->
   <div id="printable-invoice">
     <table class="inv-header-table">
       <tr>
@@ -459,6 +375,7 @@
       </table>
     </div>
 
+    <!-- ตารางพิมพ์รองรับหลายรายการย่อย -->
     <table class="inv-table">
       <thead>
         <tr>
@@ -496,6 +413,99 @@
           <div class="inv-sig-box">
             (<span id="print-finance-name"> ............................................................ </span>)<br>
             <strong>เจ้าหน้าที่ฝ่ายการเงิน (ผู้รับเงิน)</strong>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 🖨️ PRINT TEMPLATE 2: ใบสำคัญจ่าย (PAYMENT VOUCHER) -->
+  <div id="printable-voucher">
+    <table class="inv-header-table">
+      <tr>
+        <td style="width: 15%; vertical-align: middle;">
+          <img src="logomini.png" alt="Company Logo" class="inv-logo-img">
+        </td>
+        <td style="width: 52%; vertical-align: top; padding-left: 10px;">
+          <div class="inv-company-name">บริษัท อุดมสุขกบินทร์บุรี บ้านและที่ดิน จำกัด (สำนักงานใหญ่)</div>
+          <div class="inv-company-sub">
+            โครงการหมู่บ้านอุดมสุขเพลส (Udomsuk Place)<br>
+            ที่อยู่: 899/55-56 หมู่ 9 ตำบลหนองกี่ อำเภอกบินทร์บุรี จังหวัดปราจีนบุรี 25110<br>
+            โทร. 065-685-9898 | เลขประจำตัวผู้เสียภาษีอากร: <strong>0255552000178</strong>
+          </div>
+        </td>
+        <td style="width: 33%; vertical-align: top; text-align: right;">
+          <div class="inv-title-main">ใบสำคัญจ่าย</div>
+          <div class="inv-title-sub">PAYMENT VOUCHER</div>
+          <table class="inv-meta-table">
+            <tr>
+              <td style="text-align: right; color: #475569;">เลขที่อ้างอิง:</td>
+              <td style="text-align: left; font-weight: bold; color: #1e3a8a;"><span id="print-voc-no">EXP-0001</span></td>
+            </tr>
+            <tr>
+              <td style="text-align: right; color: #475569;">วันที่จ่ายเงิน:</td>
+              <td style="text-align: left; font-weight: bold;"><span id="print-voc-date">-</span></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <div class="inv-info-box">
+      <table style="width: 100%; border: none; font-size: 10.5pt;">
+        <tr>
+          <td style="width: 100%; padding: 3px 0;"><strong>หมวดหมู่รายจ่าย:</strong> <span id="print-voc-cat" style="font-weight: bold; font-size: 11pt;">-</span></td>
+        </tr>
+        <tr>
+          <td style="width: 100%; padding: 3px 0;"><strong>ช่องทางการจ่ายเงิน:</strong> <span id="print-voc-method" style="font-weight: bold;">-</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <table class="inv-table">
+      <thead>
+        <tr>
+          <th style="width: 10%; text-align: center;">ลำดับ</th>
+          <th style="width: 65%;">รายละเอียดการจ่ายเงิน (Description)</th>
+          <th style="width: 25%; text-align: right;">จำนวนเงิน (บาท)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="text-align: center;">1</td>
+          <td>
+            <strong id="print-voc-desc">-</strong>
+          </td>
+          <td style="text-align: right; font-weight: bold;" id="print-voc-amount">0.00</td>
+        </tr>
+        <tr class="inv-total-row">
+          <td colspan="2" style="text-align: right; color: #0f172a;">รวมยอดเงินจ่ายทั้งสิ้น (Total Paid):</td>
+          <td style="text-align: right; color: #dc2626;" id="print-voc-total">฿0.00</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="inv-signatures" style="margin-top: 60px;">
+      <tr>
+        <td style="width: 33%; text-align: center; vertical-align: top;">
+          <br><br>
+          <div class="inv-sig-box">
+            (<span id="print-voc-operator">-</span>)<br>
+            <strong>ผู้จัดทำ / ฝ่ายการเงิน</strong>
+          </div>
+        </td>
+        <td style="width: 33%; text-align: center; vertical-align: top;">
+          <br><br>
+          <div class="inv-sig-box">
+            ( ..................................................... )<br>
+            <strong>ผู้อนุมัติจ่าย / ผู้บริหาร</strong>
+          </div>
+        </td>
+        <td style="width: 33%; text-align: center; vertical-align: top;">
+          <br><br>
+          <div class="inv-sig-box">
+            ( ..................................................... )<br>
+            <strong>ผู้รับเงิน</strong>
           </div>
         </td>
       </tr>
@@ -648,6 +658,8 @@
       </div>
       <div style="padding: 20px;">
         <input type="hidden" id="exp-modal-id">
+        <input type="hidden" id="exp-modal-fallback-desc">
+        <input type="hidden" id="exp-modal-fallback-amt">
         
         <div id="exp-modal-admin-fields" style="display: none;">
           <div class="form-group">
@@ -693,6 +705,24 @@
         <div style="display: flex; gap: 10px; margin-top: 14px;">
           <button type="button" class="ro-btn" style="flex: 1;" onclick="closeExpenseUpdateModal()">ยกเลิก</button>
           <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #059669, #047857);" onclick="submitExpenseUpdateRecord()">💾 บันทึกข้อมูล</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📄 MODAL: ดู/พิมพ์ ใบสำคัญจ่าย (Expense Voucher) -->
+  <div id="voucher-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 600px; width: 90%;">
+      <div class="ro-header">
+        <span>📄 รายละเอียดการบันทึกรายจ่าย (Expense Voucher)</span>
+        <span class="ro-close" onclick="closeVoucherModal()">✕</span>
+      </div>
+      <div style="padding: 20px;">
+        <div id="voucher-details-container" style="background:#180a03; padding:18px; border-radius:12px; border: 1px dashed var(--accent-gold); color: var(--text-main); font-size: 14px; line-height: 1.8;">
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button type="button" class="ro-btn" style="flex: 1;" onclick="closeVoucherModal()">ปิดหน้าต่าง</button>
+          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #0284c7, #0369a1);" id="btn-print-voucher" onclick="printExpenseVoucher()">🖨️ พิมพ์ใบสำคัญจ่าย (A4)</button>
         </div>
       </div>
     </div>
@@ -792,7 +822,7 @@
   <!-- Character Selection Screen -->
   <div id="char-select-screen" class="screen-overlay" style="display: none;">
     <div class="char-select-container">
-      <h2 style="color: var(--accent-gold); font-size: 22px; margin-bottom: 4px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">⚔️️ เลือกตัวละครประจำตัว (Avatar Profile)</h2>
+      <h2 style="color: var(--accent-gold); font-size: 22px; margin-bottom: 4px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">⚔ เลือกตัวละครประจำตัว (Avatar Profile)</h2>
       <p style="color: var(--text-muted); font-size: 12px;">เลือกตัวละครที่คุณต้องการใช้เป็นโปรไฟล์ส่วนตัว (อิสระทุกตำแหน่งงาน)</p>
       
       <div class="char-grid">
@@ -1078,7 +1108,7 @@
             </div>
           </div>
 
-          <!-- 💸 ตารางประวัติการบันทึกรายจ่าย (รองรับอัปเดตไฟล์ย้อนหลัง & Admin Override) -->
+          <!-- 💸 ตารางประวัติการบันทึกรายจ่าย -->
           <div class="card" style="padding: 0; overflow: hidden; border-color: #7f1d1d;">
             <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0; color: #fca5a5;">
               <span>💸 ประวัติบันทึกรายจ่ายโครงการ (Expenses Record)</span>
@@ -1093,7 +1123,7 @@
                     <th>รายละเอียด</th>
                     <th>จำนวนเงิน</th>
                     <th>ช่องทาง</th>
-                    <th>หลักฐาน</th>
+                    <th style="text-align: center;">หลักฐาน</th>
                     <th>ผู้บันทึก</th>
                     <th style="text-align: center;">จัดการ</th>
                   </tr>
@@ -1539,6 +1569,7 @@
     let tempSelectedAvatar = "WIZmini";
     let activeCrmUnit = "";
     let activeStockItemCode = "";
+    let activeVoucherId = "";
 
     function showLoadingModal(title = "กำลังประมวลผลข้อมูล...", subtitle = "ระบบกำลังส่งคำสั่งและเชื่อมต่อ Google Sheets") {
       const modal = document.getElementById("global-loading-modal");
@@ -2308,7 +2339,7 @@
       });
     }
 
-    // 💸 เรนเดอร์ตารางบันทึกรายจ่าย (พร้อมระบบแนบหลักฐานย้อนหลัง & Admin Full Override)
+    // 💸 เรนเดอร์ตารางบันทึกรายจ่าย (ปรับปรุงระบบ Fallback สำหรับข้อมูลเก่าที่ไม่ระบุ ID)
     function renderExpensesTable(data) {
       const tbody = document.getElementById("expenses-table-body");
       tbody.innerHTML = "";
@@ -2325,19 +2356,22 @@
         const expId = item.ExpenseId || "";
         const expIdStr = String(expId).replace(/'/g, "\\'");
 
-        let attachHtml = `<button type="button" class="btn-action" style="background: #d97706;" onclick="openExpenseUpdateModal('${expIdStr}')">📤 แนบหลักฐาน</button>`;
-        if (attachUrl && attachUrl !== "-" && attachUrl.startsWith("http")) {
-          attachHtml = `
-            <a href="${attachUrl}" target="_blank" class="btn-action" style="background: #0284c7; text-decoration: none; display: inline-block;">📎 เปิดแนบ</a>
-            <button type="button" class="btn-action" style="background: #78350f; padding: 2px 6px; font-size: 10px;" onclick="openExpenseUpdateModal('${expIdStr}')">✏️️ เปลี่ยน</button>
-          `;
-        }
+        const evidenceHtml = (attachUrl && attachUrl !== "-" && attachUrl.startsWith("http"))
+          ? `<a href="${attachUrl}" target="_blank" style="color: #38bdf8; text-decoration: underline; font-size: 12px;">📎 ดูไฟล์</a>`
+          : `<span style="color: var(--text-muted); font-size: 12px;">-</span>`;
 
-        // ปุ่มจัดการของ Admin (Admin Full Override)
         const isAdmin = (currentUser?.role === "Admin");
-        const adminBtnHtml = isAdmin
-          ? `<button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openExpenseUpdateModal('${expIdStr}', true)">🛠️ แก้ไข (Admin)</button>`
-          : attachHtml;
+        const btnAttachText = (attachUrl && attachUrl !== "-" && attachUrl.startsWith("http")) ? "✏️️ เปลี่ยนไฟล์" : "📤 แนบไฟล์";
+        
+        let actionHtml = `<div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">`;
+        actionHtml += `<button type="button" class="btn-action" style="background: #0f766e;" onclick="openVoucherModal('${expIdStr}')">📄 ดู/พิมพ์</button>`;
+
+        if (isAdmin) {
+            actionHtml += `<button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openExpenseUpdateModal('${expIdStr}', true)">🛠️️ แก้ไข</button>`;
+        } else {
+            actionHtml += `<button type="button" class="btn-action" style="background: #d97706;" onclick="openExpenseUpdateModal('${expIdStr}')">${btnAttachText}</button>`;
+        }
+        actionHtml += `</div>`;
 
         tbody.innerHTML += `<tr>
           <td>${formattedDate}</td>
@@ -2345,9 +2379,9 @@
           <td>${item.Description || '-'}</td>
           <td style="color: #fca5a5; font-weight: bold;">฿${amt.toLocaleString()}</td>
           <td>${item['Payment Method'] || '-'}</td>
-          <td style="text-align: center;">${attachHtml}</td>
+          <td style="text-align: center;">${evidenceHtml}</td>
           <td style="color: var(--text-muted); font-size:12px;">${item.Operator || '-'}</td>
-          <td style="text-align: center;">${adminBtnHtml}</td>
+          <td style="text-align: center; min-width: 150px;">${actionHtml}</td>
         </tr>`;
       });
     }
@@ -2459,7 +2493,7 @@
       activeStockItemCode = itemCode;
       const item = cachedProcurement.find(p => String(p.itemCode).trim() === String(itemCode).trim());
       if (!item) {
-        alert("⚠️️ ไม่พบข้อมูลรายการพัสดุนี้");
+        alert("⚠️ ไม่พบข้อมูลรายการพัสดุนี้");
         return;
       }
 
@@ -2511,22 +2545,69 @@
       }
     }
 
-    // 💸 ป๊อปอัปแนบหลักฐาน / แก้ไขข้อมูลรายจ่าย
+    // 📄 ป๊อปอัปดู/พิมพ์ใบสำคัญจ่ายย้อนหลัง (Payment Voucher)
+    function openVoucherModal(expId) {
+      const item = cachedExpenses.find(e => String(e.ExpenseId).trim() === String(expId).trim());
+      if (!item) {
+        alert("⚠️ ไม่พบข้อมูลรายการรายจ่ายนี้ในระบบ");
+        return;
+      }
+
+      activeVoucherId = expId;
+      document.getElementById("voucher-details-container").innerHTML = `
+        <strong>วันที่:</strong> ${formatDisplayDate(item.Date)}<br>
+        <strong>เลขที่อ้างอิง:</strong> ${item.ExpenseId}<br>
+        <strong>หมวดหมู่:</strong> <span style="color:#fca5a5;">${item.Category}</span><br>
+        <strong>รายละเอียด:</strong> ${item.Description}<br>
+        <strong>จำนวนเงิน:</strong> ฿${Number(item.Amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}<br>
+        <strong>ช่องทาง:</strong> ${item['Payment Method']}<br>
+        <strong>ผู้บันทึก:</strong> ${item.Operator}
+      `;
+      document.getElementById("voucher-modal").style.display = "flex";
+    }
+
+    function closeVoucherModal() {
+      document.getElementById("voucher-modal").style.display = "none";
+      activeVoucherId = "";
+    }
+
+    function printExpenseVoucher() {
+      const item = cachedExpenses.find(e => String(e.ExpenseId).trim() === activeVoucherId);
+      if (!item) return;
+
+      document.getElementById("print-voc-no").innerText = item.ExpenseId || "-";
+      document.getElementById("print-voc-date").innerText = formatDisplayDate(item.Date);
+      document.getElementById("print-voc-cat").innerText = item.Category || "-";
+      document.getElementById("print-voc-method").innerText = item['Payment Method'] || "เงินสด";
+      document.getElementById("print-voc-desc").innerText = item.Description || "-";
+      document.getElementById("print-voc-amount").innerText = Number(item.Amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById("print-voc-total").innerText = "฿" + Number(item.Amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById("print-voc-operator").innerText = item.Operator || "-";
+
+      document.body.className = "print-mode-voc";
+      window.print();
+      document.body.className = "";
+    }
+
+    // 💸 ป๊อปอัปแนบหลักฐาน / แก้ไขข้อมูลรายจ่าย (พร้อมระบบ Fallback สำรองข้อมูลเก่า)
     let isCurrentExpenseAdminOverride = false;
     function openExpenseUpdateModal(expId, isAdminOverride = false) {
       isCurrentExpenseAdminOverride = isAdminOverride;
       const item = cachedExpenses.find(e => String(e.ExpenseId).trim() === String(expId).trim());
       if (!item) {
-        alert("⚠️ ไม่พบข้อมูลรายการรายจ่ายนี้");
+        alert("⚠️ ไม่พบข้อมูลรายการรายจ่ายนี้ในระบบ");
         return;
       }
 
       document.getElementById("exp-modal-id").value = expId;
+      document.getElementById("exp-modal-fallback-desc").value = item.Description;
+      document.getElementById("exp-modal-fallback-amt").value = item.Amount;
+
       document.getElementById("exp-modal-summary-text").innerHTML = `
         <strong>วันที่:</strong> ${formatDisplayDate(item.Date)}<br>
         <strong>หมวดหมู่:</strong> ${item.Category}<br>
         <strong>รายละเอียด:</strong> ${item.Description}<br>
-        <strong>จำนวนเงิน:</strong> ฿${Number(item.Amount).toLocaleString()} (${item['Payment Method']})
+        <strong>จำนวนเงิน:</strong> ฿${Number(item.Amount).toLocaleString('en-US', { minimumFractionDigits: 2 })} (${item['Payment Method']})
       `;
 
       const adminDiv = document.getElementById("exp-modal-admin-fields");
@@ -2574,6 +2655,8 @@
         operator: currentUser?.username,
         operatorRole: currentUser?.role,
         expenseId: expId,
+        description: document.getElementById("exp-modal-fallback-desc").value,
+        amount: document.getElementById("exp-modal-fallback-amt").value,
         fileData: expenseUpdateFileBase64,
         fileName: expenseUpdateFileName,
         mimeType: expenseUpdateFileMime,
@@ -2648,7 +2731,7 @@
           alert("❌ " + resJson.message);
         }
       } catch (err) {
-        alert("⚠️️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
       } finally {
         btn.disabled = false;
         btn.innerText = "💾 บันทึกตั้งค่าเลขที่รันเอกสาร";
@@ -2764,7 +2847,9 @@
           document.getElementById("print-operator-name").innerText = currentUser?.fullName || "ผู้จัดทำเอกสาร";
 
           await loadDashboardData();
+          document.body.className = "print-mode-inv";
           window.print();
+          document.body.className = "";
         } else {
           alert("❌ " + resJson.message);
         }
@@ -2847,7 +2932,9 @@
         body: JSON.stringify({ type: "print_receipt", operator: currentUser?.username, unitNumber: unit }) 
       }, 3, 1500, "กำลังเตรียมพิมพ์ใบเสร็จ", "บันทึกประวัติการพิมพ์ลงระบบ...");
 
+      document.body.className = "print-mode-inv";
       window.print();
+      document.body.className = "";
     }
 
     async function submitPayment(event) {
@@ -3054,7 +3141,7 @@
           alert(resJson.message);
         }
       } catch (err) { 
-        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message); 
+        alert("⚠️️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message); 
       } finally { 
         btn.disabled = false; 
         btn.innerText = "บันทึกข้อมูล & สร้างโฟลเดอร์"; 
