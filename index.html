@@ -264,6 +264,137 @@
     .unit-chip.tenant { border-color: var(--accent-blue); background: rgba(2,132,199,0.2); }
     .unit-chip.has-pending { border-color: var(--accent-gold); background: rgba(217,119,6,0.3); }
 
+    /* 🗺️ Smart Property Map & Debt Dashboard Styles */
+    .smart-map-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+      gap: 16px;
+      max-height: 650px;
+      overflow-y: auto;
+      padding: 14px;
+      background: #1e0d04;
+      border-radius: 16px;
+      border: 4px solid #140803;
+      box-shadow: inset 0 4px 15px rgba(0,0,0,0.8);
+    }
+    .smart-unit-card {
+      background: linear-gradient(145deg, #421e0b, #2b1206);
+      border: 3px solid #140803;
+      border-radius: 14px;
+      padding: 12px 10px 8px 10px;
+      position: relative;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.6), inset 0 1px 3px rgba(255,255,255,0.1);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .smart-unit-card:hover {
+      transform: translateY(-4px) scale(1.02);
+      border-color: var(--accent-gold);
+      box-shadow: 0 10px 24px rgba(251,191,36,0.3), inset 0 0 10px rgba(251,191,36,0.2);
+      z-index: 5;
+    }
+    .smart-unit-card.is-settled {
+      border-color: #065f46;
+    }
+    .smart-unit-card.is-overdue {
+      border-color: #dc2626;
+      box-shadow: 0 0 14px rgba(220,38,38,0.4), inset 0 0 8px rgba(220,38,38,0.2);
+    }
+    .smart-unit-num {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--accent-gold);
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+      letter-spacing: 0.5px;
+    }
+    .smart-unit-resident {
+      font-size: 11.5px;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 3px 0 6px 0;
+    }
+    .smap-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 8px;
+      width: 100%;
+      text-align: center;
+      letter-spacing: 0.3px;
+    }
+    .smap-badge.settled {
+      background: rgba(5,150,105,0.25);
+      color: #6ee7b7;
+      border: 1.5px solid #059669;
+      box-shadow: 0 0 8px rgba(5,150,105,0.3);
+    }
+    .smap-badge.overdue {
+      background: rgba(220,38,38,0.28);
+      color: #fca5a5;
+      border: 1.5px solid #dc2626;
+      animation: pulseOverdue 2s infinite ease-in-out;
+    }
+    @keyframes pulseOverdue {
+      0%, 100% { box-shadow: 0 0 4px rgba(220,38,38,0.4); }
+      50% { box-shadow: 0 0 12px rgba(239,68,68,0.8); }
+    }
+    .smart-unit-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px dashed rgba(255,255,255,0.1);
+    }
+    .smart-unit-btn {
+      background: #180902;
+      border: 1px solid #381808;
+      border-radius: 6px;
+      color: var(--text-muted);
+      padding: 4px 6px;
+      font-size: 12px;
+      cursor: pointer;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+    }
+    .smart-unit-btn:hover {
+      background: #78350f;
+      color: var(--accent-gold);
+      border-color: var(--accent-gold);
+      transform: scale(1.1);
+    }
+    .smap-filter-btn {
+      padding: 6px 14px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .smap-filter-btn:hover {
+      color: var(--accent-gold);
+      background: rgba(255,255,255,0.05);
+    }
+    .smap-filter-btn.active {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      color: #fffbeb;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
     .invoice-item-row {
       display: flex; gap: 10px; align-items: center; margin-bottom: 10px;
     }
@@ -1003,6 +1134,9 @@
       <li class="nav-item" id="menu-financial">
         <button onclick="switchTab('financial')">💰<span class="tooltip">การเงิน & รับชำระ</span></button>
       </li>
+      <li class="nav-item" id="menu-property-map">
+        <button onclick="switchTab('property-map')">🗺️<span class="tooltip">ผังสถานะยูนิต & หนี้ค้างชำระ</span></button>
+      </li>
       <li class="nav-item" id="menu-residents">
         <button onclick="switchTab('residents')">👥<span class="tooltip">ทะเบียนลูกบ้านใหม่</span></button>
       </li>
@@ -1540,6 +1674,89 @@
       </div>
     </div>
 
+    <!-- Tab 6: Smart Property Map & Realtime Debt Dashboard -->
+    <div id="tab-property-map" class="tab-content">
+      
+      <!-- Real-time Metric Cards -->
+      <section class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 22px;">
+        <div class="metric-card" style="border-color: #b45309;">
+          <div class="title" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>🏠 ยูนิตทั้งหมดในระบบ</span>
+            <span style="font-size: 16px;">🔑</span>
+          </div>
+          <div class="value" id="smap-total-units">0 ยูนิต</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">เจ้าของ: <span id="smap-owner-count" style="color:var(--text-main); font-weight:bold;">0</span> | ผู้เช่า: <span id="smap-tenant-count" style="color:#38bdf8; font-weight:bold;">0</span></div>
+        </div>
+
+        <div class="metric-card" style="border: 4px solid #059669; box-shadow: 0 0 20px rgba(5,150,105,0.4), inset 0 0 12px rgba(5,150,105,0.3); background: linear-gradient(145deg, #134e4a, #062f27);">
+          <div class="title" style="display:flex; justify-content:space-between; align-items:center; color: #6ee7b7;">
+            <span>✅ ชำระครบแล้ว (เคลียร์บิล)</span>
+            <span style="font-size: 16px;">💰</span>
+          </div>
+          <div class="value" id="smap-settled-units" style="color: #34d399; text-shadow: 0 0 10px rgba(52,211,153,0.8);">0 ยูนิต</div>
+          <div style="font-size: 11px; color: #a7f3d0; margin-top: 4px;">อัตราการชำระ: <span id="smap-settled-pct" style="font-weight:bold;">0%</span> ของโครงการ</div>
+        </div>
+
+        <div class="metric-card" style="border: 4px solid #dc2626; box-shadow: 0 0 25px rgba(220,38,38,0.5), inset 0 0 15px rgba(220,38,38,0.3); background: linear-gradient(145deg, #450a0a, #2b0404);">
+          <div class="title" style="display:flex; justify-content:space-between; align-items:center; color: #fca5a5;">
+            <span>🔥 หนี้ค้างชำระ (Real-time)</span>
+            <span style="font-size: 16px;">⏰</span>
+          </div>
+          <div class="value" id="smap-overdue-units" style="color: #f87171; text-shadow: 0 0 12px rgba(248,113,113,0.9);">0 ยูนิตค้างจ่าย</div>
+          <div style="font-size: 12px; color: #fecaca; margin-top: 4px; font-weight: bold;">ยอดค้างรวม: <span id="smap-overdue-amount" style="color: #fbbf24; font-size: 14px;">฿0</span> (<span id="smap-overdue-invoices">0</span> บิล)</div>
+        </div>
+
+        <div class="metric-card" style="border-color: #0284c7;">
+          <div class="title" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>📑 ใบแจ้งหนี้ที่ออกทั้งหมด</span>
+            <span style="font-size: 16px;">📜</span>
+          </div>
+          <div class="value" id="smap-total-invoices" style="color: #38bdf8;">0 ใบ</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">ยอดออกบิลสะสม: <span id="smap-total-invoice-amt" style="color: var(--accent-gold); font-weight:bold;">฿0</span></div>
+        </div>
+      </section>
+
+      <!-- Main Panel: Map & Filters -->
+      <div class="card" style="padding: 22px;">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; margin-bottom: 20px; border-bottom: 2px dashed #6b3414; padding-bottom: 16px;">
+          <div>
+            <h2 style="font-size: 20px; color: var(--accent-gold); display: flex; align-items: center; gap: 8px;">
+              <span>🗺️ ผังสถานะยูนิตโครงการ (Dynamic Property Map)</span>
+            </h2>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">
+              ดึงข้อมูลยูนิต สถานะการออกบิล และยอดหนี้ค้างชำระจริงจาก Google Sheets แบบเรียลไทม์
+            </p>
+          </div>
+
+          <!-- Quick Filters & Search -->
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+            <div style="display: flex; gap: 6px; background: #1a0c04; padding: 4px; border-radius: 12px; border: 2px solid #381808;">
+              <button type="button" class="smap-filter-btn active" id="smap-filter-all" onclick="setSmartMapFilter('all')">ทั้งหมด</button>
+              <button type="button" class="smap-filter-btn" id="smap-filter-overdue" onclick="setSmartMapFilter('overdue')">🔥 ค้างชำระ</button>
+              <button type="button" class="smap-filter-btn" id="smap-filter-settled" onclick="setSmartMapFilter('settled')">✅ ชำระแล้ว</button>
+              <button type="button" class="smap-filter-btn" id="smap-filter-owner" onclick="setSmartMapFilter('owner')">🔑 เจ้าของ</button>
+              <button type="button" class="smap-filter-btn" id="smap-filter-tenant" onclick="setSmartMapFilter('tenant')">💼 ผู้เช่า</button>
+            </div>
+
+            <div style="position: relative;">
+              <input type="text" id="smap-search-input" placeholder="🔍 ค้นหายูนิต / ชื่อลูกบ้าน..." oninput="handleSmartMapSearch()" 
+                     style="padding: 9px 14px; background: #231106; color: var(--text-main); border: 2px solid #140803; border-radius: 10px; font-size: 13px; width: 220px; outline: none;">
+            </div>
+
+            <button type="button" class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #2a1508; font-weight: bold; border: 2px solid #140803; padding: 9px 14px; border-radius: 10px;" onclick="loadDashboardData()">
+              🔄 รีเฟรชข้อมูล
+            </button>
+          </div>
+        </div>
+
+        <!-- Grid of Smart Unit Cards -->
+        <div id="smart-property-map-grid" class="smart-map-grid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+    </div>
+
   </main>
 
   <script>
@@ -1827,6 +2044,10 @@
         document.getElementById('menu-billing').style.display = 'block';
         defaultTab = 'residents';
       }
+
+      const mapMenu = document.getElementById('menu-property-map');
+      if (mapMenu) mapMenu.style.display = 'block';
+
       switchTab(defaultTab);
     }
 
@@ -2170,6 +2391,7 @@
         renderPendingInvoicesQueue(cachedPendingInvoices);
         renderSalesTrackingTable(cachedAllInvoices);
         renderPropertyMap(cachedResidents, cachedPendingInvoices);
+        renderSmartPropertyMapDashboard();
         renderProcurementTable(cachedProcurement);
         calculateMetrics(cachedPayments, cachedExpenses, cachedPendingInvoices, cachedAllInvoices, cachedProcurement);
       } catch (error) { console.error("Load Error:", error); }
@@ -2285,6 +2507,7 @@
 
     function renderPropertyMap(residents, pendingInvoices) {
       const container = document.getElementById("unit-map-container");
+      if (!container) return;
       container.innerHTML = "";
 
       if (!residents || residents.length === 0) {
@@ -2315,6 +2538,201 @@
         chip.onclick = () => openCrmModal(uStr);
         container.appendChild(chip);
       });
+    }
+
+    /* ========================================================
+       🗺️ SMART PROPERTY MAP & REALTIME DEBT DASHBOARD LOGIC
+       ======================================================== */
+    let currentSmartMapFilter = 'all';
+    let currentSmartMapSearch = '';
+
+    function setSmartMapFilter(filterKey) {
+      currentSmartMapFilter = filterKey;
+      document.querySelectorAll('.smap-filter-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`smap-filter-${filterKey}`);
+      if (activeBtn) activeBtn.classList.add('active');
+      renderSmartPropertyMapDashboard();
+    }
+
+    function handleSmartMapSearch() {
+      const input = document.getElementById("smap-search-input");
+      currentSmartMapSearch = input ? input.value.trim().toLowerCase() : "";
+      renderSmartPropertyMapDashboard();
+    }
+
+    function renderSmartPropertyMapDashboard() {
+      const grid = document.getElementById("smart-property-map-grid");
+      if (!grid) return;
+
+      const residents = cachedResidents || [];
+      const pendingInvoices = cachedPendingInvoices || [];
+      const allInvoices = cachedAllInvoices || [];
+
+      // 1. คำนวณสรุปสถิติระดับโครงการ (KPI Real-time)
+      let totalUnits = residents.length;
+      let ownerCount = 0;
+      let tenantCount = 0;
+      let settledUnitsCount = 0;
+      let overdueUnitsCount = 0;
+      let totalOverdueAmount = 0;
+      let totalOverdueInvoicesCount = 0;
+
+      // จัดกลุ่มบิลค้างรายยูนิต (รวบรวมจาก pendingInvoices และ allInvoices ที่ยังค้างจ่าย)
+      const unitDebtsMap = {};
+
+      pendingInvoices.forEach(inv => {
+        const key = cleanUnitKey(inv.unitNumber);
+        if (!key) return;
+        if (!unitDebtsMap[key]) unitDebtsMap[key] = { invoices: [], totalAmount: 0 };
+        const amt = Number(inv.amount || 0);
+        unitDebtsMap[key].invoices.push(inv);
+        unitDebtsMap[key].totalAmount += amt;
+      });
+
+      // ตรวจสอบแต่ละยูนิต
+      const unitAnalysisList = residents.map(res => {
+        const uStr = String(res.unitNumber || "").trim();
+        const key = cleanUnitKey(uStr);
+        const isTenant = res.residentType === "Tenant";
+        if (isTenant) tenantCount++; else ownerCount++;
+
+        const debtInfo = unitDebtsMap[key] || { invoices: [], totalAmount: 0 };
+        const hasDebt = debtInfo.invoices.length > 0;
+        const unpaidCount = debtInfo.invoices.length;
+        const unpaidSum = debtInfo.totalAmount;
+
+        if (hasDebt) {
+          overdueUnitsCount++;
+          totalOverdueAmount += unpaidSum;
+          totalOverdueInvoicesCount += unpaidCount;
+        } else {
+          settledUnitsCount++;
+        }
+
+        return {
+          res,
+          unitNumber: uStr,
+          residentName: res.residentName || "-",
+          residentType: res.residentType || "Owner",
+          phone: res.phone || "-",
+          hasDebt,
+          unpaidCount,
+          unpaidSum,
+          invoices: debtInfo.invoices
+        };
+      });
+
+      // คำนวณเปอร์เซ็นต์ชำระแล้ว
+      const settledPct = totalUnits > 0 ? Math.round((settledUnitsCount / totalUnits) * 100) : 0;
+
+      // ยอดบิลที่ออกทั้งหมดสะสม
+      const totalInvoicesCount = allInvoices.length;
+      const totalInvoiceAmt = allInvoices.reduce((sum, inv) => sum + Number(inv.amount || 0), 0);
+
+      // อัปเดต Metric Cards ด้านบน
+      const elTotal = document.getElementById("smap-total-units");
+      const elOwner = document.getElementById("smap-owner-count");
+      const elTenant = document.getElementById("smap-tenant-count");
+      const elSettled = document.getElementById("smap-settled-units");
+      const elSettledPct = document.getElementById("smap-settled-pct");
+      const elOverdue = document.getElementById("smap-overdue-units");
+      const elOverdueAmt = document.getElementById("smap-overdue-amount");
+      const elOverdueInv = document.getElementById("smap-overdue-invoices");
+      const elTotInv = document.getElementById("smap-total-invoices");
+      const elTotInvAmt = document.getElementById("smap-total-invoice-amt");
+
+      if (elTotal) elTotal.innerText = `${totalUnits.toLocaleString()} ยูนิต`;
+      if (elOwner) elOwner.innerText = ownerCount.toLocaleString();
+      if (elTenant) elTenant.innerText = tenantCount.toLocaleString();
+      if (elSettled) elSettled.innerText = `${settledUnitsCount.toLocaleString()} ยูนิต`;
+      if (elSettledPct) elSettledPct.innerText = `${settledPct}%`;
+      if (elOverdue) elOverdue.innerText = `${overdueUnitsCount.toLocaleString()} ยูนิตค้างจ่าย`;
+      if (elOverdueAmt) elOverdueAmt.innerText = `฿${totalOverdueAmount.toLocaleString()}`;
+      if (elOverdueInv) elOverdueInv.innerText = totalOverdueInvoicesCount.toLocaleString();
+      if (elTotInv) elTotInv.innerText = `${totalInvoicesCount.toLocaleString()} ใบ`;
+      if (elTotInvAmt) elTotInvAmt.innerText = `฿${totalInvoiceAmt.toLocaleString()}`;
+
+      // 2. กรองข้อมูลตามฟิลเตอร์และคำค้นหา
+      let filtered = unitAnalysisList.filter(item => {
+        if (currentSmartMapFilter === 'overdue' && !item.hasDebt) return false;
+        if (currentSmartMapFilter === 'settled' && item.hasDebt) return false;
+        if (currentSmartMapFilter === 'owner' && item.residentType !== 'Owner') return false;
+        if (currentSmartMapFilter === 'tenant' && item.residentType !== 'Tenant') return false;
+
+        if (currentSmartMapSearch) {
+          const matchUnit = item.unitNumber.toLowerCase().includes(currentSmartMapSearch);
+          const matchName = item.residentName.toLowerCase().includes(currentSmartMapSearch);
+          const matchPhone = item.phone.toLowerCase().includes(currentSmartMapSearch);
+          if (!matchUnit && !matchName && !matchPhone) return false;
+        }
+        return true;
+      });
+
+      // 3. Render การ์ดยูนิตลงใน Grid
+      grid.innerHTML = "";
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+          <div style="font-size: 32px; margin-bottom: 8px;">🔍</div>
+          ไม่พบยูนิตที่ตรงกับเงื่อนไขการค้นหา
+        </div>`;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const uStr = item.unitNumber.replace(/'/g, "\\'");
+        const isOverdue = item.hasDebt;
+        const cardClass = isOverdue ? "smart-unit-card is-overdue" : "smart-unit-card is-settled";
+        const iconType = item.residentType === "Tenant" ? "💼" : "🔑";
+        const typeLabel = item.residentType === "Tenant" ? "ผู้เช่า" : "เจ้าของ";
+
+        const badgeHtml = isOverdue 
+          ? `<div class="smap-badge overdue" title="มียอดค้างชำระ">🔥 ค้าง ${item.unpaidCount} บิล ฿${item.unpaidSum.toLocaleString()}</div>`
+          : `<div class="smap-badge settled" title="ชำระเงินครบถ้วน">✅ ชำระแล้ว</div>`;
+
+        const card = document.createElement("div");
+        card.className = cardClass;
+        card.innerHTML = `
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="smart-unit-num">${item.unitNumber}</span>
+              <span style="font-size: 11px; color: ${item.residentType === 'Tenant' ? '#38bdf8' : 'var(--accent-gold)'};" title="${typeLabel}">${iconType} ${typeLabel}</span>
+            </div>
+            <div class="smart-unit-resident" title="${item.residentName}">
+              👤 ${item.residentName}
+            </div>
+            <div style="margin-top: 4px;">
+              ${badgeHtml}
+            </div>
+          </div>
+
+          <div class="smart-unit-actions">
+            <button type="button" class="smart-unit-btn" title="สมุดบัญชียูนิต (Individual Ledger)" onclick="openUnitLedgerModal('${uStr}')">📖 บัญชี</button>
+            <button type="button" class="smart-unit-btn" style="color: #6ee7b7;" title="รับเงิน / ออกบิล" onclick="quickPayOrBill('${uStr}')">⚡ จ่าย/บิล</button>
+            <button type="button" class="smart-unit-btn" style="color: #38bdf8;" title="แก้ไขข้อมูลลูกบ้าน" onclick="openEditResidentModal('${uStr}')">✏️ แก้ไข</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function quickPayOrBill(unitNumber) {
+      const cleanKey = cleanUnitKey(unitNumber);
+      const pending = (cachedPendingInvoices || []).find(p => cleanUnitKey(p.unitNumber) === cleanKey);
+      if (pending) {
+        switchTab('financial');
+        const u = String(pending.unitNumber).replace(/'/g, "\\'");
+        const n = String(pending.residentName).replace(/'/g, "\\'");
+        const f = String(pending.feeType).replace(/'/g, "\\'");
+        const m = String(pending.billingMonth).replace(/'/g, "\\'");
+        fillPaymentFromQueue(u, n, f, m);
+      } else {
+        switchTab('billing');
+        const invUnitInput = document.getElementById("inv-unit");
+        if (invUnitInput) {
+          invUnitInput.value = unitNumber;
+          autoFillInvoiceResident();
+        }
+      }
     }
 
     function renderTable(data) {
