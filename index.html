@@ -154,6 +154,7 @@
       box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
     }
     .form-group input:focus, .form-group select:focus { border-color: var(--accent-gold); }
+    select, select option { color: var(--text-main); background: #231106; }
 
     .form-group input::placeholder, .form-group textarea::placeholder {
       color: rgba(254, 243, 199, 0.5) !important;
@@ -1457,9 +1458,9 @@
           <div class="card">
             <div class="card-title">
               <span>📄 ออกเอกสารการขาย</span>
-              <select id="inv-doc-type" onchange="switchDocTypeForm(this.value)" style="width: auto; padding: 4px 8px; font-size: 12px; background: #140803;">
-                <option value="INVOICE">📑 ใบแจ้งหนี้ (Invoice)</option>
-                <option value="QUOTATION">📜 ใบเสนอราคา/ใบจอง (Quotation)</option>
+              <select id="inv-doc-type" onchange="switchDocTypeForm(this.value)" style="width: auto; padding: 6px 14px; font-size: 13px; font-weight: bold; background: linear-gradient(145deg, #3d1b0a, #1a0c04); color: var(--accent-gold); border: 2px solid var(--accent-gold); border-radius: 8px; cursor: pointer; outline: none; box-shadow: 0 2px 8px rgba(0,0,0,0.6);">
+                <option value="INVOICE" style="background: #2a1508; color: #fef3c7;">📑 ใบแจ้งหนี้ (Invoice)</option>
+                <option value="QUOTATION" style="background: #2a1508; color: #fef3c7;">📜 ใบเสนอราคา/ใบจอง (Quotation)</option>
               </select>
             </div>
             <form onsubmit="handleGenerateInvoice(event)">
