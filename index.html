@@ -48,425 +48,1504 @@
 
     .screen-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(10, 5, 2, 0.95); z-index: 9999;
-      display: flex; align-items: center; justify-content: center;
+      background: rgba(10, 5, 2, 0.9); backdrop-filter: blur(8px);
+      display: flex; justify-content: center; align-items: center; z-index: 9999;
     }
-    .char-select-card {
-      background: linear-gradient(145deg, #4a2511, #2a1508);
-      border: 4px solid var(--accent-gold); border-radius: 20px;
-      padding: 30px; text-align: center; width: 90%; max-width: 500px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+    .login-card, .char-select-container {
+      background: linear-gradient(145deg, #5c2c12, #3d1b0a);
+      border: 8px solid #200e05; border-radius: 20px;
+      padding: 35px; box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.6);
+      text-align: center; position: relative;
     }
-    .char-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0;
-    }
-    .char-item {
-      background: rgba(0,0,0,0.4); border: 2px solid #381808; border-radius: 12px;
-      padding: 10px; cursor: pointer; transition: all 0.2s;
-    }
-    .char-item:hover, .char-item.selected {
-      border-color: var(--accent-gold); transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(251, 191, 36, 0.4);
-    }
-    .char-img { width: 70px; height: 70px; object-fit: contain; }
+    .login-card { width: 90%; max-width: 400px; }
+    .char-select-container { width: 92%; max-width: 720px; }
 
-    .toast-exp {
-      position: fixed; top: 20px; right: 20px; background: rgba(5, 150, 105, 0.9);
-      color: white; padding: 12px 20px; border-radius: 10px; border: 2px solid #6ee7b7;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 10000; display: none;
-      animation: slideIn 0.3s ease-out;
+    .card {
+      background: linear-gradient(145deg, #4a2511, #361b0c);
+      border: 6px solid #200e05; border-radius: 16px; padding: 22px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.6), inset 0 0 15px rgba(0,0,0,0.4);
+      position: relative;
+    }
+    .card-title {
+      font-size: 17px; font-weight: bold; margin-bottom: 18px;
+      color: var(--accent-gold); text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+      border-bottom: 2px dashed #6b3414; padding-bottom: 8px;
+      display: flex; align-items: center; justify-content: space-between;
     }
 
     .sidebar {
-      width: 280px; background: linear-gradient(180deg, #3d1b0a 0%, #1f0c03 100%);
-      border-right: 4px solid var(--wood-border); display: flex; flex-direction: column;
-      box-shadow: 5px 0 25px rgba(0,0,0,0.5); z-index: 10;
+      width: 100px; background: linear-gradient(180deg, #4a2511, #2a1508);
+      margin: 20px 0 20px 20px; border-radius: 16px; border: 6px solid #1a0c04;
+      display: flex; flex-direction: column; align-items: center; padding: 25px 0;
+      box-shadow: 10px 10px 30px rgba(0,0,0,0.6); z-index: 10;
     }
-    .brand-section {
-      padding: 20px; text-align: center; border-bottom: 2px solid #2a1508;
+    .company-logo { margin-bottom: 25px; position: relative; cursor: pointer; transition: 0.3s; }
+    .company-logo img {
+      width: 60px; height: 60px; object-fit: contain; border-radius: 12px;
+      border: 3px solid var(--accent-gold); background: #231106; box-shadow: 0 0 10px rgba(251,191,36,0.5);
     }
-    .brand-logo { width: 90px; height: 90px; object-fit: contain; margin-bottom: 10px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6)); }
+    .company-logo:hover { transform: scale(1.08); }
+    .company-logo .tooltip {
+      position: absolute; left: 75px; top: 50%; transform: translateY(-50%);
+      background: var(--wood-dark); color: var(--accent-gold); padding: 8px 14px; border-radius: 8px;
+      font-size: 13px; font-weight: bold; white-space: nowrap; opacity: 0; pointer-events: none; transition: 0.2s; border: 2px solid var(--wood-border); z-index: 100;
+    }
+    .company-logo:hover .tooltip { opacity: 1; left: 85px; }
 
-    .user-profile-box {
-      padding: 15px 20px; margin: 15px; background: rgba(0,0,0,0.4);
-      border: 2px solid #5c2c12; border-radius: 12px; display: flex; align-items: center; gap: 15px;
+    .nav-links { list-style: none; display: flex; flex-direction: column; gap: 14px; width: 100%; align-items: center; flex: 1;}
+    .nav-item { display: none; }
+    .nav-item button {
+      background: linear-gradient(135deg, #78350f, #451a03); border: 3px solid #200e05; font-size: 22px; color: var(--text-muted);
+      cursor: pointer; padding: 10px; border-radius: 12px; position: relative; width: 65px; height: 55px;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 4px 10px rgba(0,0,0,0.4);
     }
-    .avatar-wrapper { position: relative; width: 55px; height: 55px; }
-    .profile-avatar { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
+    .nav-item button:hover, .nav-item.active button {
+      background: linear-gradient(135deg, #d97706, #b45309); color: var(--accent-gold);
+      border-color: var(--accent-gold); transform: scale(1.1);
+      box-shadow: 0 0 15px rgba(251,191,36,0.6), inset 0 2px 4px rgba(255,255,255,0.3);
+    }
+    .nav-item button .tooltip {
+      position: absolute; left: 65px; top: 50%; transform: translateY(-50%);
+      background: var(--wood-dark); color: white; padding: 6px 12px; border-radius: 8px;
+      font-size: 12px; white-space: nowrap; opacity: 0; pointer-events: none; transition: 0.2s; border: 2px solid var(--wood-border); z-index: 100;
+    }
+    .nav-item button:hover .tooltip { opacity: 1; left: 80px; }
+    
+    .user-avatar { 
+      margin-top: auto; width: 60px; height: 60px; background: linear-gradient(135deg, #78350f, #451a03); border-radius: 50%; 
+      display: flex; align-items: center; justify-content: center; border: 3px solid var(--accent-gold); cursor: pointer;
+      transition: 0.3s; box-shadow: 0 0 12px rgba(251,191,36,0.4); overflow: hidden;
+    }
+    .user-avatar img { width: 50px; height: 50px; object-fit: contain; image-rendering: pixelated; }
+    .user-avatar:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(251,191,36,0.8); }
 
-    .exp-bar-container { width: 100%; height: 8px; background: #1a0c04; border-radius: 4px; margin-top: 5px; overflow: hidden; border: 1px solid #381808; }
-    .exp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent-gold), #fef08a); width: 0%; transition: width 0.4s ease; }
+    .main-content { flex: 1; padding: 20px 30px; overflow-y: auto; height: 100vh; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .greeting h1 { font-size: 26px; font-weight: bold; color: var(--accent-gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+    .greeting span { color: #fde047; }
+    .search-bar {
+      background: #2a1508; padding: 10px 20px; border-radius: 14px;
+      display: flex; align-items: center; gap: 10px; border: 3px solid #1a0c04; width: 300px;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
+    }
+    .search-bar input { background: none; border: none; color: white; outline: none; width: 100%; font-size: 14px;}
+    
+    .tab-content { display: none; animation: fadeIn 0.3s ease; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    .nav-menu { list-style: none; padding: 10px; flex: 1; overflow-y: auto; }
-    .nav-item {
-      padding: 12px 18px; margin-bottom: 8px; border-radius: 8px; cursor: pointer;
-      display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 600;
-      color: var(--text-muted); background: rgba(0,0,0,0.2); border: 1px solid transparent;
-      transition: all 0.2s;
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .metric-card { 
+      background: linear-gradient(145deg, #5c2c12, #381808);
+      border: 5px solid #1a0c04; border-radius: 16px; padding: 18px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.4);
+      cursor: pointer; transition: 0.3s;
     }
-    .nav-item:hover, .nav-item.active {
-      background: linear-gradient(90deg, var(--wood-btn), var(--wood-panel));
-      color: var(--text-main); border-color: var(--accent-gold);
-      box-shadow: inset 0 0 10px rgba(251, 191, 36, 0.3);
-    }
+    .metric-card:hover { transform: scale(1.03); border-color: var(--accent-gold); }
+    .metric-card .title { font-size: 13px; color: var(--text-muted); margin-bottom: 6px;}
+    .metric-card .value { font-size: 26px; font-weight: bold; color: var(--accent-gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);}
+    .content-grid { display: grid; grid-template-columns: 2fr 1.1fr; gap: 20px; }
 
-    .main-content {
-      flex: 1; display: flex; flex-direction: column; overflow-y: auto;
-      background: rgba(0,0,0,0.2);
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 13px; color: var(--accent-gold); margin-bottom: 6px; font-weight: 600;}
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 11px 14px; background: #231106; color: var(--text-main);
+      border: 3px solid #140803; border-radius: 10px; font-size: 14px; outline: none; transition: 0.3s;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
     }
-    .top-header {
-      padding: 15px 30px; background: linear-gradient(180deg, #3d1b0a 0%, #2a1508 100%);
-      border-bottom: 4px solid var(--wood-border); display: flex; justify-content: space-between; align-items: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--accent-gold); }
 
-    .content-area { padding: 25px; flex: 1; display: flex; flex-direction: column; gap: 25px; }
-
-    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
-    .metric-card {
-      background: linear-gradient(145deg, #4a2511, #331707); border: 3px solid #1a0c04;
-      border-radius: 14px; padding: 18px; box-shadow: 0 8px 20px rgba(0,0,0,0.6); position: relative;
+    .form-group input::placeholder, .form-group textarea::placeholder {
+      color: rgba(254, 243, 199, 0.5) !important;
     }
-    .metric-title { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .metric-value { font-size: 24px; font-weight: bold; color: var(--accent-gold); }
-
-    .section-panel {
-      background: linear-gradient(145deg, #3d1b0a, #230d03); border: 4px solid #1a0c04;
-      border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    input[type="month"]::-webkit-calendar-picker-indicator,
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(75%) sepia(80%) saturate(1000%) hue-rotate(350deg) brightness(110%) contrast(105%);
+      cursor: pointer;
+      opacity: 0.9;
     }
-    .panel-header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 18px; padding-bottom: 10px; border-bottom: 2px solid #4a2511;
+    input[type="month"]::-webkit-calendar-picker-indicator:hover,
+    input[type="date"]::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
+      transform: scale(1.15);
     }
-    .panel-title { font-size: 18px; font-weight: bold; color: var(--accent-gold); display: flex; align-items: center; gap: 10px; }
+    
+    .table-container { overflow-x: auto; max-height: 280px; }
+    table.data-table { width: 100%; border-collapse: collapse; }
+    table.data-table th, table.data-table td { padding: 10px 12px; text-align: left; border-bottom: 2px solid #2a1508; font-size: 13px; }
+    table.data-table th { position: sticky; top: 0; background: #231106; color: var(--accent-gold); font-weight: bold; z-index: 2;}
+    table.data-table tbody tr:hover { background: rgba(251,191,36,0.05); }
+    
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;}
+    .badge.overdue { background: rgba(220,38,38,0.3); color: #fca5a5; border: 1px solid var(--accent-red);}
+    .badge.pending { background: rgba(217,119,6,0.3); color: #fcd34d; border: 1px solid #d97706;}
+    .badge.paid { background: rgba(5,150,105,0.3); color: #6ee7b7; border: 1px solid var(--accent-green);}
 
-    .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
-    .data-table th { background: #1a0c04; color: var(--accent-gold); padding: 12px; text-align: left; border-bottom: 2px solid #4a2511; }
-    .data-table td { padding: 12px; border-bottom: 1px solid #2a1508; color: var(--text-main); }
-    .data-table tr:hover { background: rgba(251, 191, 36, 0.05); }
-
-    .btn-action {
-      background: linear-gradient(135deg, var(--wood-btn), #853004);
-      color: var(--text-main); border: 2px solid var(--accent-gold);
-      border-radius: 8px; padding: 8px 16px; font-weight: bold; cursor: pointer;
-      transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    .btn-primary {
+      width: 100%; padding: 14px; border-radius: 12px; border: 3px solid #140803; font-size: 15px; font-weight: bold;
+      background: linear-gradient(135deg, #d97706, #b45309); color: #fffbeb; cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5), inset 0 2px 3px rgba(255,255,255,0.3); transition: 0.2s; margin-top: 8px;
     }
-    .btn-action:hover {
-      background: linear-gradient(135deg, var(--wood-btn-hover), var(--wood-btn));
-      transform: translateY(-2px); box-shadow: 0 6px 15px rgba(251, 191, 36, 0.4);
+    .btn-primary:hover { transform: scale(1.02); background: linear-gradient(135deg, #fbbf24, #d97706); }
+    .btn-action { 
+      background: #78350f; border: 2px solid #200e05; color: white; 
+      padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; transition: 0.2s;
     }
+    .btn-action:hover { background: var(--wood-btn-hover); }
+    
+    .drop-zone { border: 3px dashed #b45309; border-radius: 14px; padding: 45px 20px; text-align: center; background: rgba(180,83,9,0.08); cursor: pointer; transition: 0.3s;}
+    .drop-zone:hover { background: rgba(180,83,9,0.15); border-color: var(--accent-gold); }
 
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; font-size: 14px; color: var(--text-muted); margin-bottom: 6px; }
-    .form-control {
-      width: 100%; padding: 10px 14px; background: rgba(0,0,0,0.5);
-      border: 2px solid #5c2c12; border-radius: 8px; color: var(--text-main); font-size: 14px;
-    }
-    .form-control:focus { outline: none; border-color: var(--accent-gold); }
-
-    .modal {
+    .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85); z-index: 1000; display: none;
-      align-items: center; justify-content: center;
+      background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(6px);
     }
-    .modal-content {
-      background: linear-gradient(145deg, #4a2511, #2a1508);
-      border: 4px solid var(--accent-gold); border-radius: 16px;
-      padding: 25px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+    .ro-window {
+      background: linear-gradient(145deg, #5c2c12, #3d1b0a); border: 6px solid #1a0c04; border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.9); width: 90%; max-width: 520px; overflow: hidden;
+    }
+    .ro-header { background: #2a1508; color: var(--accent-gold); padding: 14px 20px; font-weight: bold; display: flex; justify-content: space-between; border-bottom: 3px solid #1a0c04; }
+    .ro-header .ro-close { cursor: pointer; color: var(--text-muted); transition: 0.2s; }
+    .ro-header .ro-close:hover { color: var(--accent-red); transform: scale(1.2); }
+    .ro-body { padding: 22px; display: flex; gap: 20px; align-items: center; }
+    .ro-npc-frame {
+      width: 100px; height: 110px; background: #231106; border: 3px solid #140803; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;
+    }
+    .ro-npc-frame img { width: 80px; height: 80px; object-fit: contain; image-rendering: pixelated; }
+    .ro-dialog-box { flex: 1; background: #231106; border: 3px solid #140803; padding: 16px; border-radius: 12px; font-size: 14px; line-height: 1.6; }
+    .ro-footer { padding: 14px 20px; background: #2a1508; border-top: 3px solid #1a0c04; display: flex; justify-content: flex-end; gap: 12px; }
+    .ro-btn { padding: 8px 16px; font-size: 13px; font-weight: bold; border-radius: 8px; cursor: pointer; border: 2px solid #140803; color: white; background: #78350f; transition: 0.2s;}
+    .ro-btn:hover { background: #b45309; }
+    .ro-btn-primary { background: linear-gradient(135deg, #0284c7, #0369a1); border: none; }
+
+    .char-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); gap: 14px; margin: 20px 0;
+      max-height: 350px; overflow-y: auto; padding: 10px;
+    }
+    .char-option-card {
+      background: #231106; border: 3px solid #140803; border-radius: 16px;
+      padding: 14px 8px; cursor: pointer; transition: 0.2s;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .char-option-card:hover { transform: scale(1.05); border-color: var(--accent-gold); }
+    .char-option-card.selected { border-color: var(--accent-gold); background: linear-gradient(145deg, rgba(251,191,36,0.2), #381808); box-shadow: 0 0 15px rgba(251,191,36,0.5); }
+    .char-sprite-frame {
+      width: 70px; height: 70px; background: #120602; border-radius: 12px; border: 2px solid #140803;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 8px; overflow: hidden;
+    }
+    .char-sprite-frame img { width: 60px; height: 60px; object-fit: contain; image-rendering: pixelated; }
+
+    .exp-toast {
+      position: fixed; bottom: 30px; right: 30px;
+      background: linear-gradient(135deg, #fbbf24, #d97706); color: #2a1508;
+      padding: 12px 22px; border-radius: 20px; font-weight: bold; font-size: 15px;
+      box-shadow: 0 8px 25px rgba(251,191,36,0.6); border: 3px solid #fffbeb;
+      animation: slideUpFade 3s forwards; z-index: 10001; pointer-events: none;
+    }
+    @keyframes slideUpFade {
+      0% { opacity: 0; transform: translateY(30px) scale(0.8); }
+      15% { opacity: 1; transform: translateY(0) scale(1.1); }
+      30% { opacity: 1; transform: translateY(0) scale(1); }
+      80% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-30px); }
     }
 
-    .badge {
-      padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: bold;
+    .unit-map-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 10px;
+      max-height: 250px; overflow-y: auto; padding: 10px; background: #231106; border-radius: 12px; border: 2px solid #140803;
     }
-    .badge.paid { background: rgba(5, 150, 105, 0.2); color: #6ee7b7; border: 1px solid #059669; }
-    .badge.pending { background: rgba(217, 119, 6, 0.2); color: #fcd34d; border: 1px solid #d97706; }
-    .badge.overdue { background: rgba(220, 38, 38, 0.2); color: #fca5a5; border: 1px solid #dc2626; }
+    .unit-chip {
+      background: #381808; border: 2px solid #1a0c04; border-radius: 10px; padding: 10px 5px;
+      text-align: center; cursor: pointer; transition: 0.2s;
+    }
+    .unit-chip:hover { transform: scale(1.08); border-color: var(--accent-gold); }
+    .unit-chip.owner { border-color: var(--accent-red); background: rgba(220,38,38,0.2); }
+    .unit-chip.tenant { border-color: var(--accent-blue); background: rgba(2,132,199,0.2); }
+    .unit-chip.has-pending { border-color: var(--accent-gold); background: rgba(217,119,6,0.3); }
+
+    .invoice-item-row {
+      display: flex; gap: 10px; align-items: center; margin-bottom: 10px;
+    }
+    .invoice-item-row .item-num {
+      font-weight: bold; color: var(--accent-gold); width: 25px; text-align: center; font-size: 13px;
+    }
+
+    /* ========================================================
+       🖨️ PRINT STYLESHEET: โหมดพิมพ์สำหรับ Invoices และ Vouchers
+       ======================================================== */
+    #printable-invoice, #printable-voucher {
+      display: none;
+    }
+
+    @media print {
+      @page { size: A4 portrait; margin: 12mm 15mm; }
+      html, body {
+        width: 100% !important; height: auto !important; background: #ffffff !important;
+        color: #000000 !important; margin: 0 !important; padding: 0 !important; overflow: visible !important;
+      }
+      .sidebar, .main-content, .top-bar, .tab-content, .screen-overlay, .modal-overlay, .exp-toast, #global-loading-modal {
+        display: none !important;
+      }
+      body.print-mode-inv #printable-invoice { display: block !important; width: 100% !important; background: #ffffff !important; color: #111827 !important; font-size: 11.5pt; line-height: 1.45; }
+      body.print-mode-voc #printable-voucher { display: block !important; width: 100% !important; background: #ffffff !important; color: #111827 !important; font-size: 11.5pt; line-height: 1.45; }
+      
+      .inv-header-table { width: 100%; border-bottom: 2.5px solid #1e3a8a; padding-bottom: 12px; margin-bottom: 16px; }
+      .inv-logo-img { width: 80px; height: auto; object-fit: contain; }
+      .inv-company-name { font-size: 14pt; font-weight: bold; color: #111827; margin-bottom: 3px; }
+      .inv-company-sub { font-size: 9.5pt; color: #4b5563; line-height: 1.4; }
+      .inv-title-main { font-size: 22pt; font-weight: 800; color: #1e3a8a; letter-spacing: 1px; text-align: right; }
+      .inv-title-sub { font-size: 10.5pt; font-weight: bold; color: #6b7280; letter-spacing: 2px; text-align: right; margin-top: -2px; }
+      .inv-meta-table { margin-top: 8px; font-size: 9.5pt; float: right; }
+      .inv-meta-table td { padding: 2px 4px; }
+      .inv-info-box { width: 100%; margin-bottom: 18px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 16px; background: #f8fafc; }
+      .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+      .inv-table th, .inv-table td { border: 1px solid #94a3b8; padding: 9px 12px; text-align: left; }
+      .inv-table th { background-color: #f1f5f9; font-weight: bold; color: #0f172a; font-size: 10.5pt; }
+      .inv-total-row { background-color: #f8fafc; font-weight: bold; font-size: 12.5pt; }
+      .inv-signatures { width: 100%; margin-top: 35px; }
+      .inv-sig-box { text-align: center; width: 75%; border-top: 1px dashed #64748b; padding-top: 8px; margin: 0 auto; font-size: 10pt; }
+    }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <!-- Loading Modal -->
-  <div id="loading-modal" class="screen-overlay" style="display:none;">
+  <!-- ⏳ ป๊อปอัปกลางหน้าจอแสดงสถานะการทำงาน -->
+  <div id="global-loading-modal" class="modal-overlay" style="z-index: 25000;">
     <div class="loading-modal-box">
-      <h3 id="loading-title" style="color: var(--accent-gold); font-size: 20px; margin-bottom: 8px;">⏳ กำลังประมวลผล...</h3>
-      <p id="loading-subtitle" style="color: var(--text-muted); font-size: 14px;">กำลังเชื่อมต่อเซิร์ฟเวอร์ Google Sheets</p>
+      <div style="font-size: 38px; margin-bottom: 8px;">⏳</div>
+      <h3 style="color: var(--accent-gold); font-size: 18px; font-weight: bold;" id="loading-modal-title">กำลังประมวลผลข้อมูล...</h3>
+      <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;" id="loading-modal-subtitle">ระบบกำลังส่งคำสั่งและเชื่อมต่อ Google Sheets</p>
+      
       <div class="loading-progress-track">
-        <div class="loading-progress-fill" id="loading-bar"></div>
+        <div id="loading-progress-bar-fill" class="loading-progress-fill"></div>
+      </div>
+      <span style="font-size: 11px; color: #fbbf24; font-weight: bold;" id="loading-modal-status">กรุณารอสักครู่ ห้ามปิดหน้าต่างนี้</span>
+    </div>
+  </div>
+
+  <!-- 🖨️ PRINT TEMPLATE 1: เอกสารทางการ INVOICE / QUOTATION / RECEIPT -->
+  <div id="printable-invoice">
+    <table class="inv-header-table">
+      <tr>
+        <td style="width: 15%; vertical-align: middle;">
+          <img src="logomini.png" alt="Company Logo" class="inv-logo-img">
+        </td>
+        <td style="width: 52%; vertical-align: top; padding-left: 10px;">
+          <div class="inv-company-name">บริษัท อุดมสุขกบินทร์บุรี บ้านและที่ดิน จำกัด (สำนักงานใหญ่)</div>
+          <div class="inv-company-sub">
+            โครงการหมู่บ้านอุดมสุขเพลส (Udomsuk Place)<br>
+            ที่อยู่: 899/55-56 หมู่ 9 ตำบลหนองกี่ อำเภอกบินทร์บุรี จังหวัดปราจีนบุรี 25110<br>
+            โทร. 065-685-9898 | เลขประจำตัวผู้เสียภาษีอากร: <strong>0255552000178</strong>
+          </div>
+        </td>
+        <td style="width: 33%; vertical-align: top; text-align: right;">
+          <div class="inv-title-main" id="print-doc-title-th">ใบแจ้งหนี้</div>
+          <div class="inv-title-sub" id="print-doc-title-en">INVOICE</div>
+          <table class="inv-meta-table">
+            <tr>
+              <td style="text-align: right; color: #475569;">เลขที่เอกสาร:</td>
+              <td style="text-align: left; font-weight: bold; color: #1e3a8a;"><span id="print-inv-no">INV-202609-0001</span></td>
+            </tr>
+            <tr>
+              <td style="text-align: right; color: #475569;">วันที่ออกเอกสาร:</td>
+              <td style="text-align: left; font-weight: bold;"><span id="print-inv-date">-</span></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <div class="inv-info-box">
+      <table style="width: 100%; border: none; font-size: 10.5pt;">
+        <tr>
+          <td style="width: 60%; padding: 3px 0;"><strong id="print-label-customer">ผู้รับใบแจ้งหนี้ (เจ้าของร่วม):</strong> <span id="print-res-name" style="font-weight: bold; font-size: 11pt;">-</span></td>
+          <td style="width: 40%; padding: 3px 0;"><strong>เลขยูนิต / แปลง:</strong> <span id="print-res-unit" style="font-size: 12pt; font-weight: bold; color: #1e3a8a;">-</span></td>
+        </tr>
+        <tr id="row-print-deed">
+          <td style="padding: 3px 0;"><strong>เลขที่โฉนดที่ดิน:</strong> <span id="print-res-deed">-</span></td>
+          <td style="padding: 3px 0;"><strong>ประจำรอบเดือน:</strong> <span id="print-inv-month" style="font-weight: bold;">-</span></td>
+        </tr>
+        <tr id="row-print-month-full" style="display:none;">
+          <td colspan="2" style="padding: 3px 0;"><strong>ประจำรอบเดือน:</strong> <span id="print-inv-month-full" style="font-weight: bold;">-</span></td>
+        </tr>
+        <tr>
+          <td colspan="2" style="padding: 3px 0;"><strong>สถานที่จัดส่งเอกสาร / ที่อยู่:</strong> <span id="print-res-address">-</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- ตารางพิมพ์รองรับหลายรายการย่อย -->
+    <table class="inv-table">
+      <thead>
+        <tr>
+          <th style="width: 10%; text-align: center;">ลำดับ</th>
+          <th style="width: 65%;">รายการ (Description)</th>
+          <th style="width: 25%; text-align: right;">จำนวนเงิน (บาท)</th>
+        </tr>
+      </thead>
+      <tbody id="print-items-tbody"></tbody>
+      <tfoot>
+        <tr class="inv-total-row">
+          <td colspan="2" style="text-align: right; color: #0f172a;" id="print-total-label">รวมยอดที่ต้องชำระทั้งสิ้น (Total Due):</td>
+          <td style="text-align: right; color: #1e3a8a;" id="print-fee-total">฿0.00</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div id="print-payment-note" style="background: #fffbeb; border: 1px solid #fde68a; padding: 10px 14px; border-radius: 6px; font-size: 9.5pt; margin-bottom: 20px;">
+      <strong style="color: #b45309;">📌 ข้อมูลและขั้นตอนการชำระเงิน:</strong><br>
+      1. กรุณานำใบแจ้งหนี้นี้มาชำระ ณ สำนักงานนิติบุคคล หรือชำระผ่านช่องทางโอนเงินเข้าบัญชีบริษัท<br>
+      2. เมื่อชำระเงินเรียบร้อยแล้ว <strong>ฝ่ายการเงินจะดำเนินการออก "ใบเสร็จรับเงินฉบับเต็ม (Official Receipt)"</strong> ให้เป็นหลักฐานทันที
+    </div>
+
+    <table class="inv-signatures">
+      <tr>
+        <td style="width: 50%; text-align: center; vertical-align: top;">
+          <br><br>
+          <div class="inv-sig-box">
+            (<span id="print-operator-name">ผู้จัดทำเอกสาร</span>)<br>
+            <strong id="print-sig-left-title">เจ้าหน้าที่ฝ่ายจัดทำเอกสาร</strong>
+          </div>
+        </td>
+        <td style="width: 50%; text-align: center; vertical-align: top;">
+          <br><br>
+          <div class="inv-sig-box">
+            (<span id="print-finance-name"> ............................................................ </span>)<br>
+            <strong>เจ้าหน้าที่ฝ่ายการเงิน (ผู้รับเงิน)</strong>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 🖨️ PRINT TEMPLATE 2: ใบสำคัญจ่าย (PAYMENT VOUCHER) -->
+  <div id="printable-voucher">
+    <table class="inv-header-table">
+      <tr>
+        <td style="width: 15%; vertical-align: middle;">
+          <img src="logomini.png" alt="Company Logo" class="inv-logo-img">
+        </td>
+        <td style="width: 52%; vertical-align: top; padding-left: 10px;">
+          <div class="inv-company-name">บริษัท อุดมสุขกบินทร์บุรี บ้านและที่ดิน จำกัด (สำนักงานใหญ่)</div>
+          <div class="inv-company-sub">
+            โครงการหมู่บ้านอุดมสุขเพลส (Udomsuk Place)<br>
+            ที่อยู่: 899/55-56 หมู่ 9 ตำบลหนองกี่ อำเภอกบินทร์บุรี จังหวัดปราจีนบุรี 25110<br>
+            โทร. 065-685-9898 | เลขประจำตัวผู้เสียภาษีอากร: <strong>0255552000178</strong>
+          </div>
+        </td>
+        <td style="width: 33%; vertical-align: top; text-align: right;">
+          <div class="inv-title-main">ใบสำคัญจ่าย</div>
+          <div class="inv-title-sub">PAYMENT VOUCHER</div>
+          <table class="inv-meta-table">
+            <tr>
+              <td style="text-align: right; color: #475569;">เลขที่อ้างอิง:</td>
+              <td style="text-align: left; font-weight: bold; color: #1e3a8a;"><span id="print-voc-no">EXP-0001</span></td>
+            </tr>
+            <tr>
+              <td style="text-align: right; color: #475569;">วันที่จ่ายเงิน:</td>
+              <td style="text-align: left; font-weight: bold;"><span id="print-voc-date">-</span></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <div class="inv-info-box">
+      <table style="width: 100%; border: none; font-size: 10.5pt;">
+        <tr>
+          <td style="width: 100%; padding: 3px 0;"><strong>หมวดหมู่รายจ่าย:</strong> <span id="print-voc-cat" style="font-weight: bold; font-size: 11pt;">-</span></td>
+        </tr>
+        <tr>
+          <td style="width: 100%; padding: 3px 0;"><strong>ช่องทางการจ่ายเงิน:</strong> <span id="print-voc-method" style="font-weight: bold;">-</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <table class="inv-table">
+      <thead>
+        <tr>
+          <th style="width: 10%; text-align: center;">ลำดับ</th>
+          <th style="width: 65%;">รายละเอียดการจ่ายเงิน (Description)</th>
+          <th style="width: 25%; text-align: right;">จำนวนเงิน (บาท)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="text-align: center;">1</td>
+          <td>
+            <strong id="print-voc-desc">-</strong>
+          </td>
+          <td style="text-align: right; font-weight: bold;" id="print-voc-amount">0.00</td>
+        </tr>
+        <tr class="inv-total-row">
+          <td colspan="2" style="text-align: right; color: #0f172a;">รวมยอดเงินจ่ายทั้งสิ้น (Total Paid):</td>
+          <td style="text-align: right; color: #dc2626;" id="print-voc-total">฿0.00</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="inv-signatures" style="margin-top: 60px;">
+      <tr>
+        <td style="width: 33%; text-align: center; vertical-align: top;">
+          <br><br>
+          <div class="inv-sig-box">
+            (<span id="print-voc-operator">-</span>)<br>
+            <strong>ผู้จัดทำ / ฝ่ายการเงิน</strong>
+          </div>
+        </td>
+        <td style="width: 33%; text-align: center; vertical-align: top;">
+          <br><br>
+          <div class="inv-sig-box">
+            ( ..................................................... )<br>
+            <strong>ผู้อนุมัติจ่าย / ผู้บริหาร</strong>
+          </div>
+        </td>
+        <td style="width: 33%; text-align: center; vertical-align: top;">
+          <br><br>
+          <div class="inv-sig-box">
+            ( ..................................................... )<br>
+            <strong>ผู้รับเงิน</strong>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 📜 POPUP: รายชื่อลูกบ้านแบบรายละเอียด -->
+  <div id="customer-list-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 1020px; width: 95%;">
+      <div class="ro-header">
+        <span>📜 สารบบข้อมูลลูกบ้านทั้งหมด (Residents Directory)</span>
+        <span class="ro-close" onclick="closeCustomerListModal()">✕</span>
+      </div>
+      <div style="padding: 16px 20px 0 20px; display: flex; gap: 10px; align-items: center;">
+        <input type="text" id="modal-resident-search" placeholder="🔍 พิมพ์ค้นหาเลขยูนิต, ชื่อ-นามสกุล, เลขโฉนด, เบอร์โทร หรือที่อยู่..." onkeyup="filterModalResidentList()" 
+               style="flex: 1; padding: 10px 14px; background: #231106; color: var(--text-main); border: 2px solid #140803; border-radius: 10px; outline: none; font-size: 13px;">
+        <button type="button" class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #2a1508; font-weight: bold; border: 2px solid #140803; padding: 10px 16px; border-radius: 10px; white-space: nowrap;" onclick="goToResidentRegistrationFromModal()">
+          ➕ ลงทะเบียนลูกบ้านใหม่
+        </button>
+      </div>
+      <div class="ro-body" style="padding: 14px 20px; flex-direction: column; align-items: stretch;">
+        <div style="max-height: 420px; overflow-x: auto; overflow-y: auto; border: 2px solid #140803; border-radius: 10px; background: #231106;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 880px;">
+            <thead>
+              <tr style="background: #1a0c04; color: var(--accent-gold); position: sticky; top: 0; z-index: 2;">
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 8%;">ยูนิต</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 17%;">ชื่อผู้พักอาศัย</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 10%;">ประเภท</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 11%;">เลขที่โฉนด</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 12%;">เบอร์โทรศัพท์</th>
+                <th style="padding: 10px 12px; text-align: left; border-bottom: 2px solid #140803; width: 18%;">ที่อยู่ปัจจุบัน / ส่งเอกสาร</th>
+                <th style="padding: 10px 12px; text-align: center; border-bottom: 2px solid #140803; width: 8%;">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="modal-resident-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="ro-footer">
+        <button class="ro-btn ro-btn-cancel" onclick="closeCustomerListModal()">ปิดหน้าต่าง (ล้างข้อมูล)</button>
       </div>
     </div>
   </div>
 
-  <!-- Login Overlay -->
-  <div id="login-overlay" class="screen-overlay">
-    <div class="char-select-card" style="max-width: 400px;">
-      <img src="logomini.png" class="brand-logo" alt="Logo">
-      <h2 style="color: var(--accent-gold); margin-bottom: 20px;">เข้าสู่ระบบนิติบุคคล</h2>
-      <form id="login-form" onsubmit="handleLoginSubmit(event)">
-        <div class="form-group" style="text-align: left;">
-          <label>ชื่อผู้ใช้งาน (Username)</label>
-          <input type="text" id="login-user" class="form-control" required placeholder="กรอกชื่อผู้ใช้งาน">
+  <!-- ✏️ MODAL: แก้ไขข้อมูลลูกบ้านเดิม -->
+  <div id="edit-resident-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 650px; width: 90%;">
+      <div class="ro-header">
+        <span>✏️ แก้ไขข้อมูลลูกบ้าน (Unit Profile Update)</span>
+        <span class="ro-close" onclick="closeEditResidentModal()">✕</span>
+      </div>
+      <form onsubmit="submitUpdateResident(event)" style="padding: 20px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="form-group">
+            <label>เลขยูนิต / แปลงบ้าน (ไม่สามารถเปลี่ยนได้)</label>
+            <input type="text" id="edit-res-unit" readonly style="background: #180a03; color: var(--accent-gold); font-weight: bold; cursor: not-allowed;">
+          </div>
+          <div class="form-group">
+            <label>เลขที่โฉนดที่ดิน (Title Deed)</label>
+            <input type="text" id="edit-res-deed">
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label>ชื่อ-นามสกุล เจ้าของ / ผู้พักอาศัย *</label>
+            <input type="text" id="edit-res-name" required>
+          </div>
+          <div class="form-group">
+            <label>เบอร์โทรศัพท์ติดต่อ *</label>
+            <input type="tel" id="edit-res-phone" required>
+          </div>
+          <div class="form-group">
+            <label>อีเมล</label>
+            <input type="email" id="edit-res-email">
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label>🏠 ที่อยู่ตามบัตรประชาชน</label>
+            <textarea id="edit-res-id-address" rows="2"></textarea>
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label>📍 ที่อยู่ปัจจุบัน / สถานที่จัดส่งเอกสาร</label>
+            <textarea id="edit-res-cur-address" rows="2"></textarea>
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label>📷 อัปโหลดภาพถ่ายใหม่ (เว้นว่างไว้หากไม่เปลี่ยน)</label>
+            <input type="file" id="edit-res-photo" accept="image/*" onchange="previewEditResidentPhoto(event)">
+          </div>
         </div>
-        <div class="form-group" style="text-align: left;">
-          <label>รหัสผ่าน (Password)</label>
-          <input type="password" id="login-pass" class="form-control" required placeholder="กรอกรหัสผ่าน">
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button type="button" class="ro-btn" style="flex: 1;" onclick="closeEditResidentModal()">ยกเลิก</button>
+          <button type="submit" class="btn-primary" id="btn-submit-update-resident" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #0284c7, #0369a1);">💾 บันทึกการแก้ไขข้อมูล</button>
         </div>
-        <button type="submit" class="btn-action" style="width: 100%; margin-top: 15px; padding: 12px;">🔑 เข้าสู่ระบบ</button>
       </form>
     </div>
   </div>
 
-  <!-- Character Select Screen -->
-  <div id="char-select-screen" class="screen-overlay" style="display:none;">
-    <div class="char-select-card">
-      <h2 style="color: var(--accent-gold); margin-bottom: 10px;">เลือกตัวละคร Avatar ของคุณ</h2>
-      <p style="color: var(--text-muted); font-size: 14px;">เลือกอวตารประจำตัวเพื่อใช้ในระบบบริหารจัดการ</p>
-      <div class="char-grid">
-        <div class="char-item" onclick="selectAvatar('WIZmini', this)">
-          <img src="WIZmini.gif" class="char-img" alt="Avatar 1">
-          <p style="font-size: 12px; margin-top: 5px;">Wizard</p>
-        </div>
-        <div class="char-item" onclick="selectAvatar('Swmini', this)">
-          <img src="Swmini.gif" class="char-img" alt="Avatar 2">
-          <p style="font-size: 12px; margin-top: 5px;">Swordsman</p>
-        </div>
-        <div class="char-item" onclick="selectAvatar('Job03mini', this)">
-          <img src="Job03mini.gif" class="char-img" alt="Avatar 3">
-          <p style="font-size: 12px; margin-top: 5px;">Archer</p>
-        </div>
-        <div class="char-item" onclick="selectAvatar('Job04mini', this)">
-          <img src="Job04mini.gif" class="char-img" alt="Avatar 4">
-          <p style="font-size: 12px; margin-top: 5px;">Merchant</p>
-        </div>
-        <div class="char-item" onclick="selectAvatar('Job05mini', this)">
-          <img src="Job05mini.gif" class="char-img" alt="Avatar 5">
-          <p style="font-size: 12px; margin-top: 5px;">Thief</p>
-        </div>
-        <div class="char-item" onclick="selectAvatar('Job06mini', this)">
-          <img src="Job06mini.gif" class="char-img" alt="Avatar 6">
-          <p style="font-size: 12px; margin-top: 5px;">Acolyte</p>
-        </div>
+  <!-- 📖 MODAL: สมุดบัญชีการเงินรายลูกบ้าน (Individual Ledger) -->
+  <div id="unit-ledger-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 950px; width: 95%;">
+      <div class="ro-header">
+        <span>📖 สมุดบัญชีการเงินรายยูนิต (Individual Resident Ledger)</span>
+        <span class="ro-close" onclick="closeLedgerModal()">✕</span>
       </div>
-      <button type="button" class="btn-action" style="width: 100%; padding: 12px;" onclick="confirmAvatarSelection()">✅ ตกลงเลือกตัวละครนี้</button>
-    </div>
-  </div>
-
-  <!-- Toast Notification -->
-  <div id="toast-exp" class="toast-exp">
-    ✨ <span id="toast-exp-val">+10 EXP</span>: <span id="toast-exp-msg">เข้าสู่ระบบสำเร็จ</span>
-  </div>
-
-  <!-- Sidebar Nav -->
-  <div class="sidebar">
-    <div class="brand-section">
-      <img src="logomini.png" class="brand-logo" alt="Condo Logo">
-      <h3 style="color: var(--accent-gold); font-size: 16px;">ระบบบริหารจัดการนิติ</h3>
-    </div>
-
-    <div class="user-profile-box" onclick="openProfileModal()" style="cursor: pointer;">
-      <div class="avatar-wrapper">
-        <img src="WIZmini.gif" id="user-avatar-img" class="profile-avatar" alt="User Avatar">
-      </div>
-      <div style="flex: 1; overflow: hidden;">
-        <h4 id="user-display-name" style="font-size: 14px; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">User</h4>
-        <span id="user-role-badge" class="badge" style="background: rgba(251, 191, 36, 0.2); color: var(--accent-gold); font-size: 10px;">Admin</span>
-        <div class="exp-bar-container">
-          <div id="exp-bar-fill" class="exp-bar-fill"></div>
+      <div style="padding: 20px;">
+        <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+          <input type="text" id="ledger-search-unit" placeholder="🔍 พิมพ์เลขยูนิต เช่น 12 หรือ 899/12 แล้วกดค้นหา" style="flex: 1; padding: 10px 14px; background: #231106; color: var(--text-main); border: 2px solid #140803; border-radius: 10px; outline: none;">
+          <button type="button" class="btn-primary" style="margin: 0; width: 140px; background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="searchUnitLedger()">🔍 ค้นหา</button>
         </div>
-      </div>
-    </div>
 
-    <ul class="nav-menu">
-      <li class="nav-item active" onclick="switchTab('dashboard', this)">📊 แดชบอร์ดภาพรวม</li>
-      <li class="nav-item" onclick="switchTab('sales-tracking', this)">📑 ติดตามสถานะบิลทั้งหมด</li>
-      <li class="nav-item" onclick="switchTab('pending-invoices', this)">⏳ คิวรอชำระเงิน</li>
-      <li class="nav-item" onclick="switchTab('residents', this)">👥 ข้อมูลลูกบ้าน/แปลง</li>
-      <li class="nav-item" onclick="switchTab('procurement', this)">📦 จัดซื้อ & สต็อกพัสดุ</li>
-      <li class="nav-item" onclick="switchTab('expenses', this)">💸 บันทึกรายจ่าย</li>
-      <li class="nav-item" onclick="switchTab('settings', this)" id="nav-item-settings">⚙️ ตั้งค่าระบบ Admin</li>
-    </ul>
-
-    <div style="padding: 15px; border-top: 2px solid #2a1508;">
-      <button class="btn-action" style="width: 100%; background: #dc2626;" onclick="handleLogout()">🚪 ออกจากระบบ</button>
-    </div>
-  </div>
-
-  <!-- Main Content Area -->
-  <div class="main-content">
-    <div class="top-header">
-      <h2 id="header-title" style="color: var(--accent-gold);">📊 แดชบอร์ดภาพรวมโครงการ</h2>
-      <div style="display: flex; gap: 10px;">
-        <button class="btn-action" onclick="openInvoiceGeneratorModal()">➕ ออกใบแจ้งหนี้ / ใบเสนอราคา</button>
-        <button class="btn-action" style="background: linear-gradient(135deg, #059669, #047857);" onclick="openPaymentModal()">💵 รับชำระเงิน</button>
-      </div>
-    </div>
-
-    <div class="content-area">
-      <!-- Metrics Overview Cards -->
-      <div class="metrics-grid">
-        <div class="metric-card">
-          <div class="metric-title">💰 ยอดรับชำระเดือนนี้</div>
-          <div class="metric-value" id="total-income">฿0</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title">📉 ยอดรายจ่ายเดือนนี้</div>
-          <div class="metric-value" style="color: #fca5a5;" id="total-expense">฿0</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title">⚖️ ยอดคงเหลือสุทธิ</div>
-          <div class="metric-value" style="color: #6ee7b7;" id="net-balance">฿0</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-title">⏳ บิลรอดำเนินการ</div>
-          <div class="metric-value" style="color: #fcd34d;" id="total-pending-invoices">0</div>
-        </div>
-      </div>
-
-      <!-- Main Section Panel -->
-      <div id="tab-dashboard" class="tab-page">
-        <div class="section-panel">
-          <div class="panel-header">
-            <span class="panel-title">⏳ รายการรอดำเนินการล่าสุด</span>
-            <span class="badge pending" id="queue-badge">0 รายการ</span>
-          </div>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>วันที่ออกบิล</th>
-                <th>ยูนิต</th>
-                <th>ชื่อลูกบ้าน</th>
-                <th>รายการค่าใช้จ่าย</th>
-                <th>รอบเดือน</th>
-                <th>ผู้บันทึก</th>
-                <th style="text-align: center;">จัดการ</th>
-              </tr>
-            </thead>
-            <tbody id="pending-invoices-tbody">
-              <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">กำลังโหลดข้อมูล...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Sales Tracking Section -->
-      <div id="tab-sales-tracking" class="tab-page" style="display:none;">
-        <div class="section-panel">
-          <div class="panel-header">
-            <span class="panel-title">📜 ตารางติดตามสถานะบิลทั้งหมด (Sales Tracking List)</span>
+        <div id="ledger-content-box" style="display: none;">
+          <div style="background: #231106; border: 2px solid #140803; border-radius: 12px; padding: 14px; margin-bottom: 16px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
             <div>
-              <span>รวมยอดขายบิลที่ใช้งาน: <strong id="sales-total-amount" style="color:var(--accent-gold);">฿0</strong></span> |
-              <span>จำนวนบิล: <strong id="sales-total-count">0</strong></span>
+              <span style="font-size: 11px; color: var(--text-muted);">ยูนิต / แปลง:</span>
+              <div id="ledger-unit-display" style="font-size: 18px; font-weight: bold; color: var(--accent-gold);">-</div>
+            </div>
+            <div>
+              <span style="font-size: 11px; color: var(--text-muted);">ชื่อผู้พักอาศัย / เจ้าของ:</span>
+              <div id="ledger-name-display" style="font-size: 16px; font-weight: bold; color: var(--text-main);">-</div>
+            </div>
+            <div>
+              <span style="font-size: 11px; color: var(--text-muted);">ยอดชำระแล้วรวม:</span>
+              <div id="ledger-paid-display" style="font-size: 18px; font-weight: bold; color: #6ee7b7;">฿0.00</div>
             </div>
           </div>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>เลขที่เอกสาร</th>
-                <th>วันที่</th>
-                <th>ยูนิต</th>
-                <th>ชื่อลูกค้า</th>
-                <th>รายการ</th>
-                <th>ยอดเงิน</th>
-                <th>สถานะ</th>
-                <th style="text-align: center;">จัดการ</th>
-              </tr>
-            </thead>
-            <tbody id="sales-tracking-tbody">
-              <tr><td colspan="8" style="text-align: center; color: var(--text-muted);">กำลังโหลดข้อมูล...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
 
-      <!-- Residents Section -->
-      <div id="tab-residents" class="tab-page" style="display:none;">
-        <div class="section-panel">
-          <div class="panel-header">
-            <span class="panel-title">👥 รายชื่อลูกบ้านและข้อมูลแปลง</span>
-            <button class="btn-action" onclick="openNewResidentModal()">➕ ลงทะเบียนลูกบ้านใหม่</button>
+          <div class="table-container" style="max-height: 350px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>วันที่</th>
+                  <th>เลขที่เอกสาร</th>
+                  <th>ประเภท/รายการ</th>
+                  <th>จำนวนเงิน</th>
+                  <th>ช่องทาง</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+              <tbody id="ledger-tbody"></tbody>
+            </table>
           </div>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>ยูนิต/แปลง</th>
-                <th>ชื่อ-นามสกุล</th>
-                <th>ประเภท</th>
-                <th>โฉนดเลขที่</th>
-                <th>เบอร์โทรศัพท์</th>
-                <th>ที่อยู่ปัจจุบัน</th>
-                <th style="text-align: center;">จัดการ</th>
-              </tr>
-            </thead>
-            <tbody id="residents-tbody">
-              <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">กำลังโหลดข้อมูล...</td></tr>
-            </tbody>
-          </table>
         </div>
       </div>
-
-      <!-- Procurement Section -->
-      <div id="tab-procurement" class="tab-page" style="display:none;">
-        <div class="section-panel">
-          <div class="panel-header">
-            <span class="panel-title">📦 รายการพัสดุและสต็อกจัดซื้อ</span>
-            <button class="btn-action" onclick="openNewProcurementModal()">➕ เพิ่มรายการพัสดุใหม่</button>
-          </div>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>รหัสสินค้า</th>
-                <th>ชื่อพัสดุ/สินค้า</th>
-                <th>หมวดหมู่</th>
-                <th>คงเหลือ</th>
-                <th>ราคา/หน่วย</th>
-                <th>สถานะสต็อก</th>
-                <th style="text-align: center;">ปรับสต็อก</th>
-              </tr>
-            </thead>
-            <tbody id="procurement-tbody">
-              <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">กำลังโหลดข้อมูล...</td></tr>
-            </tbody>
-          </table>
-        </div>
+      <div class="ro-footer">
+        <button class="ro-btn ro-btn-cancel" onclick="closeLedgerModal()">ปิดหน้าต่าง</button>
       </div>
-
-      <!-- Expenses Section -->
-      <div id="tab-expenses" class="tab-page" style="display:none;">
-        <div class="section-panel">
-          <div class="panel-header">
-            <span class="panel-title">💸 บันทึกรายการรายจ่ายโครงการ</span>
-            <button class="btn-action" onclick="openNewExpenseModal()">➕ บันทึกรายจ่ายใหม่</button>
-          </div>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>วันที่</th>
-                <th>หมวดหมู่</th>
-                <th>รายละเอียด</th>
-                <th>จำนวนเงิน</th>
-                <th>ชำระโดย</th>
-                <th>หลักฐาน</th>
-                <th>ผู้บันทึก</th>
-                <th style="text-align: center;">จัดการ</th>
-              </tr>
-            </thead>
-            <tbody id="expenses-tbody">
-              <tr><td colspan="8" style="text-align: center; color: var(--text-muted);">กำลังโหลดข้อมูล...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
     </div>
   </div>
 
-  <!-- JavaScript API & Application Core Logic -->
+  <!-- 💸 MODAL: อัปเดตไฟล์หลักฐาน / แก้ไขรายการรายจ่าย (รองรับ Admin Override) -->
+  <div id="expense-update-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 600px; width: 90%;">
+      <div class="ro-header">
+        <span id="expense-modal-title">📎 แนบไฟล์หลักฐานการจ่ายเงิน</span>
+        <span class="ro-close" onclick="closeExpenseUpdateModal()">✕</span>
+      </div>
+      <div style="padding: 20px;">
+        <input type="hidden" id="exp-modal-id">
+        <input type="hidden" id="exp-modal-fallback-desc">
+        <input type="hidden" id="exp-modal-fallback-amt">
+        
+        <div id="exp-modal-admin-fields" style="display: none;">
+          <div class="form-group">
+            <label>หมวดหมู่รายจ่าย *</label>
+            <select id="exp-modal-category">
+              <option value="ค่าซ่อมบำรุงส่วนกลาง">ค่าซ่อมบำรุงส่วนกลาง / อุปกรณ์</option>
+              <option value="ค่าน้ำ-ค่าไฟส่วนกลาง">ค่าน้ำ-ค่าไฟส่วนกลางโครงการ</option>
+              <option value="ค่าจ้างแม่บ้าน-รปภ.">ค่าจ้างแม่บ้าน / รปภ. / บุคคลภายนอก</option>
+              <option value="ค่าใช้จ่ายสำนักงานนิติ">ค่าใช้จ่ายสำนักงาน / เครื่องเขียน</option>
+              <option value="ค่าธรรมเนียมวิชาชีพ/ภาษี">ค่าธรรมเนียมวิชาชีพ / บัญชี / ภาษี</option>
+              <option value="รายจ่ายอื่นๆ">รายจ่ายอื่นๆ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>รายละเอียดรายจ่าย *</label>
+            <input type="text" id="exp-modal-desc">
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <div class="form-group" style="flex: 1;">
+              <label>จำนวนเงิน (฿) *</label>
+              <input type="number" id="exp-modal-amount">
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label>ช่องทางจ่ายเงิน</label>
+              <select id="exp-modal-method">
+                <option value="เงินสด">เงินสด</option>
+                <option value="โอนเงิน/บัญชีบริษัท">โอนเงิน / บัญชีบริษัท</option>
+                <option value="เช็คธนาคาร">เช็คธนาคาร</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="exp-modal-info-summary" style="background:#180a03; border:1px solid #381808; padding:12px; border-radius:10px; margin-bottom:14px;">
+          <div style="font-size:12px; color:var(--text-muted);" id="exp-modal-summary-text">-</div>
+        </div>
+
+        <div class="form-group">
+          <label>📎 อัปโหลดไฟล์หลักฐาน (สลิปโอนเงิน / หน้าเช็ค / ใบเสร็จ) *</label>
+          <input type="file" id="exp-modal-file" accept="image/*,application/pdf" onchange="previewExpenseModalFile(event)">
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button type="button" class="ro-btn" style="flex: 1;" onclick="closeExpenseUpdateModal()">ยกเลิก</button>
+          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #059669, #047857);" onclick="submitExpenseUpdateRecord()">💾 บันทึกข้อมูล</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📄 MODAL: ดู/พิมพ์ ใบสำคัญจ่าย (Expense Voucher) -->
+  <div id="voucher-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 600px; width: 90%;">
+      <div class="ro-header">
+        <span>📄 รายละเอียดการบันทึกรายจ่าย (Expense Voucher)</span>
+        <span class="ro-close" onclick="closeVoucherModal()">✕</span>
+      </div>
+      <div style="padding: 20px;">
+        <div id="voucher-details-container" style="background:#180a03; padding:18px; border-radius:12px; border: 1px dashed var(--accent-gold); color: var(--text-main); font-size: 14px; line-height: 1.8;">
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button type="button" class="ro-btn" style="flex: 1;" onclick="closeVoucherModal()">ปิดหน้าต่าง</button>
+          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #0284c7, #0369a1);" id="btn-print-voucher" onclick="printExpenseVoucher()">🖨️ พิมพ์ใบสำคัญจ่าย (A4)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📦 MODAL: ปรับแต่งสต็อกพัสดุหน้างาน -->
+  <div id="stock-adjust-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 500px; width: 90%;">
+      <div class="ro-header">
+        <span>📦 ปรับแก้ไขสต็อกพัสดุหน้างาน</span>
+        <span class="ro-close" onclick="closeStockModal()">✕</span>
+      </div>
+      <div style="padding: 20px;">
+        <div class="form-group">
+          <label>รหัส / ชื่อพัสดุ:</label>
+          <input type="text" id="stock-modal-code" readonly style="background:#180a03; color:var(--accent-gold); font-weight:bold;">
+        </div>
+        <div class="form-group">
+          <label>ชื่อพัสดุ:</label>
+          <input type="text" id="stock-modal-name" readonly style="background:#180a03; color:var(--text-main);">
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <div class="form-group" style="flex: 1;">
+            <label>จำนวนคงเหลือหน้างานจริง *</label>
+            <input type="number" id="stock-modal-qty" required>
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>จุดแจ้งเตือนขั้นต่ำ (Min Alert) *</label>
+            <input type="number" id="stock-modal-min" required>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button type="button" class="ro-btn" style="flex: 1;" onclick="closeStockModal()">ยกเลิก</button>
+          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #059669, #047857);" onclick="submitStockAdjustment()">💾 บันทึกปรับสต็อก</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📝 MODAL: เพิ่มโน้ตติดตามงานลูกบ้าน (CRM Notes) -->
+  <div id="crm-note-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 550px; width: 90%;">
+      <div class="ro-header">
+        <span>📝 บันทึกติดตามงานยูนิต <span id="crm-modal-unit" style="color:var(--accent-gold);">-</span></span>
+        <span class="ro-close" onclick="closeCrmModal()">✕</span>
+      </div>
+      <div style="padding: 20px;">
+        <div class="form-group">
+          <label>ผู้พักอาศัยปัจจุบัน:</label>
+          <input type="text" id="crm-modal-name" readonly style="background:#180a03; color:var(--text-muted);">
+        </div>
+        <div class="form-group">
+          <label>เจ้าของห้อง/บ้าน (Owner):</label>
+          <input type="text" id="crm-modal-owner" readonly style="background:#180a03; color:var(--text-muted);">
+        </div>
+        <div class="form-group">
+          <label>📜 ประวัติโน้ตติดตามงานที่ผ่านมา:</label>
+          <textarea id="crm-modal-history" rows="4" readonly style="background:#180a03; font-size:12px; color:var(--text-muted); line-height:1.5;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>✏️ เพิ่มโน้ตติดตามงานใหม่:</label>
+          <input type="text" id="crm-modal-new-note" placeholder="เช่น ลูกค้าขอเลื่อนจ่ายวันที่ 15, โทรแจ้งต่อสัญญาแล้ว">
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button type="button" class="ro-btn" style="flex: 1;" onclick="closeCrmModal()">ปิดหน้าต่าง</button>
+          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0;" onclick="submitCrmNote()">💾 บันทึกโน้ตติดตามงาน</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RO Warning Modal -->
+  <div id="ro-modal-overlay" class="modal-overlay">
+    <div class="ro-window">
+      <div class="ro-header">
+        <span>📜 ระบบตรวจสอบข้อมูลลูกบ้าน</span>
+        <span class="ro-close" onclick="closeRoModal()">✕</span>
+      </div>
+      <div class="ro-body">
+        <div style="text-align: center;">
+          <div class="ro-npc-frame"><img src="WIZmini.gif" alt="Wizard"></div>
+        </div>
+        <div class="ro-dialog-box">
+          <p id="ro-dialog-text">
+            ไม่พบข้อมูลยูนิต <strong style="color: var(--accent-red);">[<span id="ro-target-unit">-</span>]</strong> ในระบบ!<br><br>
+            กรุณาไปที่หน้า <strong>"ลงทะเบียนลูกบ้านใหม่"</strong> เพื่อเพิ่มข้อมูลเจ้าของร่วมให้เรียบร้อยก่อนทำการรับชำระเงิน
+          </p>
+        </div>
+      </div>
+      <div class="ro-footer">
+        <button class="ro-btn ro-btn-cancel" onclick="closeRoModal()">ยกเลิก</button>
+        <button class="ro-btn ro-btn-primary" onclick="goToResidentRegistration()">ลงทะเบียนลูกบ้าน ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Character Selection Screen -->
+  <div id="char-select-screen" class="screen-overlay" style="display: none;">
+    <div class="char-select-container">
+      <h2 style="color: var(--accent-gold); font-size: 22px; margin-bottom: 4px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">⚔ เลือกตัวละครประจำตัว (Avatar Profile)</h2>
+      <p style="color: var(--text-muted); font-size: 12px;">เลือกตัวละครที่คุณต้องการใช้เป็นโปรไฟล์ส่วนตัว (อิสระทุกตำแหน่งงาน)</p>
+      
+      <div class="char-grid">
+        <div class="char-option-card" id="opt-Job03mini" onclick="pickAvatar('Job03mini')">
+          <div class="char-sprite-frame"><img src="Job03mini.gif" alt="Cleric"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Cleric</strong>
+        </div>
+        <div class="char-option-card" id="opt-Job04mini" onclick="pickAvatar('Job04mini')">
+          <div class="char-sprite-frame"><img src="Job04mini.gif" alt="Rogue"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Rogue</strong>
+        </div>
+        <div class="char-option-card" id="opt-Job05mini" onclick="pickAvatar('Job05mini')">
+          <div class="char-sprite-frame"><img src="Job05mini.gif" alt="Hunter"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Hunter</strong>
+        </div>
+        <div class="char-option-card" id="opt-Job06mini" onclick="pickAvatar('Job06mini')">
+          <div class="char-sprite-frame"><img src="Job06mini.gif" alt="Monk"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Monk</strong>
+        </div>
+        <div class="char-option-card" id="opt-Job07mini" onclick="pickAvatar('Job07mini')">
+          <div class="char-sprite-frame"><img src="Job07mini.gif" alt="Warlock"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Warlock</strong>
+        </div>
+        <div class="char-option-card" id="opt-Job08mini" onclick="pickAvatar('Job08mini')">
+          <div class="char-sprite-frame"><img src="Job08mini.gif" alt="Fighter"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Fighter</strong>
+        </div>
+        <div class="char-option-card" id="opt-Job09mini" onclick="pickAvatar('Job09mini')">
+          <div class="char-sprite-frame"><img src="Job09mini.gif" alt="Mage"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Mage</strong>
+        </div>
+        <div class="char-option-card" id="opt-Job010mini" onclick="pickAvatar('Job010mini')">
+          <div class="char-sprite-frame"><img src="Job010mini.gif" alt="Ranger"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Ranger</strong>
+        </div>
+        <div class="char-option-card" id="opt-Swmini" onclick="pickAvatar('Swmini')">
+          <div class="char-sprite-frame"><img src="Swmini.gif" alt="Knight"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Knight</strong>
+        </div>
+        <div class="char-option-card" id="opt-WIZmini" onclick="pickAvatar('WIZmini')">
+          <div class="char-sprite-frame"><img src="WIZmini.gif" alt="Grand Wizard"></div>
+          <strong style="color: var(--accent-gold); font-size: 12px;">Grand Wiz</strong>
+        </div>
+      </div>
+
+      <button class="btn-primary" style="max-width: 250px; margin: 0 auto;" onclick="confirmCharacterSelection()">🚀 เข้าสู่ระบบแดชบอร์ด</button>
+    </div>
+  </div>
+
+  <!-- Kafra Profile Modal -->
+  <div id="profile-modal-overlay" class="modal-overlay">
+    <div class="ro-window" style="max-width: 680px;">
+      <div class="ro-header">
+        <span>🏅 ข้อมูลตัวละคร & กระดานภารกิจกิลด์ (Kafra Profile & Quests)</span>
+        <span class="ro-close" onclick="closeProfileModal()">✕</span>
+      </div>
+      <div class="ro-body" style="gap: 20px; align-items: flex-start; max-height: 80vh; overflow-y: auto;">
+         
+         <div style="flex: 1; text-align: center; background: #231106; padding: 18px; border-radius: 14px; border: 2px solid #140803;">
+           <div id="prof-avatar-display" style="width: 85px; height: 85px; background: #120602; border-radius: 50%; border: 3px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(251,191,36,0.3); margin: 0 auto; overflow: hidden;">
+             <img id="prof-avatar-img" src="WIZmini.gif" style="width: 70px; height: 70px; object-fit: contain; image-rendering: pixelated;" alt="Avatar">
+           </div>
+           <div id="prof-prestige" style="color: var(--accent-gold); font-size: 16px; margin-top: 4px; font-weight: bold; letter-spacing: 2px;"></div>
+           <h3 id="prof-name" style="color: var(--text-main); margin-top: 8px; font-size: 18px;">Admin Name</h3>
+           <div id="prof-title" style="color: var(--accent-gold); font-weight: bold; margin-bottom: 12px; font-size: 13px;">🌟 Legendary Admin</div>
+           
+           <button class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #2a1508; font-weight: bold; border: 2px solid #140803; margin-bottom: 14px; padding: 5px 14px; font-size: 12px;" onclick="openCharSelectFromProfile()">
+             🔄 เปลี่ยนตัวละคร
+           </button>
+
+           <div style="width: 100%; background: #120602; border: 1px solid #140803; border-radius: 10px; padding: 10px; text-align: left;">
+             <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+               <span style="font-weight: bold; font-size: 13px;">Level <span id="prof-level" style="font-size: 16px; color: var(--accent-gold);">99</span></span>
+               <span id="prof-exp-text" style="color: var(--text-muted); font-size: 11px; line-height: 20px;">29,500 / Max EXP</span>
+             </div>
+             <div style="width: 100%; height: 10px; background: #231106; border-radius: 5px; overflow: hidden; border: 1px solid #140803;">
+               <div id="prof-exp-bar" style="height: 100%; width: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); box-shadow: 0 0 8px rgba(251,191,36,0.8); transition: width 1s ease-in-out;"></div>
+             </div>
+             <p style="font-size: 10px; color: var(--text-muted); margin-top: 6px; text-align: center;">
+               🔄 รีเซ็ตเลเวล & รับดาวจุติ (⭐) ทุก 1 ม.ค.
+             </p>
+           </div>
+         </div>
+
+         <div style="flex: 1.4; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 14px; font-weight: bold; color: var(--accent-gold); margin-bottom: 4px;">📜 กระดานภารกิจรับ EXP (Guild Quests)</div>
+            
+            <div class="quest-item">
+              <div>
+                <strong style="font-size: 12px;">🌞 เช็กชื่อประจำวัน (Daily Login)</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">เข้าใช้งานระบบครั้งแรกของวัน</p>
+              </div>
+              <span class="quest-exp">+10 EXP / วัน</span>
+            </div>
+
+            <div class="quest-item">
+              <div>
+                <strong style="font-size: 12px;">💰 บันทึกรับชำระเงินปกติ (Cashier)</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">บันทึกค่าส่วนกลาง / ค่าน้ำประปา</p>
+              </div>
+              <span class="quest-exp">+5 EXP</span>
+            </div>
+
+            <div class="quest-item" style="border-color: #b91c1c;">
+              <div>
+                <strong style="font-size: 12px; color: #fca5a5;">🎯 ล่าค่าหัวลูกหนี้ (Bounty Hunter)</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">บันทึกรับเงินยูนิตค้างชำระ / ค่าปรับ</p>
+              </div>
+              <span class="quest-exp" style="background: rgba(220,38,38,0.2); color: #fca5a5; border-color: #dc2626;">+20 EXP</span>
+            </div>
+
+            <div class="quest-item">
+              <div>
+                <strong style="font-size: 12px;">👥 ทะเบียนราษฎร์ใหม่ (New Citizen)</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">ลงทะเบียนลูกบ้านใหม่พร้อมสร้างโฟลเดอร์</p>
+              </div>
+              <span class="quest-exp">+15 EXP</span>
+            </div>
+
+            <div class="quest-item">
+              <div>
+                <strong style="font-size: 12px;">📑 ออกเอกสารการเงิน (Scroll Crafter)</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">ออกใบแจ้งหนี้ข้อมูลถูกต้อง 100% / ใบเสร็จ</p>
+              </div>
+              <span class="quest-exp">+2 EXP</span>
+            </div>
+
+            <div class="quest-item">
+              <div>
+                <strong style="font-size: 12px;">🛠️ พิทักษ์ฐานข้อมูล (Data Keeper)</strong>
+                <p style="font-size: 11px; color: var(--text-muted);">อัปโหลดไฟล์สำรองข้อมูลดิบ (Admin)</p>
+              </div>
+              <span class="quest-exp">+10 EXP</span>
+            </div>
+         </div>
+
+      </div>
+      <div class="ro-footer" style="justify-content: space-between;">
+        <button class="ro-btn" style="background: #dc2626; color: white; border: none;" onclick="handleLogout()">🚪 ออกจากระบบ</button>
+        <button class="ro-btn ro-btn-cancel" onclick="closeProfileModal()">ปิดหน้าต่าง</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Card -->
+  <div id="login-overlay" class="screen-overlay">
+    <div class="login-card">
+      <div style="width: 65px; height: 65px; background: #231106; border-radius: 50%; border: 3px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(251,191,36,0.4); margin: 0 auto 12px; overflow: hidden;">
+        <img src="logomini.png" style="width: 50px; height: 50px; object-fit: contain;" alt="Logo">
+      </div>
+      <h2 style="color: var(--accent-gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">เข้าสู่ระบบนิติบุคคล</h2>
+      <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Wooden GUI Management System</p>
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group" style="text-align: left;">
+          <label>ชื่อผู้ใช้งาน (Username)</label>
+          <input type="text" id="login-user" placeholder="ระบุ Username เช่น admin01, acc01" required>
+        </div>
+        <div class="form-group" style="text-align: left;">
+          <label>รหัสผ่าน (Password)</label>
+          <input type="password" id="login-pass" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-primary" id="btn-login" style="margin-top: 20px;">เข้าสู่ระบบ</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="company-logo" onclick="window.open('https://www.facebook.com/udomsukplace', '_blank')">
+      <img src="logomini.png" alt="Udomsuk Logo">
+      <span class="tooltip">บจก.อุดมสุขกบินทร์บุรีบ้านและที่ดิน จำกัด</span>
+    </div>
+
+    <ul class="nav-links">
+      <li class="nav-item" id="menu-financial">
+        <button onclick="switchTab('financial')">💰<span class="tooltip">การเงิน & รับชำระ</span></button>
+      </li>
+      <li class="nav-item" id="menu-residents">
+        <button onclick="switchTab('residents')">👥<span class="tooltip">ทะเบียนลูกบ้านใหม่</span></button>
+      </li>
+      <li class="nav-item" id="menu-billing">
+        <button onclick="switchTab('billing')">📑<span class="tooltip">ฝ่ายขาย & ออกบิล</span></button>
+      </li>
+      <li class="nav-item" id="menu-procurement">
+        <button onclick="switchTab('procurement')">📦<span class="tooltip">จัดซื้อ & สต็อกพัสดุ</span></button>
+      </li>
+      <li class="nav-item" id="menu-admin-hub">
+        <button onclick="switchTab('admin-hub')">🛠️<span class="tooltip">แอดมิน: ไฟล์ดิบ & ระบบ</span></button>
+      </li>
+    </ul>
+    
+    <div class="user-avatar" onclick="openProfileModal()" title="ข้อมูลตัวละคร & กิลด์ EXP (Kafra Profile)">
+      <img id="sidebar-avatar-img" src="WIZmini.gif" alt="Avatar">
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    
+    <div class="top-bar">
+      <div class="greeting">
+        <h1>Good evening, <span id="current-user-display">Admin</span></h1>
+        <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Role: <span id="current-role-display">Super Admin</span></p>
+      </div>
+      <div class="search-bar">
+        🔍 <input type="text" id="global-search" placeholder="ค้นหาข้อมูลยูนิต, ลูกบ้าน..." onkeyup="filterTable()">
+      </div>
+    </div>
+
+    <!-- Tab 1: Financial & Cashier -->
+    <div id="tab-financial" class="tab-content">
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <div class="title">รายรับรวม (ชำระแล้ว)</div>
+          <div class="value" id="total-income">฿0</div>
+        </div>
+        <div class="metric-card" style="border-color: #ef4444;">
+          <div class="title">รายจ่ายรวม (Expenses)</div>
+          <div class="value" id="total-expense" style="color: #fca5a5;">฿0</div>
+        </div>
+        <div class="metric-card" style="border-color: #10b981;">
+          <div class="title">รายรับสุทธิ (Net Cash Flow)</div>
+          <div class="value" id="net-balance" style="color: #6ee7b7;">฿0</div>
+        </div>
+        <div class="metric-card" style="border-color: #d97706;">
+          <div class="title">📑 รอดำเนินการรับเงิน (คิวแจ้งหนี้)</div>
+          <div class="value" id="total-pending-invoices" style="color: #fbbf24;">0</div>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          
+          <div class="card" style="padding: 0; overflow: hidden;">
+            <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
+              <span>📑 รายการแจ้งหนี้รอดำเนินการรับเงิน (Queue จากฝ่ายขาย/ธุรการ)</span>
+              <span id="queue-badge" class="badge pending">0 รายการ</span>
+            </div>
+            <div class="table-container" style="max-height: 200px;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>วันที่ออก</th>
+                    <th>ยูนิต</th>
+                    <th>ชื่อลูกบ้าน</th>
+                    <th>รายการ</th>
+                    <th>รอบบิล</th>
+                    <th>ผู้ส่งงาน</th>
+                    <th style="text-align: center;">จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody id="pending-invoices-tbody">
+                  <tr><td colspan="7" style="text-align: center; padding: 15px; color: var(--text-muted);">ไม่มีรายการค้างในคิว</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card" style="padding: 0; overflow: hidden;">
+            <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
+              <span>📊 ประวัติการรับเงิน & พิมพ์ใบเสร็จ (ฝ่ายการเงิน)</span>
+              <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: bold;" onclick="openLedgerModal()">
+                📖 สมุดบัญชีรายยูนิต (Ledger)
+              </button>
+            </div>
+            <div class="table-container" style="max-height: 220px;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>วันที่</th>
+                    <th>ยูนิต</th>
+                    <th>ชื่อผู้พักอาศัย</th>
+                    <th>ประเภท</th>
+                    <th>ยอดเงิน</th>
+                    <th>สถานะ</th>
+                    <th>ใบเสร็จ</th>
+                  </tr>
+                </thead>
+                <tbody id="payments-table-body">
+                  <tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--accent-gold);">กำลังโหลดข้อมูลจากเซิร์ฟเวอร์...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 💸 ตารางประวัติการบันทึกรายจ่าย -->
+          <div class="card" style="padding: 0; overflow: hidden; border-color: #7f1d1d;">
+            <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0; color: #fca5a5;">
+              <span>💸 ประวัติบันทึกรายจ่ายโครงการ (Expenses Record)</span>
+              <span id="expense-badge" class="badge overdue">0 รายการ</span>
+            </div>
+            <div class="table-container" style="max-height: 250px;">
+              <table class="data-table">
+                <thead>
+                  <tr style="background: #2b1111;">
+                    <th>วันที่</th>
+                    <th>หมวดหมู่</th>
+                    <th>รายละเอียด</th>
+                    <th>จำนวนเงิน</th>
+                    <th>ช่องทาง</th>
+                    <th style="text-align: center;">หลักฐาน</th>
+                    <th>ผู้บันทึก</th>
+                    <th style="text-align: center;">จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody id="expenses-table-body">
+                  <tr><td colspan="8" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีรายการบันทึกรายจ่าย</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div class="card">
+            <div class="card-title">📥 บันทึกรับชำระเงิน</div>
+            <form id="payment-form" onsubmit="submitPayment(event)">
+              <div class="form-group">
+                <label>เลขยูนิต / แปลง</label>
+                <input type="text" id="form-unit" placeholder="เช่น 1 หรือ A01" onblur="autoFillResidentName(this.value)" required>
+              </div>
+              <div class="form-group">
+                <label>ชื่อผู้ชำระ</label>
+                <input type="text" id="form-name" placeholder="ระบบจะดึงชื่อให้อัตโนมัติ" required>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1.2;">
+                  <label>ประเภท / รายการค่าใช้จ่าย *</label>
+                  <input type="text" id="form-fee-type" placeholder="ระบุรายการ เช่น ค่าส่วนกลางประจำปี" required>
+                </div>
+                <div class="form-group" style="flex: 0.8;">
+                  <label>จำนวนเงิน (฿) *</label>
+                  <input type="number" id="form-amount" placeholder="0" required>
+                </div>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1;">
+                  <label>ช่องทาง</label>
+                  <select id="form-payment-method">
+                    <option>โอนเงิน / สแกน QR</option><option>เงินสด</option><option>เช็คธนาคาร</option><option>บัตรเครดิต</option>
+                  </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                  <label>สถานะ</label>
+                  <select id="form-status">
+                    <option value="Paid">ชำระแล้ว (Paid)</option>
+                    <option value="Pending">รอตรวจสอบ (Pending)</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" class="btn-primary" id="btn-submit-payment">บันทึกรับชำระเงิน & ตัดยอดคิว</button>
+            </form>
+          </div>
+
+          <div class="card" style="border-color: #991b1b;">
+            <div class="card-title" style="color: #fca5a5;">💸 บันทึกรายจ่ายโครงการ</div>
+            <form id="expense-form" onsubmit="submitNewExpense(event)">
+              <div class="form-group">
+                <label>หมวดหมู่รายจ่าย *</label>
+                <select id="exp-category" required>
+                  <option value="ค่าซ่อมบำรุงส่วนกลาง">ค่าซ่อมบำรุงส่วนกลาง / อุปกรณ์</option>
+                  <option value="ค่าน้ำ-ค่าไฟส่วนกลาง">ค่าน้ำ-ค่าไฟส่วนกลางโครงการ</option>
+                  <option value="ค่าจ้างแม่บ้าน-รปภ.">ค่าจ้างแม่บ้าน / รปภ. / บุคคลภายนอก</option>
+                  <option value="ค่าใช้จ่ายสำนักงานนิติ">ค่าใช้จ่ายสำนักงาน / เครื่องเขียน</option>
+                  <option value="ค่าธรรมเนียมวิชาชีพ/ภาษี">ค่าธรรมเนียมวิชาชีพ / บัญชี / ภาษี</option>
+                  <option value="รายจ่ายอื่นๆ">รายจ่ายอื่นๆ</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>รายละเอียดรายจ่าย *</label>
+                <input type="text" id="exp-desc" placeholder="เช่น ค่าหลอดไฟถนนส่วนกลาง 10 หลอด" required>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1;">
+                  <label>จำนวนเงิน (฿) *</label>
+                  <input type="number" id="exp-amount" placeholder="0" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                  <label>ช่องทางจ่ายเงิน</label>
+                  <select id="exp-method">
+                    <option value="เงินสด">เงินสด</option>
+                    <option value="โอนเงิน/บัญชีบริษัท">โอนเงิน / บัญชีบริษัท</option>
+                    <option value="เช็คธนาคาร">เช็คธนาคาร</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>📎 อัปโหลดหลักฐานการจ่ายเงิน (สลิป / หน้าเช็ค)</label>
+                <input type="file" id="exp-file" accept="image/*,application/pdf" onchange="previewExpenseFile(event)">
+              </div>
+              <button type="submit" class="btn-primary" id="btn-submit-expense" style="background: linear-gradient(135deg, #dc2626, #991b1b);">💾 บันทึกรายจ่าย</button>
+            </form>
+          </div>
+
+        </div>
+      </section>
+    </div>
+
+    <!-- Tab 2: Residents -->
+    <div id="tab-residents" class="tab-content">
+      <div style="max-width: 800px; margin: 0 auto;">
+        <div class="card">
+          <div class="card-title">
+            <span>👥 แบบฟอร์มลงทะเบียนลูกบ้านใหม่</span>
+            <button type="button" class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #2a1508; font-weight: bold; border: 2px solid #140803;" onclick="openCustomerListModal()">
+              📜 รายชื่อลูกบ้านทั้งหมด
+            </button>
+          </div>
+          <form id="resident-form" onsubmit="submitNewResident(event)">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div class="form-group">
+                <label>ประเภทผู้พักอาศัย *</label>
+                <select id="res-type" onchange="toggleOwnerFields(this.value)" required>
+                  <option value="Owner">เจ้าของกรรมสิทธิ์ (Owner)</option>
+                  <option value="Tenant">ผู้เช่า / ผู้พักอาศัย (Tenant)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>เลขยูนิต / แปลงบ้าน * (พิมพ์เลข เช่น 12 หรือ 899/12)</label>
+                <input type="text" id="res-unit" placeholder="เช่น 12 หรือ 899/12" oninput="autoFillRegistrationFields()" required>
+              </div>
+              
+              <div class="form-group" style="grid-column: span 2;">
+                <label id="lbl-res-name">ชื่อ-นามสกุล เจ้าของกรรมสิทธิ์ (Owner) *</label>
+                <input type="text" id="res-name" placeholder="ระบุชื่อ-นามสกุล" required>
+              </div>
+
+              <div id="tenant-extra-fields" style="display: none; grid-column: span 2; grid-template-columns: 1fr 1fr; gap: 16px; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 10px; border: 1px dashed var(--accent-blue);">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label style="color: #38bdf8;">ชื่อ-นามสกุล เจ้าของกรรมสิทธิ์ห้อง/บ้าน</label>
+                  <input type="text" id="res-owner-name" placeholder="ระบุชื่อเจ้าของกรรมสิทธิ์">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label style="color: #38bdf8;">เบอร์โทรติดต่อเจ้าของกรรมสิทธิ์</label>
+                  <input type="tel" id="res-owner-phone" placeholder="เช่น 0812345678">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>เลขที่โฉนดที่ดิน (Title Deed)</label>
+                <input type="text" id="res-deed" placeholder="ระบุเลขที่โฉนดที่ดิน">
+              </div>
+              <div class="form-group">
+                <label>เบอร์โทรศัพท์ติดต่อ (ผู้พักอาศัย) *</label>
+                <input type="tel" id="res-phone" placeholder="เช่น 0812345678" required>
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label>อีเมล</label>
+                <input type="email" id="res-email" placeholder="ระบุอีเมล (ถ้ามี)">
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label>🏠 ที่อยู่ตามบัตรประชาชน</label>
+                <textarea id="res-id-address" rows="2" placeholder="ระบุที่อยู่ตามบัตรประชาชน"></textarea>
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label>📍 ที่อยู่ปัจจุบัน / สถานที่จัดส่งเอกสาร (เติมตามโครงการอัตโนมัติ)</label>
+                <textarea id="res-cur-address" rows="2" placeholder="ระบบจะดึงที่อยู่โครงการให้อัตโนมัติ"></textarea>
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label>📷 อัปโหลดภาพถ่ายลูกค้า (ถ้ามี)</label>
+                <input type="file" id="res-photo" accept="image/*" onchange="previewResidentPhoto(event)">
+              </div>
+            </div>
+            <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #059669, #047857);" id="btn-submit-resident">บันทึกข้อมูล & สร้างโฟลเดอร์</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Sales Hub & Billing -->
+    <div id="tab-billing" class="tab-content">
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <div class="title">ยอดเงินรวมบิลเดือนนี้</div>
+          <div class="value" id="sales-total-amount">฿0</div>
+        </div>
+        <div class="metric-card" style="border-color: #0284c7;">
+          <div class="title">ใบแจ้งหนี้ทั้งหมดเดือนนี้</div>
+          <div class="value" id="sales-total-count" style="color: #38bdf8;">0</div>
+        </div>
+        <div class="metric-card" style="border-color: #d97706;">
+          <div class="title">ค้างชำระ (Pending)</div>
+          <div class="value" id="sales-pending-count" style="color: #fbbf24;">0</div>
+        </div>
+        <div class="metric-card" style="border-color: #10b981;">
+          <div class="title">ชำระเงินแล้ว (Settled)</div>
+          <div class="value" id="sales-settled-count" style="color: #6ee7b7;">0</div>
+        </div>
+      </section>
+
+      <section class="content-grid" style="grid-template-columns: 1.3fr 1.7fr; gap: 20px;">
+        
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div class="card">
+            <div class="card-title">
+              <span>📄 ออกเอกสารการขาย</span>
+              <select id="inv-doc-type" onchange="switchDocTypeForm(this.value)" style="width: auto; padding: 4px 8px; font-size: 12px; background: #140803;">
+                <option value="INVOICE">📑 ใบแจ้งหนี้ (Invoice)</option>
+                <option value="QUOTATION">📜 ใบเสนอราคา/ใบจอง (Quotation)</option>
+              </select>
+            </div>
+            <form onsubmit="handleGenerateInvoice(event)">
+              <div class="form-group">
+                <label>เลขยูนิต / แปลง *</label>
+                <input type="text" id="inv-unit" placeholder="เช่น 12 หรือ 899/12" onblur="autoFillResidentForSales(this.value)" required>
+              </div>
+              <div class="form-group">
+                <label>ชื่อผู้รับเอกสาร / ลูกค้า *</label>
+                <input type="text" id="inv-res-name" placeholder="ชื่อ-นามสกุล ลูกค้า" required>
+              </div>
+              <div class="form-group">
+                <label>ประจำเดือน *</label>
+                <input type="month" id="inv-month" required>
+              </div>
+              
+              <div class="form-group" style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; border: 1px dashed var(--accent-gold);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <label style="margin-bottom:0; font-size:14px; color:var(--accent-gold);">📑 รายการเรียกเก็บ (สูงสุด 10 รายการ) *</label>
+                  <button type="button" class="btn-action" style="background: linear-gradient(135deg, #059669, #047857); padding: 3px 10px;" onclick="addInvoiceItemRow()">➕ เพิ่มรายการ</button>
+                </div>
+                
+                <div id="invoice-items-container"></div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid #381808;">
+                  <strong style="color: var(--text-main); font-size: 13px;">รวมยอดเงินทั้งสิ้น:</strong>
+                  <span id="invoice-calc-total-display" style="font-size: 18px; font-weight: bold; color: var(--accent-gold);">฿0.00</span>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #0284c7, #0369a1);" id="btn-generate-inv">
+                🖨️ ตรวจสอบ, ส่งงานเข้าคิว & พิมพ์เอกสาร (PDF)
+              </button>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-title">
+              <span>🗺️ ผังสถานะยูนิตโครงการ (Dynamic Map)</span>
+              <span style="font-size: 11px; color: var(--text-muted);">ดึงข้อมูลยูนิตจริงจากระบบ</span>
+            </div>
+            <div style="display:flex; gap:10px; font-size:10px; margin-bottom:8px;">
+              <span>🔴 เจ้าของอยู่เอง</span>
+              <span style="color:#38bdf8;">🔵 ผู้เช่า</span>
+              <span style="color:#fbbf24;">🟡 มีบิลค้าง</span>
+            </div>
+            <div class="unit-map-grid" id="unit-map-container"></div>
+          </div>
+        </div>
+
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
+            <span>📋 ตารางติดตามสถานะบิลทั้งหมด (Sales Tracking List)</span>
+          </div>
+          <div class="table-container" style="max-height: 600px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>เลขที่เอกสาร</th>
+                  <th>วันที่</th>
+                  <th>ยูนิต</th>
+                  <th>ชื่อลูกค้า</th>
+                  <th>รายการ</th>
+                  <th>ยอดเงิน</th>
+                  <th>สถานะ</th>
+                  <th style="text-align: center;">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="sales-tracking-tbody">
+                <tr><td colspan="8" style="text-align: center; padding: 20px; color: var(--accent-gold);">กำลังโหลดข้อมูลประวัติการออกบิล...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+    </div>
+
+    <!-- Tab 4: Procurement & Inventory -->
+    <div id="tab-procurement" class="tab-content">
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <div class="title">รายการพัสดุทั้งหมด</div>
+          <div class="value" id="proc-total-items">0</div>
+        </div>
+        <div class="metric-card" style="border-color: #ef4444;">
+          <div class="title">🔴 พัสดุต้องสั่งเพิ่ม (Below Min)</div>
+          <div class="value" id="proc-alert-count" style="color: #fca5a5;">0</div>
+        </div>
+        <div class="metric-card" style="border-color: #10b981;">
+          <div class="title">มูลค่าสต็อกพัสดุรวม</div>
+          <div class="value" id="proc-total-value" style="color: #6ee7b7;">฿0</div>
+        </div>
+      </section>
+
+      <section class="content-grid" style="grid-template-columns: 1.1fr 1.9fr; gap: 20px;">
+        <div class="card">
+          <div class="card-title">📦 บันทึกพัสดุจัดซื้อใหม่</div>
+          <form id="procurement-form" onsubmit="submitNewProcurement(event)">
+            <div class="form-group">
+              <label>ชื่อพัสดุ / สินค้า *</label>
+              <input type="text" id="proc-item-name" placeholder="เช่น หลอดไฟ LED 12W, น้ำยาถูพื้น" required>
+            </div>
+            <div class="form-group">
+              <label>หมวดหมู่พัสดุ *</label>
+              <input type="text" id="proc-category" placeholder="เช่น อุปกรณ์ไฟฟ้า, เครื่องเขียน, ทำความสะอาด" required>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <div class="form-group" style="flex: 1;">
+                <label>จำนวนเริ่มต้น *</label>
+                <input type="number" id="proc-qty" placeholder="0" required>
+              </div>
+              <div class="form-group" style="flex: 1;">
+                <label>หน่วยนับ *</label>
+                <input type="text" id="proc-unit" placeholder="เช่น หลอด, แกลลอน, กล่อง" required>
+              </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <div class="form-group" style="flex: 1;">
+                <label>จุดเตือนขั้นต่ำ (Min Alert) *</label>
+                <input type="number" id="proc-min-alert" placeholder="5" value="5" required>
+              </div>
+              <div class="form-group" style="flex: 1;">
+                <label>ราคาต่อหน่วย (฿)</label>
+                <input type="number" id="proc-unit-price" placeholder="0">
+              </div>
+            </div>
+            <button type="submit" class="btn-primary" id="btn-submit-proc" style="background: linear-gradient(135deg, #0284c7, #0369a1);">💾 บันทึกรับพัสดุใหม่เข้าสต็อก</button>
+          </form>
+        </div>
+
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
+            <span>📦 รายการสต็อกพัสดุทั้งหมด (Inventory List)</span>
+          </div>
+          <div class="table-container" style="max-height: 520px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>รหัส</th>
+                  <th>ชื่อพัสดุ</th>
+                  <th>หมวดหมู่</th>
+                  <th>คงเหลือ</th>
+                  <th>ราคา/หน่วย</th>
+                  <th>สถานะ</th>
+                  <th style="text-align: center;">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="procurement-tbody">
+                <tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--accent-gold);">กำลังโหลดรายการสต็อก...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Tab 5: Admin Hub -->
+    <div id="tab-admin-hub" class="tab-content">
+      <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+        
+        <div class="card" style="border-color: var(--accent-gold);">
+          <div class="card-title" style="color: var(--accent-gold);">
+            <span>🔢 ตั้งค่าเลขที่รันเอกสารเริ่มต้น (Invoice & Receipt Dynamic Running)</span>
+            <span class="badge pending">Admin Only</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+            กำหนดลำดับตัวเลขถัดไป (Next Running Number) ของใบแจ้งหนี้ (INV) และใบเสร็จรับเงิน (REC) เมื่อตั้งค่าแล้วระบบจะรันตัวเลขต่อให้อัตโนมัติในรูปแบบ <code>INV-YYYYMM-XXXX</code> และ <code>REC-YYYYMM-XXXX</code>
+          </p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label>เลขถัดไปของใบแจ้งหนี้ (Next INV Number)</label>
+              <input type="number" id="admin-next-inv-no" placeholder="เช่น 1 หรือ 1001">
+            </div>
+            <div class="form-group">
+              <label>เลขถัดไปของใบเสร็จ (Next REC Number)</label>
+              <input type="number" id="admin-next-rec-no" placeholder="เช่น 1 หรือ 1001">
+            </div>
+          </div>
+          <button type="button" class="btn-primary" id="btn-save-doc-number" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="handleSetDocRunningNumber()">
+            💾 บันทึกตั้งค่าเลขที่รันเอกสาร
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🛠️ อัปโหลดไฟล์ดิบสำรองข้อมูล (Admin Only)</div>
+          <div class="drop-zone" id="drop-zone">
+            <p style="font-size: 40px; margin-bottom: 10px;">📁</p>
+            <h3 style="color: var(--text-main); margin-bottom: 8px;">ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์</h3>
+            <p style="color: var(--text-muted); font-size: 13px;">ระบบจะส่งไฟล์เข้าโฟลเดอร์ Raw_Data_Backups อัตโนมัติ</p>
+            <input type="file" id="file-input" multiple style="display: none;">
+          </div>
+          <div id="upload-status-box" style="margin-top: 24px; display: none;">
+            <div id="upload-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
+        </div>
+
+        <div class="card" style="border-color: #7f1d1d; background: linear-gradient(145deg, #3d1515, #220808);">
+          <div class="card-title" style="color: #fca5a5; border-bottom-color: #991b1b;">
+            <span>⚠️ แดชบอร์ดรีเซ็ตระบบ (Admin Testing Reset)</span>
+            <span class="badge overdue">อันตราย</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+            ปุ่มนี้ใช้สำหรับ <strong>ล้างข้อมูลการทดสอบทั้งหมด</strong> (ตารางทะเบียนลูกบ้าน, ประวัติการรับเงิน, รายจ่าย, คิวใบแจ้งหนี้ และประวัติการทำงาน) ในคลิกเดียว เพื่อเริ่มการทดสอบรอบใหม่ตั้งแต่ต้นจนจบแบบสะอาด 100%<br>
+            <em style="color: #f87171;">* บัญชีผู้ใช้งานและรหัสผ่านพนักงานในระบบจะไม่ถูกลบ *</em>
+          </p>
+          <button type="button" class="btn-primary" id="btn-admin-reset" style="background: linear-gradient(135deg, #dc2626, #991b1b); border-color: #450a0a;" onclick="handleAdminFactoryReset()">
+            🗑️ ล้างข้อมูลใน Sheet และรีเซ็ตระบบทั้งหมด (เริ่มรอบใหม่)
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxrjW448Uz0HllSVTUCeFwVhUp7cENvK9hKqKA0qm728jQkid8ttgpq3-W3-A0ba8VMMA/exec";
     
     let currentUser = null;
-    let tempSelectedAvatar = "WIZmini";
     let cachedPayments = [];
     let cachedExpenses = [];
     let cachedResidents = [];
@@ -474,74 +1553,71 @@
     let cachedPendingInvoices = [];
     let cachedAllInvoices = [];
 
-    window.addEventListener("DOMContentLoaded", () => {
-      checkAuth();
-    });
+    let residentPhotoBase64 = null;
+    let residentPhotoName = "";
+    let residentPhotoMime = "";
+    let editResidentPhotoBase64 = null;
+    let editResidentPhotoName = "";
+    let editResidentPhotoMime = "";
+    
+    let expenseFileBase64 = null;
+    let expenseFileName = "";
+    let expenseFileMime = "";
 
-    function checkAuth() {
-      const stored = sessionStorage.getItem("condo_auth_user");
-      if (stored) {
-        currentUser = JSON.parse(stored);
-        document.getElementById("login-overlay").style.display = "none";
-        updateProfileUI();
-        loadDashboardData();
-      } else {
-        document.getElementById("login-overlay").style.display = "flex";
+    let expenseUpdateFileBase64 = null;
+    let expenseUpdateFileName = "";
+    let expenseUpdateFileMime = "";
+
+    let pendingUnitForRegistration = "";
+    let tempSelectedAvatar = "WIZmini";
+    let activeCrmUnit = "";
+    let activeStockItemCode = "";
+    let activeVoucherId = "";
+
+    function showLoadingModal(title = "กำลังประมวลผลข้อมูล...", subtitle = "ระบบกำลังส่งคำสั่งและเชื่อมต่อ Google Sheets") {
+      const modal = document.getElementById("global-loading-modal");
+      const titleEl = document.getElementById("loading-modal-title");
+      const subEl = document.getElementById("loading-modal-subtitle");
+      const barFill = document.getElementById("loading-progress-bar-fill");
+      const statusEl = document.getElementById("loading-modal-status");
+
+      if (modal && titleEl && subEl && barFill) {
+        titleEl.innerText = title;
+        subEl.innerText = subtitle;
+        statusEl.innerText = "กรุณารอสักครู่ ห้ามปิดหน้าต่างนี้";
+        barFill.style.width = "25%";
+        modal.style.display = "flex";
+        
+        setTimeout(() => { barFill.style.width = "75%"; }, 300);
       }
     }
 
-    function updateProfileUI() {
-      if (!currentUser) return;
-      document.getElementById("user-display-name").innerText = currentUser.fullName || currentUser.username;
-      document.getElementById("user-role-badge").innerText = currentUser.role || "Staff";
-      document.getElementById("user-avatar-img").src = (currentUser.avatar || "WIZmini") + ".gif";
-      
-      const currentExp = currentUser.exp || 0;
-      const pct = Math.min(100, (currentExp % 100));
-      document.getElementById("exp-bar-fill").style.width = pct + "%";
-    }
-
-    async function handleLoginSubmit(event) {
-      event.preventDefault();
-      const userVal = document.getElementById("login-user").value.trim();
-      const passVal = document.getElementById("login-pass").value.trim();
-
-      try {
-        const resJson = await fetchWithRetry(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ type: "login", username: userVal, password: passVal })
-        }, 3, 1500, "กำลังเข้าสู่ระบบ", "กำลังตรวจสอบรหัสผ่าน...");
-
-        if (resJson.status === "success") {
-          currentUser = resJson.user;
-          sessionStorage.setItem("condo_auth_user", JSON.stringify(currentUser));
-          document.getElementById("login-overlay").style.display = "none";
-          updateProfileUI();
-          if (resJson.dailyLoginBonus) {
-            showExpToast(10, "โบนัสเข้าสู่ระบบประจำวัน!");
-          }
-          await loadDashboardData();
-        } else {
-          alert("❌ " + resJson.message);
-        }
-      } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการเข้าสู่ระบบ: " + err.message);
+    function hideLoadingModal() {
+      const modal = document.getElementById("global-loading-modal");
+      const barFill = document.getElementById("loading-progress-bar-fill");
+      if (modal && barFill) {
+        barFill.style.width = "100%";
+        setTimeout(() => {
+          modal.style.display = "none";
+          barFill.style.width = "0%";
+        }, 300);
       }
     }
 
-    function handleLogout() {
-      sessionStorage.removeItem("condo_auth_user");
-      currentUser = null;
-      location.reload();
-    }
-
-    async function fetchWithRetry(url, options = {}, retries = 3, backoff = 1500, title = "กำลังโหลดข้อมูล...", subtitle = "กำลังเชื่อมต่อเซิร์ฟเวอร์ Google Sheets") {
+    async function fetchWithRetry(url, options = {}, retries = 3, backoff = 1500, title = "กำลังประมวลผลข้อมูล...", subtitle = "กำลังเชื่อมต่อ Google Sheets") {
       showLoadingModal(title, subtitle);
       for (let i = 0; i < retries; i++) {
         try {
           const response = await fetch(url, options);
           const data = await response.json();
+          if (data && data.status === "error" && data.message && data.message.includes("เซิร์ฟเวอร์กำลัง")) {
+            if (i < retries - 1) {
+              const statusEl = document.getElementById("loading-modal-status");
+              if (statusEl) statusEl.innerText = `เซิร์ฟเวอร์ยุ่ง กำลังลองใหม่อัตโนมัติ (ครั้งที่ ${i + 2}/${retries})...`;
+              await new Promise(r => setTimeout(r, backoff));
+              continue;
+            }
+          }
           hideLoadingModal();
           return data;
         } catch (err) {
@@ -549,74 +1625,554 @@
             hideLoadingModal();
             throw err;
           }
+          const statusEl = document.getElementById("loading-modal-status");
+          if (statusEl) statusEl.innerText = `การเชื่อมต่อติดขัด กำลังลองใหม่อัตโนมัติ (ครั้งที่ ${i + 2}/${retries})...`;
           await new Promise(r => setTimeout(r, backoff));
+        }
+      }
+      hideLoadingModal();
+      throw new Error("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง");
+    }
+
+    function toggleOwnerFields(val) {
+      const extraDiv = document.getElementById("tenant-extra-fields");
+      const lblName = document.getElementById("lbl-res-name");
+      if (val === "Tenant") {
+        extraDiv.style.display = "grid";
+        lblName.innerText = "ชื่อ-นามสกุล ผู้เชี่ยวชาญ / ผู้เช่า (Tenant) *";
+      } else {
+        extraDiv.style.display = "none";
+        lblName.innerText = "ชื่อ-นามสกุล เจ้าของกรรมสิทธิ์ (Owner) *";
+      }
+    }
+
+    function formatDisplayDate(val) {
+      if (!val || val === "-" || val === "") return "-";
+      try {
+        const d = new Date(val);
+        if (isNaN(d.getTime())) return String(val).split("T")[0];
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yy = (d.getFullYear() + 543);
+        return `${dd}/${mm}/${yy}`;
+      } catch (e) {
+        return String(val);
+      }
+    }
+
+    function formatDisplayMonth(val) {
+      if (!val || val === "-" || val === "") return "-";
+      const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+      try {
+        const strVal = String(val).trim();
+        if (/^\d{4}-\d{2}$/.test(strVal)) {
+          const parts = strVal.split("-");
+          const mIdx = parseInt(parts[1], 10) - 1;
+          const yThai = parseInt(parts[0], 10) + 543;
+          return `${thaiMonths[mIdx]} ${yThai}`;
+        }
+        const d = new Date(val);
+        if (!isNaN(d.getTime())) {
+          return `${thaiMonths[d.getMonth()]} ${d.getFullYear() + 543}`;
+        }
+        return strVal;
+      } catch (e) {
+        return String(val);
+      }
+    }
+
+    function initInvoiceItems() {
+      const container = document.getElementById("invoice-items-container");
+      container.innerHTML = "";
+      addInvoiceItemRow();
+    }
+
+    function addInvoiceItemRow() {
+      const container = document.getElementById("invoice-items-container");
+      const currentRows = container.getElementsByClassName("invoice-item-row");
+      if (currentRows.length >= 10) {
+        alert("⚠️ จำกัดสูงสุดไม่เกิน 10 รายการต่อ 1 เอกสาร");
+        return;
+      }
+
+      const rowIndex = currentRows.length + 1;
+      const rowDiv = document.createElement("div");
+      rowDiv.className = "invoice-item-row";
+      rowDiv.innerHTML = `
+        <span class="item-num">${rowIndex}.</span>
+        <input type="text" class="item-desc-input" placeholder="ระบุรายการ เช่น ค่าส่วนกลาง, ค่าน้ำ" style="flex: 2;" required>
+        <input type="number" class="item-amt-input" placeholder="0.00" style="flex: 1;" oninput="calculateInvoiceTotal()" required>
+        ${rowIndex > 1 ? `<button type="button" class="btn-action" style="background:#dc2626; padding: 6px 10px;" onclick="removeInvoiceItemRow(this)">🗑️</button>` : `<div style="width:32px;"></div>`}
+      `;
+      container.appendChild(rowDiv);
+      calculateInvoiceTotal();
+    }
+
+    function removeInvoiceItemRow(btn) {
+      const row = btn.closest(".invoice-item-row");
+      row.remove();
+      const container = document.getElementById("invoice-items-container");
+      const rows = container.getElementsByClassName("invoice-item-row");
+      for (let i = 0; i < rows.length; i++) {
+        rows[i].querySelector(".item-num").innerText = (i + 1) + ".";
+      }
+      calculateInvoiceTotal();
+    }
+
+    function calculateInvoiceTotal() {
+      const container = document.getElementById("invoice-items-container");
+      const amtInputs = container.getElementsByClassName("item-amt-input");
+      let total = 0;
+      for (let input of amtInputs) {
+        total += Number(input.value || 0);
+      }
+      document.getElementById("invoice-calc-total-display").innerText = "฿" + total.toLocaleString('en-US', { minimumFractionDigits: 2 });
+    }
+
+    function autoFillRegistrationFields() {
+      const unitVal = document.getElementById("res-unit").value.trim();
+      const curAddressInput = document.getElementById("res-cur-address");
+
+      if (unitVal) {
+        const houseNo = unitVal.includes("899/") ? unitVal : `899/${unitVal}`;
+        const autoAddress = `เลขที่ ${houseNo} หมู่ 9 โครงการอุดมสุขเพลส ต.หนองกี่ อ.กบินทร์บุรี จ.ปราจีนบุรี 25110`;
+        
+        if (!curAddressInput.value || curAddressInput.dataset.autofilled === "true") {
+          curAddressInput.value = autoAddress;
+          curAddressInput.dataset.autofilled = "true";
         }
       }
     }
 
-    function showLoadingModal(title, subtitle) {
-      document.getElementById("loading-title").innerText = title;
-      document.getElementById("loading-subtitle").innerText = subtitle;
-      document.getElementById("loading-bar").style.width = "70%";
-      document.getElementById("loading-modal").style.display = "flex";
+    function autoFillResidentForSales(unitVal) {
+      const targetKey = cleanUnitKey(unitVal);
+      if (!targetKey) return;
+      const found = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
+      if (found && found.residentName) {
+        document.getElementById("inv-res-name").value = found.residentName;
+      }
     }
 
-    function hideLoadingModal() {
-      document.getElementById("loading-bar").style.width = "100%";
-      setTimeout(() => {
-        document.getElementById("loading-modal").style.display = "none";
-        document.getElementById("loading-bar").style.width = "0%";
-      }, 200);
+    function cleanUnitKey(val) {
+      if (val === null || val === undefined) return "";
+      let s = String(val).trim().toLowerCase();
+      if (/^\d+$/.test(s)) return String(parseInt(s, 10));
+      return s.replace(/\s+/g, '');
     }
 
-    function showExpToast(expVal, msg) {
-      document.getElementById("toast-exp-val").innerText = `+${expVal} EXP`;
-      document.getElementById("toast-exp-msg").innerText = msg;
-      const toast = document.getElementById("toast-exp");
-      toast.style.display = "block";
-      setTimeout(() => { toast.style.display = "none"; }, 3500);
+    function calculateLevelData(exp) {
+      let level = Math.floor(Math.sqrt(exp / 3)) + 1;
+      if (level > 99) level = 99;
+      let title = "🥚 Novice Staff (พนักงานฝึกหัด)";
+      if (level >= 10 && level <= 29) title = "💼 Kafra Trainee (เจ้าหน้าที่ทั่วไป)";
+      else if (level >= 30 && level <= 49) title = "🛡️ Kafra Senior (เจ้าหน้าที่อาวุโส)";
+      else if (level >= 50 && level <= 79) title = "⚔️ Kafra Chief (หัวหน้าหน่วยบริการ)";
+      else if (level >= 80 && level <= 98) title = "👑 Kafra Master (ผู้เชี่ยวชาญระดับสูง)";
+      else if (level === 99) title = "🌟 Legendary Admin (ตำนานแห่งนิติบุคคล)";
+      let currentBaseExp = 3 * Math.pow(level - 1, 2);
+      let nextExp = (level === 99) ? currentBaseExp : (3 * Math.pow(level, 2));
+      let progressPercent = (level === 99) ? 100 : ((exp - currentBaseExp) / (nextExp - currentBaseExp)) * 100;
+      return { level, title, currentBaseExp, nextExp, progressPercent };
     }
 
-    function switchTab(tabId, el) {
-      document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
-      if (el) el.classList.add("active");
+    function showExpToast(amount, actionName) {
+      const toast = document.createElement('div');
+      toast.className = 'exp-toast';
+      toast.innerHTML = `🌟 +${amount} EXP <span style="font-size:12px; font-weight:normal;">(${actionName})</span>`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+      if(currentUser) {
+         currentUser.exp += amount;
+         sessionStorage.setItem("condo_auth_user", JSON.stringify(currentUser));
+         updateProfileUI(); 
+      }
+    }
 
-      document.querySelectorAll(".tab-page").forEach(p => p.style.display = "none");
-      const target = document.getElementById("tab-" + tabId);
-      if (target) target.style.display = "block";
+    function updateProfileUI() {
+      if(!currentUser) return;
+      const stats = calculateLevelData(currentUser.exp);
+      const avatarFile = (currentUser.avatar || "WIZmini") + ".gif";
+      document.getElementById("sidebar-avatar-img").src = avatarFile;
+      document.getElementById("prof-avatar-img").src = avatarFile;
+      document.getElementById("prof-name").innerText = currentUser.fullName;
+      document.getElementById("prof-title").innerText = stats.title;
+      document.getElementById("prof-level").innerText = stats.level;
+      let stars = "";
+      for(let i=0; i<(currentUser.prestige || 0); i++) stars += "⭐";
+      document.getElementById("prof-prestige").innerText = stars;
+      let expLabel = (stats.level === 99) ? `${currentUser.exp.toLocaleString()} / MAX` : `${currentUser.exp.toLocaleString()} / ${stats.nextExp.toLocaleString()} EXP`;
+      document.getElementById("prof-exp-text").innerText = expLabel;
+      document.getElementById("prof-exp-bar").style.width = `${stats.progressPercent}%`;
+    }
 
-      const titleMap = {
-        'dashboard': '📊 แดชบอร์ดภาพรวมโครงการ',
-        'sales-tracking': '📜 ตารางติดตามสถานะบิลทั้งหมด (Sales Tracking)',
-        'pending-invoices': '⏳ คิวรอดำเนินการและแจ้งชำระเงิน',
-        'residents': '👥 ข้อมูลลูกบ้านและโฉนดแปลง',
-        'procurement': '📦 ข้อมูลพัสดุและสต็อกจัดซื้อ',
-        'expenses': '💸 บันทึกรายการรายจ่ายโครงการ'
+    function applyRolePermissions(role) {
+      document.querySelectorAll('.nav-item').forEach(el => el.style.display = 'none');
+      let defaultTab = 'financial';
+
+      if (role === 'Admin') {
+        document.getElementById('menu-financial').style.display = 'block';
+        document.getElementById('menu-residents').style.display = 'block';
+        document.getElementById('menu-billing').style.display = 'block';
+        document.getElementById('menu-procurement').style.display = 'block';
+        document.getElementById('menu-admin-hub').style.display = 'block';
+      } else if (role === 'Finance') {
+        document.getElementById('menu-financial').style.display = 'block';
+        document.getElementById('menu-procurement').style.display = 'block';
+      } else if (role === 'AdminDoc') {
+        document.getElementById('menu-residents').style.display = 'block';
+        document.getElementById('menu-billing').style.display = 'block';
+        defaultTab = 'billing';
+      } else if (role === 'Sales') {
+        document.getElementById('menu-residents').style.display = 'block';
+        document.getElementById('menu-billing').style.display = 'block';
+        defaultTab = 'residents';
+      }
+      switchTab(defaultTab);
+    }
+
+    function checkAuth() {
+      const savedUser = sessionStorage.getItem("condo_auth_user");
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        document.getElementById("login-overlay").style.display = "none";
+        document.getElementById("char-select-screen").style.display = "none";
+        document.getElementById("current-user-display").innerText = (currentUser.fullName.split(' ')[0] || currentUser.username).toUpperCase();
+        document.getElementById("current-role-display").innerText = currentUser.role;
+        applyRolePermissions(currentUser.role);
+        updateProfileUI();
+        initInvoiceItems();
+        loadDashboardData();
+      } else {
+        document.getElementById("login-overlay").style.display = "flex";
+      }
+    }
+
+    let tempPendingUser = null;
+    async function handleLogin(event) {
+      event.preventDefault();
+      const btn = document.getElementById("btn-login");
+      btn.disabled = true; btn.innerText = "กำลังตรวจสอบ...";
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ type: "login", username: document.getElementById("login-user").value, password: document.getElementById("login-pass").value })
+        }, 3, 1500, "กำลังตรวจสอบข้อมูลล็อกอิน", "โปรดรอสักครู่...");
+        if (resJson.status === "success") {
+          tempPendingUser = resJson.user;
+          if(resJson.dailyLoginBonus) tempPendingUser.gotDailyBonus = true;
+          document.getElementById("login-overlay").style.display = "none";
+          document.getElementById("char-select-screen").style.display = "flex";
+          pickAvatar(tempPendingUser.avatar || "WIZmini");
+        } else alert("❌ " + resJson.message);
+      } catch (err) { alert("⚠️ เชื่อมต่อขัดข้อง: " + err.message); } 
+      finally { btn.disabled = false; btn.innerText = "เข้าสู่ระบบ"; }
+    }
+
+    function pickAvatar(avatarKey) {
+      tempSelectedAvatar = avatarKey;
+      document.querySelectorAll('.char-option-card').forEach(c => c.classList.remove('selected'));
+      const card = document.getElementById(`opt-${avatarKey}`);
+      if(card) card.classList.add('selected');
+    }
+
+    async function confirmCharacterSelection() {
+      if(!tempPendingUser) return;
+      tempPendingUser.avatar = tempSelectedAvatar;
+      currentUser = tempPendingUser;
+      sessionStorage.setItem("condo_auth_user", JSON.stringify(currentUser));
+      document.getElementById("char-select-screen").style.display = "none";
+      checkAuth();
+      if (currentUser.gotDailyBonus) {
+        setTimeout(() => showExpToast(10, "Daily Login รายวัน"), 800);
+        delete currentUser.gotDailyBonus;
+      }
+      fetchWithRetry(API_URL, {
+        method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ type: "save_avatar", username: currentUser.username, avatar: tempSelectedAvatar })
+      });
+    }
+
+    function openCharSelectFromProfile() {
+      closeProfileModal();
+      tempSelectedAvatar = currentUser.avatar || "WIZmini";
+      pickAvatar(tempSelectedAvatar);
+      document.getElementById("char-select-screen").style.display = "flex";
+    }
+
+    function handleLogout() { sessionStorage.removeItem("condo_auth_user"); location.reload(); }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const targetTab = document.getElementById(`tab-${tabName}`);
+      const targetMenu = document.getElementById(`menu-${tabName}`);
+      if (targetTab) targetTab.classList.add('active');
+      if (targetMenu) targetMenu.classList.add('active');
+    }
+
+    function openRoModal(unit) {
+      pendingUnitForRegistration = unit; document.getElementById("ro-target-unit").innerText = unit;
+      document.getElementById("ro-modal-overlay").style.display = "flex";
+    }
+    function closeRoModal() { document.getElementById("ro-modal-overlay").style.display = "none"; }
+    function goToResidentRegistration() {
+      closeRoModal(); switchTab('residents');
+      const resUnitInput = document.getElementById("res-unit");
+      if (resUnitInput && pendingUnitForRegistration) { 
+        resUnitInput.value = pendingUnitForRegistration; 
+        autoFillRegistrationFields();
+        document.getElementById("res-name").focus(); 
+      }
+    }
+
+    function openProfileModal() { updateProfileUI(); document.getElementById("profile-modal-overlay").style.display = "flex"; }
+    function closeProfileModal() { document.getElementById("profile-modal-overlay").style.display = "none"; }
+
+    function openLedgerModal() {
+      document.getElementById("ledger-search-unit").value = "";
+      document.getElementById("ledger-content-box").style.display = "none";
+      document.getElementById("unit-ledger-modal").style.display = "flex";
+    }
+
+    function closeLedgerModal() {
+      document.getElementById("unit-ledger-modal").style.display = "none";
+    }
+
+    function searchUnitLedger() {
+      const q = document.getElementById("ledger-search-unit").value.trim();
+      if (!q) {
+        alert("⚠️ กรุณาพิมพ์ระบุเลขยูนิตที่ต้องการค้นหา");
+        return;
+      }
+
+      const targetKey = cleanUnitKey(q);
+      const res = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
+      const unitPayments = cachedPayments.filter(p => cleanUnitKey(p["Unit Number"] || p.unitNumber) === targetKey);
+
+      document.getElementById("ledger-unit-display").innerText = q.toUpperCase();
+      document.getElementById("ledger-name-display").innerText = res ? res.residentName : "ไม่พบทะเบียนในระบบ (ลูกค้าทั่วไป)";
+
+      let totalPaid = 0;
+      const tbody = document.getElementById("ledger-tbody");
+      tbody.innerHTML = "";
+
+      if (unitPayments.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px; color: var(--text-muted);">ไม่พบประวัติธุรกรรมการเงินของยูนิตนี้</td></tr>`;
+      } else {
+        unitPayments.forEach(p => {
+          const amt = Number(p.Amount || p.amount || 0);
+          const st = p.Status || "Paid";
+          if (st.toLowerCase() === "paid") totalPaid += amt;
+
+          tbody.innerHTML += `<tr>
+            <td>${formatDisplayDate(p.Date)}</td>
+            <td style="color:var(--accent-gold); font-weight:bold;">${p.DocNo || '-'}</td>
+            <td>${p["Fee Type"] || '-'}</td>
+            <td style="color:#6ee7b7; font-weight:bold;">฿${amt.toLocaleString()}</td>
+            <td>${p["Payment Method"] || '-'}</td>
+            <td><span class="badge ${st.toLowerCase()}">${st}</span></td>
+          </tr>`;
+        });
+      }
+
+      document.getElementById("ledger-paid-display").innerText = "฿" + totalPaid.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById("ledger-content-box").style.display = "block";
+    }
+
+    function openCustomerListModal() {
+      const tbody = document.getElementById("modal-resident-tbody");
+      tbody.innerHTML = "";
+      if (!cachedResidents || cachedResidents.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--text-muted);">ไม่พบข้อมูลลูกบ้านในระบบ</td></tr>`;
+      } else {
+        renderModalResidents(cachedResidents);
+      }
+      document.getElementById("modal-resident-search").value = "";
+      document.getElementById("customer-list-modal").style.display = "flex";
+    }
+
+    function renderModalResidents(list) {
+      const tbody = document.getElementById("modal-resident-tbody");
+      tbody.innerHTML = "";
+      list.forEach(res => {
+        const uStr = String(res.unitNumber).replace(/'/g, "\\'");
+        const typeBadge = (res.residentType === "Tenant") 
+          ? `<span class="badge" style="background:rgba(2,132,199,0.2); color:#38bdf8; border:1px solid #0284c7;">ผู้เช่า</span>` 
+          : `<span class="badge" style="background:rgba(220,38,38,0.2); color:#fca5a5; border:1px solid #dc2626;">เจ้าของ</span>`;
+
+        tbody.innerHTML += `
+          <tr style="border-bottom: 1px solid #140803;">
+            <td style="padding: 10px 12px; font-weight: bold; color: var(--accent-gold);">${String(res.unitNumber).toUpperCase()}</td>
+            <td style="padding: 10px 12px; color: var(--text-main); font-weight: 600;">${res.residentName || "-"}</td>
+            <td style="padding: 10px 12px;">${typeBadge}</td>
+            <td style="padding: 10px 12px; color: #60a5fa;">${res.titleDeedNo || "-"}</td>
+            <td style="padding: 10px 12px; color: #6ee7b7;">${res.phone || "-"}</td>
+            <td style="padding: 10px 12px; color: var(--text-muted); font-size: 12px;">${res.currentAddress || "-"}</td>
+            <td style="padding: 10px 12px; text-align: center;">
+              <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openEditResidentModal('${uStr}')">✏️ แก้ไข</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function filterModalResidentList() {
+      const q = document.getElementById("modal-resident-search").value.trim().toLowerCase();
+      const filtered = cachedResidents.filter(r => 
+        String(r.unitNumber).toLowerCase().includes(q) || 
+        (r.residentName && r.residentName.toLowerCase().includes(q)) ||
+        (r.titleDeedNo && r.titleDeedNo.toLowerCase().includes(q)) ||
+        (r.phone && r.phone.toLowerCase().includes(q)) ||
+        (r.idCardAddress && r.idCardAddress.toLowerCase().includes(q)) ||
+        (r.currentAddress && r.currentAddress.toLowerCase().includes(q))
+      );
+      renderModalResidents(filtered);
+    }
+
+    function closeCustomerListModal() {
+      document.getElementById("customer-list-modal").style.display = "none";
+      document.getElementById("modal-resident-tbody").innerHTML = "";
+      document.getElementById("modal-resident-search").value = "";
+    }
+
+    function goToResidentRegistrationFromModal() {
+      closeCustomerListModal();
+      switchTab('residents');
+      const form = document.getElementById("resident-form");
+      if (form) form.reset();
+      toggleOwnerFields("Owner");
+    }
+
+    function openEditResidentModal(unitNumber) {
+      const targetKey = cleanUnitKey(unitNumber);
+      const res = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
+      if (!res) {
+        alert("⚠️ ไม่พบข้อมูลลูกบ้านรายนี้");
+        return;
+      }
+
+      document.getElementById("customer-list-modal").style.display = "none";
+
+      document.getElementById("edit-res-unit").value = res.unitNumber;
+      document.getElementById("edit-res-deed").value = (res.titleDeedNo && res.titleDeedNo !== "-") ? res.titleDeedNo : "";
+      document.getElementById("edit-res-name").value = res.residentName || "";
+      document.getElementById("edit-res-phone").value = (res.phone && res.phone !== "-") ? res.phone : "";
+      document.getElementById("edit-res-email").value = (res.email && res.email !== "-") ? res.email : "";
+      document.getElementById("edit-res-id-address").value = (res.idCardAddress && res.idCardAddress !== "-") ? res.idCardAddress : "";
+      document.getElementById("edit-res-cur-address").value = (res.currentAddress && res.currentAddress !== "-") ? res.currentAddress : "";
+      document.getElementById("edit-res-photo").value = "";
+      editResidentPhotoBase64 = null;
+
+      document.getElementById("edit-resident-modal").style.display = "flex";
+    }
+
+    function closeEditResidentModal() {
+      document.getElementById("edit-resident-modal").style.display = "none";
+      openCustomerListModal();
+    }
+
+    function previewEditResidentPhoto(e) {
+      const file = e.target.files[0];
+      if (file) {
+        editResidentPhotoName = file.name;
+        editResidentPhotoMime = file.type || "image/jpeg";
+        const reader = new FileReader();
+        reader.onload = function(evt) { editResidentPhotoBase64 = evt.target.result; };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function submitUpdateResident(event) {
+      event.preventDefault();
+      const btn = document.getElementById("btn-submit-update-resident");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังบันทึกการแก้ไข...";
+
+      const payload = {
+        type: "update_resident",
+        operator: currentUser?.username,
+        operatorRole: currentUser?.role,
+        unitNumber: document.getElementById("edit-res-unit").value.trim(),
+        titleDeedNo: document.getElementById("edit-res-deed").value.trim(),
+        residentName: document.getElementById("edit-res-name").value.trim(),
+        phone: document.getElementById("edit-res-phone").value.trim(),
+        email: document.getElementById("edit-res-email").value.trim(),
+        idCardAddress: document.getElementById("edit-res-id-address").value.trim(),
+        currentAddress: document.getElementById("edit-res-cur-address").value.trim(),
+        photoData: editResidentPhotoBase64,
+        photoName: editResidentPhotoName,
+        photoMimeType: editResidentPhotoMime
       };
-      document.getElementById("header-title").innerText = titleMap[tabId] || 'ระบบบริหารจัดการ';
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        }, 3, 1500, "กำลังอัปเดตข้อมูลลูกบ้าน", "กำลังบันทึกข้อมูลทับข้อมูลเดิม...");
+
+        if (resJson.status === "success") {
+          showExpToast(5, "อัปเดตข้อมูลลูกบ้าน");
+          alert("✅ บันทึกการแก้ไขข้อมูลเรียบร้อยแล้ว!");
+          closeEditResidentModal();
+          await loadDashboardData();
+          openCustomerListModal();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "💾 บันทึกการแก้ไขข้อมูล";
+      }
+    }
+
+    function autoFillResidentName(inputUnit) {
+      const targetKey = cleanUnitKey(inputUnit);
+      if (!targetKey) return;
+      const found = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
+      if (found && found.residentName) document.getElementById("form-name").value = found.residentName;
+    }
+
+    function fillPaymentFromQueue(unit, name, feeType, month) {
+      document.getElementById("form-unit").value = unit;
+      document.getElementById("form-name").value = name;
+      document.getElementById("form-fee-type").value = feeType;
+
+      if (feeType.includes("500") || feeType === "ค่าส่วนกลางประจำปี") {
+        document.getElementById("form-amount").value = 500;
+      }
+      
+      document.getElementById("form-amount").focus();
+      showExpToast(1, `เลือกยูนิต ${unit} จากคิว`);
     }
 
     async function loadDashboardData() {
       try {
         const fetchUrl = API_URL + "?t=" + new Date().getTime();
-        const data = await fetchWithRetry(fetchUrl, {}, 3, 1500, "กำลังโหลดข้อมูลสรุป...", "กำลังดึงข้อมูลล่าสุดจาก Google Sheets");
-        
-        cachedPayments = data.payments || [];
-        cachedExpenses = data.expenses || [];
-        cachedResidents = data.residents || [];
-        cachedProcurement = data.procurement || [];
-        cachedPendingInvoices = data.pendingInvoices || [];
-        cachedAllInvoices = data.allInvoices || [];
-
+        const data = await fetchWithRetry(fetchUrl, {}, 3, 1500, "กำลังโหลดข้อมูลระบบ...", "กำลังดึงข้อมูลล่าสุดจาก Google Sheets");
+        if (data.payments) { 
+          cachedPayments = data.payments || []; 
+          cachedExpenses = data.expenses || [];
+          cachedResidents = data.residents || []; 
+          cachedProcurement = data.procurement || [];
+          cachedPendingInvoices = data.pendingInvoices || [];
+          cachedAllInvoices = data.allInvoices || [];
+          
+          if (data.nextInvNo !== undefined) document.getElementById("admin-next-inv-no").value = data.nextInvNo;
+          if (data.nextRecNo !== undefined) document.getElementById("admin-next-rec-no").value = data.nextRecNo;
+        } else if (Array.isArray(data)) { 
+          cachedPayments = data; 
+        }
+        renderTable(cachedPayments); 
+        renderExpensesTable(cachedExpenses);
         renderPendingInvoicesQueue(cachedPendingInvoices);
         renderSalesTrackingTable(cachedAllInvoices);
-        renderResidentsTable(cachedResidents);
+        renderPropertyMap(cachedResidents, cachedPendingInvoices);
         renderProcurementTable(cachedProcurement);
-        renderExpensesTable(cachedExpenses);
         calculateMetrics(cachedPayments, cachedExpenses, cachedPendingInvoices, cachedAllInvoices, cachedProcurement);
-      } catch (error) {
-        console.error("Load Dashboard Error:", error);
-      }
+      } catch (error) { console.error("Load Error:", error); }
     }
 
     function renderPendingInvoicesQueue(data) {
@@ -624,40 +2180,44 @@
       tbody.innerHTML = "";
 
       if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 15px; color: #6ee7b7;">🎉 ไม่มีรายการรอดำเนินการ (ดำเนินการครบถ้วน)</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 15px; color: #6ee7b7;">✅ ไม่มีคิวค้างรับเงิน (เคลียร์ครบแล้ว)</td></tr>`;
         return;
       }
 
       data.forEach(item => {
+        const u = String(item.unitNumber).replace(/'/g, "\\'");
+        const n = String(item.residentName).replace(/'/g, "\\'");
+        const f = String(item.feeType).replace(/'/g, "\\'");
+        const m = String(item.billingMonth).replace(/'/g, "\\'");
+
         const formattedDate = formatDisplayDate(item.date || item.timestamp);
         const formattedMonth = formatDisplayMonth(item.billingMonth);
 
         tbody.innerHTML += `<tr>
           <td>${formattedDate}</td>
-          <td style="font-weight: bold; color: var(--accent-gold);">${item.unitNumber}</td>
+          <td style="color: var(--accent-gold); font-weight: bold;">${item.unitNumber}</td>
           <td>${item.residentName}</td>
           <td>${item.feeType}</td>
           <td><span class="badge pending" style="font-size:11px;">${formattedMonth}</span></td>
           <td style="color: var(--text-muted); font-size:12px;">${item.operator}</td>
           <td style="text-align: center;">
-            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #059669, #047857);" onclick="fillPaymentFromQueue('${item.unitNumber}', '${item.residentName}', '${item.feeType}', '${item.amount}')">
-              💵 ชำระเงิน
+            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #059669, #047857);" onclick="fillPaymentFromQueue('${u}', '${n}', '${f}', '${m}')">
+              ⚡ รับเงิน
             </button>
           </td>
         </tr>`;
       });
     }
 
-    // 🛑 ฟังก์ชันเรนเดอร์ตารางติดตามสถานะบิลทั้งหมด (ซ่อนรายการ Cancelled ออก)
     function renderSalesTrackingTable(data) {
       const tbody = document.getElementById("sales-tracking-tbody");
       tbody.innerHTML = "";
 
-      // 🛑 กรองรายการที่ไม่ใช่ "Cancelled" มาแสดงเท่านั้น
+      // 🛑 กรองรายการที่สถานะเป็น "Cancelled" ออกไป ไม่ให้แสดงในตาราง
       const filteredData = data ? data.filter(item => item.status !== "Cancelled") : [];
 
       if (filteredData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 15px; color: var(--text-muted);">ไม่มีรายการบิลที่ใช้งานอยู่ (ซ่อนรายการที่ถูกยกเลิกแล้ว)</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีประวัติการออกเอกสาร (หรือรายการถูกยกเลิกทั้งหมด)</td></tr>`;
         return;
       }
 
@@ -689,63 +2249,6 @@
       });
     }
 
-    // 🛑 ฟังก์ชันยกเลิกใบแจ้งหนี้ พร้อม Pop-up แจ้งเตือนยืนยันและรีเฟรชตาราง
-    async function handleCancelInvoice(docNo) {
-      if (!docNo || docNo === "-") return;
-      const confirmCancel = confirm(`⚠️ ยืนยันการยกเลิกเอกสารเลขที่: ${docNo} ?\n\nเมื่อยกเลิกเรียบร้อยแล้ว รายการนี้จะถูกลบ/ซ่อนออกจากตารางติดตามสถานะบิลทันที`);
-      if (!confirmCancel) return;
-
-      try {
-        const resJson = await fetchWithRetry(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            type: "cancel_invoice",
-            docNo: docNo,
-            operator: currentUser?.username || "Operator",
-            operatorRole: currentUser?.role || "Staff"
-          })
-        }, 3, 1500, "กำลังยกเลิกเอกสาร...", "กำลังส่งคำขอยกเลิกไปยัง Google Sheets...");
-
-        if (resJson.status === "success") {
-          alert("✅ " + resJson.message);
-          await loadDashboardData(); // รีเฟรชตารางใหม่ ลบ/ซ่อนรายการยกเลิกทันที
-        } else {
-          alert("❌ " + resJson.message);
-        }
-      } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการยกเลิกเอกสาร: " + err.message);
-      }
-    }
-
-    function renderResidentsTable(data) {
-      const tbody = document.getElementById("residents-tbody");
-      tbody.innerHTML = "";
-      if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีข้อมูลลูกบ้านในระบบ</td></tr>`;
-        return;
-      }
-
-      data.forEach(res => {
-        const uStr = String(res.unitNumber).replace(/'/g, "\\'");
-        const typeBadge = (res.residentType === "Tenant") 
-          ? `<span class="badge" style="background:rgba(2,132,199,0.2); color:#38bdf8; border:1px solid #0284c7;">ผู้เช่า</span>` 
-          : `<span class="badge" style="background:rgba(220,38,38,0.2); color:#fca5a5; border:1px solid #dc2626;">เจ้าของ</span>`;
-
-        tbody.innerHTML += `<tr>
-          <td style="padding: 10px 12px; font-weight: bold; color: var(--accent-gold);">${String(res.unitNumber).toUpperCase()}</td>
-          <td style="padding: 10px 12px; color: var(--text-main); font-weight: 600;">${res.residentName || "-"}</td>
-          <td style="padding: 10px 12px;">${typeBadge}</td>
-          <td style="padding: 10px 12px; color: #60a5fa;">${res.titleDeedNo || "-"}</td>
-          <td style="padding: 10px 12px; color: #6ee7b7;">${res.phone || "-"}</td>
-          <td style="padding: 10px 12px; color: var(--text-muted); font-size: 12px;">${res.currentAddress || "-"}</td>
-          <td style="padding: 10px 12px; text-align: center;">
-            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openEditResidentModal('${uStr}')">✏️ แก้ไข</button>
-          </td>
-        </tr>`;
-      });
-    }
-
     function renderProcurementTable(data) {
       const tbody = document.getElementById("procurement-tbody");
       tbody.innerHTML = "";
@@ -763,7 +2266,7 @@
 
         let statusBadge = `<span class="badge paid">ปกติ</span>`;
         if (qty <= minAlert) {
-          statusBadge = `<span class="badge overdue" style="animation: pulse 1.5s infinite;">⚠️ สต็อกเหลือน้อย</span>`;
+          statusBadge = `<span class="badge overdue" style="animation: pulse 1.5s infinite;">🔴 ต้องสั่งเพิ่ม</span>`;
         }
 
         tbody.innerHTML += `<tr>
@@ -780,15 +2283,89 @@
       });
     }
 
-    function renderExpensesTable(data) {
-      const tbody = document.getElementById("expenses-tbody");
-      tbody.innerHTML = "";
-      if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีรายการรายจ่ายในระบบ</td></tr>`;
+    function renderPropertyMap(residents, pendingInvoices) {
+      const container = document.getElementById("unit-map-container");
+      container.innerHTML = "";
+
+      if (!residents || residents.length === 0) {
+        container.innerHTML = `<div style="grid-column: span 4; text-align: center; padding: 20px; color: var(--text-muted);">ยังไม่มีการลงทะเบียนยูนิตในระบบ</div>`;
         return;
       }
 
-      data.slice().reverse().forEach(item => {
+      residents.forEach(res => {
+        const uStr = res.unitNumber;
+        const targetKey = cleanUnitKey(uStr);
+        const pending = pendingInvoices.find(p => cleanUnitKey(p.unitNumber) === targetKey);
+
+        let statusClass = (res.residentType === "Tenant") ? "tenant" : "owner";
+        let statusText = (res.residentType === "Tenant") ? "ผู้เช่า" : "เจ้าของ";
+
+        if (pending) {
+          statusClass = "has-pending";
+          statusText = "มีบิลค้าง";
+        }
+
+        const chip = document.createElement("div");
+        chip.className = `unit-chip ${statusClass}`;
+        chip.innerHTML = `
+          <div style="font-weight: bold; font-size: 13px; color: var(--text-main);">${uStr}</div>
+          <div style="font-size: 10px; margin-top: 2px;">${statusText}</div>
+        `;
+        
+        chip.onclick = () => openCrmModal(uStr);
+        container.appendChild(chip);
+      });
+    }
+
+    function renderTable(data) {
+      const tableBody = document.getElementById("payments-table-body");
+      tableBody.innerHTML = "";
+      if (!data || data.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">ไม่พบรายการ</td></tr>`; return;
+      }
+      data.forEach(item => {
+        const rawDate = item["Date"] || item["Timestamp"] || "-";
+        const formattedDate = formatDisplayDate(rawDate);
+        const status = item["Status"] || "Pending";
+        const amount = Number(item["Amount"] || item["amount"] || 0);
+        const unit = item["Unit Number"] || item["unitNumber"] || "-";
+        const residentName = item["Resident Name"] || "-";
+        const feeType = item["Fee Type"] || "ค่าส่วนกลาง";
+        const payMethod = item["Payment Method"] || "โอนเงิน / สแกน QR";
+        const docNo = item["DocNo"] || "-";
+
+        const u = String(unit).replace(/'/g, "\\'");
+        const r = String(residentName).replace(/'/g, "\\'");
+        const f = String(feeType).replace(/'/g, "\\'");
+        const p = String(payMethod).replace(/'/g, "\\'");
+        const d = String(docNo).replace(/'/g, "\\'");
+
+        const btnReceiptHtml = status.toLowerCase() === 'paid' 
+          ? `<button class="btn-action" style="background: linear-gradient(135deg, var(--accent-green), #047857);" onclick="handlePrintReceipt('${u}', '${r}', '${f}', ${amount}, '${p}', '${d}')">🖨️ พิมพ์ใบเสร็จ</button>` 
+          : `<span style="font-size:12px; color:var(--text-muted);">-</span>`;
+        tableBody.innerHTML += `<tr>
+          <td>${formattedDate}</td>
+          <td style="color: var(--accent-gold); font-weight: bold;">${unit}</td>
+          <td>${residentName}</td>
+          <td>${feeType}</td>
+          <td style="color: #6ee7b7;">฿${amount.toLocaleString()}</td>
+          <td><span class="badge ${status.toLowerCase()}">${status}</span></td>
+          <td>${btnReceiptHtml}</td>
+        </tr>`;
+      });
+    }
+
+    // 💸 เรนเดอร์ตารางบันทึกรายจ่าย (ปรับปรุงระบบ Fallback สำหรับข้อมูลเก่าที่ไม่ระบุ ID)
+    function renderExpensesTable(data) {
+      const tbody = document.getElementById("expenses-table-body");
+      tbody.innerHTML = "";
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีรายการบันทึกรายจ่าย</td></tr>`;
+        return;
+      }
+
+      data.forEach(item => {
         const formattedDate = formatDisplayDate(item.Date);
         const amt = Number(item.Amount || 0);
         const attachUrl = item.AttachmentUrl || item.Attachment || "-";
@@ -799,22 +2376,39 @@
           ? `<a href="${attachUrl}" target="_blank" style="color: #38bdf8; text-decoration: underline; font-size: 12px;">📎 ดูไฟล์</a>`
           : `<span style="color: var(--text-muted); font-size: 12px;">-</span>`;
 
+        const isAdmin = (currentUser?.role === "Admin");
+        const btnAttachText = (attachUrl && attachUrl !== "-" && attachUrl.startsWith("http")) ? "✏ เปลี่ยนไฟล์" : "📤 แนบไฟล์";
+        
+        let actionHtml = `<div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">`;
+        actionHtml += `<button type="button" class="btn-action" style="background: #0f766e;" onclick="openVoucherModal('${expIdStr}')">📄 ดู/พิมพ์</button>`;
+
+        if (isAdmin) {
+            actionHtml += `<button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openExpenseUpdateModal('${expIdStr}', true)">🛠 แก้ไข</button>`;
+        } else {
+            actionHtml += `<button type="button" class="btn-action" style="background: #d97706;" onclick="openExpenseUpdateModal('${expIdStr}')">${btnAttachText}</button>`;
+        }
+        actionHtml += `</div>`;
+
         tbody.innerHTML += `<tr>
           <td>${formattedDate}</td>
-          <td><span class="badge pending">${item.Category || 'ทั่วไป'}</span></td>
+          <td style="color: #fca5a5; font-weight: bold;">${item.Category || '-'}</td>
           <td>${item.Description || '-'}</td>
           <td style="color: #fca5a5; font-weight: bold;">฿${amt.toLocaleString()}</td>
           <td>${item['Payment Method'] || '-'}</td>
-          <td>${evidenceHtml}</td>
-          <td style="color: var(--text-muted); font-size: 12px;">${item.Operator || '-'}</td>
-          <td style="text-align: center;">
-            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openExpenseUpdateModal('${expIdStr}')">✏️ อัปเดต</button>
-          </td>
+          <td style="text-align: center;">${evidenceHtml}</td>
+          <td style="color: var(--text-muted); font-size:12px;">${item.Operator || '-'}</td>
+          <td style="text-align: center; min-width: 150px;">${actionHtml}</td>
         </tr>`;
       });
     }
 
-    // 🛑 คำนวณสรุปแดชบอร์ด โดยไม่เอายอดบิล Cancelled มาคำนวณซ้ำ
+    function filterTable() {
+      const query = document.getElementById("global-search").value.toLowerCase();
+      renderTable(cachedPayments.filter(item => {
+        return String(item["Unit Number"] || "").toLowerCase().includes(query) || String(item["Resident Name"] || "").toLowerCase().includes(query);
+      }));
+    }
+
     function calculateMetrics(payments, expenses, pendingInvoices, allInvoices, procurement) {
       let income = 0;
       payments.forEach(item => {
@@ -834,38 +2428,364 @@
       document.getElementById("total-income").innerText = "฿" + income.toLocaleString();
       document.getElementById("total-expense").innerText = "฿" + totalExp.toLocaleString();
       document.getElementById("net-balance").innerText = "฿" + net.toLocaleString();
+      // document.getElementById("total-records").innerText = payments.length.toLocaleString(); // if exists
 
       const queueCount = pendingInvoices ? pendingInvoices.length : 0;
       document.getElementById("total-pending-invoices").innerText = queueCount.toLocaleString();
       document.getElementById("queue-badge").innerText = `${queueCount} รายการ`;
+      document.getElementById("expense-badge").innerText = `${expenses ? expenses.length : 0} รายการ`;
 
-      // 🛑 ตัดบิล "ยกเลิกแล้ว" ทิ้งจากการคำนวณยอดรวมบนแดชบอร์ด
-      let salesSum = 0, activeSalesCount = 0;
+      // 🛑 ปรับปรุงการคำนวณยอดของบิลทั้งหมด โดยตัดบิล "ยกเลิกแล้ว" ทิ้ง
+      let salesSum = 0, salesPendingCount = 0, salesSettledCount = 0, activeSalesCount = 0;
       if (allInvoices && Array.isArray(allInvoices)) {
         allInvoices.forEach(inv => {
           if (inv.status !== "Cancelled") {
             salesSum += Number(inv.amount || 0);
             activeSalesCount++;
           }
+          if (inv.status === "Pending") salesPendingCount++;
+          if (inv.status === "Settled" || inv.status === "Paid") salesSettledCount++;
         });
         document.getElementById("sales-total-amount").innerText = "฿" + salesSum.toLocaleString();
         document.getElementById("sales-total-count").innerText = activeSalesCount.toLocaleString();
+        document.getElementById("sales-pending-count").innerText = salesPendingCount.toLocaleString();
+        document.getElementById("sales-settled-count").innerText = salesSettledCount.toLocaleString();
+      }
+
+      let procAlertCount = 0, procTotalVal = 0;
+      if (procurement && Array.isArray(procurement)) {
+        procurement.forEach(item => {
+          const qty = Number(item.quantity || 0);
+          const minAlert = Number(item.minAlert || 5);
+          const price = Number(item.unitPrice || 0);
+
+          if (qty <= minAlert) procAlertCount++;
+          procTotalVal += (qty * price);
+        });
+        document.getElementById("proc-total-items").innerText = procurement.length.toLocaleString();
+        document.getElementById("proc-alert-count").innerText = procAlertCount.toLocaleString();
+        document.getElementById("proc-total-value").innerText = "฿" + procTotalVal.toLocaleString();
       }
     }
 
-    function formatDisplayDate(dateVal) {
-      if (!dateVal) return "-";
+    async function submitNewProcurement(event) {
+      event.preventDefault();
+      const btn = document.getElementById("btn-submit-proc");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังบันทึกพัสดุ...";
+
+      const payload = {
+        type: "new_procurement",
+        operator: currentUser?.username,
+        operatorRole: currentUser?.role,
+        itemName: document.getElementById("proc-item-name").value.trim(),
+        category: document.getElementById("proc-category").value.trim(),
+        quantity: document.getElementById("proc-qty").value,
+        unit: document.getElementById("proc-unit").value.trim(),
+        minAlert: document.getElementById("proc-min-alert").value,
+        unitPrice: document.getElementById("proc-unit-price").value
+      };
+
       try {
-        const d = new Date(dateVal);
-        if (isNaN(d.getTime())) return String(dateVal);
-        return d.toLocaleDateString("th-TH", { year: "numeric", month: "2-digit", day: "2-digit" });
-      } catch (e) { return String(dateVal); }
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        }, 3, 1500, "กำลังบันทึกพัสดุจัดซื้อ", "กำลังเพิ่มข้อมูลลงชีต Procurement...");
+
+        if (resJson.status === "success") {
+          showExpToast(10, "เพิ่มรายการจัดซื้อพัสดุ");
+          alert("✅ " + resJson.message);
+          document.getElementById("procurement-form").reset();
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "💾 บันทึกรับพัสดุใหม่เข้าสต็อก";
+      }
     }
 
-    function formatDisplayMonth(monthVal) {
-      if (!monthVal) return "-";
-      return String(monthVal);
+    function openStockModal(itemCode) {
+      activeStockItemCode = itemCode;
+      const item = cachedProcurement.find(p => String(p.itemCode).trim() === String(itemCode).trim());
+      if (!item) {
+        alert("⚠️ ไม่พบข้อมูลรายการพัสดุนี้");
+        return;
+      }
+
+      document.getElementById("stock-modal-code").value = item.itemCode;
+      document.getElementById("stock-modal-name").value = `${item.itemName} (${item.category})`;
+      document.getElementById("stock-modal-qty").value = item.quantity;
+      document.getElementById("stock-modal-min").value = item.minAlert;
+
+      document.getElementById("stock-adjust-modal").style.display = "flex";
     }
+
+    function closeStockModal() {
+      document.getElementById("stock-adjust-modal").style.display = "none";
+      activeStockItemCode = "";
+    }
+
+    async function submitStockAdjustment() {
+      const newQty = document.getElementById("stock-modal-qty").value;
+      const newMin = document.getElementById("stock-modal-min").value;
+
+      if (newQty === "" || newMin === "" || !activeStockItemCode) {
+        alert("⚠️ กรุณาระบุจำนวนพัสดุและจุดแจ้งเตือนขั้นต่ำ");
+        return;
+      }
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            type: "update_stock_quantity",
+            operator: currentUser?.username,
+            operatorRole: currentUser?.role,
+            itemCode: activeStockItemCode,
+            newQuantity: newQty,
+            newMinAlert: newMin
+          })
+        }, 3, 1500, "กำลังปรับสต็อกพัสดุ", "กำลังอัปเดตจำนวนคงเหลือในชีต...");
+
+        if (resJson.status === "success") {
+          alert("✅ " + resJson.message);
+          closeStockModal();
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+      }
+    }
+
+    // 📄 ป๊อปอัปดู/พิมพ์ใบสำคัญจ่ายย้อนหลัง (Payment Voucher)
+    function openVoucherModal(expId) {
+      const item = cachedExpenses.find(e => String(e.ExpenseId).trim() === String(expId).trim());
+      if (!item) {
+        alert("⚠️ ไม่พบข้อมูลรายการรายจ่ายนี้ในระบบ");
+        return;
+      }
+
+      activeVoucherId = expId;
+      document.getElementById("voucher-details-container").innerHTML = `
+        <strong>วันที่:</strong> ${formatDisplayDate(item.Date)}<br>
+        <strong>เลขที่อ้างอิง:</strong> ${item.ExpenseId}<br>
+        <strong>หมวดหมู่:</strong> <span style="color:#fca5a5;">${item.Category}</span><br>
+        <strong>รายละเอียด:</strong> ${item.Description}<br>
+        <strong>จำนวนเงิน:</strong> ฿${Number(item.Amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}<br>
+        <strong>ช่องทาง:</strong> ${item['Payment Method']}<br>
+        <strong>ผู้บันทึก:</strong> ${item.Operator}
+      `;
+      document.getElementById("voucher-modal").style.display = "flex";
+    }
+
+    function closeVoucherModal() {
+      document.getElementById("voucher-modal").style.display = "none";
+      activeVoucherId = "";
+    }
+
+    function printExpenseVoucher() {
+      const item = cachedExpenses.find(e => String(e.ExpenseId).trim() === activeVoucherId);
+      if (!item) return;
+
+      document.getElementById("print-voc-no").innerText = item.ExpenseId || "-";
+      document.getElementById("print-voc-date").innerText = formatDisplayDate(item.Date);
+      document.getElementById("print-voc-cat").innerText = item.Category || "-";
+      document.getElementById("print-voc-method").innerText = item['Payment Method'] || "เงินสด";
+      document.getElementById("print-voc-desc").innerText = item.Description || "-";
+      document.getElementById("print-voc-amount").innerText = Number(item.Amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById("print-voc-total").innerText = "฿" + Number(item.Amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
+      document.getElementById("print-voc-operator").innerText = item.Operator || "-";
+
+      document.body.className = "print-mode-voc";
+      window.print();
+      document.body.className = "";
+    }
+
+    // 💸 ป๊อปอัปแนบหลักฐาน / แก้ไขข้อมูลรายจ่าย (พร้อมระบบ Fallback สำรองข้อมูลเก่า)
+    let isCurrentExpenseAdminOverride = false;
+    function openExpenseUpdateModal(expId, isAdminOverride = false) {
+      isCurrentExpenseAdminOverride = isAdminOverride;
+      const item = cachedExpenses.find(e => String(e.ExpenseId).trim() === String(expId).trim());
+      if (!item) {
+        alert("⚠️ ไม่พบข้อมูลรายการรายจ่ายนี้ในระบบ");
+        return;
+      }
+
+      document.getElementById("exp-modal-id").value = expId;
+      document.getElementById("exp-modal-fallback-desc").value = item.Description;
+      document.getElementById("exp-modal-fallback-amt").value = item.Amount;
+
+      document.getElementById("exp-modal-summary-text").innerHTML = `
+        <strong>วันที่:</strong> ${formatDisplayDate(item.Date)}<br>
+        <strong>หมวดหมู่:</strong> ${item.Category}<br>
+        <strong>รายละเอียด:</strong> ${item.Description}<br>
+        <strong>จำนวนเงิน:</strong> ฿${Number(item.Amount).toLocaleString('en-US', { minimumFractionDigits: 2 })} (${item['Payment Method']})
+      `;
+
+      const adminDiv = document.getElementById("exp-modal-admin-fields");
+      const titleEl = document.getElementById("expense-modal-title");
+
+      if (isAdminOverride && currentUser?.role === "Admin") {
+        titleEl.innerText = "🛠️ แก้ไขรายการรายจ่าย (Admin Full Override)";
+        adminDiv.style.display = "block";
+        document.getElementById("exp-modal-category").value = item.Category;
+        document.getElementById("exp-modal-desc").value = item.Description;
+        document.getElementById("exp-modal-amount").value = item.Amount;
+        document.getElementById("exp-modal-method").value = item['Payment Method'];
+      } else {
+        titleEl.innerText = "📎 แนบไฟล์หลักฐานการจ่ายเงิน";
+        adminDiv.style.display = "none";
+      }
+
+      document.getElementById("exp-modal-file").value = "";
+      expenseUpdateFileBase64 = null;
+      document.getElementById("expense-update-modal").style.display = "flex";
+    }
+
+    function closeExpenseUpdateModal() {
+      document.getElementById("expense-update-modal").style.display = "none";
+      expenseUpdateFileBase64 = null;
+    }
+
+    function previewExpenseModalFile(e) {
+      const file = e.target.files[0];
+      if (file) {
+        expenseUpdateFileName = file.name;
+        expenseUpdateFileMime = file.type || "image/jpeg";
+        const reader = new FileReader();
+        reader.onload = function(evt) { expenseUpdateFileBase64 = evt.target.result; };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function submitExpenseUpdateRecord() {
+      const expId = document.getElementById("exp-modal-id").value;
+      if (!expId) return;
+
+      const payload = {
+        type: "update_expense_record",
+        operator: currentUser?.username,
+        operatorRole: currentUser?.role,
+        expenseId: expId,
+        description: document.getElementById("exp-modal-fallback-desc").value,
+        amount: document.getElementById("exp-modal-fallback-amt").value,
+        fileData: expenseUpdateFileBase64,
+        fileName: expenseUpdateFileName,
+        mimeType: expenseUpdateFileMime,
+        isFullOverride: isCurrentExpenseAdminOverride
+      };
+
+      if (isCurrentExpenseAdminOverride) {
+        payload.category = document.getElementById("exp-modal-category").value;
+        payload.description = document.getElementById("exp-modal-desc").value.trim();
+        payload.amount = document.getElementById("exp-modal-amount").value;
+        payload.paymentMethod = document.getElementById("exp-modal-method").value;
+      }
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        }, 3, 1500, "กำลังอัปเดตข้อมูลรายจ่าย", "อัปโหลดไฟล์หลักฐานไปยัง Expense_Receipts...");
+
+        if (resJson.status === "success") {
+          alert("✅ " + resJson.message);
+          closeExpenseUpdateModal();
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+      }
+    }
+
+    function switchDocTypeForm(val) {
+      const btn = document.getElementById("btn-generate-inv");
+      if (val === "QUOTATION") {
+        btn.innerText = "🖨️ พิมพ์ใบเสนอราคา / ใบจอง (PDF)";
+      } else {
+        btn.innerText = "🖨️ ตรวจสอบ, ส่งงานเข้าคิว & พิมพ์ใบแจ้งหนี้ (PDF)";
+      }
+    }
+
+    async function handleSetDocRunningNumber() {
+      const nextInvNo = document.getElementById("admin-next-inv-no").value.trim();
+      const nextRecNo = document.getElementById("admin-next-rec-no").value.trim();
+
+      if (!nextInvNo && !nextRecNo) {
+        alert("⚠️ กรุณาระบุตัวเลขอย่างน้อย 1 ช่องสำหรับการตั้งค่า");
+        return;
+      }
+
+      const btn = document.getElementById("btn-save-doc-number");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังบันทึกการตั้งค่า...";
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            type: "set_doc_running_number",
+            operator: currentUser?.username,
+            operatorRole: currentUser?.role,
+            nextInvNo: nextInvNo,
+            nextRecNo: nextRecNo
+          })
+        }, 3, 1500, "กำลังตั้งค่าเลขรันเอกสาร", "กำลังอัปเดตตัวเลขถัดไปใน Google Sheets...");
+
+        if (resJson.status === "success") {
+          alert("✅ " + resJson.message);
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "💾 บันทึกตั้งค่าเลขที่รัน";
+      }
+    }
+
+    async function handleCancelInvoice(docNo) {
+      if (!confirm(`คุณต้องการยกเลิกบิลเลขที่ ${docNo} ใช่หรือไม่?`)) return;
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            type: "cancel_invoice",
+            docNo: docNo,
+            operator: currentUser?.username,
+            operatorRole: currentUser?.role
+          })
+        }, 3, 1500, "กำลังยกเลิกเอกสาร", "กำลังส่งคำขอยกเลิกบิลไปยัง Google Sheets...");
+
+        if (resJson.status === "success") {
+          alert("✅ " + resJson.message);
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการยกเลิกบิล: " + err.message);
+      }
+    }
+
+    window.onload = function() {
+      checkAuth();
+    };
   </script>
 </body>
 </html>
