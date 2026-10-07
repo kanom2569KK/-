@@ -1135,6 +1135,9 @@
       <li class="nav-item" id="menu-financial">
         <button onclick="switchTab('financial')">💰<span class="tooltip">การเงิน & รับชำระ</span></button>
       </li>
+      <li class="nav-item" id="menu-expenses">
+        <button onclick="switchTab('expenses')">💸<span class="tooltip">บันทึก & ประวัติรายจ่าย</span></button>
+      </li>
       <li class="nav-item" id="menu-property-map">
         <button onclick="switchTab('property-map')">🗺️<span class="tooltip">ผังสถานะยูนิต & หนี้ค้างชำระ</span></button>
       </li>
@@ -1226,7 +1229,7 @@
                 📖 สมุดบัญชีรายยูนิต (Ledger)
               </button>
             </div>
-            <div class="table-container" style="max-height: 220px;">
+            <div class="table-container" style="max-height: 480px;">
               <table class="data-table">
                 <thead>
                   <tr>
@@ -1241,33 +1244,6 @@
                 </thead>
                 <tbody id="payments-table-body">
                   <tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--accent-gold);">กำลังโหลดข้อมูลจากเซิร์ฟเวอร์...</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- 💸 ตารางประวัติการบันทึกรายจ่าย -->
-          <div class="card" style="padding: 0; overflow: hidden; border-color: #7f1d1d;">
-            <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0; color: #fca5a5;">
-              <span>💸 ประวัติบันทึกรายจ่ายโครงการ (Expenses Record)</span>
-              <span id="expense-badge" class="badge overdue">0 รายการ</span>
-            </div>
-            <div class="table-container" style="max-height: 250px;">
-              <table class="data-table">
-                <thead>
-                  <tr style="background: #2b1111;">
-                    <th>วันที่</th>
-                    <th>หมวดหมู่</th>
-                    <th>รายละเอียด</th>
-                    <th>จำนวนเงิน</th>
-                    <th>ช่องทาง</th>
-                    <th style="text-align: center;">หลักฐาน</th>
-                    <th>ผู้บันทึก</th>
-                    <th style="text-align: center;">จัดการ</th>
-                  </tr>
-                </thead>
-                <tbody id="expenses-table-body">
-                  <tr><td colspan="8" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีรายการบันทึกรายจ่าย</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1316,12 +1292,64 @@
             </form>
           </div>
 
-          <div class="card" style="border-color: #991b1b;">
-            <div class="card-title" style="color: #fca5a5;">💸 บันทึกรายจ่ายโครงการ</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Tab: Expenses (บันทึก & ประวัติรายจ่ายโครงการ) -->
+    <div id="tab-expenses" class="tab-content">
+      <!-- 4 Top KPI Metric Cards -->
+      <section class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 22px;">
+        <div class="metric-card" style="border: 2px solid #b91c1c; background: linear-gradient(145deg, #2b1111, #1a0808); box-shadow: 0 4px 15px rgba(185, 28, 28, 0.3);">
+          <div class="title" style="display:flex; justify-content:space-between; align-items:center; color: #fca5a5;">
+            <span>💸 ยอดรายจ่ายรวมเดือนนี้</span>
+            <span style="font-size: 16px;">📉</span>
+          </div>
+          <div class="value" id="exp-kpi-month-total" style="color: #f87171; text-shadow: 0 0 10px rgba(248,113,113,0.4);">฿0</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">รวมบันทึกจ่ายประจำเดือน</div>
+        </div>
+
+        <div class="metric-card" style="border: 2px solid #d97706; background: linear-gradient(145deg, #2c1a0c, #1a0f05);">
+          <div class="title" style="display:flex; justify-content:space-between; align-items:center; color: #fde68a;">
+            <span>💵 จ่ายด้วยเงินสด</span>
+            <span style="font-size: 16px;">🪙</span>
+          </div>
+          <div class="value" id="exp-kpi-cash-total" style="color: #fbbf24;">฿0</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">ตัดจากเงินสดย่อย / สำรองจ่าย</div>
+        </div>
+
+        <div class="metric-card" style="border: 2px solid #0284c7; background: linear-gradient(145deg, #0f2438, #071524);">
+          <div class="title" style="display:flex; justify-content:space-between; align-items:center; color: #bae6fd;">
+            <span>🏦 โอนเงิน / เช็คธนาคาร</span>
+            <span style="font-size: 16px;">📑</span>
+          </div>
+          <div class="value" id="exp-kpi-transfer-total" style="color: #38bdf8;">฿0</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">ตัดจ่ายผ่านบัญชี / เช็คบริษัท</div>
+        </div>
+
+        <div class="metric-card" style="border: 2px solid #059669; background: linear-gradient(145deg, #0e2e25, #061c16);">
+          <div class="title" style="display:flex; justify-content:space-between; align-items:center; color: #a7f3d0;">
+            <span>📋 จำนวนรายการจ่ายทั้งหมด</span>
+            <span style="font-size: 16px;">🔢</span>
+          </div>
+          <div class="value" id="exp-kpi-count" style="color: #34d399;">0 รายการ</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">รายการที่มีการบันทึกในระบบ</div>
+        </div>
+      </section>
+
+      <!-- Main Content Grid: Left Form (380px), Right Table (1fr) -->
+      <section class="content-grid" style="grid-template-columns: 380px 1fr; gap: 20px;">
+        
+        <!-- ฝั่งซ้าย: ฟอร์มบันทึกรายจ่ายโครงการ -->
+        <div>
+          <div class="card" style="border: 2px solid #991b1b; background: linear-gradient(145deg, #2b1111, #1a0a0a);">
+            <div class="card-title" style="color: #fca5a5; border-bottom: 2px dashed #7f1d1d; padding-bottom: 12px; margin-bottom: 16px;">
+              <span>💸 บันทึกรายจ่ายโครงการ</span>
+            </div>
             <form id="expense-form" onsubmit="submitNewExpense(event)">
               <div class="form-group">
                 <label>หมวดหมู่รายจ่าย *</label>
-                <select id="exp-category" required>
+                <select id="exp-category" required style="border-color: #991b1b;">
                   <option value="ค่าซ่อมบำรุงส่วนกลาง">ค่าซ่อมบำรุงส่วนกลาง / อุปกรณ์</option>
                   <option value="ค่าน้ำ-ค่าไฟส่วนกลาง">ค่าน้ำ-ค่าไฟส่วนกลางโครงการ</option>
                   <option value="ค่าจ้างแม่บ้าน-รปภ.">ค่าจ้างแม่บ้าน / รปภ. / บุคคลภายนอก</option>
@@ -1332,16 +1360,16 @@
               </div>
               <div class="form-group">
                 <label>รายละเอียดรายจ่าย *</label>
-                <input type="text" id="exp-desc" placeholder="เช่น ค่าหลอดไฟถนนส่วนกลาง 10 หลอด" required>
+                <input type="text" id="exp-desc" placeholder="เช่น ค่าหลอดไฟถนนส่วนกลาง 10 หลอด" required style="border-color: #991b1b;">
               </div>
               <div style="display: flex; gap: 10px;">
                 <div class="form-group" style="flex: 1;">
                   <label>จำนวนเงิน (฿) *</label>
-                  <input type="number" id="exp-amount" placeholder="0" required>
+                  <input type="number" id="exp-amount" placeholder="0" required style="border-color: #991b1b; color: #fca5a5; font-weight: bold;">
                 </div>
                 <div class="form-group" style="flex: 1;">
                   <label>ช่องทางจ่ายเงิน</label>
-                  <select id="exp-method">
+                  <select id="exp-method" style="border-color: #991b1b;">
                     <option value="เงินสด">เงินสด</option>
                     <option value="โอนเงิน/บัญชีบริษัท">โอนเงิน / บัญชีบริษัท</option>
                     <option value="เช็คธนาคาร">เช็คธนาคาร</option>
@@ -1352,11 +1380,56 @@
                 <label>📎 อัปโหลดหลักฐานการจ่ายเงิน (สลิป / หน้าเช็ค)</label>
                 <input type="file" id="exp-file" accept="image/*,application/pdf" onchange="previewExpenseFile(event)">
               </div>
-              <button type="submit" class="btn-primary" id="btn-submit-expense" style="background: linear-gradient(135deg, #dc2626, #991b1b);">💾 บันทึกรายจ่าย</button>
+              <button type="submit" class="btn-primary" id="btn-submit-expense" style="background: linear-gradient(135deg, #dc2626, #991b1b); box-shadow: 0 4px 12px rgba(220,38,38,0.4);">
+                💾 บันทึกรายจ่าย
+              </button>
             </form>
           </div>
-
         </div>
+
+        <!-- ฝั่งขวา: ตารางประวัติบันทึกรายจ่ายโครงการพร้อมตัวกรอง -->
+        <div>
+          <div class="card" style="padding: 0; overflow: hidden; border: 2px solid #7f1d1d;">
+            <div class="card-title" style="padding: 16px 20px; border-bottom: 1px solid #450a0a; margin-bottom: 0; color: #fca5a5; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; background: rgba(43, 17, 17, 0.4);">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 16px; font-weight: bold;">💸 ประวัติบันทึกรายจ่ายโครงการ (Expenses Record)</span>
+                <span id="expense-badge" class="badge overdue" style="font-size: 12px;">0 รายการ</span>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <select id="exp-filter-cat" onchange="filterExpensesList()" style="width: auto; padding: 6px 12px; font-size: 12px; background: #1a0808; border: 1px solid #b91c1c; color: #fca5a5; border-radius: 6px;">
+                  <option value="">ทุกหมวดหมู่รายจ่าย</option>
+                  <option value="ค่าซ่อมบำรุงส่วนกลาง">ค่าซ่อมบำรุงส่วนกลาง</option>
+                  <option value="ค่าน้ำ-ค่าไฟส่วนกลาง">ค่าน้ำ-ค่าไฟส่วนกลาง</option>
+                  <option value="ค่าจ้างแม่บ้าน-รปภ.">ค่าจ้างแม่บ้าน-รปภ.</option>
+                  <option value="ค่าใช้จ่ายสำนักงานนิติ">ค่าใช้จ่ายสำนักงานนิติ</option>
+                  <option value="ค่าธรรมเนียมวิชาชีพ/ภาษี">ค่าธรรมเนียมวิชาชีพ/ภาษี</option>
+                  <option value="รายจ่ายอื่นๆ">รายจ่ายอื่นๆ</option>
+                </select>
+                <input type="text" id="exp-search-input" placeholder="🔍 ค้นหารายละเอียด..." oninput="filterExpensesList()" style="width: 160px; padding: 6px 10px; font-size: 12px; background: #1a0808; border: 1px solid #b91c1c; color: #fef3c7; border-radius: 6px;">
+              </div>
+            </div>
+            <div class="table-container" style="max-height: 520px;">
+              <table class="data-table">
+                <thead>
+                  <tr style="background: #2b1111;">
+                    <th>วันที่</th>
+                    <th>หมวดหมู่</th>
+                    <th>รายละเอียด</th>
+                    <th>จำนวนเงิน</th>
+                    <th>ช่องทาง</th>
+                    <th style="text-align: center;">หลักฐาน</th>
+                    <th>ผู้บันทึก</th>
+                    <th style="text-align: center;">จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody id="expenses-table-body">
+                  <tr><td colspan="8" style="text-align: center; padding: 25px; color: var(--text-muted);">กำลังโหลดข้อมูลรายจ่าย...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
       </section>
     </div>
 
@@ -2029,12 +2102,14 @@
 
       if (role === 'Admin') {
         document.getElementById('menu-financial').style.display = 'block';
+        document.getElementById('menu-expenses').style.display = 'block';
         document.getElementById('menu-residents').style.display = 'block';
         document.getElementById('menu-billing').style.display = 'block';
         document.getElementById('menu-procurement').style.display = 'block';
         document.getElementById('menu-admin-hub').style.display = 'block';
       } else if (role === 'Finance') {
         document.getElementById('menu-financial').style.display = 'block';
+        document.getElementById('menu-expenses').style.display = 'block';
         document.getElementById('menu-procurement').style.display = 'block';
       } else if (role === 'AdminDoc') {
         document.getElementById('menu-residents').style.display = 'block';
@@ -2774,17 +2849,48 @@
       });
     }
 
-    // 💸 เรนเดอร์ตารางบันทึกรายจ่าย (ปรับปรุงระบบ Fallback สำหรับข้อมูลเก่าที่ไม่ระบุ ID)
-    function renderExpensesTable(data) {
+    // 💸 ฟังก์ชันกรองตารางรายจ่ายตามหมวดหมู่และคำค้นหา
+    function filterExpensesList() {
+      const catFilter = document.getElementById("exp-filter-cat") ? document.getElementById("exp-filter-cat").value : "";
+      const searchTxt = document.getElementById("exp-search-input") ? document.getElementById("exp-search-input").value.trim().toLowerCase() : "";
+
+      let filtered = (cachedExpenses || []).slice();
+      if (catFilter) {
+        filtered = filtered.filter(item => String(item.Category || "") === catFilter);
+      }
+      if (searchTxt) {
+        filtered = filtered.filter(item => {
+          const d = String(item.Description || "").toLowerCase();
+          const c = String(item.Category || "").toLowerCase();
+          const op = String(item.Operator || "").toLowerCase();
+          const m = String(item['Payment Method'] || "").toLowerCase();
+          return d.includes(searchTxt) || c.includes(searchTxt) || op.includes(searchTxt) || m.includes(searchTxt);
+        });
+      }
+      renderExpensesTable(filtered, false);
+    }
+
+    // 💸 เรนเดอร์ตารางบันทึกรายจ่าย
+    function renderExpensesTable(data, shouldRecalcKPIs = true) {
       const tbody = document.getElementById("expenses-table-body");
+      if (!tbody) return;
       tbody.innerHTML = "";
 
+      const badge = document.getElementById("expense-badge");
+      if (badge && data) {
+        badge.innerText = `${data.length} รายการ`;
+      }
+
+      if (shouldRecalcKPIs) {
+        calculateExpenseKPIs(cachedExpenses);
+      }
+
       if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีรายการบันทึกรายจ่าย</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 25px; color: var(--text-muted);">ยังไม่มีรายการบันทึกรายจ่าย (หรือไม่มีรายการที่ตรงกับเงื่อนไขค้นหา)</td></tr>`;
         return;
       }
 
-      data.forEach(item => {
+      data.slice().reverse().forEach(item => {
         const formattedDate = formatDisplayDate(item.Date);
         const amt = Number(item.Amount || 0);
         const attachUrl = item.AttachmentUrl || item.Attachment || "-";
@@ -2821,6 +2927,157 @@
       });
     }
 
+    // 💸 คำนวณ KPI การเงินแท็บรายจ่าย 4 การ์ด
+    function calculateExpenseKPIs(expenses) {
+      if (!expenses || !Array.isArray(expenses)) return;
+
+      let monthTotal = 0;
+      let cashTotal = 0;
+      let transferTotal = 0;
+
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth();
+
+      expenses.forEach(item => {
+        const amt = Number(item.Amount || 0);
+        const method = String(item['Payment Method'] || '');
+        const dateVal = item.Date ? new Date(item.Date) : null;
+
+        // คำนวณยอดเดือนปัจจุบัน (หรือรวมทั้งหมดถ้าแปลงวันที่ไม่ได้)
+        if (dateVal && !isNaN(dateVal.getTime())) {
+          if (dateVal.getFullYear() === currentYear && dateVal.getMonth() === currentMonth) {
+            monthTotal += amt;
+          }
+        } else {
+          monthTotal += amt;
+        }
+
+        if (method.includes("เงินสด")) {
+          cashTotal += amt;
+        } else {
+          transferTotal += amt;
+        }
+      });
+
+      const elMonth = document.getElementById("exp-kpi-month-total");
+      const elCash = document.getElementById("exp-kpi-cash-total");
+      const elTransfer = document.getElementById("exp-kpi-transfer-total");
+      const elCount = document.getElementById("exp-kpi-count");
+
+      if (elMonth) elMonth.innerText = "฿" + monthTotal.toLocaleString();
+      if (elCash) elCash.innerText = "฿" + cashTotal.toLocaleString();
+      if (elTransfer) elTransfer.innerText = "฿" + transferTotal.toLocaleString();
+      if (elCount) elCount.innerText = expenses.length.toLocaleString() + " รายการ";
+    }
+
+    // 📥 บันทึกรับชำระเงิน
+    async function submitPayment(event) {
+      event.preventDefault();
+      const btn = document.getElementById("btn-submit-payment");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังบันทึกรับเงิน...";
+
+      const rawUnit = document.getElementById("form-unit").value.trim();
+      const resName = document.getElementById("form-name").value.trim();
+      const feeType = document.getElementById("form-fee-type").value.trim();
+      const amountVal = document.getElementById("form-amount").value;
+      const payMethod = document.getElementById("form-payment-method").value;
+      const statusVal = document.getElementById("form-status").value;
+
+      const payload = {
+        type: "payment",
+        operator: currentUser?.username || "Staff",
+        operatorRole: currentUser?.role || "Finance",
+        unitNumber: rawUnit,
+        residentName: resName,
+        feeType: feeType,
+        amount: amountVal,
+        paymentMethod: payMethod,
+        status: statusVal
+      };
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        }, 3, 1500, "กำลังบันทึกรับชำระเงิน", "กำลังออกใบเสร็จและตัดยอดคิว...");
+
+        if (resJson.status === "success") {
+          showExpToast(resJson.expAdded || 5, "บันทึกรับชำระเงิน");
+          alert(`✅ บันทึกรับเงินสำเร็จ! เลขที่ใบเสร็จ: ${resJson.docNo || '-'}`);
+          document.getElementById("payment-form").reset();
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "บันทึกรับชำระเงิน & ตัดยอดคิว";
+      }
+    }
+
+    // 💸 อัปโหลดตัวอย่างไฟล์สลิปรายจ่าย
+    function previewExpenseFile(e) {
+      const file = e.target.files[0];
+      if (file) {
+        expenseFileName = file.name;
+        expenseFileMime = file.type || "image/jpeg";
+        const reader = new FileReader();
+        reader.onload = function(evt) { expenseFileBase64 = evt.target.result; };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // 💸 ส่งบันทึกรายจ่ายโครงการใหม่
+    async function submitNewExpense(event) {
+      event.preventDefault();
+      const btn = document.getElementById("btn-submit-expense");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังบันทึกรายจ่าย...";
+
+      const payload = {
+        type: "new_expense",
+        operator: currentUser?.username || "Staff",
+        operatorRole: currentUser?.role || "Finance",
+        category: document.getElementById("exp-category").value,
+        description: document.getElementById("exp-desc").value.trim(),
+        amount: document.getElementById("exp-amount").value,
+        paymentMethod: document.getElementById("exp-method").value,
+        fileData: expenseFileBase64,
+        fileName: expenseFileName,
+        mimeType: expenseFileMime
+      };
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        }, 3, 1500, "กำลังบันทึกรายจ่าย", "กำลังอัปโหลดหลักฐานและบันทึกข้อมูล...");
+
+        if (resJson.status === "success") {
+          showExpToast(5, "บันทึกรายจ่ายโครงการ");
+          alert("✅ " + resJson.message);
+          document.getElementById("expense-form").reset();
+          expenseFileBase64 = null;
+          expenseFileName = "";
+          expenseFileMime = "";
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "💾 บันทึกรายจ่าย";
+      }
+    }
+
     function filterTable() {
       const query = document.getElementById("global-search").value.toLowerCase();
       renderTable(cachedPayments.filter(item => {
@@ -2847,12 +3104,13 @@
       document.getElementById("total-income").innerText = "฿" + income.toLocaleString();
       document.getElementById("total-expense").innerText = "฿" + totalExp.toLocaleString();
       document.getElementById("net-balance").innerText = "฿" + net.toLocaleString();
-      // document.getElementById("total-records").innerText = payments.length.toLocaleString(); // if exists
 
       const queueCount = pendingInvoices ? pendingInvoices.length : 0;
       document.getElementById("total-pending-invoices").innerText = queueCount.toLocaleString();
       document.getElementById("queue-badge").innerText = `${queueCount} รายการ`;
-      document.getElementById("expense-badge").innerText = `${expenses ? expenses.length : 0} รายการ`;
+      if (document.getElementById("expense-badge")) {
+        document.getElementById("expense-badge").innerText = `${expenses ? expenses.length : 0} รายการ`;
+      }
 
       // 🛑 ปรับปรุงการคำนวณยอดของบิลทั้งหมด โดยตัดบิล "ยกเลิกแล้ว" ทิ้ง
       let salesSum = 0, salesPendingCount = 0, salesSettledCount = 0, activeSalesCount = 0;
