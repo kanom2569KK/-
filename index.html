@@ -2199,12 +2199,15 @@
       const tbody = document.getElementById("sales-tracking-tbody");
       tbody.innerHTML = "";
 
-      if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีประวัติการออกเอกสาร</td></tr>`;
+      // 🛑 กรองรายการที่สถานะเป็น "Cancelled" ออกไป ไม่ให้แสดงในตาราง
+      const filteredData = data ? data.filter(item => item.status !== "Cancelled") : [];
+
+      if (filteredData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีประวัติการออกเอกสาร (หรือรายการถูกยกเลิกทั้งหมด)</td></tr>`;
         return;
       }
 
-      data.slice().reverse().forEach(item => {
+      filteredData.slice().reverse().forEach(item => {
         const formattedDate = formatDisplayDate(item.date || item.timestamp);
         const status = item.status || "Pending";
         const amt = Number(item.amount || 0);
@@ -2212,9 +2215,8 @@
 
         let statusBadge = `<span class="badge pending">รอดำเนินการ</span>`;
         if (status === "Settled" || status === "Paid") statusBadge = `<span class="badge paid">ชำระแล้ว</span>`;
-        if (status === "Cancelled") statusBadge = `<span class="badge overdue">ยกเลิกแล้ว</span>`;
         if (status === "Quotation") statusBadge = `<span class="badge pending" style="background:rgba(2,132,199,0.3); color:#38bdf8; border-color:#0284c7;">ใบเสนอราคา</span>`;
-
+        
         const dStr = String(docNo).replace(/'/g, "\\'");
         const btnCancelHtml = (status === "Pending" || status === "Quotation" || currentUser?.role === "Admin") 
           ? `<button type="button" class="btn-action" style="background: #dc2626;" onclick="handleCancelInvoice('${dStr}')">🚫 ยกเลิกบิล</button>` 
@@ -2361,13 +2363,13 @@
           : `<span style="color: var(--text-muted); font-size: 12px;">-</span>`;
 
         const isAdmin = (currentUser?.role === "Admin");
-        const btnAttachText = (attachUrl && attachUrl !== "-" && attachUrl.startsWith("http")) ? "✏️️ เปลี่ยนไฟล์" : "📤 แนบไฟล์";
+        const btnAttachText = (attachUrl && attachUrl !== "-" && attachUrl.startsWith("http")) ? "✏ เปลี่ยนไฟล์" : "📤 แนบไฟล์";
         
         let actionHtml = `<div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">`;
         actionHtml += `<button type="button" class="btn-action" style="background: #0f766e;" onclick="openVoucherModal('${expIdStr}')">📄 ดู/พิมพ์</button>`;
 
         if (isAdmin) {
-            actionHtml += `<button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openExpenseUpdateModal('${expIdStr}', true)">🛠️️ แก้ไข</button>`;
+            actionHtml += `<button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openExpenseUpdateModal('${expIdStr}', true)">🛠 แก้ไข</button>`;
         } else {
             actionHtml += `<button type="button" class="btn-action" style="background: #d97706;" onclick="openExpenseUpdateModal('${expIdStr}')">${btnAttachText}</button>`;
         }
@@ -2412,22 +2414,26 @@
       document.getElementById("total-income").innerText = "฿" + income.toLocaleString();
       document.getElementById("total-expense").innerText = "฿" + totalExp.toLocaleString();
       document.getElementById("net-balance").innerText = "฿" + net.toLocaleString();
-      document.getElementById("total-records").innerText = payments.length.toLocaleString();
+      // document.getElementById("total-records").innerText = payments.length.toLocaleString(); // if exists
 
       const queueCount = pendingInvoices ? pendingInvoices.length : 0;
       document.getElementById("total-pending-invoices").innerText = queueCount.toLocaleString();
       document.getElementById("queue-badge").innerText = `${queueCount} รายการ`;
       document.getElementById("expense-badge").innerText = `${expenses ? expenses.length : 0} รายการ`;
 
-      let salesSum = 0, salesPendingCount = 0, salesSettledCount = 0;
+      // 🛑 ปรับปรุงการคำนวณยอดของบิลทั้งหมด โดยตัดบิล "ยกเลิกแล้ว" ทิ้ง
+      let salesSum = 0, salesPendingCount = 0, salesSettledCount = 0, activeSalesCount = 0;
       if (allInvoices && Array.isArray(allInvoices)) {
         allInvoices.forEach(inv => {
-          salesSum += Number(inv.amount || 0);
+          if (inv.status !== "Cancelled") {
+            salesSum += Number(inv.amount || 0);
+            activeSalesCount++;
+          }
           if (inv.status === "Pending") salesPendingCount++;
           if (inv.status === "Settled" || inv.status === "Paid") salesSettledCount++;
         });
         document.getElementById("sales-total-amount").innerText = "฿" + salesSum.toLocaleString();
-        document.getElementById("sales-total-count").innerText = allInvoices.length.toLocaleString();
+        document.getElementById("sales-total-count").innerText = activeSalesCount.toLocaleString();
         document.getElementById("sales-pending-count").innerText = salesPendingCount.toLocaleString();
         document.getElementById("sales-settled-count").innerText = salesSettledCount.toLocaleString();
       }
@@ -2734,504 +2740,4 @@
         alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.innerText = "💾 บันทึกตั้งค่าเลขที่รันเอกสาร";
-      }
-    }
-
-    async function handleGenerateInvoice(event) {
-      event.preventDefault();
-      const unitVal = document.getElementById("inv-unit").value.trim();
-      const resNameVal = document.getElementById("inv-res-name").value.trim();
-      const monthVal = document.getElementById("inv-month").value;
-      const docTypeVal = document.getElementById("inv-doc-type").value;
-
-      const container = document.getElementById("invoice-items-container");
-      const rows = container.getElementsByClassName("invoice-item-row");
-      const itemsList = [];
-      let calculatedGrandTotal = 0;
-
-      for (let row of rows) {
-        const desc = row.querySelector(".item-desc-input").value.trim();
-        const amt = Number(row.querySelector(".item-amt-input").value || 0);
-        if (desc && amt > 0) {
-          itemsList.push({ description: desc, amount: amt });
-          calculatedGrandTotal += amt;
-        }
-      }
-
-      if (!unitVal || itemsList.length === 0 || calculatedGrandTotal <= 0) {
-        alert("⚠️ กรุณาระบุเลขยูนิต และกรอกรายการค่าใช้จ่ายพร้อมจำนวนเงินอย่างน้อย 1 รายการ");
-        return;
-      }
-
-      const summaryFeeType = itemsList.map(i => i.description).join(" | ");
-      const targetKey = cleanUnitKey(unitVal);
-      const matchedResident = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
-
-      const btn = document.getElementById("btn-generate-inv");
-      btn.disabled = true;
-      btn.innerText = "⏳ กำลังประมวลผล...";
-
-      try {
-        const resJson = await fetchWithRetry(API_URL, { 
-          method: "POST", 
-          headers: { "Content-Type": "text/plain;charset=utf-8" }, 
-          body: JSON.stringify({ 
-            type: "generate_invoice", 
-            operator: currentUser?.username, 
-            operatorRole: currentUser?.role, 
-            unitNumber: unitVal, 
-            residentName: resNameVal,
-            billingMonth: monthVal, 
-            feeType: summaryFeeType,
-            amount: calculatedGrandTotal,
-            docType: docTypeVal,
-            items: itemsList
-          }) 
-        }, 3, 1500, `กำลังออกเอกสาร ${docTypeVal}`, "กำลังบันทึกข้อมูลและรันลำดับเอกสาร...");
-
-        if (resJson.status === "success") {
-          showExpToast(resJson.expAdded, "ออกเอกสารการขายสำเร็จ");
-
-          const now = new Date();
-          const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-          const dStr = `${now.getDate()} ${thaiMonths[now.getMonth()]} ${now.getFullYear() + 543}`;
-
-          let displayMonth = monthVal;
-          if (monthVal && monthVal.includes("-")) {
-            const parts = monthVal.split("-");
-            const mIndex = parseInt(parts[1], 10) - 1;
-            const yThai = parseInt(parts[0], 10) + 543;
-            displayMonth = `${thaiMonths[mIndex]} ${yThai}`;
-          }
-
-          if (docTypeVal === "QUOTATION") {
-            document.getElementById("print-doc-title-th").innerText = "ใบเสนอราคา / ใบจอง";
-            document.getElementById("print-doc-title-en").innerText = "QUOTATION";
-            document.getElementById("print-label-customer").innerText = "เสนอราคาสำหรับ (ลูกค้า):";
-            document.getElementById("print-total-label").innerText = "รวมยอดเงินทั้งสิ้น (Total Amount):";
-          } else {
-            document.getElementById("print-doc-title-th").innerText = "ใบแจ้งหนี้";
-            document.getElementById("print-doc-title-en").innerText = "INVOICE";
-            document.getElementById("print-label-customer").innerText = "ผู้รับใบแจ้งหนี้ (เจ้าของร่วม):";
-            document.getElementById("print-total-label").innerText = "รวมยอดที่ต้องชำระทั้งสิ้น (Total Due):";
-          }
-
-          document.getElementById("print-sig-left-title").innerText = "เจ้าหน้าที่ฝ่ายจัดทำเอกสาร";
-          document.getElementById("print-payment-note").style.display = "block";
-          document.getElementById("print-finance-name").innerText = " ............................................................ ";
-          document.getElementById("row-print-deed").style.display = "table-row";
-          document.getElementById("row-print-month-full").style.display = "none";
-
-          document.getElementById("print-inv-no").innerText = resJson.docNo || "DOC-AUTO";
-          document.getElementById("print-inv-date").innerText = dStr;
-          document.getElementById("print-res-name").innerText = resNameVal || resJson.residentName || "-";
-          document.getElementById("print-res-unit").innerText = unitVal;
-          document.getElementById("print-res-deed").innerText = matchedResident?.titleDeedNo || "-";
-          document.getElementById("print-inv-month").innerText = displayMonth || "ประจำเดือนปัจจุบัน";
-          document.getElementById("print-res-address").innerText = matchedResident?.currentAddress || `แปลงที่ ${unitVal} โครงการอุดมสุขเพลส`;
-          
-          const printTbody = document.getElementById("print-items-tbody");
-          printTbody.innerHTML = "";
-          itemsList.forEach((it, idx) => {
-            printTbody.innerHTML += `
-              <tr>
-                <td style="text-align: center;">${idx + 1}</td>
-                <td><strong>${it.description}</strong></td>
-                <td style="text-align: right; font-weight: bold;">${it.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
-              </tr>
-            `;
-          });
-
-          document.getElementById("print-fee-total").innerText = "฿" + calculatedGrandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 });
-          document.getElementById("print-operator-name").innerText = currentUser?.fullName || "ผู้จัดทำเอกสาร";
-
-          await loadDashboardData();
-          document.body.className = "print-mode-inv";
-          window.print();
-          document.body.className = "";
-        } else {
-          alert("❌ " + resJson.message);
-        }
-      } catch (err) {
-        alert("⚠️ เชื่อมต่อเซิร์ฟเวอร์ขัดข้อง: " + err.message);
-      } finally {
-        btn.disabled = false;
-        switchDocTypeForm(docTypeVal);
-      }
-    }
-
-    async function handleCancelInvoice(docNo) {
-      if (!confirm(`คุณแน่ใจหรือไม่ว่าต้องการยกเลิกเอกสารเลขที่ [${docNo}]?`)) return;
-
-      try {
-        const resJson = await fetchWithRetry(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            type: "cancel_invoice",
-            operator: currentUser?.username,
-            operatorRole: currentUser?.role,
-            docNo: docNo
-          })
-        }, 3, 1500, "กำลังยกเลิกเอกสาร", "กำลังอัปเดตสถานะในระบบ...");
-
-        if (resJson.status === "success") {
-          alert("✅ " + resJson.message);
-          await loadDashboardData();
-        } else {
-          alert("❌ " + resJson.message);
-        }
-      } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อ: " + err.message);
-      }
-    }
-
-    async function handlePrintReceipt(unit, residentName, feeType, amount, payMethod, existingDocNo) {
-      showExpToast(2, "พิมพ์ใบเสร็จรับเงิน");
-      
-      const targetKey = cleanUnitKey(unit);
-      const matchedResident = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
-      const now = new Date();
-      const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-      const dStr = `${now.getDate()} ${thaiMonths[now.getMonth()]} ${now.getFullYear() + 543}`;
-
-      document.getElementById("print-doc-title-th").innerText = "ใบเสร็จรับเงิน";
-      document.getElementById("print-doc-title-en").innerText = "RECEIPT";
-      document.getElementById("print-label-customer").innerText = "ได้รับเงินจาก (ผู้ชำระเงิน):";
-      document.getElementById("print-total-label").innerText = "จำนวนเงินที่ได้รับชำระทั้งสิ้น (Total Paid):";
-      document.getElementById("print-sig-left-title").innerText = "เจ้าหน้าที่ฝ่ายจัดทำเอกสาร";
-      document.getElementById("print-payment-note").style.display = "none";
-      
-      document.getElementById("row-print-deed").style.display = "none";
-      document.getElementById("row-print-month-full").style.display = "table-row";
-
-      document.getElementById("print-inv-no").innerText = (existingDocNo && existingDocNo !== "-") ? existingDocNo : "REC-AUTO";
-      document.getElementById("print-inv-date").innerText = dStr;
-      document.getElementById("print-res-name").innerText = residentName || "-";
-      document.getElementById("print-res-unit").innerText = unit;
-      document.getElementById("print-inv-month-full").innerText = `ชำระค่าบริการ (${feeType}) ผ่านช่องทาง: ${payMethod || 'โอนเงิน / QR'}`;
-      document.getElementById("print-res-address").innerText = matchedResident?.currentAddress || `แปลงที่ ${unit} โครงการอุดมสุขเพลส`;
-      
-      const printTbody = document.getElementById("print-items-tbody");
-      printTbody.innerHTML = `
-        <tr>
-          <td style="text-align: center;">1</td>
-          <td><strong>${feeType}</strong></td>
-          <td style="text-align: right; font-weight: bold;">${Number(amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
-        </tr>
-      `;
-
-      document.getElementById("print-fee-total").innerText = "฿" + Number(amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
-      document.getElementById("print-operator-name").innerText = "ฝ่ายธุรการ / ระบบ";
-      document.getElementById("print-finance-name").innerText = currentUser?.fullName || "ฝ่ายการเงิน (ผู้รับเงิน)";
-
-      fetchWithRetry(API_URL, { 
-        method: "POST", 
-        headers: { "Content-Type": "text/plain;charset=utf-8" }, 
-        body: JSON.stringify({ type: "print_receipt", operator: currentUser?.username, unitNumber: unit }) 
-      }, 3, 1500, "กำลังเตรียมพิมพ์ใบเสร็จ", "บันทึกประวัติการพิมพ์ลงระบบ...");
-
-      document.body.className = "print-mode-inv";
-      window.print();
-      document.body.className = "";
-    }
-
-    async function submitPayment(event) {
-      event.preventDefault();
-      const targetKey = cleanUnitKey(document.getElementById("form-unit").value);
-      if (cachedResidents.length > 0 && !cachedResidents.some(r => cleanUnitKey(r.unitNumber) === targetKey)) { 
-        openRoModal(document.getElementById("form-unit").value.trim()); 
-        return; 
-      }
-      const btn = document.getElementById("btn-submit-payment"); btn.disabled = true; btn.innerText = "⏳ กำลังบันทึกและตัดยอดคิว...";
-      const payload = {
-        type: "payment", operator: currentUser?.username, operatorRole: currentUser?.role, unitNumber: document.getElementById("form-unit").value.trim(),
-        residentName: document.getElementById("form-name").value, feeType: document.getElementById("form-fee-type").value.trim(), amount: document.getElementById("form-amount").value, paymentMethod: document.getElementById("form-payment-method").value, status: document.getElementById("form-status").value
-      };
-      try {
-        const resJson = await fetchWithRetry(API_URL, { 
-          method: "POST", 
-          headers: { "Content-Type": "text/plain;charset=utf-8" }, 
-          body: JSON.stringify(payload) 
-        }, 3, 1500, "กำลังบันทึกรับชำระเงิน", "กำลังออกเลขใบเสร็จ & เคลียร์คิวแจ้งหนี้...");
-
-        if(resJson.status === "success") {
-          showExpToast(resJson.expAdded || 5, (payload.status==="Overdue"||payload.feeType.includes("ค่าปรับ"))?"ทวงหนี้สำเร็จ":"รับชำระเงินสำเร็จ");
-          alert(`✅ บันทึกรายการสำเร็จ!\nออกใบเสร็จรับเงินเลขที่: ${resJson.docNo || '-'}`);
-          document.getElementById("payment-form").reset();
-          await loadDashboardData();
-        } else { alert("❌ " + resJson.message); }
-      } catch (err) { alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message); } 
-      finally { btn.disabled = false; btn.innerText = "บันทึกรับชำระเงิน & ตัดยอดคิว"; }
-    }
-
-    function previewExpenseFile(e) {
-      const file = e.target.files[0];
-      if (file) {
-        expenseFileName = file.name;
-        expenseFileMime = file.type || "image/jpeg";
-        const reader = new FileReader();
-        reader.onload = function(evt) { expenseFileBase64 = evt.target.result; };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    async function submitNewExpense(event) {
-      event.preventDefault();
-      const btn = document.getElementById("btn-submit-expense");
-      btn.disabled = true;
-      btn.innerText = "⏳ กำลังบันทึกรายจ่าย...";
-
-      const payload = {
-        type: "new_expense",
-        operator: currentUser?.username,
-        operatorRole: currentUser?.role,
-        category: document.getElementById("exp-category").value,
-        description: document.getElementById("exp-desc").value.trim(),
-        amount: document.getElementById("exp-amount").value,
-        paymentMethod: document.getElementById("exp-method").value,
-        fileData: expenseFileBase64,
-        fileName: expenseFileName,
-        mimeType: expenseFileMime
-      };
-
-      try {
-        const resJson = await fetchWithRetry(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
-        }, 3, 1500, "กำลังบันทึกรายจ่าย", "อัปโหลดหลักฐานไปยัง Expense_Receipts & บันทึกชีต...");
-
-        if (resJson.status === "success") {
-          showExpToast(5, "บันทึกรายจ่ายโครงการ");
-          alert("✅ บันทึกรายการรายจ่ายเรียบร้อยแล้ว!");
-          document.getElementById("expense-form").reset();
-          document.getElementById("exp-file").value = "";
-          expenseFileBase64 = null;
-          await loadDashboardData();
-        } else {
-          alert("❌ " + resJson.message);
-        }
-      } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerText = "💾 บันทึกรายจ่าย";
-      }
-    }
-
-    function openCrmModal(unitNumber) {
-      activeCrmUnit = unitNumber;
-      const targetKey = cleanUnitKey(unitNumber);
-      const res = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
-
-      document.getElementById("crm-modal-unit").innerText = unitNumber;
-      document.getElementById("crm-modal-name").value = res ? res.residentName : "ยูนิตยังไม่ลงทะเบียน";
-      document.getElementById("crm-modal-owner").value = res ? (res.ownerName || res.residentName) : "-";
-      document.getElementById("crm-modal-history").value = res ? (res.notes || "ไม่มีประวัติบันทึก") : "ยูนิตยังไม่ลงทะเบียน";
-      document.getElementById("crm-modal-new-note").value = "";
-
-      document.getElementById("crm-note-modal").style.display = "flex";
-    }
-
-    function closeCrmModal() {
-      document.getElementById("crm-note-modal").style.display = "none";
-      activeCrmUnit = "";
-    }
-
-    async function submitCrmNote() {
-      const noteVal = document.getElementById("crm-modal-new-note").value.trim();
-      if (!noteVal || !activeCrmUnit) {
-        alert("⚠️ กรุณาระบุข้อความโน้ตติดตามงาน");
-        return;
-      }
-
-      try {
-        const resJson = await fetchWithRetry(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            type: "update_resident",
-            operator: currentUser?.username,
-            operatorRole: currentUser?.role,
-            unitNumber: activeCrmUnit,
-            notes: noteVal,
-            crmNoteOnly: true
-          })
-        }, 3, 1500, "กำลังบันทึก CRM Note", "กำลังอัปเดตประวัติการติดตามงาน...");
-
-        if (resJson.status === "success") {
-          alert("✅ " + resJson.message);
-          closeCrmModal();
-          await loadDashboardData();
-        } else {
-          alert("❌ " + resJson.message);
-        }
-      } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
-      }
-    }
-
-    function previewResidentPhoto(e) {
-      const file = e.target.files[0];
-      if (file) {
-        residentPhotoName = file.name; residentPhotoMime = file.type || "image/jpeg";
-        const reader = new FileReader();
-        reader.onload = function(evt) { residentPhotoBase64 = evt.target.result; };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    async function submitNewResident(event) {
-      event.preventDefault();
-      const inputUnit = document.getElementById("res-unit").value.trim();
-      const targetKey = cleanUnitKey(inputUnit);
-
-      const duplicateFound = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
-      if (duplicateFound) {
-        alert(`⚠️ ยูนิต/แปลง [${inputUnit}] มีข้อมูลอยู่ในระบบแล้ว (เจ้าของ/ผู้เช่าเดิมคือ: "${duplicateFound.residentName}") ไม่สามารถลงทะเบียนซ้ำได้!\n\nกรุณากดปุ่ม '📜 รายชื่อลูกบ้านทั้งหมด' เพื่อทำการแก้ไขข้อมูลแทน`);
-        document.getElementById("res-unit").focus();
-        return;
-      }
-
-      const btn = document.getElementById("btn-submit-resident"); 
-      btn.disabled = true; 
-      btn.innerText = "⏳ กำลังตรวจสอบและสร้างโฟลเดอร์...";
-      
-      const payload = {
-        type: "new_resident", 
-        operator: currentUser?.username, 
-        operatorRole: currentUser?.role, 
-        residentType: document.getElementById("res-type").value,
-        unitNumber: inputUnit,
-        residentName: document.getElementById("res-name").value.trim(), 
-        ownerName: document.getElementById("res-owner-name") ? document.getElementById("res-owner-name").value.trim() : "",
-        ownerPhone: document.getElementById("res-owner-phone") ? document.getElementById("res-owner-phone").value.trim() : "",
-        titleDeedNo: document.getElementById("res-deed").value.trim(), 
-        phone: document.getElementById("res-phone").value.trim(), 
-        email: document.getElementById("res-email").value.trim(), 
-        idCardAddress: document.getElementById("res-id-address").value.trim(), 
-        currentAddress: document.getElementById("res-cur-address").value.trim(), 
-        moveInDate: Utilities_getTodayDate(), 
-        outstandingBalance: 0, 
-        notes: "-", 
-        photoData: residentPhotoBase64, 
-        photoName: residentPhotoName, 
-        photoMimeType: residentPhotoMime
-      };
-
-      try {
-        const resJson = await fetchWithRetry(API_URL, { 
-          method: "POST", 
-          headers: { "Content-Type": "text/plain;charset=utf-8" }, 
-          body: JSON.stringify(payload) 
-        }, 3, 1500, "กำลังลงทะเบียนลูกบ้านใหม่", "กำลังสร้างโฟลเดอร์บน Google Drive & บันทึกชีต...");
-        
-        if (resJson.status === "success") {
-          showExpToast(15, "ลงทะเบียนลูกบ้าน");
-          alert("✅ บันทึกข้อมูลและสร้างโฟลเดอร์สำเร็จ!");
-          document.getElementById("resident-form").reset();
-          document.getElementById("res-photo").value = "";
-          toggleOwnerFields("Owner");
-          residentPhotoBase64 = null;
-          await loadDashboardData();
-          if (currentUser.role === 'Admin' || currentUser.role === 'Finance') { switchTab('financial'); }
-        } else {
-          alert(resJson.message);
-        }
-      } catch (err) { 
-        alert("⚠️️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message); 
-      } finally { 
-        btn.disabled = false; 
-        btn.innerText = "บันทึกข้อมูล & สร้างโฟลเดอร์"; 
-      }
-    }
-
-    async function handleAdminFactoryReset() {
-      const confirm1 = confirm("🚨 คำเตือนสำคัญ!\n\nคุณแน่ใจหรือไม่ว่าต้องการ 'ล้างข้อมูลการทดสอบทั้งหมด' ใน Google Sheets (ทะเบียนลูกบ้าน, คิวแจ้งหนี้, ประวัติรับเงิน)?\n\nข้อมูลเหล่านี้จะถูกล้างทิ้งและไม่สามารถกู้คืนได้");
-      if (!confirm1) return;
-
-      const confirm2 = prompt("กรุณาพิมพ์คำว่า 'RESET' เพื่อยืนยันการล้างข้อมูล:");
-      if (confirm2 !== "RESET") {
-        alert("❌ ยกเลิกการรีเซ็ต (คุณพิมพ์คำยืนยันไม่ถูกต้อง)");
-        return;
-      }
-
-      const btn = document.getElementById("btn-admin-reset");
-      btn.disabled = true;
-      btn.innerText = "⏳ กำลังล้างข้อมูลใน Google Sheets...";
-
-      try {
-        const resJson = await fetchWithRetry(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            type: "admin_factory_reset",
-            operator: currentUser?.username,
-            operatorRole: currentUser?.role
-          })
-        }, 3, 1500, "กำลังรีเซ็ตระบบ", "กำลังล้างข้อมูลใน Google Sheets ทั้งหมด...");
-
-        if (resJson.status === "success") {
-          alert("🎉 " + resJson.message);
-          cachedPayments = [];
-          cachedExpenses = [];
-          cachedResidents = [];
-          cachedProcurement = [];
-          cachedPendingInvoices = [];
-          cachedAllInvoices = [];
-          await loadDashboardData();
-          switchTab('financial');
-        } else {
-          alert("❌ " + resJson.message);
-        }
-      } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อ: " + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerText = "🗑️ ล้างข้อมูลใน Sheet และรีเซ็ตระบบทั้งหมด (เริ่มรอบใหม่)";
-      }
-    }
-
-    function Utilities_getTodayDate() {
-      const d = new Date();
-      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    }
-
-    const dropZone = document.getElementById("drop-zone");
-    const fileInput = document.getElementById("file-input");
-    const uploadList = document.getElementById("upload-list");
-
-    if (dropZone && fileInput) {
-      dropZone.addEventListener("click", () => fileInput.click());
-      dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.style.background = "rgba(180,83,9,0.2)"; });
-      dropZone.addEventListener("dragleave", () => { dropZone.style.background = "rgba(180,83,9,0.08)"; });
-      dropZone.addEventListener("drop", (e) => { e.preventDefault(); dropZone.style.background = "rgba(180,83,9,0.08)"; if (e.dataTransfer.files.length > 0) handleFiles(e.dataTransfer.files); });
-      fileInput.addEventListener("change", (e) => { if (e.target.files.length > 0) handleFiles(e.target.files); });
-    }
-
-    function handleFiles(files) {
-      document.getElementById("upload-status-box").style.display = "block";
-      Array.from(files).forEach(file => {
-        const itemEl = document.createElement("div");
-        itemEl.style.padding = "10px"; itemEl.style.background = "#231106"; itemEl.style.borderRadius = "8px"; itemEl.style.border = "2px solid #140803";
-        itemEl.innerHTML = `<span>📄 ${file.name}</span> <span style="color:var(--accent-gold); float:right;">⏳ อัปโหลด...</span>`;
-        uploadList.prepend(itemEl);
-
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-          try {
-            await fetchWithRetry(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ type: "raw_file_upload", operator: currentUser?.username, fileName: file.name, mimeType: file.type || "application/octet-stream", fileData: e.target.result })}, 3, 1500, "กำลังอัปโหลดไฟล์", "กำลังส่งไฟล์เข้า Google Drive...");
-            itemEl.innerHTML = `<span>✅ ${file.name}</span> <span style="color:#6ee7b7; float:right;">สำเร็จ</span>`;
-            showExpToast(10, "อัปโหลดไฟล์");
-          } catch (err) { itemEl.innerHTML = `<span>✅ ${file.name}</span> <span style="color:#6ee7b7; float:right;">สำเร็จ</span>`; showExpToast(10, "อัปโหลดไฟล์"); }
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    document.addEventListener("DOMContentLoaded", () => { checkAuth(); });
-  </script>
-</body>
-</html>
+        btn.innerText = "💾 บันทึกตั้งค่าเลขที่รัน
