@@ -3460,6 +3460,210 @@
       }
     }
 
+    // 🖨️ ฟังก์ชันพิมพ์ใบเสร็จรับเงิน (Official Receipt)
+    function handlePrintReceipt(unit, residentName, feeType, amount, payMethod, docNo) {
+      try {
+        const cleanKey = cleanUnitKey(unit);
+        const resident = (cachedResidents || []).find(r => cleanUnitKey(r.unitNumber) === cleanKey);
+        
+        // กำหนดหัวเอกสารเป็น ใบเสร็จรับเงิน
+        document.getElementById("print-doc-title-th").innerText = "ใบเสร็จรับเงิน";
+        document.getElementById("print-doc-title-en").innerText = "RECEIPT";
+        
+        // เลขที่เอกสารและวันที่
+        const displayDocNo = (docNo && docNo !== "-") ? docNo : ("REC-" + new Date().getFullYear() + String(new Date().getMonth() + 1).padStart(2, '0') + "-" + String(Math.floor(Math.random() * 9000) + 1000));
+        document.getElementById("print-inv-no").innerText = displayDocNo;
+        document.getElementById("print-inv-date").innerText = formatDisplayDate(new Date().toISOString());
+        
+        // ข้อมูลลูกบ้าน
+        const finalName = (residentName && residentName !== "-") ? residentName : (resident?.residentName || "-");
+        document.getElementById("print-label-customer").innerText = "ผู้ชำระเงิน (ลูกบ้าน):";
+        document.getElementById("print-res-name").innerText = finalName;
+        document.getElementById("print-res-unit").innerText = unit || "-";
+        
+        // เลขโฉนด & ข้อมูลรอบเดือน
+        const deedEl = document.getElementById("print-res-deed");
+        if (deedEl) deedEl.innerText = resident?.titleDeed || resident?.deed || "-";
+        
+        const monthEl = document.getElementById("print-inv-month");
+        if (monthEl) monthEl.innerText = feeType || "ค่าส่วนกลาง / บริการ";
+
+        // ที่อยู่จัดส่ง
+        const houseNo = unit ? (unit.includes("899/") ? unit : `899/${unit}`) : "-";
+        const autoAddress = resident?.currentAddress || resident?.address || `เลขที่ ${houseNo} หมู่ 9 โครงการอุดมสุขเพลส ต.หนองกี่ อ.กบินทร์บุรี จ.ปราจีนบุรี 25110`;
+        document.getElementById("print-res-address").innerText = autoAddress;
+
+        // รายการในตาราง
+        const numAmount = Number(amount || 0);
+        const methodTxt = payMethod ? ` (ชำระโดย: ${payMethod})` : "";
+        const tbody = document.getElementById("print-items-tbody");
+        tbody.innerHTML = `
+          <tr>
+            <td style="text-align: center;">1</td>
+            <td><strong>${feeType || "ค่าส่วนกลาง"}</strong>${methodTxt}</td>
+            <td style="text-align: right; font-weight: bold;">฿${numAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+          </tr>
+        `;
+
+        // ยอดรวม
+        document.getElementById("print-total-label").innerText = "รวมยอดชำระทั้งสิ้น (Total Paid):";
+        document.getElementById("print-fee-total").innerText = "฿" + numAmount.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+        // ข้อความท้ายใบเสร็จ
+        const noteBox = document.getElementById("print-payment-note");
+        if (noteBox) {
+          noteBox.style.background = "#f0fdf4";
+          noteBox.style.borderColor = "#86efac";
+          noteBox.innerHTML = `
+            <strong style="color: #166534;">✅ สถานะการรับชำระเงิน: ได้รับเงินเรียบร้อยแล้ว (PAID)</strong><br>
+            ช่องทางการชำระ: <strong>${payMethod || "โอนเงิน / สแกน QR"}</strong> | ออกโดยระบบนิติบุคคลอุดมสุขเพลส (Official Receipt)<br>
+            เอกสารฉบับนี้พิมพ์จากระบบคอมพิวเตอร์ มีผลสมบูรณ์ตามระเบียบนิติบุคคล
+          `;
+        }
+
+        // ผู้จัดทำและผู้รับเงิน
+        const opName = currentUser?.fullName || currentUser?.username || "เจ้าหน้าที่นิติบุคคล";
+        document.getElementById("print-operator-name").innerText = opName;
+        document.getElementById("print-sig-left-title").innerText = "เจ้าหน้าที่ออกใบเสร็จ";
+        const finNameEl = document.getElementById("print-finance-name");
+        if (finNameEl) finNameEl.innerText = opName;
+
+        // สั่งพิมพ์
+        document.body.className = "print-mode-inv";
+        window.print();
+        document.body.className = "";
+      } catch (err) {
+        console.error("Print Receipt Error:", err);
+        alert("⚠️ เกิดข้อผิดพลาดในการพิมพ์ใบเสร็จ: " + err.message);
+      }
+    }
+
+    // 📑 ฟังก์ชันออกใบแจ้งหนี้ / ใบเสนอราคา & สั่งพิมพ์ (Billing Tab Form)
+    async function handleGenerateInvoice(event) {
+      event.preventDefault();
+      const docType = document.getElementById("inv-doc-type").value;
+      const unit = document.getElementById("inv-unit").value.trim();
+      const resName = document.getElementById("inv-res-name").value.trim();
+      const monthVal = document.getElementById("inv-month").value;
+
+      const container = document.getElementById("invoice-items-container");
+      const rows = container.getElementsByClassName("invoice-item-row");
+      const items = [];
+      let totalAmt = 0;
+
+      for (let r of rows) {
+        const desc = r.querySelector(".item-desc-input").value.trim();
+        const amt = Number(r.querySelector(".item-amt-input").value || 0);
+        if (desc && amt > 0) {
+          items.push({ description: desc, amount: amt });
+          totalAmt += amt;
+        }
+      }
+
+      if (items.length === 0) {
+        alert("⚠️ กรุณาระบุรายการและจำนวนเงินอย่างน้อย 1 รายการ");
+        return;
+      }
+
+      const btn = document.getElementById("btn-generate-inv");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังบันทึกข้อมูล...";
+
+      try {
+        const payload = {
+          type: "create_invoice",
+          docType: docType,
+          unitNumber: unit,
+          residentName: resName,
+          billingMonth: monthVal,
+          items: items,
+          totalAmount: totalAmt,
+          operator: currentUser?.username || "Staff",
+          operatorRole: currentUser?.role || "Staff"
+        };
+
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        }, 3, 1500, "กำลังออกเอกสาร", "กำลังบันทึกข้อมูลไปยัง Google Sheets...");
+
+        if (resJson.status === "success") {
+          const docNo = resJson.docNo || (docType === "QUOTATION" ? "QT-" : "INV-") + Date.now();
+          showExpToast(5, `ออกเอกสาร ${docType}`);
+          
+          // กำหนดข้อมูลลง printable-invoice
+          const isQuotation = docType === "QUOTATION";
+          document.getElementById("print-doc-title-th").innerText = isQuotation ? "ใบเสนอราคา / ใบจอง" : "ใบแจ้งหนี้";
+          document.getElementById("print-doc-title-en").innerText = isQuotation ? "QUOTATION" : "INVOICE";
+          document.getElementById("print-inv-no").innerText = docNo;
+          document.getElementById("print-inv-date").innerText = formatDisplayDate(new Date().toISOString());
+
+          document.getElementById("print-label-customer").innerText = "ผู้รับเอกสาร (ลูกค้า/เจ้าของร่วม):";
+          document.getElementById("print-res-name").innerText = resName;
+          document.getElementById("print-res-unit").innerText = unit;
+
+          const cleanKey = cleanUnitKey(unit);
+          const resident = (cachedResidents || []).find(r => cleanUnitKey(r.unitNumber) === cleanKey);
+          const deedEl = document.getElementById("print-res-deed");
+          if (deedEl) deedEl.innerText = resident?.titleDeed || resident?.deed || "-";
+
+          const monthEl = document.getElementById("print-inv-month");
+          if (monthEl) monthEl.innerText = formatDisplayMonth(monthVal);
+
+          const houseNo = unit.includes("899/") ? unit : `899/${unit}`;
+          const autoAddress = resident?.currentAddress || resident?.address || `เลขที่ ${houseNo} หมู่ 9 โครงการอุดมสุขเพลส ต.หนองกี่ อ.กบินทร์บุรี จ.ปราจีนบุรี 25110`;
+          document.getElementById("print-res-address").innerText = autoAddress;
+
+          const tbody = document.getElementById("print-items-tbody");
+          tbody.innerHTML = "";
+          items.forEach((it, idx) => {
+            tbody.innerHTML += `
+              <tr>
+                <td style="text-align: center;">${idx + 1}</td>
+                <td>${it.description}</td>
+                <td style="text-align: right; font-weight: bold;">฿${it.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+              </tr>
+            `;
+          });
+
+          document.getElementById("print-total-label").innerText = isQuotation ? "รวมยอดเสนอราคาทั้งสิ้น (Total Quotation):" : "รวมยอดที่ต้องชำระทั้งสิ้น (Total Due):";
+          document.getElementById("print-fee-total").innerText = "฿" + totalAmt.toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+          const noteBox = document.getElementById("print-payment-note");
+          if (noteBox) {
+            noteBox.style.background = "#fffbeb";
+            noteBox.style.borderColor = "#fde68a";
+            noteBox.innerHTML = `
+              <strong style="color: #b45309;">📌 ข้อมูลและขั้นตอนการชำระเงิน:</strong><br>
+              1. กรุณานำใบแจ้งหนี้นี้มาชำระ ณ สำนักงานนิติบุคคล หรือชำระผ่านช่องทางโอนเงินเข้าบัญชีบริษัท<br>
+              2. เมื่อชำระเงินเรียบร้อยแล้ว <strong>ฝ่ายการเงินจะดำเนินการออก "ใบเสร็จรับเงินฉบับเต็ม (Official Receipt)"</strong> ให้เป็นหลักฐานทันที
+            `;
+          }
+
+          const opName = currentUser?.fullName || currentUser?.username || "เจ้าหน้าที่";
+          document.getElementById("print-operator-name").innerText = opName;
+          document.getElementById("print-sig-left-title").innerText = isQuotation ? "เจ้าหน้าที่ฝ่ายขาย" : "เจ้าหน้าที่ฝ่ายจัดทำเอกสาร";
+
+          // สั่งพิมพ์
+          document.body.className = "print-mode-inv";
+          window.print();
+          document.body.className = "";
+
+          // โหลดข้อมูลใหม่
+          await loadDashboardData();
+        } else {
+          alert("❌ " + resJson.message);
+        }
+      } catch (err) {
+        console.error("Generate Invoice Error:", err);
+        alert("⚠️ เกิดข้อผิดพลาดในการออกบิล: " + err.message);
+      } finally {
+        btn.disabled = false;
+        switchDocTypeForm(docType);
+      }
+    }
+
     window.onload = function() {
       checkAuth();
     };
