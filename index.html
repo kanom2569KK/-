@@ -2225,6 +2225,16 @@
     function openProfileModal() { updateProfileUI(); document.getElementById("profile-modal-overlay").style.display = "flex"; }
     function closeProfileModal() { document.getElementById("profile-modal-overlay").style.display = "none"; }
 
+    function openUnitLedgerModal(unitNumber) {
+      document.getElementById("ledger-search-unit").value = unitNumber || "";
+      document.getElementById("unit-ledger-modal").style.display = "flex";
+      if (unitNumber) {
+        searchUnitLedger();
+      } else {
+        document.getElementById("ledger-content-box").style.display = "none";
+      }
+    }
+
     function openLedgerModal() {
       document.getElementById("ledger-search-unit").value = "";
       document.getElementById("ledger-content-box").style.display = "none";
