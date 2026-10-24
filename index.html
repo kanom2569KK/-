@@ -403,6 +403,31 @@
       font-weight: bold; color: var(--accent-gold); width: 25px; text-align: center; font-size: 13px;
     }
 
+    /* 📦 Quick Audit Styles */
+    .proc-tab-btn {
+      padding: 7px 14px; background: #1a0c04; border: 2px solid #381808; color: var(--text-muted);
+      border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.2s;
+    }
+    .proc-tab-btn.active {
+      background: linear-gradient(135deg, #d97706, #b45309); color: white; border-color: var(--accent-gold);
+    }
+    .audit-row-item {
+      display: grid; grid-template-columns: 2.2fr 1fr 36px; gap: 8px; align-items: center; margin-bottom: 8px;
+    }
+    .audit-row-item input {
+      padding: 9px 12px; background: #180902; border: 2px solid #140803; color: var(--text-main);
+      border-radius: 8px; font-size: 13px; outline: none;
+    }
+    .audit-row-item input:focus { border-color: var(--accent-gold); }
+    .btn-audit-del {
+      background: #7f1d1d; border: 1px solid #dc2626; color: #fca5a5; height: 38px;
+      border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .audit-review-box {
+      background: #180902; border: 2px solid #381808; border-radius: 12px; padding: 14px;
+      margin-top: 14px; display: none;
+    }
+
     /* ========================================================
        🖨️ PRINT STYLESHEET: โหมดพิมพ์สำหรับ Invoices และ Vouchers
        ======================================================== */
@@ -863,39 +888,85 @@
     </div>
   </div>
 
-  <!-- 📦 MODAL: ปรับแต่งสต็อกพัสดุหน้างาน -->
+  <!-- 📦 MODAL: ปรับแก้ไขข้อมูลและสต็อกพัสดุ (Full Detailed Edit) -->
   <div id="stock-adjust-modal" class="modal-overlay">
-    <div class="ro-window" style="max-width: 500px; width: 90%;">
+    <div class="ro-window" style="max-width: 540px; width: 92%;">
       <div class="ro-header">
-        <span>📦 ปรับแก้ไขสต็อกพัสดุหน้างาน</span>
+        <span>🛠️ ปรับแก้ไขข้อมูลพัสดุและสต็อก (Full Edit)</span>
         <span class="ro-close" onclick="closeStockModal()">✕</span>
       </div>
       <div style="padding: 20px;">
-        <div class="form-group">
-          <label>รหัส / ชื่อพัสดุ:</label>
-          <input type="text" id="stock-modal-code" readonly style="background:#180a03; color:var(--accent-gold); font-weight:bold;">
-        </div>
-        <div class="form-group">
-          <label>ชื่อพัสดุ:</label>
-          <input type="text" id="stock-modal-name" readonly style="background:#180a03; color:var(--text-main);">
-        </div>
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 12px;">
           <div class="form-group" style="flex: 1;">
-            <label>จำนวนคงเหลือหน้างานจริง *</label>
-            <input type="number" id="stock-modal-qty" required>
+            <label>รหัสพัสดุ:</label>
+            <input type="text" id="stock-modal-code" readonly style="background:#180a03; color:var(--accent-gold); font-weight:bold; cursor:not-allowed;">
           </div>
-          <div class="form-group" style="flex: 1;">
-            <label>จุดแจ้งเตือนขั้นต่ำ (Min Alert) *</label>
-            <input type="number" id="stock-modal-min" required>
+          <div class="form-group" style="flex: 2;">
+            <label>ชื่อพัสดุ / สินค้า *</label>
+            <input type="text" id="stock-modal-name" required placeholder="เช่น หลอดไฟ LED 12W, สายไฟ VAF">
           </div>
         </div>
+
+        <div style="display: flex; gap: 12px;">
+          <div class="form-group" style="flex: 1;">
+            <label>หมวดหมู่พัสดุ *</label>
+            <input type="text" id="stock-modal-category" list="proc-categories-list" required placeholder="เช่น อุปกรณ์ไฟฟ้า, ซ่อมบำรุง">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>หน่วยนับ *</label>
+            <input type="text" id="stock-modal-unit" list="proc-units-list" required placeholder="เช่น ม้วน, กล่อง, หลอด, ชิ้น">
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+          <div class="form-group" style="flex: 1;">
+            <label>จำนวนคงเหลือจริง *</label>
+            <input type="number" id="stock-modal-qty" required min="0" step="any">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>เตือนขั้นต่ำ (Min Alert) *</label>
+            <input type="number" id="stock-modal-min" required min="0">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>ราคาต่อหน่วย (฿)</label>
+            <input type="number" id="stock-modal-price" min="0" step="any" placeholder="0">
+          </div>
+        </div>
+
         <div style="display: flex; gap: 10px; margin-top: 14px;">
           <button type="button" class="ro-btn" style="flex: 1;" onclick="closeStockModal()">ยกเลิก</button>
-          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #059669, #047857);" onclick="submitStockAdjustment()">💾 บันทึกปรับสต็อก</button>
+          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #059669, #047857);" onclick="submitStockAdjustment()">💾 บันทึกการแก้ไขข้อมูล</button>
         </div>
       </div>
     </div>
   </div>
+
+  <datalist id="proc-categories-list">
+    <option value="อุปกรณ์ไฟฟ้า">
+    <option value="ประปาและสุขภัณฑ์">
+    <option value="อุปกรณ์ซ่อมบำรุง">
+    <option value="เครื่องเขียนสำนักงาน">
+    <option value="ทำความสะอาด">
+    <option value="วัสดุสิ้นเปลืองทั่วไป">
+  </datalist>
+
+  <datalist id="proc-units-list">
+    <option value="หลอด">
+    <option value="กล่อง">
+    <option value="ม้วน">
+    <option value="เส้น">
+    <option value="ชิ้น">
+    <option value="ถุง">
+    <option value="แกลลอน">
+    <option value="ขวด">
+    <option value="รีม">
+    <option value="ชุด">
+    <option value="ตัว">
+    <option value="ด้าม">
+    <option value="แพ็ก">
+    <option value="คู่">
+    <option value="ใบ">
+  </datalist>
 
   <!-- 📝 MODAL: เพิ่มโน้ตติดตามงานลูกบ้าน (CRM Notes) -->
   <div id="crm-note-modal" class="modal-overlay">
@@ -1629,32 +1700,42 @@
         </div>
       </section>
 
-      <section class="content-grid" style="grid-template-columns: 1.1fr 1.9fr; gap: 20px;">
-        <div class="card">
-          <div class="card-title">📦 บันทึกพัสดุจัดซื้อใหม่</div>
-          <form id="procurement-form" onsubmit="submitNewProcurement(event)">
+      <section class="content-grid" style="grid-template-columns: 1.15fr 1.85fr; gap: 20px;">
+        <div class="card" style="padding: 18px 20px;">
+          <!-- Switcher: ฟอร์มปกติ vs โหมดตรวจนับหน้างานด้วย AI -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 2px dashed #6b3414; padding-bottom: 10px;">
+            <div style="display: flex; gap: 6px;">
+              <button type="button" class="proc-tab-btn" id="btn-proc-mode-normal" onclick="switchProcMode('normal')">📝 บันทึกรับพัสดุ</button>
+              <button type="button" class="proc-tab-btn active" id="btn-proc-mode-audit" onclick="switchProcMode('audit')">⚡ ตรวจนับสต็อก (AI)</button>
+            </div>
+            <span style="font-size: 11px; color: var(--accent-gold); font-weight: bold;">Smart Mode</span>
+          </div>
+
+          <!-- แบบฟอร์มเดิม (ปกติ) -->
+          <form id="procurement-form" onsubmit="submitNewProcurement(event)" style="display: none;">
+            <div class="card-title" style="margin-bottom: 14px;">📦 บันทึกพัสดุจัดซื้อใหม่</div>
             <div class="form-group">
               <label>ชื่อพัสดุ / สินค้า *</label>
-              <input type="text" id="proc-item-name" placeholder="เช่น หลอดไฟ LED 12W, น้ำยาถูพื้น" required>
+              <input type="text" id="proc-item-name" placeholder="เช่น หลอดไฟ LED 12W, น้ำยาถูพื้น">
             </div>
             <div class="form-group">
               <label>หมวดหมู่พัสดุ *</label>
-              <input type="text" id="proc-category" placeholder="เช่น อุปกรณ์ไฟฟ้า, เครื่องเขียน, ทำความสะอาด" required>
+              <input type="text" id="proc-category" placeholder="เช่น อุปกรณ์ไฟฟ้า, เครื่องเขียน, ทำความสะอาด">
             </div>
             <div style="display: flex; gap: 10px;">
               <div class="form-group" style="flex: 1;">
                 <label>จำนวนเริ่มต้น *</label>
-                <input type="number" id="proc-qty" placeholder="0" required>
+                <input type="number" id="proc-qty" placeholder="0">
               </div>
               <div class="form-group" style="flex: 1;">
                 <label>หน่วยนับ *</label>
-                <input type="text" id="proc-unit" placeholder="เช่น หลอด, แกลลอน, กล่อง" required>
+                <input type="text" id="proc-unit" placeholder="เช่น หลอด, แกลลอน, กล่อง">
               </div>
             </div>
             <div style="display: flex; gap: 10px;">
               <div class="form-group" style="flex: 1;">
                 <label>จุดเตือนขั้นต่ำ (Min Alert) *</label>
-                <input type="number" id="proc-min-alert" placeholder="5" value="5" required>
+                <input type="number" id="proc-min-alert" placeholder="5" value="5">
               </div>
               <div class="form-group" style="flex: 1;">
                 <label>ราคาต่อหน่วย (฿)</label>
@@ -1663,6 +1744,51 @@
             </div>
             <button type="submit" class="btn-primary" id="btn-submit-proc" style="background: linear-gradient(135deg, #0284c7, #0369a1);">💾 บันทึกรับพัสดุใหม่เข้าสต็อก</button>
           </form>
+
+          <!-- ⚡ โหมดตรวจนับสต็อกหน้างาน (AI Quick Audit) -->
+          <div id="proc-audit-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <div style="font-size: 15px; font-weight: bold; color: var(--accent-gold);">⚡ ตรวจนับสต็อกหน้างาน (AI Auto-Sort)</div>
+              <button type="button" class="btn-action" style="font-size: 11px; padding: 4px 8px;" onclick="addQuickAuditRow()">➕ เพิ่มรายการ</button>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+              กรอกเพียง <strong>ชื่อของ + จำนวน</strong> หน้างาน ไม่ต้องพิมพ์หมวดหมู่ AI จะจับคู่สต็อกเดิมและแยกหมวดหมู่ให้อัตโนมัติ
+            </p>
+
+            <div id="quick-audit-rows-list">
+              <!-- แถวสำหรับกรอก -->
+            </div>
+
+            <button type="button" class="btn-primary" style="background: linear-gradient(135deg, #d97706, #b45309); margin-top: 10px;" onclick="processQuickAuditAi()">
+              ⚡ ประมวลผล & วิเคราะห์หมวดหมู่ด้วย AI
+            </button>
+
+            <!-- กล่องแสดงผลลัพธ์พรีวิวก่อนบันทึก -->
+            <div id="audit-review-result-box" class="audit-review-box">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 13px; font-weight: bold; color: var(--accent-gold);">📋 ผลวิเคราะห์สต็อก (พร้อมบันทึก)</span>
+                <span style="font-size: 11px; color: var(--text-muted);" id="audit-summary-count">0 รายการ</span>
+              </div>
+              <div style="max-height: 200px; overflow-y: auto; border: 1px solid #381808; border-radius: 8px; margin-bottom: 10px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                  <thead>
+                    <tr style="background: #231106; color: var(--accent-gold); position: sticky; top: 0;">
+                      <th style="padding: 6px 8px; text-align: left;">พัสดุ</th>
+                      <th style="padding: 6px 8px; text-align: left;">หมวดหมู่ (AI)</th>
+                      <th style="padding: 6px 8px; text-align: center;">จำนวน</th>
+                      <th style="padding: 6px 8px; text-align: center;">ผลต่าง</th>
+                    </tr>
+                  </thead>
+                  <tbody id="audit-review-tbody"></tbody>
+                </table>
+              </div>
+              <button type="button" class="btn-primary" id="btn-save-audit-final" style="background: linear-gradient(135deg, #059669, #047857); margin-top: 4px;" onclick="confirmSaveAuditToDatabase()">
+                💾 บันทึกผลการตรวจนับลงสต็อกจริง
+              </button>
+            </div>
+
+          </div>
+
         </div>
 
         <div class="card" style="padding: 0; overflow: hidden;">
@@ -2138,6 +2264,11 @@
         applyRolePermissions(currentUser.role);
         updateProfileUI();
         initInvoiceItems();
+        if (typeof addQuickAuditRow === 'function') {
+          addQuickAuditRow();
+          addQuickAuditRow();
+          addQuickAuditRow();
+        }
         loadDashboardData();
       } else {
         document.getElementById("login-overlay").style.display = "flex";
@@ -2425,7 +2556,7 @@
           await loadDashboardData();
           openCustomerListModal();
         } else {
-          alert("❌ " + resJson.message);
+          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
         }
       } catch (err) {
         alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
@@ -2585,7 +2716,7 @@
           <td>฿${price.toLocaleString()}</td>
           <td>${statusBadge}</td>
           <td style="text-align: center;">
-            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openStockModal('${codeStr}')">⚙️ ปรับสต็อก</button>
+            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-size: 11px; padding: 4px 10px;" onclick="openStockModal('${codeStr}')">✏️ แก้ไขข้อมูล / สต็อก</button>
           </td>
         </tr>`;
       });
@@ -2981,6 +3112,279 @@
       if (elCount) elCount.innerText = expenses.length.toLocaleString() + " รายการ";
     }
 
+    // ==========================================
+    // ⚡ ฟังก์ชันโหมดตรวจนับสต็อกหน้างาน (AI Stock Audit)
+    // ==========================================
+    let quickAuditParsedItems = [];
+
+    function switchProcMode(mode) {
+      const btnNormal = document.getElementById("btn-proc-mode-normal");
+      const btnAudit = document.getElementById("btn-proc-mode-audit");
+      const formNormal = document.getElementById("procurement-form");
+      const formAudit = document.getElementById("proc-audit-container");
+
+      if (mode === "audit") {
+        btnAudit.classList.add("active");
+        btnNormal.classList.remove("active");
+        formAudit.style.display = "block";
+        formNormal.style.display = "none";
+        if (document.querySelectorAll(".audit-row-item").length === 0) {
+          addQuickAuditRow();
+          addQuickAuditRow();
+          addQuickAuditRow();
+        }
+      } else {
+        btnNormal.classList.add("active");
+        btnAudit.classList.remove("active");
+        formNormal.style.display = "block";
+        formAudit.style.display = "none";
+      }
+    }
+
+    function addQuickAuditRow(name = "", qty = "") {
+      const container = document.getElementById("quick-audit-rows-list");
+      if (!container) return;
+      const row = document.createElement("div");
+      row.className = "audit-row-item";
+      row.innerHTML = `
+        <input type="text" class="quick-audit-name" placeholder="ชื่อของที่นับได้ เช่น หลอดไฟ LED" value="${name}">
+        <input type="number" class="quick-audit-qty" placeholder="จำนวน" value="${qty}">
+        <button type="button" class="btn-audit-del" onclick="this.parentElement.remove()" title="ลบ">✕</button>
+      `;
+      container.appendChild(row);
+    }
+
+    // AI Classification Engine (Smart Dictionary Matching)
+    // 📏 กฎหน่วยนับรายสินค้า (ตรวจจากบนลงล่าง — คำที่เจาะจงกว่าต้องอยู่ก่อน)
+    // หลักการ: ของชิ้นเล็กที่ขายเป็นแพ็ก (ตะปู, น็อต, สกรู) นับเป็น "กล่อง" / ของที่ขายเป็นม้วน (สายไฟ, เทป, สายยาง) นับเป็น "ม้วน"
+    const STOCK_UNIT_RULES = [
+      // ⚡ อุปกรณ์ไฟฟ้า
+      { re: /สายไฟ|vaf|thw|สายแลน|สายโทรศัพท์|สายทีวี/, category: "อุปกรณ์ไฟฟ้า", unit: "ม้วน" },
+      { re: /เทปพันสายไฟ|เทปไฟ/, category: "อุปกรณ์ไฟฟ้า", unit: "ม้วน" },
+      { re: /หลอดไฟ|หลอด\s*led|หลอดนีออน|หลอดตะเกียบ|^หลอด/, category: "อุปกรณ์ไฟฟ้า", unit: "หลอด" },
+      { re: /โคมไฟ|โคม/, category: "อุปกรณ์ไฟฟ้า", unit: "ชุด" },
+      { re: /เบรกเกอร์|เบรคเกอร์|สวิตช์|สวิทช์|เต้ารับ|ปลั๊ก|บล็อกลอย|ฝาครอบ/, category: "อุปกรณ์ไฟฟ้า", unit: "ตัว" },
+      { re: /ถ่าน|แบตเตอรี่/, category: "อุปกรณ์ไฟฟ้า", unit: "แพ็ก" },
+      { re: /ไฟฉาย/, category: "อุปกรณ์ไฟฟ้า", unit: "อัน" },
+
+      // 🔩 วัสดุยึดติด (ขายเป็นกล่อง)
+      { re: /ตะปู|น็อต|น๊อต|สกรู|พุก|แหวนรอง|รีเวท|ลวดเย็บ|ลูกแม็ก/, category: "อุปกรณ์ซ่อมบำรุง", unit: "กล่อง" },
+
+      // 🧰 ซ่อมบำรุง / ก่อสร้าง
+      { re: /ปูน/, category: "อุปกรณ์ซ่อมบำรุง", unit: "ถุง" },
+      { re: /ซิลิโคน|อะคริลิก|แด๊ป|กาวตะปู/, category: "อุปกรณ์ซ่อมบำรุง", unit: "หลอด" },
+      { re: /สีทา|สีน้ำ|สีน้ำมัน|สีรองพื้น|ทินเนอร์|^สี/, category: "อุปกรณ์ซ่อมบำรุง", unit: "แกลลอน" },
+      { re: /สีสเปรย์|สเปรย์/, category: "อุปกรณ์ซ่อมบำรุง", unit: "กระป๋อง" },
+      { re: /กาว/, category: "อุปกรณ์ซ่อมบำรุง", unit: "หลอด" },
+      { re: /เทปกาว|เทปผ้า|เทปใส|สก็อตเทป|เทป/, category: "อุปกรณ์ซ่อมบำรุง", unit: "ม้วน" },
+      { re: /ลวด/, category: "อุปกรณ์ซ่อมบำรุง", unit: "ม้วน" },
+      { re: /บันได/, category: "อุปกรณ์ซ่อมบำรุง", unit: "ตัว" },
+      { re: /แปรงทาสี|ลูกกลิ้ง|ค้อน|ไขควง|คีม|ประแจ|ตลับเมตร|เลื่อย|สว่าน|เกรียง/, category: "อุปกรณ์ซ่อมบำรุง", unit: "อัน" },
+      { re: /ใบตัด|ใบเจียร|ดอกสว่าน/, category: "อุปกรณ์ซ่อมบำรุง", unit: "ใบ" },
+      { re: /ถุงมือ/, category: "อุปกรณ์ซ่อมบำรุง", unit: "คู่" },
+
+      // 🚰 ประปา
+      { re: /สายยาง|สายฉีด/, category: "ประปาและสุขภัณฑ์", unit: "ม้วน" },
+      { re: /เทปพันเกลียว/, category: "ประปาและสุขภัณฑ์", unit: "ม้วน" },
+      { re: /ท่อ\s*pvc|ท่อพีวีซี|ท่อน้ำ|^ท่อ/, category: "ประปาและสุขภัณฑ์", unit: "เส้น" },
+      { re: /ข้อต่อ|ข้องอ|สามทาง|ข้อลด|ต่อตรง/, category: "ประปาและสุขภัณฑ์", unit: "ตัว" },
+      { re: /ก๊อก|วาล์ว|ฝักบัว|สะดือ|ลูกลอย|ชักโครก|ปั๊มน้ำ/, category: "ประปาและสุขภัณฑ์", unit: "ตัว" },
+      { re: /กาวทาท่อ|น้ำยาประสานท่อ/, category: "ประปาและสุขภัณฑ์", unit: "กระป๋อง" },
+
+      // 🧹 ทำความสะอาด
+      { re: /ถุงขยะ|ถุงดำ/, category: "ทำความสะอาด", unit: "แพ็ก" },
+      { re: /น้ำยาถูพื้น|น้ำยาล้างห้องน้ำ|น้ำยาล้างจาน|ไฮเตอร์|มาจิคลีน|เป็ด|ฟองน้ำ|น้ำยา/, category: "ทำความสะอาด", unit: "แกลลอน" },
+      { re: /สบู่เหลว|สบู่/, category: "ทำความสะอาด", unit: "ขวด" },
+      { re: /ผงซักฟอก/, category: "ทำความสะอาด", unit: "ถุง" },
+      { re: /กระดาษทิชชู่|ทิชชู่|กระดาษชำระ/, category: "ทำความสะอาด", unit: "แพ็ก" },
+      { re: /ไม้กวาด|ไม้ถูพื้น|ม็อบ|ที่โกยผง|ไม้ปัดฝุ่น/, category: "ทำความสะอาด", unit: "ด้าม" },
+      { re: /ผ้าขี้ริ้ว|ผ้าเช็ด|ผ้าไมโคร/, category: "ทำความสะอาด", unit: "ผืน" },
+      { re: /ถังขยะ|ถังน้ำ/, category: "ทำความสะอาด", unit: "ใบ" },
+
+      // 📎 สำนักงาน
+      { re: /กระดาษ\s*a4|กระดาษถ่ายเอกสาร|a4/, category: "เครื่องเขียนสำนักงาน", unit: "รีม" },
+      { re: /ปากกา|ดินสอ|ปากกาเคมี|ไฮไลท์/, category: "เครื่องเขียนสำนักงาน", unit: "ด้าม" },
+      { re: /หมึก|ตลับหมึก|โทนเนอร์/, category: "เครื่องเขียนสำนักงาน", unit: "ตลับ" },
+      { re: /แฟ้ม/, category: "เครื่องเขียนสำนักงาน", unit: "เล่ม" },
+      { re: /ซองจดหมาย|ซอง/, category: "เครื่องเขียนสำนักงาน", unit: "แพ็ก" },
+      { re: /คลิป|ลวดเสียบ|หนีบกระดาษ/, category: "เครื่องเขียนสำนักงาน", unit: "กล่อง" }
+    ];
+
+    // หมวดหมู่สำรอง (กรณีไม่ตรงกฎรายสินค้า)
+    const STOCK_CATEGORY_FALLBACK = [
+      { re: /ไฟ|led|ไฟฟ้า/, category: "อุปกรณ์ไฟฟ้า", unit: "ชิ้น" },
+      { re: /ประปา|น้ำ/, category: "ประปาและสุขภัณฑ์", unit: "ชิ้น" },
+      { re: /สำนักงาน|เอกสาร/, category: "เครื่องเขียนสำนักงาน", unit: "ชิ้น" }
+    ];
+
+    // AI Classification Engine (Smart Dictionary Matching)
+    function classifyStockItemAi(rawName) {
+      const name = String(rawName || "").toLowerCase().trim();
+      for (const rule of STOCK_UNIT_RULES) {
+        if (rule.re.test(name)) return { category: rule.category, unit: rule.unit };
+      }
+      for (const rule of STOCK_CATEGORY_FALLBACK) {
+        if (rule.re.test(name)) return { category: rule.category, unit: rule.unit };
+      }
+      return { category: "วัสดุสิ้นเปลืองทั่วไป", unit: "ชิ้น" };
+    }
+
+    // หน่วยนับที่ไม่ชัดเจน (เช่น "หลอด/ชิ้น", "ชุด/อัน" จากเวอร์ชันก่อน) ให้ AI กำหนดใหม่
+    function isAmbiguousUnit(unit) {
+      const u = String(unit || "").trim();
+      return !u || u === "-" || u.includes("/");
+    }
+
+    // ให้ผู้ใช้แก้หน่วยนับในตารางพรีวิวได้เองก่อนบันทึก
+    function updateAuditItemUnit(index, value) {
+      if (quickAuditParsedItems[index]) {
+        quickAuditParsedItems[index].unit = String(value || "").trim() || "ชิ้น";
+        quickAuditParsedItems[index].unitChanged = true;
+      }
+    }
+
+    function processQuickAuditAi() {
+      const rowElements = document.querySelectorAll(".audit-row-item");
+      const items = [];
+
+      rowElements.forEach(r => {
+        const name = r.querySelector(".quick-audit-name").value.trim();
+        const qtyVal = r.querySelector(".quick-audit-qty").value.trim();
+        if (name && qtyVal !== "") {
+          items.push({ name: name, qty: Number(qtyVal) });
+        }
+      });
+
+      if (items.length === 0) {
+        alert("⚠️ กรุณากรอกชื่อพัสดุและจำนวนอย่างน้อย 1 รายการครับ");
+        return;
+      }
+
+      // เปรียบเทียบกับ cachedProcurement ที่มีอยู่จริงในระบบ
+      quickAuditParsedItems = items.map(it => {
+        const matched = (cachedProcurement || []).find(p => 
+          p.itemName.toLowerCase().includes(it.name.toLowerCase()) || 
+          it.name.toLowerCase().includes(p.itemName.toLowerCase())
+        );
+
+        let cat = "";
+        let unit = "";
+        let isExisting = false;
+        let oldQty = 0;
+        let itemCode = "-";
+
+        let unitChanged = false;
+
+        if (matched) {
+          isExisting = true;
+          itemCode = matched.itemCode;
+          cat = matched.category;
+          unit = matched.unit;
+          oldQty = Number(matched.quantity || 0);
+          // ถ้าหน่วยเดิมกำกวม (เช่น "หลอด/ชิ้น") ให้ AI แก้เป็นหน่วยที่ถูกต้อง
+          if (isAmbiguousUnit(unit)) {
+            unit = classifyStockItemAi(matched.itemName || it.name).unit;
+            unitChanged = true;
+          }
+        } else {
+          const aiClass = classifyStockItemAi(it.name);
+          cat = aiClass.category;
+          unit = aiClass.unit;
+        }
+
+        const diff = it.qty - oldQty;
+        return {
+          name: it.name,
+          qty: it.qty,
+          category: cat,
+          unit: unit,
+          unitChanged,
+          isExisting,
+          oldQty,
+          itemCode,
+          diff
+        };
+      });
+
+      renderAuditReviewTable(quickAuditParsedItems);
+    }
+
+    function renderAuditReviewTable(results) {
+      const tbody = document.getElementById("audit-review-tbody");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      results.forEach((res, idx) => {
+        let diffColor = "#94a3b8";
+        let diffText = "0";
+        if (res.isExisting) {
+          if (res.diff > 0) { diffColor = "#6ee7b7"; diffText = `+${res.diff}`; }
+          else if (res.diff < 0) { diffColor = "#fca5a5"; diffText = `${res.diff}`; }
+        } else {
+          diffColor = "#38bdf8"; diffText = `+${res.qty} (ใหม่)`;
+        }
+
+        tbody.innerHTML += `
+          <tr style="border-bottom: 1px solid #381808;">
+            <td style="padding: 6px 8px; color: var(--text-main); font-weight: bold;">
+              ${res.name}
+              ${res.isExisting ? `<span style="font-size:10px; color:#6ee7b7; display:block;">[รหัส: ${res.itemCode}]</span>` : `<span style="font-size:10px; color:#38bdf8; display:block;">[✨ พัสดุใหม่]</span>`}
+            </td>
+            <td style="padding: 6px 8px; color: #fde68a;">${res.category}</td>
+            <td style="padding: 6px 8px; text-align: center; color: var(--accent-gold); font-weight: bold; white-space: nowrap;">
+              ${res.qty}
+              <input type="text" value="${res.unit}" title="แก้หน่วยนับได้" onchange="updateAuditItemUnit(${idx}, this.value)"
+                     style="width: 64px; margin-left: 4px; padding: 3px 6px; background: #231106; color: #fde68a; border: 1px solid ${res.unitChanged ? '#fbbf24' : '#381808'}; border-radius: 6px; font-size: 12px; text-align: center;">
+            </td>
+            <td style="padding: 6px 8px; text-align: center; color: ${diffColor}; font-weight: bold;">${diffText}</td>
+          </tr>
+        `;
+      });
+
+      document.getElementById("audit-summary-count").innerText = `${results.length} รายการ`;
+      document.getElementById("audit-review-result-box").style.display = "block";
+    }
+
+    async function confirmSaveAuditToDatabase() {
+      if (!quickAuditParsedItems || quickAuditParsedItems.length === 0) return;
+
+      const btn = document.getElementById("btn-save-audit-final");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังบันทึกลงชีต...";
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            type: "batch_stock_audit",
+            operator: currentUser?.username || "Staff",
+            operatorRole: currentUser?.role || "Staff",
+            items: quickAuditParsedItems
+          })
+        }, 3, 1500, "กำลังบันทึกตรวจนับสต็อก", "กำลังอัปเดตข้อมูลเข้า Google Sheets...");
+
+        if (resJson.status === "success") {
+          showExpToast(15, "ตรวจนับสต็อกหน้างาน (AI)");
+          alert("✅ " + resJson.message);
+          document.getElementById("quick-audit-rows-list").innerHTML = "";
+          document.getElementById("audit-review-result-box").style.display = "none";
+          quickAuditParsedItems = [];
+          addQuickAuditRow();
+          addQuickAuditRow();
+          addQuickAuditRow();
+          await loadDashboardData();
+        } else {
+          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการบันทึกสต็อก: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "💾 บันทึกผลการตรวจนับลงสต็อกจริง";
+      }
+    }
+
     // 📥 บันทึกรับชำระเงิน
     async function submitPayment(event) {
       event.preventDefault();
@@ -3020,7 +3424,7 @@
           document.getElementById("payment-form").reset();
           await loadDashboardData();
         } else {
-          alert("❌ " + resJson.message);
+          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
         }
       } catch (err) {
         alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
@@ -3078,7 +3482,7 @@
           expenseFileMime = "";
           await loadDashboardData();
         } else {
-          alert("❌ " + resJson.message);
+          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
         }
       } catch (err) {
         alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
@@ -3186,7 +3590,7 @@
           document.getElementById("procurement-form").reset();
           await loadDashboardData();
         } else {
-          alert("❌ " + resJson.message);
+          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
         }
       } catch (err) {
         alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
@@ -3204,10 +3608,13 @@
         return;
       }
 
-      document.getElementById("stock-modal-code").value = item.itemCode;
-      document.getElementById("stock-modal-name").value = `${item.itemName} (${item.category})`;
+      document.getElementById("stock-modal-code").value = item.itemCode || "";
+      document.getElementById("stock-modal-name").value = item.itemName || "";
+      document.getElementById("stock-modal-category").value = item.category || "";
+      document.getElementById("stock-modal-unit").value = item.unit || "";
       document.getElementById("stock-modal-qty").value = item.quantity;
       document.getElementById("stock-modal-min").value = item.minAlert;
+      document.getElementById("stock-modal-price").value = item.unitPrice || 0;
 
       document.getElementById("stock-adjust-modal").style.display = "flex";
     }
@@ -3218,11 +3625,15 @@
     }
 
     async function submitStockAdjustment() {
+      const itemName = document.getElementById("stock-modal-name").value.trim();
+      const category = document.getElementById("stock-modal-category").value.trim();
       const newQty = document.getElementById("stock-modal-qty").value;
+      const unit = document.getElementById("stock-modal-unit").value.trim();
       const newMin = document.getElementById("stock-modal-min").value;
+      const unitPrice = document.getElementById("stock-modal-price").value;
 
-      if (newQty === "" || newMin === "" || !activeStockItemCode) {
-        alert("⚠️ กรุณาระบุจำนวนพัสดุและจุดแจ้งเตือนขั้นต่ำ");
+      if (!activeStockItemCode || !itemName || newQty === "" || !unit || newMin === "") {
+        alert("⚠️ กรุณาระบุข้อมูลให้ครบถ้วน (ชื่อพัสดุ, หมวดหมู่, จำนวนคงเหลือ, หน่วยนับ, จุดเตือน)");
         return;
       }
 
@@ -3235,17 +3646,21 @@
             operator: currentUser?.username,
             operatorRole: currentUser?.role,
             itemCode: activeStockItemCode,
+            itemName: itemName,
+            category: category || "วัสดุสิ้นเปลืองทั่วไป",
             newQuantity: newQty,
-            newMinAlert: newMin
+            unit: unit || "ชิ้น",
+            newMinAlert: newMin,
+            unitPrice: unitPrice || 0
           })
-        }, 3, 1500, "กำลังปรับสต็อกพัสดุ", "กำลังอัปเดตจำนวนคงเหลือในชีต...");
+        }, 3, 1500, "กำลังปรับปรุงข้อมูลพัสดุ", "กำลังอัปเดตข้อมูลใน Google Sheets...");
 
         if (resJson.status === "success") {
           alert("✅ " + resJson.message);
           closeStockModal();
           await loadDashboardData();
         } else {
-          alert("❌ " + resJson.message);
+          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
         }
       } catch (err) {
         alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
@@ -3389,7 +3804,7 @@
           closeExpenseUpdateModal();
           await loadDashboardData();
         } else {
-          alert("❌ " + resJson.message);
+          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
         }
       } catch (err) {
         alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
@@ -3435,7 +3850,7 @@
           alert("✅ " + resJson.message);
           await loadDashboardData();
         } else {
-          alert("❌ " + resJson.message);
+          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
         }
       } catch (err) {
         alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
@@ -3463,7 +3878,7 @@
           alert("✅ " + resJson.message);
           await loadDashboardData();
         } else {
-          alert("❌ " + resJson.message);
+          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
         }
       } catch (err) {
         alert("⚠️ เกิดข้อผิดพลาดในการยกเลิกบิล: " + err.message);
@@ -3588,6 +4003,8 @@
           billingMonth: monthVal,
           items: items,
           totalAmount: totalAmt,
+          amount: totalAmt,
+          feeType: items.length > 0 ? items[0].description : "ค่าบริการ",
           operator: currentUser?.username || "Staff",
           operatorRole: currentUser?.role || "Staff"
         };
@@ -3663,7 +4080,7 @@
           // โหลดข้อมูลใหม่
           await loadDashboardData();
         } else {
-          alert("❌ " + resJson.message);
+          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
         }
       } catch (err) {
         console.error("Generate Invoice Error:", err);
