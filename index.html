@@ -721,18 +721,25 @@
             <input type="text" id="edit-res-unit" readonly style="background: #180a03; color: var(--accent-gold); font-weight: bold; cursor: not-allowed;">
           </div>
           <div class="form-group">
+            <label>ประเภทผู้พักอาศัย</label>
+            <select id="edit-res-type">
+              <option value="Owner">เจ้าของห้อง (Owner)</option>
+              <option value="Tenant">ผู้เช่า (Tenant)</option>
+            </select>
+          </div>
+          <div class="form-group">
             <label>เลขที่โฉนดที่ดิน (Title Deed)</label>
             <input type="text" id="edit-res-deed">
-          </div>
-          <div class="form-group" style="grid-column: span 2;">
-            <label>ชื่อ-นามสกุล เจ้าของ / ผู้พักอาศัย *</label>
-            <input type="text" id="edit-res-name" required>
           </div>
           <div class="form-group">
             <label>เบอร์โทรศัพท์ติดต่อ *</label>
             <input type="tel" id="edit-res-phone" required>
           </div>
-          <div class="form-group">
+          <div class="form-group" style="grid-column: span 2;">
+            <label>ชื่อ-นามสกุล เจ้าของ / ผู้พักอาศัย *</label>
+            <input type="text" id="edit-res-name" required>
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
             <label>อีเมล</label>
             <input type="email" id="edit-res-email">
           </div>
@@ -2481,6 +2488,83 @@
       toggleOwnerFields("Owner");
     }
 
+    let residentPhotoBase64 = null;
+    let residentPhotoName = "";
+    let residentPhotoMime = "";
+
+    function previewResidentPhoto(e) {
+      const file = e.target.files[0];
+      if (file) {
+        residentPhotoName = file.name;
+        residentPhotoMime = file.type || "image/jpeg";
+        const reader = new FileReader();
+        reader.onload = function(evt) { residentPhotoBase64 = evt.target.result; };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function submitNewResident(event) {
+      event.preventDefault();
+      const btn = document.getElementById("btn-submit-resident");
+      btn.disabled = true;
+      btn.innerText = "⏳ กำลังบันทึกข้อมูล...";
+
+      const resType = document.getElementById("res-type").value;
+      const unit = document.getElementById("res-unit").value.trim();
+      const name = document.getElementById("res-name").value.trim();
+
+      if (!unit || !name) {
+        alert("⚠️ กรุณาระบุเลขยูนิตและชื่อ-นามสกุลให้ครบถ้วน");
+        btn.disabled = false;
+        btn.innerText = "ลงทะเบียนลูกบ้าน & เปิดแฟ้มเก็บข้อมูล";
+        return;
+      }
+
+      const payload = {
+        type: "new_resident",
+        operator: currentUser?.username,
+        operatorRole: currentUser?.role,
+        residentType: resType,
+        unitNumber: unit,
+        residentName: name,
+        ownerName: (resType === "Tenant") ? document.getElementById("res-owner-name").value.trim() : "",
+        ownerPhone: (resType === "Tenant") ? document.getElementById("res-owner-phone").value.trim() : "",
+        titleDeedNo: document.getElementById("res-deed").value.trim(),
+        phone: document.getElementById("res-phone").value.trim(),
+        email: document.getElementById("res-email").value.trim(),
+        idCardAddress: document.getElementById("res-id-address").value.trim(),
+        currentAddress: document.getElementById("res-cur-address").value.trim(),
+        photoData: residentPhotoBase64,
+        photoName: residentPhotoName,
+        photoMimeType: residentPhotoMime
+      };
+
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        }, 3, 1500, "กำลังลงทะเบียนลูกบ้าน", "กำลังบันทึกข้อมูลและสร้างโฟลเดอร์...");
+
+        if (resJson.status === "success") {
+          showExpToast(15, "ลงทะเบียนลูกบ้านใหม่");
+          alert("✅ บันทึกลงทะเบียนลูกบ้านเรียบร้อยแล้ว!");
+          document.getElementById("resident-form").reset();
+          residentPhotoBase64 = null;
+          residentPhotoName = "";
+          toggleOwnerFields("Owner");
+          await loadDashboardData();
+        } else {
+          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการลงทะเบียน"));
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "ลงทะเบียนลูกบ้าน & เปิดแฟ้มเก็บข้อมูล";
+      }
+    }
+
     function openEditResidentModal(unitNumber) {
       const targetKey = cleanUnitKey(unitNumber);
       const res = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
@@ -2492,6 +2576,9 @@
       document.getElementById("customer-list-modal").style.display = "none";
 
       document.getElementById("edit-res-unit").value = res.unitNumber;
+      if (document.getElementById("edit-res-type")) {
+        document.getElementById("edit-res-type").value = res.residentType || "Owner";
+      }
       document.getElementById("edit-res-deed").value = (res.titleDeedNo && res.titleDeedNo !== "-") ? res.titleDeedNo : "";
       document.getElementById("edit-res-name").value = res.residentName || "";
       document.getElementById("edit-res-phone").value = (res.phone && res.phone !== "-") ? res.phone : "";
@@ -2531,6 +2618,7 @@
         operator: currentUser?.username,
         operatorRole: currentUser?.role,
         unitNumber: document.getElementById("edit-res-unit").value.trim(),
+        residentType: document.getElementById("edit-res-type") ? document.getElementById("edit-res-type").value : "Owner",
         titleDeedNo: document.getElementById("edit-res-deed").value.trim(),
         residentName: document.getElementById("edit-res-name").value.trim(),
         phone: document.getElementById("edit-res-phone").value.trim(),
