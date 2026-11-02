@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- UDplace Production System - Connected to AKfycbyWMES...tw4A -->
 <html lang="th">
 <head>
   <meta charset="UTF-8">
@@ -429,6 +428,71 @@
       margin-top: 14px; display: none;
     }
 
+    /* 🧮 Tax & Custom Adjustment Controls (Wooden GUI) */
+    .tax-config-box {
+      background: rgba(20, 8, 3, 0.65);
+      border: 1.5px dashed #78350f;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-top: 10px;
+    }
+    .tax-check-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 0;
+      font-size: 12.5px;
+      color: var(--text-main);
+    }
+    .tax-check-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 600;
+    }
+    .tax-check-label input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      accent-color: #f59e0b;
+      cursor: pointer;
+    }
+    .tax-inline-rate {
+      width: 54px !important;
+      padding: 3px 6px !important;
+      font-size: 12px !important;
+      text-align: center;
+      background: #180902 !important;
+      border: 1px solid #6b3414 !important;
+      border-radius: 6px !important;
+      color: var(--accent-gold) !important;
+      font-weight: bold;
+    }
+    .custom-adj-row {
+      display: grid;
+      grid-template-columns: 92px 1fr 78px 66px 28px;
+      gap: 6px;
+      align-items: center;
+      margin-top: 7px;
+    }
+    .custom-adj-row select,
+    .custom-adj-row input {
+      padding: 6px 8px !important;
+      font-size: 12px !important;
+      background: #180902 !important;
+      border: 1px solid #4a2511 !important;
+      border-radius: 6px !important;
+      color: var(--text-main) !important;
+    }
+    @media (max-width: 640px) {
+      .custom-adj-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
     /* ========================================================
        🖨️ PRINT STYLESHEET: โหมดพิมพ์สำหรับ Invoices และ Vouchers
        ======================================================== */
@@ -456,12 +520,15 @@
       .inv-title-sub { font-size: 10.5pt; font-weight: bold; color: #6b7280; letter-spacing: 2px; text-align: right; margin-top: -2px; }
       .inv-meta-table { margin-top: 8px; font-size: 9.5pt; float: right; }
       .inv-meta-table td { padding: 2px 4px; }
-      .inv-info-box { width: 100%; margin-bottom: 18px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 16px; background: #f8fafc; }
-      .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-      .inv-table th, .inv-table td { border: 1px solid #94a3b8; padding: 9px 12px; text-align: left; }
+      .inv-info-box { width: 100%; margin-bottom: 16px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 16px; background: #f8fafc; }
+      .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+      .inv-table th, .inv-table td { border: 1px solid #94a3b8; padding: 8px 12px; text-align: left; }
       .inv-table th { background-color: #f1f5f9; font-weight: bold; color: #0f172a; font-size: 10.5pt; }
-      .inv-total-row { background-color: #f8fafc; font-weight: bold; font-size: 12.5pt; }
-      .inv-signatures { width: 100%; margin-top: 35px; }
+      .inv-sub-row td { background-color: #ffffff; font-weight: 600; font-size: 10pt; padding: 6px 12px !important; color: #1e293b; }
+      .inv-sub-row.is-deduct td { color: #b91c1c; }
+      .inv-sub-row.is-add td { color: #0f766e; }
+      .inv-total-row { background-color: #f8fafc; font-weight: bold; font-size: 12pt; }
+      .inv-signatures { width: 100%; margin-top: 26px; }
       .inv-sig-box { text-align: center; width: 75%; border-top: 1px dashed #64748b; padding-top: 8px; margin: 0 auto; font-size: 10pt; }
     }
   </style>
@@ -543,7 +610,7 @@
         </tr>
       </thead>
       <tbody id="print-items-tbody"></tbody>
-      <tfoot>
+      <tfoot id="print-summary-tfoot">
         <tr class="inv-total-row">
           <td colspan="2" style="text-align: right; color: #0f172a;" id="print-total-label">รวมยอดที่ต้องชำระทั้งสิ้น (Total Due):</td>
           <td style="text-align: right; color: #1e3a8a;" id="print-fee-total">฿0.00</td>
@@ -953,6 +1020,79 @@
     </div>
   </div>
 
+  <!-- 🧾 MODAL: ตั้งค่าภาษีและตรวจสอบยอดก่อนพิมพ์ใบเสร็จ / ใบแจ้งหนี้ -->
+  <div id="doc-tax-print-modal" class="modal-overlay">
+    <div class="ro-window" style="max-width: 640px; width: 94%;">
+      <div class="ro-header">
+        <span id="doc-tax-modal-title">🧾 ตั้งค่าภาษีและพิมพ์เอกสาร</span>
+        <span class="ro-close" onclick="closeDocTaxPrintModal()">✕</span>
+      </div>
+      <div style="padding: 18px 20px; max-height: 82vh; overflow-y: auto;">
+        <div id="doc-tax-modal-info" style="background: #180902; border: 1.5px solid #381808; border-radius: 10px; padding: 10px 14px; font-size: 12.5px; line-height: 1.6; margin-bottom: 12px;"></div>
+
+        <div class="form-group" id="modal-base-subtotal-group" style="margin-bottom: 10px;">
+          <label id="modal-base-subtotal-label" style="color: var(--accent-gold);">💰 ยอดรวมตั้งต้นก่อนภาษี (Subtotal - บาท)</label>
+          <input type="number" id="modal-base-subtotal" step="any" min="0" oninput="recalcDocTax('modal')" style="font-size: 16px; font-weight: bold; color: #fef3c7;">
+        </div>
+
+        <div class="tax-config-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px dashed #4a2511; padding-bottom: 6px;">
+            <strong style="font-size: 13px; color: var(--accent-gold);">🧮 ตัวเลือกภาษีและรายการปรับลด/บวกเพิ่ม</strong>
+            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #d97706, #b45309); padding: 4px 10px; font-size: 11.5px;" onclick="addCustomTaxRow('modal')">➕ เพิ่มช่องกำหนดเอง</button>
+          </div>
+
+          <div class="tax-check-row">
+            <label class="tax-check-label">
+              <input type="checkbox" id="modal-vat-enable" onchange="recalcDocTax('modal')">
+              <span style="color: #6ee7b7;">➕ บวกภาษีมูลค่าเพิ่ม (VAT)</span>
+              <input type="number" id="modal-vat-rate" class="tax-inline-rate" value="7" step="any" min="0" oninput="recalcDocTax('modal')">
+              <span>%</span>
+            </label>
+            <span id="modal-vat-preview" style="font-weight: bold; color: #6ee7b7;">+฿0.00</span>
+          </div>
+
+          <div class="tax-check-row">
+            <label class="tax-check-label">
+              <input type="checkbox" id="modal-wht-enable" onchange="recalcDocTax('modal')">
+              <span style="color: #fca5a5;">➖ หักภาษี ณ ที่จ่าย (ผู้เช่า)</span>
+              <input type="number" id="modal-wht-rate" class="tax-inline-rate" value="5" step="any" min="0" oninput="recalcDocTax('modal')">
+              <span>%</span>
+            </label>
+            <span id="modal-wht-preview" style="font-weight: bold; color: #fca5a5;">-฿0.00</span>
+          </div>
+
+          <div id="modal-custom-adj-container"></div>
+        </div>
+
+        <div id="modal-tax-breakdown-preview" style="background: #140803; border: 1.5px solid #4a2511; border-radius: 10px; padding: 10px 14px; margin-top: 12px; font-size: 12.5px; line-height: 1.7;"></div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding: 10px 14px; background: rgba(5, 150, 105, 0.16); border: 1.5px solid #059669; border-radius: 10px;">
+          <strong style="color: #a7f3d0; font-size: 14px;">ยอดสุทธิที่จะพิมพ์ลงเอกสาร:</strong>
+          <span id="modal-calc-total-display" style="font-size: 20px; font-weight: bold; color: #6ee7b7;">฿0.00</span>
+        </div>
+
+        <label style="display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 12px; color: var(--text-muted); cursor: pointer;">
+          <input type="checkbox" id="modal-save-tax-to-sheet" checked style="width: 15px; height: 15px; accent-color: #10b981; margin: 0;">
+          <span>💾 บันทึกจำค่าภาษีและยอดสุทธินี้ไว้ในประวัติเอกสารด้วย</span>
+        </label>
+
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button type="button" class="ro-btn" style="flex: 1;" onclick="closeDocTaxPrintModal()">ยกเลิก</button>
+          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #059669, #047857);" onclick="executeModalDocPrint()">🖨️ สั่งพิมพ์เอกสาร / PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <datalist id="custom-tax-labels-list">
+    <option value="หักภาษี ณ ที่จ่าย 3% (ค่าบริการ)">
+    <option value="หักภาษี ณ ที่จ่าย 1%">
+    <option value="ส่วนลดพิเศษ">
+    <option value="หักเงินมัดจำ / เงินจอง">
+    <option value="ค่าบริการ / ค่าดำเนินการเพิ่มเติม">
+    <option value="ค่าปรับชำระล่าช้า">
+  </datalist>
+
   <datalist id="proc-categories-list">
     <option value="อุปกรณ์ไฟฟ้า">
     <option value="ประปาและสุขภัณฑ์">
@@ -1352,8 +1492,43 @@
                   <input type="text" id="form-fee-type" placeholder="ระบุรายการ เช่น ค่าส่วนกลางประจำปี" required>
                 </div>
                 <div class="form-group" style="flex: 0.8;">
-                  <label>จำนวนเงิน (฿) *</label>
-                  <input type="number" id="form-amount" placeholder="0" required>
+                  <label>ยอดก่อนภาษี (฿) *</label>
+                  <input type="number" id="form-amount" step="any" min="0" placeholder="0" oninput="recalcDocTax('pay')" required>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-top: -4px;">
+                <div id="pay-tenant-tax-hint" style="display: none; margin-bottom: 6px; padding: 5px 10px; border-radius: 6px; background: rgba(2, 132, 199, 0.2); border: 1px solid #0284c7; color: #7dd3fc; font-size: 11.5px;">
+                  💼 ยูนิตผู้เช่า (Tenant) — สามารถติ๊กหักภาษี 5% ด้านล่างได้หากลูกค้าหัก ณ ที่จ่าย
+                </div>
+                <div class="tax-config-box">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-bottom: 1px dashed #4a2511; padding-bottom: 5px;">
+                    <span style="font-size: 12px; font-weight: bold; color: var(--accent-gold);">🧮 ภาษี & ปรับลด/บวกเพิ่ม (ไม่บังคับ)</span>
+                    <button type="button" class="btn-action" style="background: linear-gradient(135deg, #d97706, #b45309); padding: 2px 8px; font-size: 11px;" onclick="addCustomTaxRow('pay')">➕ กำหนดเอง</button>
+                  </div>
+                  <div class="tax-check-row">
+                    <label class="tax-check-label">
+                      <input type="checkbox" id="pay-vat-enable" onchange="recalcDocTax('pay')">
+                      <span style="color: #6ee7b7;">➕ VAT</span>
+                      <input type="number" id="pay-vat-rate" class="tax-inline-rate" value="7" step="any" min="0" oninput="recalcDocTax('pay')">
+                      <span>%</span>
+                    </label>
+                    <span id="pay-vat-preview" style="font-weight: bold; color: #6ee7b7; font-size: 12px;">+฿0.00</span>
+                  </div>
+                  <div class="tax-check-row">
+                    <label class="tax-check-label">
+                      <input type="checkbox" id="pay-wht-enable" onchange="recalcDocTax('pay')">
+                      <span style="color: #fca5a5;">➖ หักภาษี (ผู้เช่า)</span>
+                      <input type="number" id="pay-wht-rate" class="tax-inline-rate" value="5" step="any" min="0" oninput="recalcDocTax('pay')">
+                      <span>%</span>
+                    </label>
+                    <span id="pay-wht-preview" style="font-weight: bold; color: #fca5a5; font-size: 12px;">-฿0.00</span>
+                  </div>
+                  <div id="pay-custom-adj-container"></div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; padding-top: 6px; border-top: 1px solid #381808;">
+                    <strong style="font-size: 12.5px; color: var(--text-main);">ยอดรับชำระสุทธิจริง:</strong>
+                    <span id="pay-calc-total-display" style="font-size: 16px; font-weight: bold; color: #6ee7b7;">฿0.00</span>
+                  </div>
                 </div>
               </div>
               <div style="display: flex; gap: 10px;">
@@ -1641,8 +1816,43 @@
                 
                 <div id="invoice-items-container"></div>
 
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 6px; border-top: 1px dashed #4a2511; font-size: 12.5px;">
+                  <span style="color: var(--text-muted);">ยอดรวมรายการก่อนภาษี (Subtotal):</span>
+                  <strong id="inv-subtotal-display" style="color: #fef3c7;">฿0.00</strong>
+                </div>
+
+                <div id="inv-tenant-tax-hint" style="display: none; margin-top: 8px; padding: 5px 10px; border-radius: 6px; background: rgba(2, 132, 199, 0.2); border: 1px solid #0284c7; color: #7dd3fc; font-size: 11.5px;">
+                  💼 ยูนิตนี้เป็นผู้เช่า (Tenant) — สามารถติ๊กหักภาษี 5% ด้านล่างได้หากลูกค้าหัก ณ ที่จ่าย
+                </div>
+
+                <div class="tax-config-box">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-bottom: 1px dashed #4a2511; padding-bottom: 5px;">
+                    <span style="font-size: 12px; font-weight: bold; color: var(--accent-gold);">🧮 ตัวเลือกภาษี & รายการปรับลด/บวกเพิ่ม</span>
+                    <button type="button" class="btn-action" style="background: linear-gradient(135deg, #d97706, #b45309); padding: 2px 8px; font-size: 11px;" onclick="addCustomTaxRow('inv')">➕ กำหนดเอง</button>
+                  </div>
+                  <div class="tax-check-row">
+                    <label class="tax-check-label">
+                      <input type="checkbox" id="inv-vat-enable" onchange="recalcDocTax('inv')">
+                      <span style="color: #6ee7b7;">➕ บวกภาษี (VAT)</span>
+                      <input type="number" id="inv-vat-rate" class="tax-inline-rate" value="7" step="any" min="0" oninput="recalcDocTax('inv')">
+                      <span>%</span>
+                    </label>
+                    <span id="inv-vat-preview" style="font-weight: bold; color: #6ee7b7; font-size: 12px;">+฿0.00</span>
+                  </div>
+                  <div class="tax-check-row">
+                    <label class="tax-check-label">
+                      <input type="checkbox" id="inv-wht-enable" onchange="recalcDocTax('inv')">
+                      <span style="color: #fca5a5;">➖ หักภาษี ณ ที่จ่าย (ผู้เช่า)</span>
+                      <input type="number" id="inv-wht-rate" class="tax-inline-rate" value="5" step="any" min="0" oninput="recalcDocTax('inv')">
+                      <span>%</span>
+                    </label>
+                    <span id="inv-wht-preview" style="font-weight: bold; color: #fca5a5; font-size: 12px;">-฿0.00</span>
+                  </div>
+                  <div id="inv-custom-adj-container"></div>
+                </div>
+
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid #381808;">
-                  <strong style="color: var(--text-main); font-size: 13px;">รวมยอดเงินทั้งสิ้น:</strong>
+                  <strong style="color: var(--text-main); font-size: 13.5px;">รวมยอดสุทธิทั้งสิ้น (Net Total):</strong>
                   <span id="invoice-calc-total-display" style="font-size: 18px; font-weight: bold; color: var(--accent-gold);">฿0.00</span>
                 </div>
               </div>
@@ -2004,6 +2214,8 @@
     let activeCrmUnit = "";
     let activeStockItemCode = "";
     let activeVoucherId = "";
+    let activeQueuedInvoiceDocNo = "";
+    let activeTaxPrintContext = null;
 
     function showLoadingModal(title = "กำลังประมวลผลข้อมูล...", subtitle = "ระบบกำลังส่งคำสั่งและเชื่อมต่อ Google Sheets") {
       const modal = document.getElementById("global-loading-modal");
@@ -2132,7 +2344,7 @@
       rowDiv.innerHTML = `
         <span class="item-num">${rowIndex}.</span>
         <input type="text" class="item-desc-input" placeholder="ระบุรายการ เช่น ค่าส่วนกลาง, ค่าน้ำ" style="flex: 2;" required>
-        <input type="number" class="item-amt-input" placeholder="0.00" style="flex: 1;" oninput="calculateInvoiceTotal()" required>
+        <input type="number" class="item-amt-input" step="any" min="0" placeholder="0.00" style="flex: 1;" oninput="calculateInvoiceTotal()" required>
         ${rowIndex > 1 ? `<button type="button" class="btn-action" style="background:#dc2626; padding: 6px 10px;" onclick="removeInvoiceItemRow(this)">🗑️</button>` : `<div style="width:32px;"></div>`}
       `;
       container.appendChild(rowDiv);
@@ -2151,13 +2363,17 @@
     }
 
     function calculateInvoiceTotal() {
-      const container = document.getElementById("invoice-items-container");
-      const amtInputs = container.getElementsByClassName("item-amt-input");
-      let total = 0;
-      for (let input of amtInputs) {
-        total += Number(input.value || 0);
+      if (typeof recalcDocTax === "function") {
+        recalcDocTax("inv");
+      } else {
+        const container = document.getElementById("invoice-items-container");
+        const amtInputs = container.getElementsByClassName("item-amt-input");
+        let total = 0;
+        for (let input of amtInputs) {
+          total += Number(input.value || 0);
+        }
+        document.getElementById("invoice-calc-total-display").innerText = "฿" + total.toLocaleString('en-US', { minimumFractionDigits: 2 });
       }
-      document.getElementById("invoice-calc-total-display").innerText = "฿" + total.toLocaleString('en-US', { minimumFractionDigits: 2 });
     }
 
     function autoFillRegistrationFields() {
@@ -2177,10 +2393,17 @@
 
     function autoFillResidentForSales(unitVal) {
       const targetKey = cleanUnitKey(unitVal);
-      if (!targetKey) return;
+      const hintEl = document.getElementById("inv-tenant-tax-hint");
+      if (!targetKey) {
+        if (hintEl) hintEl.style.display = "none";
+        return;
+      }
       const found = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
       if (found && found.residentName) {
         document.getElementById("inv-res-name").value = found.residentName;
+      }
+      if (hintEl) {
+        hintEl.style.display = (found && found.residentType === "Tenant") ? "block" : "none";
       }
     }
 
@@ -2795,20 +3018,43 @@
 
     function autoFillResidentName(inputUnit) {
       const targetKey = cleanUnitKey(inputUnit);
-      if (!targetKey) return;
+      const hintEl = document.getElementById("pay-tenant-tax-hint");
+      if (!targetKey) {
+        if (hintEl) hintEl.style.display = "none";
+        return;
+      }
       const found = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
       if (found && found.residentName) document.getElementById("form-name").value = found.residentName;
+      if (hintEl) {
+        hintEl.style.display = (found && found.residentType === "Tenant") ? "block" : "none";
+      }
     }
 
-    function fillPaymentFromQueue(unit, name, feeType, month) {
+    function fillPaymentFromQueue(unit, name, feeType, month, docNo = "") {
+      activeQueuedInvoiceDocNo = docNo || "";
       document.getElementById("form-unit").value = unit;
       document.getElementById("form-name").value = name;
       document.getElementById("form-fee-type").value = feeType;
+      autoFillResidentName(unit);
 
-      if (feeType.includes("500") || feeType === "ค่าส่วนกลางประจำปี") {
-        document.getElementById("form-amount").value = 500;
+      const matchedInv = docNo
+        ? (cachedPendingInvoices || []).find(p => String(p.docNo || "").trim() === String(docNo).trim())
+        : (cachedPendingInvoices || []).find(p => cleanUnitKey(p.unitNumber) === cleanUnitKey(unit));
+
+      if (matchedInv && matchedInv.taxMeta) {
+        document.getElementById("form-amount").value = Number(matchedInv.taxMeta.subtotal || matchedInv.amount || 0);
+        applyDocTaxConfigToDOM("pay", matchedInv.taxMeta);
+      } else if (matchedInv && Number(matchedInv.amount || 0) > 0) {
+        document.getElementById("form-amount").value = Number(matchedInv.amount);
+        resetDocTaxForm("pay");
+      } else {
+        if (feeType.includes("500") || feeType === "ค่าส่วนกลางประจำปี") {
+          document.getElementById("form-amount").value = 500;
+        }
+        resetDocTaxForm("pay");
       }
       
+      recalcDocTax("pay");
       document.getElementById("form-amount").focus();
       showExpToast(1, `เลือกยูนิต ${unit} จากคิว`);
     }
@@ -2857,6 +3103,7 @@
         const n = String(item.residentName).replace(/'/g, "\\'");
         const f = String(item.feeType).replace(/'/g, "\\'");
         const m = String(item.billingMonth).replace(/'/g, "\\'");
+        const dNo = String(item.docNo || "").replace(/'/g, "\\'");
 
         const formattedDate = formatDisplayDate(item.date || item.timestamp);
         const formattedMonth = formatDisplayMonth(item.billingMonth);
@@ -2869,7 +3116,7 @@
           <td><span class="badge pending" style="font-size:11px;">${formattedMonth}</span></td>
           <td style="color: var(--text-muted); font-size:12px;">${item.operator}</td>
           <td style="text-align: center;">
-            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #059669, #047857);" onclick="fillPaymentFromQueue('${u}', '${n}', '${f}', '${m}')">
+            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #059669, #047857);" onclick="fillPaymentFromQueue('${u}', '${n}', '${f}', '${m}', '${dNo}')">
               ⚡ รับเงิน
             </button>
           </td>
@@ -2900,8 +3147,12 @@
         if (status === "Quotation") statusBadge = `<span class="badge pending" style="background:rgba(2,132,199,0.3); color:#38bdf8; border-color:#0284c7;">ใบเสนอราคา</span>`;
         
         const dStr = String(docNo).replace(/'/g, "\\'");
+        const taxBadgesHtml = formatShortTaxBadgesHtml(item.taxMeta);
+        const btnPrintHtml = (docNo && docNo !== "-")
+          ? `<button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openInvoiceTaxPrintModal('${dStr}')">🖨️ พิมพ์</button>`
+          : "";
         const btnCancelHtml = (status === "Pending" || status === "Quotation" || currentUser?.role === "Admin") 
-          ? `<button type="button" class="btn-action" style="background: #dc2626;" onclick="handleCancelInvoice('${dStr}')">🚫 ยกเลิกบิล</button>` 
+          ? `<button type="button" class="btn-action" style="background: #dc2626;" onclick="handleCancelInvoice('${dStr}')">🚫 ยกเลิก</button>` 
           : `<span style="font-size:11px; color:var(--text-muted);">🔒 ล็อก</span>`;
 
         tbody.innerHTML += `<tr>
@@ -2910,9 +3161,9 @@
           <td style="font-weight: bold;">${item.unitNumber}</td>
           <td>${item.residentName}</td>
           <td>${item.feeType}</td>
-          <td style="color: #6ee7b7;">฿${amt.toLocaleString()}</td>
+          <td style="color: #6ee7b7;">฿${amt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${taxBadgesHtml}</td>
           <td>${statusBadge}</td>
-          <td style="text-align: center;">${btnCancelHtml}</td>
+          <td style="text-align: center; white-space: nowrap;"><div style="display:flex; gap:4px; justify-content:center;">${btnPrintHtml}${btnCancelHtml}</div></td>
         </tr>`;
       });
     }
@@ -3170,13 +3421,14 @@
         const n = String(pending.residentName).replace(/'/g, "\\'");
         const f = String(pending.feeType).replace(/'/g, "\\'");
         const m = String(pending.billingMonth).replace(/'/g, "\\'");
-        fillPaymentFromQueue(u, n, f, m);
+        const dNo = String(pending.docNo || "").replace(/'/g, "\\'");
+        fillPaymentFromQueue(u, n, f, m, dNo);
       } else {
         switchTab('billing');
         const invUnitInput = document.getElementById("inv-unit");
         if (invUnitInput) {
           invUnitInput.value = unitNumber;
-          autoFillInvoiceResident();
+          autoFillResidentForSales(unitNumber);
         }
       }
     }
@@ -3195,24 +3447,18 @@
         const unit = item["Unit Number"] || item["unitNumber"] || "-";
         const residentName = item["Resident Name"] || "-";
         const feeType = item["Fee Type"] || "ค่าส่วนกลาง";
-        const payMethod = item["Payment Method"] || "โอนเงิน / สแกน QR";
-        const docNo = item["DocNo"] || "-";
-
-        const u = String(unit).replace(/'/g, "\\'");
-        const r = String(residentName).replace(/'/g, "\\'");
-        const f = String(feeType).replace(/'/g, "\\'");
-        const p = String(payMethod).replace(/'/g, "\\'");
-        const d = String(docNo).replace(/'/g, "\\'");
+        const origIdx = cachedPayments.indexOf(item);
+        const taxBadgesHtml = formatShortTaxBadgesHtml(item.taxMeta);
 
         const btnReceiptHtml = status.toLowerCase() === 'paid' 
-          ? `<button class="btn-action" style="background: linear-gradient(135deg, var(--accent-green), #047857);" onclick="handlePrintReceipt('${u}', '${r}', '${f}', ${amount}, '${p}', '${d}')">🖨️ พิมพ์ใบเสร็จ</button>` 
+          ? `<button type="button" class="btn-action" style="background: linear-gradient(135deg, var(--accent-green), #047857);" onclick="openReceiptTaxPrintModal(${origIdx})">🖨️ พิมพ์ใบเสร็จ</button>` 
           : `<span style="font-size:12px; color:var(--text-muted);">-</span>`;
         tableBody.innerHTML += `<tr>
           <td>${formattedDate}</td>
           <td style="color: var(--accent-gold); font-weight: bold;">${unit}</td>
           <td>${residentName}</td>
           <td>${feeType}</td>
-          <td style="color: #6ee7b7;">฿${amount.toLocaleString()}</td>
+          <td style="color: #6ee7b7;">฿${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${taxBadgesHtml}</td>
           <td><span class="badge ${status.toLowerCase()}">${status}</span></td>
           <td>${btnReceiptHtml}</td>
         </tr>`;
@@ -3624,9 +3870,12 @@
       const rawUnit = document.getElementById("form-unit").value.trim();
       const resName = document.getElementById("form-name").value.trim();
       const feeType = document.getElementById("form-fee-type").value.trim();
-      const amountVal = document.getElementById("form-amount").value;
+      const baseSubtotal = Number(document.getElementById("form-amount").value || 0);
       const payMethod = document.getElementById("form-payment-method").value;
       const statusVal = document.getElementById("form-status").value;
+
+      const payTaxConfig = getDocTaxConfigFromDOM("pay", baseSubtotal);
+      const paySummary = computeTaxSummary(baseSubtotal, payTaxConfig);
 
       const payload = {
         type: "payment",
@@ -3635,9 +3884,11 @@
         unitNumber: rawUnit,
         residentName: resName,
         feeType: feeType,
-        amount: amountVal,
+        amount: paySummary.netTotal,
         paymentMethod: payMethod,
-        status: statusVal
+        status: statusVal,
+        sourceDocNo: activeQueuedInvoiceDocNo || "",
+        taxMeta: paySummary.hasAdjustments ? payTaxConfig : null
       };
 
       try {
@@ -3649,8 +3900,12 @@
 
         if (resJson.status === "success") {
           showExpToast(resJson.expAdded || 5, "บันทึกรับชำระเงิน");
-          alert(`✅ บันทึกรับเงินสำเร็จ! เลขที่ใบเสร็จ: ${resJson.docNo || '-'}`);
+          alert(`✅ บันทึกรับเงินสำเร็จ! เลขที่ใบเสร็จ: ${resJson.docNo || '-'} (ยอดสุทธิ ฿${formatBaht(paySummary.netTotal)})`);
           document.getElementById("payment-form").reset();
+          activeQueuedInvoiceDocNo = "";
+          resetDocTaxForm("pay");
+          const hintEl = document.getElementById("pay-tenant-tax-hint");
+          if (hintEl) hintEl.style.display = "none";
           await loadDashboardData();
         } else {
           alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
@@ -4114,82 +4369,638 @@
       }
     }
 
-    // 🖨️ ฟังก์ชันพิมพ์ใบเสร็จรับเงิน (Official Receipt)
-    function handlePrintReceipt(unit, residentName, feeType, amount, payMethod, docNo) {
-      try {
-        const cleanKey = cleanUnitKey(unit);
-        const resident = (cachedResidents || []).find(r => cleanUnitKey(r.unitNumber) === cleanKey);
-        
-        // กำหนดหัวเอกสารเป็น ใบเสร็จรับเงิน
-        document.getElementById("print-doc-title-th").innerText = "ใบเสร็จรับเงิน";
-        document.getElementById("print-doc-title-en").innerText = "RECEIPT";
-        
-        // เลขที่เอกสารและวันที่
-        const displayDocNo = (docNo && docNo !== "-") ? docNo : ("REC-" + new Date().getFullYear() + String(new Date().getMonth() + 1).padStart(2, '0') + "-" + String(Math.floor(Math.random() * 9000) + 1000));
-        document.getElementById("print-inv-no").innerText = displayDocNo;
-        document.getElementById("print-inv-date").innerText = formatDisplayDate(new Date().toISOString());
-        
-        // ข้อมูลลูกบ้าน
-        const finalName = (residentName && residentName !== "-") ? residentName : (resident?.residentName || "-");
-        document.getElementById("print-label-customer").innerText = "ผู้ชำระเงิน (ลูกบ้าน):";
-        document.getElementById("print-res-name").innerText = finalName;
-        document.getElementById("print-res-unit").innerText = unit || "-";
-        
-        // เลขโฉนด & ข้อมูลรอบเดือน
-        const deedEl = document.getElementById("print-res-deed");
-        if (deedEl) deedEl.innerText = resident?.titleDeedNo || resident?.titleDeed || resident?.deed || "-";
-        
-        const monthEl = document.getElementById("print-inv-month");
-        if (monthEl) monthEl.innerText = feeType || "ค่าส่วนกลาง / บริการ";
+    /* ========================================================
+       🧮 ระบบคำนวณภาษี (+VAT 7%, -หัก ณ ที่จ่าย 5% ผู้เช่า & กำหนดเอง)
+       สำหรับทั้ง ใบเสร็จรับเงิน / ใบแจ้งหนี้ / ใบเสนอราคา
+       ======================================================== */
+    function escapeHtmlText(val) {
+      return String(val ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
 
-        // ที่อยู่จัดส่ง
-        const houseNo = unit ? (unit.includes("899/") ? unit : `899/${unit}`) : "-";
-        const autoAddress = resident?.currentAddress || resident?.address || `เลขที่ ${houseNo} หมู่ 9 โครงการอุดมสุขเพลส ต.หนองกี่ อ.กบินทร์บุรี จ.ปราจีนบุรี 25110`;
-        document.getElementById("print-res-address").innerText = autoAddress;
+    function roundCurrency(num) {
+      return Math.round((Number(num || 0) + Number.EPSILON) * 100) / 100;
+    }
 
-        // รายการในตาราง
-        const numAmount = Number(amount || 0);
-        const methodTxt = payMethod ? ` (ชำระโดย: ${payMethod})` : "";
-        const tbody = document.getElementById("print-items-tbody");
-        tbody.innerHTML = `
-          <tr>
-            <td style="text-align: center;">1</td>
-            <td><strong>${feeType || "ค่าส่วนกลาง"}</strong>${methodTxt}</td>
-            <td style="text-align: right; font-weight: bold;">฿${numAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+    function formatBaht(num) {
+      return Number(num || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function getBaseAmountForPrefix(pfx) {
+      if (pfx === "inv") {
+        const container = document.getElementById("invoice-items-container");
+        if (!container) return 0;
+        const amtInputs = container.getElementsByClassName("item-amt-input");
+        let sum = 0;
+        for (let input of amtInputs) sum += Number(input.value || 0);
+        return roundCurrency(sum);
+      }
+      if (pfx === "pay") {
+        const el = document.getElementById("form-amount");
+        return roundCurrency(el ? el.value : 0);
+      }
+      if (pfx === "modal") {
+        const el = document.getElementById("modal-base-subtotal");
+        return roundCurrency(el ? el.value : 0);
+      }
+      return 0;
+    }
+
+    function addCustomTaxRow(pfx, initialData = null) {
+      const container = document.getElementById(`${pfx}-custom-adj-container`);
+      if (!container) return;
+      if (container.getElementsByClassName("custom-adj-row").length >= 6) {
+        alert("⚠️ เพิ่มรายการปรับยอดกำหนดเองได้สูงสุด 6 รายการต่อบิลครับ");
+        return;
+      }
+
+      const signVal = (initialData && initialData.sign === "add") ? "add" : "deduct";
+      const labelVal = initialData && initialData.label ? initialData.label : "";
+      const numVal = (initialData && initialData.value !== undefined) ? initialData.value : "";
+      const modeVal = (initialData && initialData.mode === "amount") ? "amount" : "percent";
+
+      const row = document.createElement("div");
+      row.className = "custom-adj-row";
+      row.innerHTML = `
+        <select class="custom-adj-sign" onchange="recalcDocTax('${pfx}')">
+          <option value="deduct" ${signVal === "deduct" ? "selected" : ""}>➖ หักออก (-)</option>
+          <option value="add" ${signVal === "add" ? "selected" : ""}>➕ บวกเพิ่ม (+)</option>
+        </select>
+        <input type="text" class="custom-adj-label" list="custom-tax-labels-list" placeholder="ระบุชื่อ เช่น หักภาษี 3%, ส่วนลด" value="${escapeHtmlText(labelVal)}" oninput="recalcDocTax('${pfx}')">
+        <input type="number" class="custom-adj-val" step="any" min="0" placeholder="ตัวเลข" value="${numVal}" oninput="recalcDocTax('${pfx}')">
+        <select class="custom-adj-mode" onchange="recalcDocTax('${pfx}')">
+          <option value="percent" ${modeVal === "percent" ? "selected" : ""}>%</option>
+          <option value="amount" ${modeVal === "amount" ? "selected" : ""}>บาท</option>
+        </select>
+        <button type="button" class="btn-audit-del" style="height: 30px; font-size: 11px;" onclick="this.parentElement.remove(); recalcDocTax('${pfx}');" title="ลบรายการนี้">✕</button>
+      `;
+      container.appendChild(row);
+      recalcDocTax(pfx);
+    }
+
+    function getDocTaxConfigFromDOM(pfx, explicitSubtotal = null) {
+      const subtotal = (explicitSubtotal !== null) ? roundCurrency(explicitSubtotal) : getBaseAmountForPrefix(pfx);
+      const vatChk = document.getElementById(`${pfx}-vat-enable`);
+      const vatRateEl = document.getElementById(`${pfx}-vat-rate`);
+      const whtChk = document.getElementById(`${pfx}-wht-enable`);
+      const whtRateEl = document.getElementById(`${pfx}-wht-rate`);
+      const container = document.getElementById(`${pfx}-custom-adj-container`);
+
+      const customAdjustments = [];
+      if (container) {
+        const rows = container.getElementsByClassName("custom-adj-row");
+        for (let r of rows) {
+          const sign = r.querySelector(".custom-adj-sign")?.value || "deduct";
+          const label = (r.querySelector(".custom-adj-label")?.value || "").trim();
+          const valRaw = Number(r.querySelector(".custom-adj-val")?.value || 0);
+          const mode = r.querySelector(".custom-adj-mode")?.value || "percent";
+          if (valRaw > 0 || label !== "") {
+            customAdjustments.push({ sign, label, value: Math.abs(valRaw), mode });
+          }
+        }
+      }
+
+      return {
+        subtotal: subtotal,
+        vatEnabled: !!(vatChk && vatChk.checked),
+        vatRate: vatRateEl ? Math.max(0, Number(vatRateEl.value || 0)) : 7,
+        wht5Enabled: !!(whtChk && whtChk.checked),
+        whtRate: whtRateEl ? Math.max(0, Number(whtRateEl.value || 0)) : 5,
+        customAdjustments: customAdjustments
+      };
+    }
+
+    function resetDocTaxForm(pfx) {
+      const vatChk = document.getElementById(`${pfx}-vat-enable`);
+      const vatRateEl = document.getElementById(`${pfx}-vat-rate`);
+      const whtChk = document.getElementById(`${pfx}-wht-enable`);
+      const whtRateEl = document.getElementById(`${pfx}-wht-rate`);
+      const container = document.getElementById(`${pfx}-custom-adj-container`);
+
+      if (vatChk) vatChk.checked = false;
+      if (vatRateEl) vatRateEl.value = 7;
+      if (whtChk) whtChk.checked = false;
+      if (whtRateEl) whtRateEl.value = 5;
+      if (container) container.innerHTML = "";
+      recalcDocTax(pfx);
+    }
+
+    function applyDocTaxConfigToDOM(pfx, taxMeta) {
+      resetDocTaxForm(pfx);
+      if (!taxMeta) return;
+      const vatChk = document.getElementById(`${pfx}-vat-enable`);
+      const vatRateEl = document.getElementById(`${pfx}-vat-rate`);
+      const whtChk = document.getElementById(`${pfx}-wht-enable`);
+      const whtRateEl = document.getElementById(`${pfx}-wht-rate`);
+
+      if (vatChk) vatChk.checked = !!taxMeta.vatEnabled;
+      if (vatRateEl && taxMeta.vatRate !== undefined) vatRateEl.value = taxMeta.vatRate;
+      if (whtChk) whtChk.checked = !!taxMeta.wht5Enabled;
+      if (whtRateEl && taxMeta.whtRate !== undefined) whtRateEl.value = taxMeta.whtRate;
+
+      if (Array.isArray(taxMeta.customAdjustments)) {
+        taxMeta.customAdjustments.forEach(adj => addCustomTaxRow(pfx, adj));
+      }
+      recalcDocTax(pfx);
+    }
+
+    function computeTaxSummary(subtotal, taxConfig) {
+      const base = Math.max(0, roundCurrency(subtotal));
+      const cfg = taxConfig || {};
+      const addLines = [];
+      const deductLines = [];
+      const shortBadges = [];
+
+      let vatAmount = 0;
+      const hasVat = !!(cfg.vatEnabled && Number(cfg.vatRate || 0) > 0);
+      if (hasVat) {
+        const vRate = Number(cfg.vatRate);
+        vatAmount = roundCurrency(base * (vRate / 100));
+        addLines.push({
+          sign: "add",
+          label: `บวก ภาษีมูลค่าเพิ่ม ${vRate}% (VAT ${vRate}%)`,
+          amount: vatAmount,
+          isVat: true
+        });
+        shortBadges.push({ text: `+VAT ${vRate}%`, color: "#6ee7b7" });
+      }
+
+      let whtAmount = 0;
+      const hasWht = !!(cfg.wht5Enabled && Number(cfg.whtRate || 0) > 0);
+      if (hasWht) {
+        const wRate = Number(cfg.whtRate);
+        whtAmount = roundCurrency(base * (wRate / 100));
+        const whtLabel = hasVat
+          ? `หัก ภาษีหัก ณ ที่จ่าย ${wRate}% (สำหรับผู้เช่า - คิดจากยอดก่อน VAT)`
+          : `หัก ภาษีหัก ณ ที่จ่าย ${wRate}% (สำหรับผู้เช่า)`;
+        deductLines.push({
+          sign: "deduct",
+          label: whtLabel,
+          amount: whtAmount,
+          isWht: true
+        });
+        shortBadges.push({ text: `-หักภาษี ${wRate}%`, color: "#fca5a5" });
+      }
+
+      if (Array.isArray(cfg.customAdjustments)) {
+        cfg.customAdjustments.forEach(adj => {
+          const valNum = Math.abs(Number(adj.value || 0));
+          const rawLbl = String(adj.label || "").trim();
+          if (valNum <= 0 && !rawLbl) return;
+          const isAdd = adj.sign === "add";
+          const isPct = adj.mode === "percent";
+          const lineAmt = isPct ? roundCurrency(base * (valNum / 100)) : roundCurrency(valNum);
+          let dispLabel = rawLbl || (isAdd ? "รายการบวกเพิ่มอื่นๆ" : "รายการหักลดอื่นๆ");
+          if (isPct && dispLabel.indexOf("%") === -1) {
+            dispLabel += ` (${valNum}%)`;
+          }
+          const entry = { sign: isAdd ? "add" : "deduct", label: dispLabel, amount: lineAmt, isCustom: true };
+          if (isAdd) {
+            addLines.push(entry);
+            shortBadges.push({ text: `+${rawLbl || (isPct ? valNum + '%' : '฿' + valNum)}`, color: "#6ee7b7" });
+          } else {
+            deductLines.push(entry);
+            shortBadges.push({ text: `-${rawLbl || (isPct ? valNum + '%' : '฿' + valNum)}`, color: "#fca5a5" });
+          }
+        });
+      }
+
+      const totalAdditions = roundCurrency(addLines.reduce((s, l) => s + l.amount, 0));
+      const totalDeductions = roundCurrency(deductLines.reduce((s, l) => s + l.amount, 0));
+      const afterAddTotal = roundCurrency(base + totalAdditions);
+      const netTotal = Math.max(0, roundCurrency(base + totalAdditions - totalDeductions));
+      const hasAdjustments = (addLines.length > 0 || deductLines.length > 0);
+
+      return {
+        subtotal: base,
+        hasVat,
+        vatAmount,
+        hasWht,
+        whtAmount,
+        addLines,
+        deductLines,
+        afterAddTotal,
+        netTotal,
+        hasAdjustments,
+        shortBadges
+      };
+    }
+
+    function formatShortTaxBadgesHtml(taxMeta) {
+      if (!taxMeta) return "";
+      const summary = computeTaxSummary(taxMeta.subtotal || 0, taxMeta);
+      if (!summary.hasAdjustments || summary.shortBadges.length === 0) return "";
+      const pills = summary.shortBadges.map(b =>
+        `<span style="display:inline-block; font-size:10px; padding:1px 5px; border-radius:4px; background:rgba(0,0,0,0.35); border:1px solid ${b.color}; color:${b.color}; margin-right:3px; margin-top:2px;">${escapeHtmlText(b.text)}</span>`
+      ).join("");
+      return `<div style="line-height:1.2;">${pills}</div>`;
+    }
+
+    function recalcDocTax(pfx) {
+      const base = getBaseAmountForPrefix(pfx);
+      const cfg = getDocTaxConfigFromDOM(pfx, base);
+      const summary = computeTaxSummary(base, cfg);
+
+      const vatPrev = document.getElementById(`${pfx}-vat-preview`);
+      if (vatPrev) vatPrev.innerText = `+฿${formatBaht(summary.vatAmount)}`;
+
+      const whtPrev = document.getElementById(`${pfx}-wht-preview`);
+      if (whtPrev) whtPrev.innerText = `-฿${formatBaht(summary.whtAmount)}`;
+
+      if (pfx === "inv") {
+        const subEl = document.getElementById("inv-subtotal-display");
+        if (subEl) subEl.innerText = `฿${formatBaht(summary.subtotal)}`;
+        const totEl = document.getElementById("invoice-calc-total-display");
+        if (totEl) totEl.innerText = `฿${formatBaht(summary.netTotal)}`;
+      } else if (pfx === "pay") {
+        const totEl = document.getElementById("pay-calc-total-display");
+        if (totEl) totEl.innerText = `฿${formatBaht(summary.netTotal)}`;
+      } else if (pfx === "modal") {
+        const totEl = document.getElementById("modal-calc-total-display");
+        if (totEl) totEl.innerText = `฿${formatBaht(summary.netTotal)}`;
+        const box = document.getElementById("modal-tax-breakdown-preview");
+        if (box) {
+          let html = `<div style="display:flex; justify-content:space-between;"><span>ยอดรวมก่อนภาษี (Subtotal):</span><strong>฿${formatBaht(summary.subtotal)}</strong></div>`;
+          summary.addLines.forEach(l => {
+            html += `<div style="display:flex; justify-content:space-between; color:#6ee7b7;"><span>+ ${escapeHtmlText(l.label)}:</span><strong>+฿${formatBaht(l.amount)}</strong></div>`;
+          });
+          if (summary.hasVat && summary.deductLines.length > 0) {
+            html += `<div style="display:flex; justify-content:space-between; color:#fde68a;"><span>รวมทั้งสิ้น (รวม VAT):</span><strong>฿${formatBaht(summary.afterAddTotal)}</strong></div>`;
+          }
+          summary.deductLines.forEach(l => {
+            html += `<div style="display:flex; justify-content:space-between; color:#fca5a5;"><span>- ${escapeHtmlText(l.label)}:</span><strong>-฿${formatBaht(l.amount)}</strong></div>`;
+          });
+          if (!summary.hasAdjustments) {
+            html += `<div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">(ไม่มีการบวก/หักภาษีเพิ่มเติม — พิมพ์ยอดเต็มปกติ)</div>`;
+          }
+          box.innerHTML = html;
+        }
+      }
+    }
+
+    function renderPrintableSummaryFooter(docMode, subtotal, taxConfig) {
+      const tfoot = document.getElementById("print-summary-tfoot");
+      if (!tfoot) return;
+      const summary = computeTaxSummary(subtotal, taxConfig);
+
+      let normalLabel = "รวมยอดที่ต้องชำระทั้งสิ้น (Total Due):";
+      let netLabel = "รวมยอดที่ต้องชำระสุทธิ (Net Total Due):";
+      if (docMode === "RECEIPT") {
+        normalLabel = "รวมยอดชำระทั้งสิ้น (Total Paid):";
+        netLabel = "ยอดรับชำระสุทธิทั้งสิ้น (Net Total Paid):";
+      } else if (docMode === "QUOTATION") {
+        normalLabel = "รวมยอดเสนอราคาทั้งสิ้น (Total Quotation):";
+        netLabel = "รวมยอดเสนอราคาสุทธิ (Net Quotation):";
+      }
+
+      if (!summary.hasAdjustments) {
+        tfoot.innerHTML = `
+          <tr class="inv-total-row">
+            <td colspan="2" style="text-align: right; color: #0f172a;" id="print-total-label">${normalLabel}</td>
+            <td style="text-align: right; color: #1e3a8a;" id="print-fee-total">฿${formatBaht(summary.netTotal)}</td>
           </tr>
         `;
+        return;
+      }
 
-        // ยอดรวม
-        document.getElementById("print-total-label").innerText = "รวมยอดชำระทั้งสิ้น (Total Paid):";
-        document.getElementById("print-fee-total").innerText = "฿" + numAmount.toLocaleString('en-US', { minimumFractionDigits: 2 });
+      let rowsHtml = `
+        <tr class="inv-sub-row">
+          <td colspan="2" style="text-align: right;">รวมเป็นเงินก่อนภาษี (Subtotal):</td>
+          <td style="text-align: right;">฿${formatBaht(summary.subtotal)}</td>
+        </tr>
+      `;
+      summary.addLines.forEach(l => {
+        rowsHtml += `
+          <tr class="inv-sub-row is-add">
+            <td colspan="2" style="text-align: right;">${escapeHtmlText(l.label)}:</td>
+            <td style="text-align: right;">+฿${formatBaht(l.amount)}</td>
+          </tr>
+        `;
+      });
+      if (summary.hasVat && summary.deductLines.length > 0) {
+        rowsHtml += `
+          <tr class="inv-sub-row">
+            <td colspan="2" style="text-align: right;">รวมเป็นเงินทั้งสิ้น (รวมภาษีมูลค่าเพิ่ม):</td>
+            <td style="text-align: right;">฿${formatBaht(summary.afterAddTotal)}</td>
+          </tr>
+        `;
+      }
+      summary.deductLines.forEach(l => {
+        rowsHtml += `
+          <tr class="inv-sub-row is-deduct">
+            <td colspan="2" style="text-align: right;">${escapeHtmlText(l.label)}:</td>
+            <td style="text-align: right;">-฿${formatBaht(l.amount)}</td>
+          </tr>
+        `;
+      });
+      rowsHtml += `
+        <tr class="inv-total-row">
+          <td colspan="2" style="text-align: right; color: #0f172a;" id="print-total-label">${netLabel}</td>
+          <td style="text-align: right; color: #1e3a8a;" id="print-fee-total">฿${formatBaht(summary.netTotal)}</td>
+        </tr>
+      `;
+      tfoot.innerHTML = rowsHtml;
+    }
 
-        // ข้อความท้ายใบเสร็จ
-        const noteBox = document.getElementById("print-payment-note");
-        if (noteBox) {
+    function populateAndPrintOfficialDoc(opts) {
+      const docMode = opts.docMode || "INVOICE"; // RECEIPT | INVOICE | QUOTATION
+      const unit = String(opts.unit || "-").trim();
+      const cleanKey = cleanUnitKey(unit);
+      const resident = (cachedResidents || []).find(r => cleanUnitKey(r.unitNumber) === cleanKey);
+
+      if (docMode === "RECEIPT") {
+        document.getElementById("print-doc-title-th").innerText = "ใบเสร็จรับเงิน";
+        document.getElementById("print-doc-title-en").innerText = "RECEIPT";
+        document.getElementById("print-label-customer").innerText = "ผู้ชำระเงิน (ลูกบ้าน):";
+      } else if (docMode === "QUOTATION") {
+        document.getElementById("print-doc-title-th").innerText = "ใบเสนอราคา / ใบจอง";
+        document.getElementById("print-doc-title-en").innerText = "QUOTATION";
+        document.getElementById("print-label-customer").innerText = "ผู้รับเอกสาร (ลูกค้า/ผู้สนใจ):";
+      } else {
+        document.getElementById("print-doc-title-th").innerText = "ใบแจ้งหนี้";
+        document.getElementById("print-doc-title-en").innerText = "INVOICE";
+        document.getElementById("print-label-customer").innerText = "ผู้รับเอกสาร (ลูกค้า/เจ้าของร่วม):";
+      }
+
+      document.getElementById("print-inv-no").innerText = opts.docNo || "-";
+      document.getElementById("print-inv-date").innerText = opts.dateDisplay || formatDisplayDate(new Date().toISOString());
+
+      const finalName = (opts.residentName && opts.residentName !== "-") ? opts.residentName : (resident?.residentName || "-");
+      document.getElementById("print-res-name").innerText = finalName;
+      document.getElementById("print-res-unit").innerText = unit || "-";
+
+      const deedEl = document.getElementById("print-res-deed");
+      if (deedEl) deedEl.innerText = resident?.titleDeedNo || resident?.titleDeed || resident?.deed || "-";
+
+      const monthEl = document.getElementById("print-inv-month");
+      if (monthEl) monthEl.innerText = opts.periodLabel || "-";
+
+      const houseNo = (unit && unit !== "-") ? (unit.includes("899/") ? unit : `899/${unit}`) : "-";
+      const autoAddress = (resident?.currentAddress && resident.currentAddress !== "-")
+        ? resident.currentAddress
+        : `เลขที่ ${houseNo} หมู่ 9 โครงการอุดมสุขเพลส ต.หนองกี่ อ.กบินทร์บุรี จ.ปราจีนบุรี 25110`;
+      document.getElementById("print-res-address").innerText = autoAddress;
+
+      const tbody = document.getElementById("print-items-tbody");
+      tbody.innerHTML = "";
+      const itemsList = (Array.isArray(opts.items) && opts.items.length > 0)
+        ? opts.items
+        : [{ description: opts.defaultDesc || "ค่าบริการ", amount: Number(opts.subtotal || 0) }];
+
+      itemsList.forEach((it, idx) => {
+        const suffixHtml = (idx === 0 && opts.payMethodNote) ? ` <span style="font-weight:normal;">(${escapeHtmlText(opts.payMethodNote)})</span>` : "";
+        tbody.innerHTML += `
+          <tr>
+            <td style="text-align: center;">${idx + 1}</td>
+            <td><strong>${escapeHtmlText(it.description || "-")}</strong>${suffixHtml}</td>
+            <td style="text-align: right; font-weight: bold;">฿${formatBaht(it.amount)}</td>
+          </tr>
+        `;
+      });
+
+      const summary = computeTaxSummary(opts.subtotal, opts.taxConfig);
+      renderPrintableSummaryFooter(docMode, opts.subtotal, opts.taxConfig);
+
+      const noteBox = document.getElementById("print-payment-note");
+      if (noteBox) {
+        const whtExtraNote = summary.hasWht
+          ? `<br><span style="color:#b91c1c;">📌 หมายเหตุภาษีหัก ณ ที่จ่าย: กรุณานำส่งหนังสือรับรองการหักภาษี ณ ที่จ่าย (ใบ 50 ทวิ) ให้แก่ฝ่ายบัญชีนิติบุคคลเพื่อเป็นหลักฐานทางภาษี</span>`
+          : "";
+        if (docMode === "RECEIPT") {
           noteBox.style.background = "#f0fdf4";
           noteBox.style.borderColor = "#86efac";
           noteBox.innerHTML = `
             <strong style="color: #166534;">✅ สถานะการรับชำระเงิน: ได้รับเงินเรียบร้อยแล้ว (PAID)</strong><br>
-            ช่องทางการชำระ: <strong>${payMethod || "โอนเงิน / สแกน QR"}</strong> | ออกโดยระบบนิติบุคคลอุดมสุขเพลส (Official Receipt)<br>
-            เอกสารฉบับนี้พิมพ์จากระบบคอมพิวเตอร์ มีผลสมบูรณ์ตามระเบียบนิติบุคคล
+            ช่องทางการชำระ: <strong>${escapeHtmlText(opts.payMethod || "โอนเงิน / สแกน QR")}</strong> | ออกโดยระบบนิติบุคคลอุดมสุขเพลส (Official Receipt)<br>
+            เอกสารฉบับนี้พิมพ์จากระบบคอมพิวเตอร์ มีผลสมบูรณ์ตามระเบียบนิติบุคคล${whtExtraNote}
+          `;
+        } else {
+          noteBox.style.background = "#fffbeb";
+          noteBox.style.borderColor = "#fde68a";
+          noteBox.innerHTML = `
+            <strong style="color: #b45309;">📌 ข้อมูลและขั้นตอนการชำระเงิน:</strong><br>
+            1. กรุณานำใบแจ้งหนี้นี้มาชำระ ณ สำนักงานนิติบุคคล หรือชำระผ่านช่องทางโอนเงินเข้าบัญชีบริษัท<br>
+            2. เมื่อชำระเงินเรียบร้อยแล้ว <strong>ฝ่ายการเงินจะดำเนินการออก "ใบเสร็จรับเงินฉบับเต็ม (Official Receipt)"</strong> ให้เป็นหลักฐานทันที${whtExtraNote}
           `;
         }
-
-        // ผู้จัดทำและผู้รับเงิน
-        const opName = currentUser?.fullName || currentUser?.username || "เจ้าหน้าที่นิติบุคคล";
-        document.getElementById("print-operator-name").innerText = opName;
-        document.getElementById("print-sig-left-title").innerText = "เจ้าหน้าที่ออกใบเสร็จ";
-        const finNameEl = document.getElementById("print-finance-name");
-        if (finNameEl) finNameEl.innerText = opName;
-
-        // สั่งพิมพ์
-        document.body.className = "print-mode-inv";
-        window.print();
-        document.body.className = "";
-      } catch (err) {
-        console.error("Print Receipt Error:", err);
-        alert("⚠️ เกิดข้อผิดพลาดในการพิมพ์ใบเสร็จ: " + err.message);
       }
+
+      const opName = currentUser?.fullName || currentUser?.username || "เจ้าหน้าที่นิติบุคคล";
+      document.getElementById("print-operator-name").innerText = opName;
+      const finNameEl = document.getElementById("print-finance-name");
+      if (docMode === "RECEIPT") {
+        document.getElementById("print-sig-left-title").innerText = "เจ้าหน้าที่ออกใบเสร็จ";
+        if (finNameEl) finNameEl.innerText = opName;
+      } else {
+        document.getElementById("print-sig-left-title").innerText = (docMode === "QUOTATION") ? "เจ้าหน้าที่ฝ่ายขาย" : "เจ้าหน้าที่ฝ่ายจัดทำเอกสาร";
+        if (finNameEl) finNameEl.innerText = " ............................................................ ";
+      }
+
+      document.body.className = "print-mode-inv";
+      window.print();
+      document.body.className = "";
+    }
+
+    function openReceiptTaxPrintModal(paymentIdx) {
+      const item = cachedPayments[paymentIdx];
+      if (!item) {
+        alert("⚠️ ไม่พบข้อมูลใบเสร็จรายการนี้");
+        return;
+      }
+
+      const unit = item["Unit Number"] || item["unitNumber"] || "-";
+      const residentName = item["Resident Name"] || "-";
+      const feeType = item["Fee Type"] || "ค่าส่วนกลาง";
+      const payMethod = item["Payment Method"] || "โอนเงิน / สแกน QR";
+      const docNo = (item["DocNo"] && item["DocNo"] !== "-")
+        ? item["DocNo"]
+        : ("REC-" + new Date().getFullYear() + String(new Date().getMonth() + 1).padStart(2, '0') + "-" + String(paymentIdx + 1).padStart(4, '0'));
+      const savedTax = item.taxMeta || null;
+      const baseSubtotal = savedTax && savedTax.subtotal !== undefined
+        ? Number(savedTax.subtotal)
+        : Number(item["Amount"] || item["amount"] || 0);
+
+      const resObj = (cachedResidents || []).find(r => cleanUnitKey(r.unitNumber) === cleanUnitKey(unit));
+      const tenantBadge = (resObj && resObj.residentType === "Tenant")
+        ? `<span style="color:#38bdf8; font-weight:bold;"> (💼 ยูนิตผู้เช่า)</span>`
+        : "";
+
+      activeTaxPrintContext = {
+        targetKind: "RECEIPT",
+        docMode: "RECEIPT",
+        paymentIdx: paymentIdx,
+        sheetRowIndex: item.sheetRowIndex || null,
+        docNo: docNo,
+        dateDisplay: formatDisplayDate(item["Date"] || new Date().toISOString()),
+        unit: unit,
+        residentName: residentName,
+        feeType: feeType,
+        payMethod: payMethod,
+        items: null
+      };
+
+      document.getElementById("doc-tax-modal-title").innerText = `🧾 ตั้งค่าภาษี & พิมพ์ใบเสร็จรับเงิน (${docNo})`;
+      document.getElementById("doc-tax-modal-info").innerHTML = `
+        <div><strong style="color:var(--accent-gold);">เลขที่ใบเสร็จ:</strong> ${escapeHtmlText(docNo)} | <strong>ยูนิต:</strong> ${escapeHtmlText(unit)}${tenantBadge}</div>
+        <div><strong style="color:var(--accent-gold);">ลูกค้า:</strong> ${escapeHtmlText(residentName)} | <strong>รายการ:</strong> ${escapeHtmlText(feeType)}</div>
+      `;
+      document.getElementById("modal-base-subtotal-label").innerText = "💰 ยอดตั้งต้นก่อนภาษี (Subtotal - บาท)";
+      const baseInput = document.getElementById("modal-base-subtotal");
+      baseInput.readOnly = false;
+      baseInput.value = baseSubtotal;
+
+      applyDocTaxConfigToDOM("modal", savedTax);
+      document.getElementById("doc-tax-print-modal").style.display = "flex";
+    }
+
+    function openInvoiceTaxPrintModal(invDocNo) {
+      const item = (cachedAllInvoices || []).find(inv => String(inv.docNo || "").trim() === String(invDocNo || "").trim());
+      if (!item) {
+        alert("⚠️ ไม่พบข้อมูลเอกสารใบแจ้งหนี้นี้");
+        return;
+      }
+
+      const docMode = (item.docType === "QUOTATION" || item.status === "Quotation") ? "QUOTATION" : "INVOICE";
+      const savedTax = item.taxMeta || null;
+      const itemsArr = (Array.isArray(item.items) && item.items.length > 0)
+        ? item.items
+        : [{ description: item.feeType || "ค่าบริการ", amount: savedTax?.subtotal ?? Number(item.amount || 0) }];
+      const itemsSum = roundCurrency(itemsArr.reduce((s, it) => s + Number(it.amount || 0), 0));
+      const baseSubtotal = (savedTax && savedTax.subtotal !== undefined) ? Number(savedTax.subtotal) : itemsSum;
+
+      const resObj = (cachedResidents || []).find(r => cleanUnitKey(r.unitNumber) === cleanUnitKey(item.unitNumber));
+      const tenantBadge = (resObj && resObj.residentType === "Tenant")
+        ? `<span style="color:#38bdf8; font-weight:bold;"> (💼 ยูนิตผู้เช่า)</span>`
+        : "";
+
+      activeTaxPrintContext = {
+        targetKind: "INVOICE",
+        docMode: docMode,
+        docNo: item.docNo,
+        dateDisplay: formatDisplayDate(item.date || item.timestamp || new Date().toISOString()),
+        unit: item.unitNumber,
+        residentName: item.residentName,
+        periodLabel: formatDisplayMonth(item.billingMonth),
+        feeType: item.feeType,
+        items: itemsArr
+      };
+
+      const isMultiItem = itemsArr.length > 1;
+      document.getElementById("doc-tax-modal-title").innerText = `🧾 ตั้งค่าภาษี & พิมพ์${docMode === "QUOTATION" ? "ใบเสนอราคา" : "ใบแจ้งหนี้"} (${item.docNo})`;
+      document.getElementById("doc-tax-modal-info").innerHTML = `
+        <div><strong style="color:var(--accent-gold);">เลขที่เอกสาร:</strong> ${escapeHtmlText(item.docNo)} | <strong>ยูนิต:</strong> ${escapeHtmlText(item.unitNumber)}${tenantBadge}</div>
+        <div><strong style="color:var(--accent-gold);">ลูกค้า:</strong> ${escapeHtmlText(item.residentName)} | <strong>จำนวนรายการย่อย:</strong> ${itemsArr.length} รายการ</div>
+      `;
+      document.getElementById("modal-base-subtotal-label").innerText = isMultiItem
+        ? "💰 ยอดรวมรายการก่อนภาษี (รวมจากรายการย่อยอัตโนมัติ)"
+        : "💰 ยอดตั้งต้นก่อนภาษี (Subtotal - บาท)";
+      const baseInput = document.getElementById("modal-base-subtotal");
+      baseInput.readOnly = isMultiItem;
+      baseInput.value = baseSubtotal;
+
+      applyDocTaxConfigToDOM("modal", savedTax);
+      document.getElementById("doc-tax-print-modal").style.display = "flex";
+    }
+
+    function closeDocTaxPrintModal() {
+      document.getElementById("doc-tax-print-modal").style.display = "none";
+      activeTaxPrintContext = null;
+    }
+
+    function executeModalDocPrint() {
+      if (!activeTaxPrintContext) return;
+      const ctx = activeTaxPrintContext;
+      const baseSubtotal = getBaseAmountForPrefix("modal");
+      const taxCfg = getDocTaxConfigFromDOM("modal", baseSubtotal);
+      const summary = computeTaxSummary(baseSubtotal, taxCfg);
+      const shouldSave = document.getElementById("modal-save-tax-to-sheet")?.checked;
+
+      let printItems = ctx.items;
+      if (!printItems || printItems.length === 0) {
+        printItems = [{ description: ctx.feeType || "ค่าส่วนกลาง", amount: baseSubtotal }];
+      } else if (printItems.length === 1) {
+        printItems = [{ description: printItems[0].description, amount: baseSubtotal }];
+      }
+
+      document.getElementById("doc-tax-print-modal").style.display = "none";
+
+      populateAndPrintOfficialDoc({
+        docMode: ctx.docMode,
+        docNo: ctx.docNo,
+        dateDisplay: ctx.dateDisplay,
+        unit: ctx.unit,
+        residentName: ctx.residentName,
+        periodLabel: ctx.docMode === "RECEIPT" ? (ctx.feeType || "ค่าส่วนกลาง / บริการ") : (ctx.periodLabel || "-"),
+        items: printItems,
+        subtotal: baseSubtotal,
+        taxConfig: summary.hasAdjustments ? taxCfg : null,
+        payMethod: ctx.payMethod,
+        payMethodNote: ctx.docMode === "RECEIPT" ? `ชำระโดย: ${ctx.payMethod || "โอนเงิน / สแกน QR"}` : ""
+      });
+
+      if (shouldSave) {
+        const savedMeta = summary.hasAdjustments ? taxCfg : null;
+        if (ctx.targetKind === "RECEIPT" && ctx.paymentIdx !== undefined && cachedPayments[ctx.paymentIdx]) {
+          cachedPayments[ctx.paymentIdx].taxMeta = savedMeta;
+          cachedPayments[ctx.paymentIdx]["Amount"] = summary.netTotal;
+          renderTable(cachedPayments);
+          calculateMetrics(cachedPayments, cachedExpenses, cachedPendingInvoices, cachedAllInvoices, cachedProcurement);
+        } else if (ctx.targetKind === "INVOICE") {
+          const invTarget = (cachedAllInvoices || []).find(i => i.docNo === ctx.docNo);
+          if (invTarget) {
+            invTarget.taxMeta = savedMeta;
+            invTarget.amount = summary.netTotal;
+            invTarget.items = printItems;
+          }
+          const pendTarget = (cachedPendingInvoices || []).find(i => i.docNo === ctx.docNo);
+          if (pendTarget) {
+            pendTarget.taxMeta = savedMeta;
+            pendTarget.amount = summary.netTotal;
+            pendTarget.items = printItems;
+          }
+          renderSalesTrackingTable(cachedAllInvoices);
+          renderPendingInvoicesQueue(cachedPendingInvoices);
+        }
+
+        fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            type: "update_doc_tax_meta",
+            targetKind: ctx.targetKind,
+            docNo: ctx.docNo,
+            unitNumber: ctx.unit,
+            sheetRowIndex: ctx.sheetRowIndex || null,
+            netAmount: summary.netTotal,
+            items: printItems,
+            taxMeta: savedMeta,
+            operator: currentUser?.username || "Staff",
+            operatorRole: currentUser?.role || "Staff"
+          })
+        }).catch(err => console.warn("Save tax meta warning:", err));
+      }
+
+      activeTaxPrintContext = null;
+    }
+
+    // 🖨️ ฟังก์ชันพิมพ์ใบเสร็จรับเงิน (รองรับการเรียกตรงแบบเดิม)
+    function handlePrintReceipt(unit, residentName, feeType, amount, payMethod, docNo) {
+      populateAndPrintOfficialDoc({
+        docMode: "RECEIPT",
+        docNo: (docNo && docNo !== "-") ? docNo : ("REC-" + Date.now()),
+        dateDisplay: formatDisplayDate(new Date().toISOString()),
+        unit: unit,
+        residentName: residentName,
+        periodLabel: feeType || "ค่าส่วนกลาง / บริการ",
+        items: [{ description: feeType || "ค่าส่วนกลาง", amount: Number(amount || 0) }],
+        subtotal: Number(amount || 0),
+        taxConfig: null,
+        payMethod: payMethod || "โอนเงิน / สแกน QR",
+        payMethodNote: `ชำระโดย: ${payMethod || "โอนเงิน / สแกน QR"}`
+      });
     }
 
     // 📑 ฟังก์ชันออกใบแจ้งหนี้ / ใบเสนอราคา & สั่งพิมพ์ (Billing Tab Form)
@@ -4203,21 +5014,25 @@
       const container = document.getElementById("invoice-items-container");
       const rows = container.getElementsByClassName("invoice-item-row");
       const items = [];
-      let totalAmt = 0;
+      let subtotalAmt = 0;
 
       for (let r of rows) {
         const desc = r.querySelector(".item-desc-input").value.trim();
         const amt = Number(r.querySelector(".item-amt-input").value || 0);
         if (desc && amt > 0) {
-          items.push({ description: desc, amount: amt });
-          totalAmt += amt;
+          items.push({ description: desc, amount: roundCurrency(amt) });
+          subtotalAmt += amt;
         }
       }
+      subtotalAmt = roundCurrency(subtotalAmt);
 
       if (items.length === 0) {
         alert("⚠️ กรุณาระบุรายการและจำนวนเงินอย่างน้อย 1 รายการ");
         return;
       }
+
+      const invTaxConfig = getDocTaxConfigFromDOM("inv", subtotalAmt);
+      const invSummary = computeTaxSummary(subtotalAmt, invTaxConfig);
 
       const btn = document.getElementById("btn-generate-inv");
       btn.disabled = true;
@@ -4231,8 +5046,9 @@
           residentName: resName,
           billingMonth: monthVal,
           items: items,
-          totalAmount: totalAmt,
-          amount: totalAmt,
+          totalAmount: invSummary.netTotal,
+          amount: invSummary.netTotal,
+          taxMeta: invSummary.hasAdjustments ? invTaxConfig : null,
           feeType: items.length > 0 ? items[0].description : "ค่าบริการ",
           operator: currentUser?.username || "Staff",
           operatorRole: currentUser?.role || "Staff"
@@ -4248,65 +5064,23 @@
           const docNo = resJson.docNo || (docType === "QUOTATION" ? "QT-" : "INV-") + Date.now();
           showExpToast(5, `ออกเอกสาร ${docType}`);
           
-          // กำหนดข้อมูลลง printable-invoice
-          const isQuotation = docType === "QUOTATION";
-          document.getElementById("print-doc-title-th").innerText = isQuotation ? "ใบเสนอราคา / ใบจอง" : "ใบแจ้งหนี้";
-          document.getElementById("print-doc-title-en").innerText = isQuotation ? "QUOTATION" : "INVOICE";
-          document.getElementById("print-inv-no").innerText = docNo;
-          document.getElementById("print-inv-date").innerText = formatDisplayDate(new Date().toISOString());
-
-          document.getElementById("print-label-customer").innerText = "ผู้รับเอกสาร (ลูกค้า/เจ้าของร่วม):";
-          document.getElementById("print-res-name").innerText = resName;
-          document.getElementById("print-res-unit").innerText = unit;
-
-          const cleanKey = cleanUnitKey(unit);
-          const resident = (cachedResidents || []).find(r => cleanUnitKey(r.unitNumber) === cleanKey);
-          const deedEl = document.getElementById("print-res-deed");
-          if (deedEl) deedEl.innerText = resident?.titleDeedNo || resident?.titleDeed || resident?.deed || "-";
-
-          const monthEl = document.getElementById("print-inv-month");
-          if (monthEl) monthEl.innerText = formatDisplayMonth(monthVal);
-
-          const houseNo = unit.includes("899/") ? unit : `899/${unit}`;
-          const autoAddress = resident?.currentAddress || resident?.address || `เลขที่ ${houseNo} หมู่ 9 โครงการอุดมสุขเพลส ต.หนองกี่ อ.กบินทร์บุรี จ.ปราจีนบุรี 25110`;
-          document.getElementById("print-res-address").innerText = autoAddress;
-
-          const tbody = document.getElementById("print-items-tbody");
-          tbody.innerHTML = "";
-          items.forEach((it, idx) => {
-            tbody.innerHTML += `
-              <tr>
-                <td style="text-align: center;">${idx + 1}</td>
-                <td>${it.description}</td>
-                <td style="text-align: right; font-weight: bold;">฿${it.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
-              </tr>
-            `;
+          populateAndPrintOfficialDoc({
+            docMode: (docType === "QUOTATION") ? "QUOTATION" : "INVOICE",
+            docNo: docNo,
+            dateDisplay: formatDisplayDate(new Date().toISOString()),
+            unit: unit,
+            residentName: resName,
+            periodLabel: formatDisplayMonth(monthVal),
+            items: items,
+            subtotal: subtotalAmt,
+            taxConfig: invSummary.hasAdjustments ? invTaxConfig : null
           });
 
-          document.getElementById("print-total-label").innerText = isQuotation ? "รวมยอดเสนอราคาทั้งสิ้น (Total Quotation):" : "รวมยอดที่ต้องชำระทั้งสิ้น (Total Due):";
-          document.getElementById("print-fee-total").innerText = "฿" + totalAmt.toLocaleString('en-US', { minimumFractionDigits: 2 });
+          initInvoiceItems();
+          resetDocTaxForm("inv");
+          const hintEl = document.getElementById("inv-tenant-tax-hint");
+          if (hintEl) hintEl.style.display = "none";
 
-          const noteBox = document.getElementById("print-payment-note");
-          if (noteBox) {
-            noteBox.style.background = "#fffbeb";
-            noteBox.style.borderColor = "#fde68a";
-            noteBox.innerHTML = `
-              <strong style="color: #b45309;">📌 ข้อมูลและขั้นตอนการชำระเงิน:</strong><br>
-              1. กรุณานำใบแจ้งหนี้นี้มาชำระ ณ สำนักงานนิติบุคคล หรือชำระผ่านช่องทางโอนเงินเข้าบัญชีบริษัท<br>
-              2. เมื่อชำระเงินเรียบร้อยแล้ว <strong>ฝ่ายการเงินจะดำเนินการออก "ใบเสร็จรับเงินฉบับเต็ม (Official Receipt)"</strong> ให้เป็นหลักฐานทันที
-            `;
-          }
-
-          const opName = currentUser?.fullName || currentUser?.username || "เจ้าหน้าที่";
-          document.getElementById("print-operator-name").innerText = opName;
-          document.getElementById("print-sig-left-title").innerText = isQuotation ? "เจ้าหน้าที่ฝ่ายขาย" : "เจ้าหน้าที่ฝ่ายจัดทำเอกสาร";
-
-          // สั่งพิมพ์
-          document.body.className = "print-mode-inv";
-          window.print();
-          document.body.className = "";
-
-          // โหลดข้อมูลใหม่
           await loadDashboardData();
         } else {
           alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
