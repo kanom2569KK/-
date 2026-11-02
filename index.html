@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- UDplace Production System - v2026-11-02-v2 -->
+<!-- UDplace Production System - Connected to AKfycbyWMES...tw4A -->
 <html lang="th">
 <head>
   <meta charset="UTF-8">
@@ -1972,7 +1972,7 @@
   </main>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxrjW448Uz0HllSVTUCeFwVhUp7cENvK9hKqKA0qm728jQkid8ttgpq3-W3-A0ba8VMMA/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbyWMESqlfPWxdvc2YhkigKTf37dUc8X7uJwWoc30eXpCGHVzO567g-f1LYkdYl8t_tw4A/exec";
     
     let currentUser = null;
     let activeBackendVersion = null;
@@ -2694,7 +2694,8 @@
 
       const warnBanner = document.getElementById("edit-res-backend-warning");
       if (warnBanner) {
-        warnBanner.style.display = (hasLoadedDashboardOnce && !activeBackendVersion) ? "block" : "none";
+        const isLegacyUrl = API_URL.indexOf("A0ba8VMMA") !== -1;
+        warnBanner.style.display = (isLegacyUrl && hasLoadedDashboardOnce && !activeBackendVersion) ? "block" : "none";
       }
 
       document.getElementById("edit-res-unit").value = res.unitNumber;
@@ -2732,7 +2733,7 @@
     async function submitUpdateResident(event) {
       event.preventDefault();
 
-      if (hasLoadedDashboardOnce && !activeBackendVersion) {
+      if (API_URL.indexOf("A0ba8VMMA") !== -1 && hasLoadedDashboardOnce && !activeBackendVersion) {
         alert(
           "🛑 ระบบระงับการบันทึกไว้ชั่วคราว เพื่อป้องกันข้อมูลกระโดดข้ามช่อง!\n\n" +
           "สาเหตุ: ลิงก์ Google Apps Script หลังบ้านยังรันโค้ดเวอร์ชันเก่าอยู่\n\n" +
