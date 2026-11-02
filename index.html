@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- UDplace Production System - v2026-11-02-v2 -->
 <html lang="th">
 <head>
   <meta charset="UTF-8">
@@ -714,7 +715,11 @@
         <span>✏️ แก้ไขข้อมูลลูกบ้าน (Unit Profile Update)</span>
         <span class="ro-close" onclick="closeEditResidentModal()">✕</span>
       </div>
-      <form onsubmit="submitUpdateResident(event)" style="padding: 20px;">
+      <form onsubmit="submitUpdateResident(event)" autocomplete="off" style="padding: 20px;">
+        <div id="edit-res-backend-warning" style="display: none; margin-bottom: 14px; padding: 12px 14px; border-radius: 10px; background: rgba(185, 28, 28, 0.28); border: 2px solid #ef4444; color: #fecaca; font-size: 13px; line-height: 1.55;">
+          ⚠️ <strong style="color: #fde047;">แจ้งเตือนสำคัญ:</strong> ตรวจพบว่า <strong>Google Apps Script หลังบ้านยังเป็นเวอร์ชันเก่า</strong> (สาเหตุที่ทำให้ข้อมูลกระโดดข้ามช่อง)<br>
+          กรุณาอัปเดตโค้ด <code>Code.gs</code> แล้วกด <strong>การทำให้ใช้งานได้ (Deploy) ➔ จัดการการทำให้ใช้งานได้ ➔ รูปดินสอ ✏️ ➔ เลือก "เวอร์ชันใหม่" ➔ กดการทำให้ใช้งานได้</strong> จากนั้นรีเฟรชหน้าเว็บนี้ก่อนบันทึกครับ
+        </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
           <div class="form-group">
             <label>เลขยูนิต / แปลงบ้าน (ไม่สามารถเปลี่ยนได้)</label>
@@ -1521,7 +1526,7 @@
               📜 รายชื่อลูกบ้านทั้งหมด
             </button>
           </div>
-          <form id="resident-form" onsubmit="submitNewResident(event)">
+          <form id="resident-form" onsubmit="submitNewResident(event)" autocomplete="off">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
               <div class="form-group">
                 <label>ประเภทผู้พักอาศัย *</label>
@@ -1970,6 +1975,8 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbxrjW448Uz0HllSVTUCeFwVhUp7cENvK9hKqKA0qm728jQkid8ttgpq3-W3-A0ba8VMMA/exec";
     
     let currentUser = null;
+    let activeBackendVersion = null;
+    let hasLoadedDashboardOnce = false;
     let cachedPayments = [];
     let cachedExpenses = [];
     let cachedResidents = [];
@@ -2561,19 +2568,138 @@
       }
     }
 
+    function cleanResFieldFront(val) {
+      if (val === null || val === undefined) return "";
+      let s = String(val).trim();
+      if (s === "-") return "";
+      if (/^\d+\.0$/.test(s)) s = s.slice(0, -2);
+      return s;
+    }
+
+    function isThaiPhoneFront(val) {
+      const s = cleanResFieldFront(val);
+      if (!s || s.indexOf("/") !== -1 || s.indexOf("@") !== -1) return false;
+      const digits = s.replace(/[\s\-()]/g, "");
+      if (/^0[2-9]\d{7,8}$/.test(digits)) return true;
+      if (/^[2-9]\d{7,8}$/.test(digits)) return true;
+      return false;
+    }
+
+    function normalizeThaiPhoneFront(val) {
+      const s = cleanResFieldFront(val);
+      if (!s) return "-";
+      const compact = s.replace(/\s+/g, "");
+      if (/^[2-9]\d{7,8}$/.test(compact)) return "0" + compact;
+      return s;
+    }
+
+    function isThaiAddressFront(val) {
+      const s = cleanResFieldFront(val);
+      if (!s || s.indexOf("@") !== -1 || s.indexOf("http") === 0) return false;
+      return /(เลขที่|หมู่|ม\.|ตำบล|ต\.|อำเภอ|อ\.|จังหวัด|จ\.|ถนน|โครงการ|สำนักงาน|\b\d{5}\b)/.test(s);
+    }
+
+    function normalizeResidentRecord(raw) {
+      if (!raw) return raw;
+      const colC = cleanResFieldFront(raw.residentType);
+      const colD = cleanResFieldFront(raw.titleDeedNo);
+      const colE = cleanResFieldFront(raw.phone);
+      const colF = cleanResFieldFront(raw.email);
+      const colG = cleanResFieldFront(raw.idCardAddress);
+      const colH = cleanResFieldFront(raw.currentAddress);
+      const colO = cleanResFieldFront(raw.ownerPhone);
+
+      const isShifted = (colC !== "Owner" && colC !== "Tenant") ||
+                        (isThaiPhoneFront(colD) && !isThaiPhoneFront(colE)) ||
+                        isThaiAddressFront(colF);
+
+      if (!isShifted) {
+        return Object.assign({}, raw, {
+          residentType: (colC === "Tenant") ? "Tenant" : "Owner",
+          titleDeedNo: colD || "-",
+          phone: isThaiPhoneFront(colE) ? normalizeThaiPhoneFront(colE) : (colE || "-"),
+          email: colF || "-",
+          idCardAddress: colG || "-",
+          currentAddress: colH || "-"
+        });
+      }
+
+      const fixedType = (colC === "Tenant") ? "Tenant" : "Owner";
+      let fixedDeed = "-";
+      if (colC && colC !== "Owner" && colC !== "Tenant" && !isThaiPhoneFront(colC) && !isThaiAddressFront(colC) && colC.indexOf("@") === -1 && colC.indexOf("http") !== 0) {
+        fixedDeed = colC;
+      } else if (colD && !isThaiPhoneFront(colD) && !isThaiAddressFront(colD) && colD.indexOf("@") === -1 && colD.indexOf("http") !== 0) {
+        fixedDeed = colD;
+      }
+
+      let fixedPhone = "-";
+      if (isThaiPhoneFront(colE)) fixedPhone = normalizeThaiPhoneFront(colE);
+      else if (isThaiPhoneFront(colD)) fixedPhone = normalizeThaiPhoneFront(colD);
+      else if (isThaiPhoneFront(colC)) fixedPhone = normalizeThaiPhoneFront(colC);
+      else if (isThaiPhoneFront(colO)) fixedPhone = normalizeThaiPhoneFront(colO);
+      else if (colE && colE.indexOf("@") === -1 && !isThaiAddressFront(colE)) fixedPhone = colE;
+
+      let fixedEmail = "-";
+      if (colE.indexOf("@") !== -1) fixedEmail = colE;
+      else if (colF.indexOf("@") !== -1) fixedEmail = colF;
+
+      const isAddr = v => v && v.indexOf("@") === -1 && v.indexOf("http") !== 0 && !isThaiPhoneFront(v);
+      const addrF = isAddr(colF) ? colF : "";
+      const addrG = isAddr(colG) ? colG : "";
+      const addrH = isAddr(colH) ? colH : "";
+
+      let fixedIdAddr = "-";
+      let fixedCurAddr = "-";
+      if (addrF && addrG) {
+        fixedIdAddr = addrF;
+        fixedCurAddr = addrG;
+      } else if (!addrF && addrG) {
+        fixedIdAddr = "-";
+        fixedCurAddr = addrG;
+      } else if (addrF && !addrG) {
+        if (addrH) {
+          fixedIdAddr = addrF;
+          fixedCurAddr = addrH;
+        } else if (addrF.indexOf("โครงการอุดมสุขเพลส") !== -1) {
+          fixedIdAddr = "-";
+          fixedCurAddr = addrF;
+        } else {
+          fixedIdAddr = addrF;
+          fixedCurAddr = "-";
+        }
+      } else if (addrH) {
+        fixedCurAddr = addrH;
+      }
+
+      return Object.assign({}, raw, {
+        residentType: fixedType,
+        titleDeedNo: fixedDeed,
+        phone: fixedPhone,
+        email: fixedEmail,
+        idCardAddress: fixedIdAddr,
+        currentAddress: fixedCurAddr
+      });
+    }
+
     function openEditResidentModal(unitNumber) {
       const targetKey = cleanUnitKey(unitNumber);
-      const res = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
-      if (!res) {
+      const foundRes = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
+      if (!foundRes) {
         alert("⚠️ ไม่พบข้อมูลลูกบ้านรายนี้");
         return;
       }
+      const res = normalizeResidentRecord(foundRes);
 
       document.getElementById("customer-list-modal").style.display = "none";
 
+      const warnBanner = document.getElementById("edit-res-backend-warning");
+      if (warnBanner) {
+        warnBanner.style.display = (hasLoadedDashboardOnce && !activeBackendVersion) ? "block" : "none";
+      }
+
       document.getElementById("edit-res-unit").value = res.unitNumber;
       if (document.getElementById("edit-res-type")) {
-        document.getElementById("edit-res-type").value = res.residentType || "Owner";
+        document.getElementById("edit-res-type").value = (res.residentType === "Tenant") ? "Tenant" : "Owner";
       }
       document.getElementById("edit-res-deed").value = (res.titleDeedNo && res.titleDeedNo !== "-") ? res.titleDeedNo : "";
       document.getElementById("edit-res-name").value = res.residentName || "";
@@ -2605,16 +2731,32 @@
 
     async function submitUpdateResident(event) {
       event.preventDefault();
+
+      if (hasLoadedDashboardOnce && !activeBackendVersion) {
+        alert(
+          "🛑 ระบบระงับการบันทึกไว้ชั่วคราว เพื่อป้องกันข้อมูลกระโดดข้ามช่อง!\n\n" +
+          "สาเหตุ: ลิงก์ Google Apps Script หลังบ้านยังรันโค้ดเวอร์ชันเก่าอยู่\n\n" +
+          "วิธีแก้ไข (ทำครั้งเดียว):\n" +
+          "1. เปิดหน้า Google Apps Script วางโค้ด Code.gs ตัวใหม่ แล้วกด Save (💾)\n" +
+          "2. กดปุ่ม 'การทำให้ใช้งานได้ (Deploy)' ➔ เลือก 'จัดการการทำให้ใช้งานได้ (Manage deployments)'\n" +
+          "3. กดไอคอนรูปดินสอ ✏️ ➔ ช่องเวอร์ชันเลือก 'เวอร์ชันใหม่ (New version)' ➔ กดปุ่ม 'การทำให้ใช้งานได้'\n" +
+          "   (⚠️ ห้ามกด 'การทำให้ใช้งานได้รายการใหม่' เพราะลิงก์จะเปลี่ยน)\n" +
+          "4. กลับมารีเฟรชหน้าเว็บนี้ (กด F5) แล้วกดบันทึกได้ทันทีครับ"
+        );
+        return;
+      }
+
       const btn = document.getElementById("btn-submit-update-resident");
       btn.disabled = true;
       btn.innerText = "⏳ กำลังบันทึกการแก้ไข...";
 
+      const rawTypeVal = document.getElementById("edit-res-type") ? document.getElementById("edit-res-type").value : "Owner";
       const payload = {
         type: "update_resident",
         operator: currentUser?.username,
         operatorRole: currentUser?.role,
         unitNumber: document.getElementById("edit-res-unit").value.trim(),
-        residentType: document.getElementById("edit-res-type") ? document.getElementById("edit-res-type").value : "Owner",
+        residentType: (rawTypeVal === "Tenant") ? "Tenant" : "Owner",
         titleDeedNo: document.getElementById("edit-res-deed").value.trim(),
         residentName: document.getElementById("edit-res-name").value.trim(),
         phone: document.getElementById("edit-res-phone").value.trim(),
@@ -2675,9 +2817,11 @@
         const fetchUrl = API_URL + "?t=" + new Date().getTime();
         const data = await fetchWithRetry(fetchUrl, {}, 3, 1500, "กำลังโหลดข้อมูลระบบ...", "กำลังดึงข้อมูลล่าสุดจาก Google Sheets");
         if (data.payments) { 
+          activeBackendVersion = data.backendVersion || null;
+          hasLoadedDashboardOnce = true;
           cachedPayments = data.payments || []; 
           cachedExpenses = data.expenses || [];
-          cachedResidents = data.residents || []; 
+          cachedResidents = (data.residents || []).map(normalizeResidentRecord); 
           cachedProcurement = data.procurement || [];
           cachedPendingInvoices = data.pendingInvoices || [];
           cachedAllInvoices = data.allInvoices || [];
@@ -3992,7 +4136,7 @@
         
         // เลขโฉนด & ข้อมูลรอบเดือน
         const deedEl = document.getElementById("print-res-deed");
-        if (deedEl) deedEl.innerText = resident?.titleDeed || resident?.deed || "-";
+        if (deedEl) deedEl.innerText = resident?.titleDeedNo || resident?.titleDeed || resident?.deed || "-";
         
         const monthEl = document.getElementById("print-inv-month");
         if (monthEl) monthEl.innerText = feeType || "ค่าส่วนกลาง / บริการ";
@@ -4117,7 +4261,7 @@
           const cleanKey = cleanUnitKey(unit);
           const resident = (cachedResidents || []).find(r => cleanUnitKey(r.unitNumber) === cleanKey);
           const deedEl = document.getElementById("print-res-deed");
-          if (deedEl) deedEl.innerText = resident?.titleDeed || resident?.deed || "-";
+          if (deedEl) deedEl.innerText = resident?.titleDeedNo || resident?.titleDeed || resident?.deed || "-";
 
           const monthEl = document.getElementById("print-inv-month");
           if (monthEl) monthEl.innerText = formatDisplayMonth(monthVal);
