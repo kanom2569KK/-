@@ -731,7 +731,6 @@
   <!-- ⏳ ป๊อปอัปกลางหน้าจอแสดงสถานะการทำงาน -->
   <div id="global-loading-modal" class="modal-overlay" style="z-index: 25000;">
     <div class="loading-modal-box">
-      <div style="font-size: 38px; margin-bottom: 8px;">⏳</div>
       <h3 style="color: var(--accent-gold); font-size: 18px; font-weight: bold;" id="loading-modal-title">กำลังประมวลผลข้อมูล...</h3>
       <p style="color: var(--text-muted); font-size: 12px; margin-top: 4px;" id="loading-modal-subtitle">ระบบกำลังส่งคำสั่งและเชื่อมต่อ Google Sheets</p>
       
@@ -812,7 +811,7 @@
     </table>
 
     <div id="print-payment-note" style="background: #fffbeb; border: 1px solid #fde68a; padding: 10px 14px; border-radius: 6px; font-size: 9.5pt; margin-bottom: 20px;">
-      <strong style="color: #b45309;">📌 ข้อมูลและขั้นตอนการชำระเงิน:</strong><br>
+      <strong style="color: #b45309;">ข้อมูลและขั้นตอนการชำระเงิน:</strong><br>
       1. กรุณานำใบแจ้งหนี้นี้มาชำระ ณ สำนักงานนิติบุคคล หรือชำระผ่านช่องทางโอนเงินเข้าบัญชีบริษัท<br>
       2. เมื่อชำระเงินเรียบร้อยแล้ว <strong>ฝ่ายการเงินจะดำเนินการออก "ใบเสร็จรับเงินฉบับเต็ม (Official Receipt)"</strong> ให้เป็นหลักฐานทันที
     </div>
@@ -934,14 +933,14 @@
   <div id="customer-list-modal" class="modal-overlay">
     <div class="ro-window" style="max-width: 1020px; width: 95%;">
       <div class="ro-header">
-        <span>📜 สารบบข้อมูลลูกบ้านทั้งหมด (Residents Directory)</span>
+        <span>สารบบข้อมูลลูกบ้านทั้งหมด (Residents Directory)</span>
         <span class="ro-close" onclick="closeCustomerListModal()">✕</span>
       </div>
       <div style="padding: 16px 20px 0 20px; display: flex; gap: 10px; align-items: center;">
-        <input type="text" id="modal-resident-search" placeholder="🔍 พิมพ์ค้นหาเลขยูนิต, ชื่อ-นามสกุล, เลขโฉนด, เบอร์โทร หรือที่อยู่..." onkeyup="filterModalResidentList()" 
+        <input type="text" id="modal-resident-search" placeholder="พิมพ์ค้นหาเลขยูนิต, ชื่อ-นามสกุล, เลขโฉนด, เบอร์โทร หรือที่อยู่..." onkeyup="filterModalResidentList()" 
                style="flex: 1; padding: 10px 14px; background: #231106; color: var(--text-main); border: 2px solid #140803; border-radius: 10px; outline: none; font-size: 13px;">
         <button type="button" class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #2a1508; font-weight: bold; border: 2px solid #140803; padding: 10px 16px; border-radius: 10px; white-space: nowrap;" onclick="goToResidentRegistrationFromModal()">
-          ➕ ลงทะเบียนลูกบ้านใหม่
+          + ลงทะเบียนลูกบ้านใหม่
         </button>
       </div>
       <div class="ro-body" style="padding: 14px 20px; flex-direction: column; align-items: stretch;">
@@ -972,13 +971,13 @@
   <div id="edit-resident-modal" class="modal-overlay">
     <div class="ro-window" style="max-width: 650px; width: 90%;">
       <div class="ro-header">
-        <span>✏️ แก้ไขข้อมูลลูกบ้าน (Unit Profile Update)</span>
+        <span>แก้ไขข้อมูลลูกบ้าน (Unit Profile Update)</span>
         <span class="ro-close" onclick="closeEditResidentModal()">✕</span>
       </div>
       <form onsubmit="submitUpdateResident(event)" autocomplete="off" style="padding: 20px;">
         <div id="edit-res-backend-warning" style="display: none; margin-bottom: 14px; padding: 12px 14px; border-radius: 10px; background: rgba(185, 28, 28, 0.28); border: 2px solid #ef4444; color: #fecaca; font-size: 13px; line-height: 1.55;">
-          ⚠️ <strong style="color: #fde047;">แจ้งเตือนสำคัญ:</strong> ตรวจพบว่า <strong>Google Apps Script หลังบ้านยังเป็นเวอร์ชันเก่า</strong> (สาเหตุที่ทำให้ข้อมูลกระโดดข้ามช่อง)<br>
-          กรุณาอัปเดตโค้ด <code>Code.gs</code> แล้วกด <strong>การทำให้ใช้งานได้ (Deploy) ➔ จัดการการทำให้ใช้งานได้ ➔ รูปดินสอ ✏️ ➔ เลือก "เวอร์ชันใหม่" ➔ กดการทำให้ใช้งานได้</strong> จากนั้นรีเฟรชหน้าเว็บนี้ก่อนบันทึกครับ
+          <strong style="color: #fde047;">แจ้งเตือนสำคัญ:</strong> ตรวจพบว่า <strong>Google Apps Script หลังบ้านยังเป็นเวอร์ชันเก่า</strong> (สาเหตุที่ทำให้ข้อมูลกระโดดข้ามช่อง)<br>
+          กรุณาอัปเดตโค้ด <code>Code.gs</code> แล้วกด <strong>การทำให้ใช้งานได้ (Deploy) ➔ จัดการการทำให้ใช้งานได้ ➔ รูปดินสอ ➔ เลือก "เวอร์ชันใหม่" ➔ กดการทำให้ใช้งานได้</strong> จากนั้นรีเฟรชหน้าเว็บนี้ก่อนบันทึกครับ
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
           <div class="form-group">
@@ -1009,21 +1008,21 @@
             <input type="email" id="edit-res-email">
           </div>
           <div class="form-group" style="grid-column: span 2;">
-            <label>🏠 ที่อยู่ตามบัตรประชาชน</label>
+            <label>ที่อยู่ตามบัตรประชาชน</label>
             <textarea id="edit-res-id-address" rows="2"></textarea>
           </div>
           <div class="form-group" style="grid-column: span 2;">
-            <label>📍 ที่อยู่ปัจจุบัน / สถานที่จัดส่งเอกสาร</label>
+            <label>ที่อยู่ปัจจุบัน / สถานที่จัดส่งเอกสาร</label>
             <textarea id="edit-res-cur-address" rows="2"></textarea>
           </div>
           <div class="form-group" style="grid-column: span 2;">
-            <label>📷 อัปโหลดภาพถ่ายใหม่ (เว้นว่างไว้หากไม่เปลี่ยน)</label>
+            <label>อัปโหลดภาพถ่ายใหม่ (เว้นว่างไว้หากไม่เปลี่ยน)</label>
             <input type="file" id="edit-res-photo" accept="image/*" onchange="previewEditResidentPhoto(event)">
           </div>
         </div>
         <div style="display: flex; gap: 10px; margin-top: 14px;">
           <button type="button" class="ro-btn" style="flex: 1;" onclick="closeEditResidentModal()">ยกเลิก</button>
-          <button type="submit" class="btn-primary" id="btn-submit-update-resident" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #0284c7, #0369a1);">💾 บันทึกการแก้ไขข้อมูล</button>
+          <button type="submit" class="btn-primary" id="btn-submit-update-resident" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #0284c7, #0369a1);">บันทึกการแก้ไขข้อมูล</button>
         </div>
       </form>
     </div>
@@ -1033,13 +1032,13 @@
   <div id="unit-ledger-modal" class="modal-overlay">
     <div class="ro-window" style="max-width: 950px; width: 95%;">
       <div class="ro-header">
-        <span>📖 สมุดบัญชีการเงินรายยูนิต (Individual Resident Ledger)</span>
+        <span>สมุดบัญชีการเงินรายยูนิต (Individual Resident Ledger)</span>
         <span class="ro-close" onclick="closeLedgerModal()">✕</span>
       </div>
       <div style="padding: 20px;">
         <div style="display: flex; gap: 10px; margin-bottom: 16px;">
-          <input type="text" id="ledger-search-unit" placeholder="🔍 พิมพ์เลขยูนิต เช่น 12 หรือ 899/12 แล้วกดค้นหา" style="flex: 1; padding: 10px 14px; background: #231106; color: var(--text-main); border: 2px solid #140803; border-radius: 10px; outline: none;">
-          <button type="button" class="btn-primary" style="margin: 0; width: 140px; background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="searchUnitLedger()">🔍 ค้นหา</button>
+          <input type="text" id="ledger-search-unit" placeholder="พิมพ์เลขยูนิต เช่น 12 หรือ 899/12 แล้วกดค้นหา" style="flex: 1; padding: 10px 14px; background: #231106; color: var(--text-main); border: 2px solid #140803; border-radius: 10px; outline: none;">
+          <button type="button" class="btn-primary" style="margin: 0; width: 140px; background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="searchUnitLedger()">ค้นหา</button>
         </div>
 
         <div id="ledger-content-box" style="display: none;">
@@ -1085,7 +1084,7 @@
   <div id="expense-update-modal" class="modal-overlay">
     <div class="ro-window" style="max-width: 600px; width: 90%;">
       <div class="ro-header">
-        <span id="expense-modal-title">📎 แนบไฟล์หลักฐานการจ่ายเงิน</span>
+        <span id="expense-modal-title">แนบไฟล์หลักฐานการจ่ายเงิน</span>
         <span class="ro-close" onclick="closeExpenseUpdateModal()">✕</span>
       </div>
       <div style="padding: 20px;">
@@ -1130,19 +1129,19 @@
         </div>
 
         <div id="exp-modal-existing-files-box" style="background: rgba(3, 105, 161, 0.16); border: 1px dashed #38bdf8; padding: 10px 12px; border-radius: 10px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
-          <span id="exp-modal-existing-files-label" style="font-size: 12.5px; color: #bae6fd; font-weight: bold;">📂 บิลหลักฐานที่แนบไว้แล้ว: 0 ใบ</span>
-          <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: bold;" onclick="openFilesModalFromUpdateModal()">🗂️ เปิดดู / เลือกลบบิลเดิม</button>
+          <span id="exp-modal-existing-files-label" style="font-size: 12.5px; color: #bae6fd; font-weight: bold;">บิลหลักฐานที่แนบไว้แล้ว: 0 ใบ</span>
+          <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: bold;" onclick="openFilesModalFromUpdateModal()">เปิดดู / เลือกลบบิลเดิม</button>
         </div>
 
         <div class="form-group">
-          <label for="exp-modal-file">📎 อัปโหลดไฟล์บิลหลักฐานเพิ่ม (เลือกได้หลายไฟล์ — ระบบจะต่อท้ายบิลเดิม ไม่ทับไฟล์เก่า)</label>
+          <label for="exp-modal-file">อัปโหลดไฟล์บิลหลักฐานเพิ่ม (เลือกได้หลายไฟล์ — ระบบจะต่อท้ายบิลเดิม ไม่ทับไฟล์เก่า)</label>
           <input type="file" id="exp-modal-file" accept="image/*,application/pdf" multiple onchange="previewExpenseModalFile(event)">
           <div id="exp-modal-file-list"></div>
         </div>
 
         <div style="display: flex; gap: 10px; margin-top: 14px;">
           <button type="button" class="ro-btn" style="flex: 1;" onclick="closeExpenseUpdateModal()">ยกเลิก</button>
-          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #059669, #047857);" onclick="submitExpenseUpdateRecord()">💾 บันทึกข้อมูล & อัปโหลดบิลเพิ่ม</button>
+          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #059669, #047857);" onclick="submitExpenseUpdateRecord()">บันทึกข้อมูล & อัปโหลดบิลเพิ่ม</button>
         </div>
       </div>
     </div>
@@ -1151,12 +1150,11 @@
   <!-- 🗂️ DIALOG POPUP: แฟ้มดูบิลหลักฐานทั้งหมด + อัปโหลดบิลเพิ่มหลายรอบ + เลือกลบบิลรายใบ -->
   <dialog id="expense-files-dialog" class="ro-dialog-modal" closedby="any" aria-labelledby="expense-files-dialog-title">
     <div class="ro-header" style="align-items: center;">
-      <h2 id="expense-files-dialog-title" style="font-size: 16px; font-weight: bold; color: var(--accent-gold); margin: 0;">🗂️ แฟ้มหลักฐานการจ่ายเงิน</h2>
+      <h2 id="expense-files-dialog-title" style="font-size: 16px; font-weight: bold; color: var(--accent-gold); margin: 0;">แฟ้มหลักฐานการจ่ายเงิน</h2>
       <button type="button" class="ro-dialog-close-btn" onclick="closeExpenseFilesModal()" aria-label="ปิดหน้าต่าง">✕</button>
     </div>
 
     <div id="exp-files-dialog-busy" class="dialog-busy-bar" aria-live="polite">
-      <span>⏳</span>
       <span id="exp-files-dialog-busy-text">กำลังประมวลผลไฟล์หลักฐาน...</span>
     </div>
 
@@ -1167,7 +1165,7 @@
       <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; background: rgba(20, 8, 3, 0.65); border: 1.5px dashed #78350f; border-radius: 12px; padding: 10px 14px;">
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
           <label for="exp-popup-upload-input" class="btn-action" style="background: linear-gradient(135deg, #059669, #047857); border-color: #064e3b; padding: 7px 14px; font-size: 12.5px; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; margin: 0; cursor: pointer;">
-            ➕ เพิ่มบิลหลักฐาน (อัปโหลดหลายใบ/หลายรอบ)
+            + เพิ่มบิลหลักฐาน (อัปโหลดหลายใบ/หลายรอบ)
           </label>
           <input type="file" id="exp-popup-upload-input" accept="image/*,application/pdf" multiple onchange="handlePopupSelectMoreFiles(event)" style="position: absolute; clip-path: inset(50%); overflow: hidden; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;">
         </div>
@@ -1178,7 +1176,7 @@
             <span>เลือกทั้งหมด</span>
           </label>
           <button type="button" id="btn-delete-selected-bills" class="btn-action" style="background: #7f1d1d; border-color: #dc2626; color: #fecaca; padding: 6px 12px; font-weight: bold; opacity: 0.5; cursor: not-allowed;" onclick="deleteSelectedExpenseBills()" disabled>
-            🗑️ ลบบิลที่เลือก (0 ใบ)
+            ลบบิลที่เลือก (0 ใบ)
           </button>
         </div>
       </div>
@@ -1186,10 +1184,10 @@
       <!-- กล่องแสดงไฟล์ใหม่ที่รออัปโหลดเข้าแฟ้มเพิ่มเติม -->
       <div id="exp-popup-staged-box" style="display: none; margin-top: 12px; background: rgba(5, 150, 105, 0.14); border: 1.5px solid #059669; border-radius: 12px; padding: 12px 14px;">
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
-          <strong id="exp-popup-staged-title" style="color: #6ee7b7; font-size: 13px;">📥 ไฟล์บิลใหม่ที่เตรียมอัปโหลดเพิ่ม (0 ใบ)</strong>
+          <strong id="exp-popup-staged-title" style="color: #6ee7b7; font-size: 13px;">ไฟล์บิลใหม่ที่เตรียมอัปโหลดเพิ่ม (0 ใบ)</strong>
           <div style="display: flex; gap: 8px;">
             <button type="button" class="btn-action" style="background: #451a03;" onclick="clearPopupStagedFiles()">ล้างรายการที่เลือก</button>
-            <button type="button" id="btn-confirm-popup-upload" class="btn-action" style="background: linear-gradient(135deg, #10b981, #047857); font-weight: bold; padding: 6px 14px;" onclick="submitPopupStagedFiles()">📤 ยืนยันอัปโหลดเข้าแฟ้ม</button>
+            <button type="button" id="btn-confirm-popup-upload" class="btn-action" style="background: linear-gradient(135deg, #10b981, #047857); font-weight: bold; padding: 6px 14px;" onclick="submitPopupStagedFiles()">ยืนยันอัปโหลดเข้าแฟ้ม</button>
           </div>
         </div>
         <div id="exp-popup-staged-list"></div>
@@ -1208,7 +1206,7 @@
   <!-- 🔍 DIALOG POPUP: ขยายดูบิลใบเต็ม / เปิดอ่าน PDF พร้อมปุ่มเลื่อนดูบิลก่อนหน้า-ถัดไป และปุ่มลบบิล -->
   <dialog id="expense-bill-viewer-dialog" class="ro-dialog-modal" closedby="any" aria-labelledby="bill-viewer-dialog-title" style="max-width: 980px; width: 96%;">
     <div class="ro-header" style="align-items: center;">
-      <h2 id="bill-viewer-dialog-title" style="font-size: 15px; font-weight: bold; color: var(--accent-gold); margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔍 ดูรายละเอียดบิลหลักฐาน</h2>
+      <h2 id="bill-viewer-dialog-title" style="font-size: 15px; font-weight: bold; color: var(--accent-gold); margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">ดูรายละเอียดบิลหลักฐาน</h2>
       <button type="button" class="ro-dialog-close-btn" onclick="closeBillViewerDialog()" aria-label="ปิดหน้าต่างขยายบิล">✕</button>
     </div>
 
@@ -1217,13 +1215,13 @@
 
     <div class="ro-footer" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
       <div style="display: flex; gap: 8px; align-items: center;">
-        <button type="button" id="btn-viewer-prev" class="ro-btn" onclick="stepBillViewer(-1)">◀ บิลก่อนหน้า</button>
+        <button type="button" id="btn-viewer-prev" class="ro-btn" onclick="stepBillViewer(-1)">← บิลก่อนหน้า</button>
         <span id="bill-viewer-counter" style="font-size: 13px; font-weight: bold; color: var(--accent-gold); padding: 0 6px;">1 / 1</span>
-        <button type="button" id="btn-viewer-next" class="ro-btn" onclick="stepBillViewer(1)">บิลถัดไป ▶</button>
+        <button type="button" id="btn-viewer-next" class="ro-btn" onclick="stepBillViewer(1)">บิลถัดไป →</button>
       </div>
       <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-        <button type="button" id="btn-viewer-delete-current" class="ro-btn" style="background: #991b1b; border-color: #dc2626;" onclick="deleteCurrentViewedBill()">🗑️ ลบบิลใบนี้</button>
-        <a id="btn-viewer-open-newtab" href="#" target="_blank" rel="noopener noreferrer" class="ro-btn" style="background: #0369a1; text-decoration: none; display: inline-flex; align-items: center;">🔗 เปิดในแท็บใหม่</a>
+        <button type="button" id="btn-viewer-delete-current" class="ro-btn" style="background: #991b1b; border-color: #dc2626;" onclick="deleteCurrentViewedBill()">ลบบิลใบนี้</button>
+        <a id="btn-viewer-open-newtab" href="#" target="_blank" rel="noopener noreferrer" class="ro-btn" style="background: #0369a1; text-decoration: none; display: inline-flex; align-items: center;">เปิดในแท็บใหม่</a>
         <button type="button" class="ro-btn" onclick="closeBillViewerDialog()">ปิด</button>
       </div>
     </div>
@@ -1233,7 +1231,7 @@
   <div id="voucher-modal" class="modal-overlay">
     <div class="ro-window" style="max-width: 600px; width: 90%;">
       <div class="ro-header">
-        <span>📄 รายละเอียดการบันทึกรายจ่าย (Expense Voucher)</span>
+        <span>รายละเอียดการบันทึกรายจ่าย (Expense Voucher)</span>
         <span class="ro-close" onclick="closeVoucherModal()">✕</span>
       </div>
       <div style="padding: 20px;">
@@ -1241,7 +1239,7 @@
         </div>
         <div style="display: flex; gap: 10px; margin-top: 20px;">
           <button type="button" class="ro-btn" style="flex: 1;" onclick="closeVoucherModal()">ปิดหน้าต่าง</button>
-          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #0284c7, #0369a1);" id="btn-print-voucher" onclick="printExpenseVoucher()">🖨️ พิมพ์ใบสำคัญจ่าย (A4)</button>
+          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #0284c7, #0369a1);" id="btn-print-voucher" onclick="printExpenseVoucher()">พิมพ์ใบสำคัญจ่าย (A4)</button>
         </div>
       </div>
     </div>
@@ -1251,7 +1249,7 @@
   <div id="stock-adjust-modal" class="modal-overlay">
     <div class="ro-window" style="max-width: 540px; width: 92%;">
       <div class="ro-header">
-        <span>🛠️ ปรับแก้ไขข้อมูลพัสดุและสต็อก (Full Edit)</span>
+        <span>ปรับแก้ไขข้อมูลพัสดุและสต็อก (Full Edit)</span>
         <span class="ro-close" onclick="closeStockModal()">✕</span>
       </div>
       <div style="padding: 20px;">
@@ -1294,7 +1292,7 @@
 
         <div style="display: flex; gap: 10px; margin-top: 14px;">
           <button type="button" class="ro-btn" style="flex: 1;" onclick="closeStockModal()">ยกเลิก</button>
-          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #059669, #047857);" onclick="submitStockAdjustment()">💾 บันทึกการแก้ไขข้อมูล</button>
+          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #059669, #047857);" onclick="submitStockAdjustment()">บันทึกการแก้ไขข้อมูล</button>
         </div>
       </div>
     </div>
@@ -1304,27 +1302,27 @@
   <div id="doc-tax-print-modal" class="modal-overlay">
     <div class="ro-window" style="max-width: 640px; width: 94%;">
       <div class="ro-header">
-        <span id="doc-tax-modal-title">🧾 ตั้งค่าภาษีและพิมพ์เอกสาร</span>
+        <span id="doc-tax-modal-title">ตั้งค่าภาษีและพิมพ์เอกสาร</span>
         <span class="ro-close" onclick="closeDocTaxPrintModal()">✕</span>
       </div>
       <div style="padding: 18px 20px; max-height: 82vh; overflow-y: auto;">
         <div id="doc-tax-modal-info" style="background: #180902; border: 1.5px solid #381808; border-radius: 10px; padding: 10px 14px; font-size: 12.5px; line-height: 1.6; margin-bottom: 12px;"></div>
 
         <div class="form-group" id="modal-base-subtotal-group" style="margin-bottom: 10px;">
-          <label id="modal-base-subtotal-label" style="color: var(--accent-gold);">💰 ยอดรวมตั้งต้นก่อนภาษี (Subtotal - บาท)</label>
+          <label id="modal-base-subtotal-label" style="color: var(--accent-gold);">ยอดรวมตั้งต้นก่อนภาษี (Subtotal - บาท)</label>
           <input type="number" id="modal-base-subtotal" step="any" min="0" oninput="recalcDocTax('modal')" style="font-size: 16px; font-weight: bold; color: #fef3c7;">
         </div>
 
         <div class="tax-config-box">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px dashed #4a2511; padding-bottom: 6px;">
-            <strong style="font-size: 13px; color: var(--accent-gold);">🧮 ตัวเลือกภาษีและรายการปรับลด/บวกเพิ่ม</strong>
-            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #d97706, #b45309); padding: 4px 10px; font-size: 11.5px;" onclick="addCustomTaxRow('modal')">➕ เพิ่มช่องกำหนดเอง</button>
+            <strong style="font-size: 13px; color: var(--accent-gold);">ตัวเลือกภาษีและรายการปรับลด/บวกเพิ่ม</strong>
+            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #d97706, #b45309); padding: 4px 10px; font-size: 11.5px;" onclick="addCustomTaxRow('modal')">+ เพิ่มช่องกำหนดเอง</button>
           </div>
 
           <div class="tax-check-row">
             <label class="tax-check-label">
               <input type="checkbox" id="modal-vat-enable" onchange="recalcDocTax('modal')">
-              <span style="color: #6ee7b7;">➕ บวกภาษีมูลค่าเพิ่ม (VAT)</span>
+              <span style="color: #6ee7b7;">+ บวกภาษีมูลค่าเพิ่ม (VAT)</span>
               <input type="number" id="modal-vat-rate" class="tax-inline-rate" value="7" step="any" min="0" oninput="recalcDocTax('modal')">
               <span>%</span>
             </label>
@@ -1334,7 +1332,7 @@
           <div class="tax-check-row">
             <label class="tax-check-label">
               <input type="checkbox" id="modal-wht-enable" onchange="recalcDocTax('modal')">
-              <span style="color: #fca5a5;">➖ หักภาษี ณ ที่จ่าย (ผู้เช่า)</span>
+              <span style="color: #fca5a5;">- หักภาษี ณ ที่จ่าย (ผู้เช่า)</span>
               <input type="number" id="modal-wht-rate" class="tax-inline-rate" value="5" step="any" min="0" oninput="recalcDocTax('modal')">
               <span>%</span>
             </label>
@@ -1353,12 +1351,12 @@
 
         <label style="display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 12px; color: var(--text-muted); cursor: pointer;">
           <input type="checkbox" id="modal-save-tax-to-sheet" checked style="width: 15px; height: 15px; accent-color: #10b981; margin: 0;">
-          <span>💾 บันทึกจำค่าภาษีและยอดสุทธินี้ไว้ในประวัติเอกสารด้วย</span>
+          <span>บันทึกจำค่าภาษีและยอดสุทธินี้ไว้ในประวัติเอกสารด้วย</span>
         </label>
 
         <div style="display: flex; gap: 10px; margin-top: 14px;">
           <button type="button" class="ro-btn" style="flex: 1;" onclick="closeDocTaxPrintModal()">ยกเลิก</button>
-          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #059669, #047857);" onclick="executeModalDocPrint()">🖨️ สั่งพิมพ์เอกสาร / PDF</button>
+          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #059669, #047857);" onclick="executeModalDocPrint()">สั่งพิมพ์เอกสาร / PDF</button>
         </div>
       </div>
     </div>
@@ -1404,7 +1402,7 @@
   <div id="crm-note-modal" class="modal-overlay">
     <div class="ro-window" style="max-width: 550px; width: 90%;">
       <div class="ro-header">
-        <span>📝 บันทึกติดตามงานยูนิต <span id="crm-modal-unit" style="color:var(--accent-gold);">-</span></span>
+        <span>บันทึกติดตามงานยูนิต <span id="crm-modal-unit" style="color:var(--accent-gold);">-</span></span>
         <span class="ro-close" onclick="closeCrmModal()">✕</span>
       </div>
       <div style="padding: 20px;">
@@ -1417,16 +1415,16 @@
           <input type="text" id="crm-modal-owner" readonly style="background:#180a03; color:var(--text-muted);">
         </div>
         <div class="form-group">
-          <label>📜 ประวัติโน้ตติดตามงานที่ผ่านมา:</label>
+          <label>ประวัติโน้ตติดตามงานที่ผ่านมา:</label>
           <textarea id="crm-modal-history" rows="4" readonly style="background:#180a03; font-size:12px; color:var(--text-muted); line-height:1.5;"></textarea>
         </div>
         <div class="form-group">
-          <label>✏️ เพิ่มโน้ตติดตามงานใหม่:</label>
+          <label>เพิ่มโน้ตติดตามงานใหม่:</label>
           <input type="text" id="crm-modal-new-note" placeholder="เช่น ลูกค้าขอเลื่อนจ่ายวันที่ 15, โทรแจ้งต่อสัญญาแล้ว">
         </div>
         <div style="display: flex; gap: 10px; margin-top: 14px;">
           <button type="button" class="ro-btn" style="flex: 1;" onclick="closeCrmModal()">ปิดหน้าต่าง</button>
-          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0;" onclick="submitCrmNote()">💾 บันทึกโน้ตติดตามงาน</button>
+          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0;" onclick="submitCrmNote()">บันทึกโน้ตติดตามงาน</button>
         </div>
       </div>
     </div>
@@ -1436,7 +1434,7 @@
   <div id="ro-modal-overlay" class="modal-overlay">
     <div class="ro-window">
       <div class="ro-header">
-        <span>📜 ระบบตรวจสอบข้อมูลลูกบ้าน</span>
+        <span>ระบบตรวจสอบข้อมูลลูกบ้าน</span>
         <span class="ro-close" onclick="closeRoModal()">✕</span>
       </div>
       <div class="ro-body">
@@ -1460,7 +1458,7 @@
   <!-- Character Selection Screen -->
   <div id="char-select-screen" class="screen-overlay" style="display: none;">
     <div class="char-select-container">
-      <h2 style="color: var(--accent-gold); font-size: 22px; margin-bottom: 4px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">⚔ เลือกตัวละครประจำตัว (Avatar Profile)</h2>
+      <h2 style="color: var(--accent-gold); font-size: 22px; margin-bottom: 4px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">เลือกตัวละครประจำตัว (Avatar Profile)</h2>
       <p style="color: var(--text-muted); font-size: 12px;">เลือกตัวละครที่คุณต้องการใช้เป็นโปรไฟล์ส่วนตัว (อิสระทุกตำแหน่งงาน)</p>
       
       <div class="char-grid">
@@ -1506,7 +1504,7 @@
         </div>
       </div>
 
-      <button class="btn-primary" style="max-width: 250px; margin: 0 auto;" onclick="confirmCharacterSelection()">🚀 เข้าสู่ระบบแดชบอร์ด</button>
+      <button class="btn-primary" style="max-width: 250px; margin: 0 auto;" onclick="confirmCharacterSelection()">เข้าสู่ระบบแดชบอร์ด</button>
     </div>
   </div>
 
@@ -1514,7 +1512,7 @@
   <div id="profile-modal-overlay" class="modal-overlay">
     <div class="ro-window" style="max-width: 680px;">
       <div class="ro-header">
-        <span>🏅 ข้อมูลตัวละคร & กระดานภารกิจกิลด์ (Kafra Profile & Quests)</span>
+        <span>ข้อมูลตัวละคร & กระดานภารกิจกิลด์ (Kafra Profile & Quests)</span>
         <span class="ro-close" onclick="closeProfileModal()">✕</span>
       </div>
       <div class="ro-body" style="gap: 20px; align-items: flex-start; max-height: 80vh; overflow-y: auto;">
@@ -1525,10 +1523,10 @@
            </div>
            <div id="prof-prestige" style="color: var(--accent-gold); font-size: 16px; margin-top: 4px; font-weight: bold; letter-spacing: 2px;"></div>
            <h3 id="prof-name" style="color: var(--text-main); margin-top: 8px; font-size: 18px;">Admin Name</h3>
-           <div id="prof-title" style="color: var(--accent-gold); font-weight: bold; margin-bottom: 12px; font-size: 13px;">🌟 Legendary Admin</div>
+           <div id="prof-title" style="color: var(--accent-gold); font-weight: bold; margin-bottom: 12px; font-size: 13px;">Legendary Admin</div>
            
            <button class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #2a1508; font-weight: bold; border: 2px solid #140803; margin-bottom: 14px; padding: 5px 14px; font-size: 12px;" onclick="openCharSelectFromProfile()">
-             🔄 เปลี่ยนตัวละคร
+             เปลี่ยนตัวละคร
            </button>
 
            <div style="width: 100%; background: #120602; border: 1px solid #140803; border-radius: 10px; padding: 10px; text-align: left;">
@@ -1540,17 +1538,17 @@
                <div id="prof-exp-bar" style="height: 100%; width: 100%; background: linear-gradient(90deg, #f59e0b, #fbbf24); box-shadow: 0 0 8px rgba(251,191,36,0.8); transition: width 1s ease-in-out;"></div>
              </div>
              <p style="font-size: 10px; color: var(--text-muted); margin-top: 6px; text-align: center;">
-               🔄 รีเซ็ตเลเวล & รับดาวจุติ (⭐) ทุก 1 ม.ค.
+               รีเซ็ตเลเวล & รับดาวจุติทุก 1 ม.ค.
              </p>
            </div>
          </div>
 
          <div style="flex: 1.4; display: flex; flex-direction: column; gap: 8px;">
-            <div style="font-size: 14px; font-weight: bold; color: var(--accent-gold); margin-bottom: 4px;">📜 กระดานภารกิจรับ EXP (Guild Quests)</div>
+            <div style="font-size: 14px; font-weight: bold; color: var(--accent-gold); margin-bottom: 4px;">กระดานภารกิจรับ EXP (Guild Quests)</div>
             
             <div class="quest-item">
               <div>
-                <strong style="font-size: 12px;">🌞 เช็กชื่อประจำวัน (Daily Login)</strong>
+                <strong style="font-size: 12px;">เช็กชื่อประจำวัน (Daily Login)</strong>
                 <p style="font-size: 11px; color: var(--text-muted);">เข้าใช้งานระบบครั้งแรกของวัน</p>
               </div>
               <span class="quest-exp">+10 EXP / วัน</span>
@@ -1558,7 +1556,7 @@
 
             <div class="quest-item">
               <div>
-                <strong style="font-size: 12px;">💰 บันทึกรับชำระเงินปกติ (Cashier)</strong>
+                <strong style="font-size: 12px;">บันทึกรับชำระเงินปกติ (Cashier)</strong>
                 <p style="font-size: 11px; color: var(--text-muted);">บันทึกค่าส่วนกลาง / ค่าน้ำประปา</p>
               </div>
               <span class="quest-exp">+5 EXP</span>
@@ -1566,7 +1564,7 @@
 
             <div class="quest-item" style="border-color: #b91c1c;">
               <div>
-                <strong style="font-size: 12px; color: #fca5a5;">🎯 ล่าค่าหัวลูกหนี้ (Bounty Hunter)</strong>
+                <strong style="font-size: 12px; color: #fca5a5;">ล่าค่าหัวลูกหนี้ (Bounty Hunter)</strong>
                 <p style="font-size: 11px; color: var(--text-muted);">บันทึกรับเงินยูนิตค้างชำระ / ค่าปรับ</p>
               </div>
               <span class="quest-exp" style="background: rgba(220,38,38,0.2); color: #fca5a5; border-color: #dc2626;">+20 EXP</span>
@@ -1574,7 +1572,7 @@
 
             <div class="quest-item">
               <div>
-                <strong style="font-size: 12px;">👥 ทะเบียนราษฎร์ใหม่ (New Citizen)</strong>
+                <strong style="font-size: 12px;">ทะเบียนราษฎร์ใหม่ (New Citizen)</strong>
                 <p style="font-size: 11px; color: var(--text-muted);">ลงทะเบียนลูกบ้านใหม่พร้อมสร้างโฟลเดอร์</p>
               </div>
               <span class="quest-exp">+15 EXP</span>
@@ -1582,7 +1580,7 @@
 
             <div class="quest-item">
               <div>
-                <strong style="font-size: 12px;">📑 ออกเอกสารการเงิน (Scroll Crafter)</strong>
+                <strong style="font-size: 12px;">ออกเอกสารการเงิน (Scroll Crafter)</strong>
                 <p style="font-size: 11px; color: var(--text-muted);">ออกใบแจ้งหนี้ข้อมูลถูกต้อง 100% / ใบเสร็จ</p>
               </div>
               <span class="quest-exp">+2 EXP</span>
@@ -1590,7 +1588,7 @@
 
             <div class="quest-item">
               <div>
-                <strong style="font-size: 12px;">🛠️ พิทักษ์ฐานข้อมูล (Data Keeper)</strong>
+                <strong style="font-size: 12px;">พิทักษ์ฐานข้อมูล (Data Keeper)</strong>
                 <p style="font-size: 11px; color: var(--text-muted);">อัปโหลดไฟล์สำรองข้อมูลดิบ (Admin)</p>
               </div>
               <span class="quest-exp">+10 EXP</span>
@@ -1599,7 +1597,7 @@
 
       </div>
       <div class="ro-footer" style="justify-content: space-between;">
-        <button class="ro-btn" style="background: #dc2626; color: white; border: none;" onclick="handleLogout()">🚪 ออกจากระบบ</button>
+        <button class="ro-btn" style="background: #dc2626; color: white; border: none;" onclick="handleLogout()">ออกจากระบบ</button>
         <button class="ro-btn ro-btn-cancel" onclick="closeProfileModal()">ปิดหน้าต่าง</button>
       </div>
     </div>
@@ -1728,7 +1726,7 @@
         <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Role: <span id="current-role-display">Super Admin</span></p>
       </div>
       <div class="search-bar">
-        🔍 <input type="text" id="global-search" placeholder="ค้นหาข้อมูลยูนิต, ลูกบ้าน..." onkeyup="filterTable()">
+        <input type="text" id="global-search" placeholder="ค้นหาข้อมูลยูนิต, ลูกบ้าน..." onkeyup="filterTable()">
       </div>
     </div>
 
@@ -1748,7 +1746,7 @@
           <div class="value" id="net-balance" style="color: #6ee7b7;">฿0</div>
         </div>
         <div class="metric-card" style="border-color: #d97706;">
-          <div class="title">📑 รอดำเนินการรับเงิน (คิวแจ้งหนี้)</div>
+          <div class="title">รอดำเนินการรับเงิน (คิวแจ้งหนี้)</div>
           <div class="value" id="total-pending-invoices" style="color: #fbbf24;">0</div>
         </div>
       </section>
@@ -1758,7 +1756,7 @@
           
           <div class="card" style="padding: 0; overflow: hidden;">
             <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
-              <span>📑 รายการแจ้งหนี้รอดำเนินการรับเงิน (Queue จากฝ่ายขาย/ธุรการ)</span>
+              <span>รายการแจ้งหนี้รอดำเนินการรับเงิน (Queue จากฝ่ายขาย/ธุรการ)</span>
               <span id="queue-badge" class="badge pending">0 รายการ</span>
             </div>
             <div class="table-container" style="max-height: 200px;">
@@ -1783,9 +1781,9 @@
 
           <div class="card" style="padding: 0; overflow: hidden;">
             <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
-              <span>📊 ประวัติการรับเงิน & พิมพ์ใบเสร็จ (ฝ่ายการเงิน)</span>
+              <span>ประวัติการรับเงิน & พิมพ์ใบเสร็จ (ฝ่ายการเงิน)</span>
               <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: bold;" onclick="openLedgerModal()">
-                📖 สมุดบัญชีรายยูนิต (Ledger)
+                สมุดบัญชีรายยูนิต (Ledger)
               </button>
             </div>
             <div class="table-container" style="max-height: 480px;">
@@ -1812,7 +1810,7 @@
 
         <div style="display: flex; flex-direction: column; gap: 20px;">
           <div class="card">
-            <div class="card-title">📥 บันทึกรับชำระเงิน</div>
+            <div class="card-title">บันทึกรับชำระเงิน</div>
             <form id="payment-form" onsubmit="submitPayment(event)">
               <div class="form-group">
                 <label>เลขยูนิต / แปลง</label>
@@ -1835,17 +1833,17 @@
 
               <div class="form-group" style="margin-top: -4px;">
                 <div id="pay-tenant-tax-hint" style="display: none; margin-bottom: 6px; padding: 5px 10px; border-radius: 6px; background: rgba(2, 132, 199, 0.2); border: 1px solid #0284c7; color: #7dd3fc; font-size: 11.5px;">
-                  💼 ยูนิตผู้เช่า (Tenant) — สามารถติ๊กหักภาษี 5% ด้านล่างได้หากลูกค้าหัก ณ ที่จ่าย
+                  ยูนิตผู้เช่า (Tenant) — สามารถติ๊กหักภาษี 5% ด้านล่างได้หากลูกค้าหัก ณ ที่จ่าย
                 </div>
                 <div class="tax-config-box">
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-bottom: 1px dashed #4a2511; padding-bottom: 5px;">
-                    <span style="font-size: 12px; font-weight: bold; color: var(--accent-gold);">🧮 ภาษี & ปรับลด/บวกเพิ่ม (ไม่บังคับ)</span>
-                    <button type="button" class="btn-action" style="background: linear-gradient(135deg, #d97706, #b45309); padding: 2px 8px; font-size: 11px;" onclick="addCustomTaxRow('pay')">➕ กำหนดเอง</button>
+                    <span style="font-size: 12px; font-weight: bold; color: var(--accent-gold);">ภาษี & ปรับลด/บวกเพิ่ม (ไม่บังคับ)</span>
+                    <button type="button" class="btn-action" style="background: linear-gradient(135deg, #d97706, #b45309); padding: 2px 8px; font-size: 11px;" onclick="addCustomTaxRow('pay')">+ กำหนดเอง</button>
                   </div>
                   <div class="tax-check-row">
                     <label class="tax-check-label">
                       <input type="checkbox" id="pay-vat-enable" onchange="recalcDocTax('pay')">
-                      <span style="color: #6ee7b7;">➕ VAT</span>
+                      <span style="color: #6ee7b7;">+ VAT</span>
                       <input type="number" id="pay-vat-rate" class="tax-inline-rate" value="7" step="any" min="0" oninput="recalcDocTax('pay')">
                       <span>%</span>
                     </label>
@@ -1854,7 +1852,7 @@
                   <div class="tax-check-row">
                     <label class="tax-check-label">
                       <input type="checkbox" id="pay-wht-enable" onchange="recalcDocTax('pay')">
-                      <span style="color: #fca5a5;">➖ หักภาษี (ผู้เช่า)</span>
+                      <span style="color: #fca5a5;">- หักภาษี (ผู้เช่า)</span>
                       <input type="number" id="pay-wht-rate" class="tax-inline-rate" value="5" step="any" min="0" oninput="recalcDocTax('pay')">
                       <span>%</span>
                     </label>
@@ -1896,8 +1894,7 @@
       <section class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 22px;">
         <div class="metric-card" style="border: 2px solid #b91c1c; background: linear-gradient(145deg, #2b1111, #1a0808); box-shadow: 0 4px 15px rgba(185, 28, 28, 0.3);">
           <div class="title" style="display:flex; justify-content:space-between; align-items:center; color: #fca5a5;">
-            <span>💸 ยอดรายจ่ายรวมเดือนนี้</span>
-            <span style="font-size: 16px;">📉</span>
+            <span>ยอดรายจ่ายรวมเดือนนี้</span>
           </div>
           <div class="value" id="exp-kpi-month-total" style="color: #f87171; text-shadow: 0 0 10px rgba(248,113,113,0.4);">฿0</div>
           <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">รวมบันทึกจ่ายประจำเดือน</div>
@@ -1905,8 +1902,7 @@
 
         <div class="metric-card" style="border: 2px solid #d97706; background: linear-gradient(145deg, #2c1a0c, #1a0f05);">
           <div class="title" style="display:flex; justify-content:space-between; align-items:center; color: #fde68a;">
-            <span>💵 จ่ายด้วยเงินสด</span>
-            <span style="font-size: 16px;">🪙</span>
+            <span>จ่ายด้วยเงินสด</span>
           </div>
           <div class="value" id="exp-kpi-cash-total" style="color: #fbbf24;">฿0</div>
           <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">ตัดจากเงินสดย่อย / สำรองจ่าย</div>
@@ -1914,8 +1910,7 @@
 
         <div class="metric-card" style="border: 2px solid #0284c7; background: linear-gradient(145deg, #0f2438, #071524);">
           <div class="title" style="display:flex; justify-content:space-between; align-items:center; color: #bae6fd;">
-            <span>🏦 โอนเงิน / เช็คธนาคาร</span>
-            <span style="font-size: 16px;">📑</span>
+            <span>โอนเงิน / เช็คธนาคาร</span>
           </div>
           <div class="value" id="exp-kpi-transfer-total" style="color: #38bdf8;">฿0</div>
           <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">ตัดจ่ายผ่านบัญชี / เช็คบริษัท</div>
@@ -1923,8 +1918,7 @@
 
         <div class="metric-card" style="border: 2px solid #059669; background: linear-gradient(145deg, #0e2e25, #061c16);">
           <div class="title" style="display:flex; justify-content:space-between; align-items:center; color: #a7f3d0;">
-            <span>📋 จำนวนรายการจ่ายทั้งหมด</span>
-            <span style="font-size: 16px;">🔢</span>
+            <span>จำนวนรายการจ่ายทั้งหมด</span>
           </div>
           <div class="value" id="exp-kpi-count" style="color: #34d399;">0 รายการ</div>
           <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">รายการที่มีการบันทึกในระบบ</div>
@@ -1938,7 +1932,7 @@
         <div>
           <div class="card" style="border: 2px solid #991b1b; background: linear-gradient(145deg, #2b1111, #1a0a0a);">
             <div class="card-title" style="color: #fca5a5; border-bottom: 2px dashed #7f1d1d; padding-bottom: 12px; margin-bottom: 16px;">
-              <span>💸 บันทึกรายจ่ายโครงการ</span>
+              <span>บันทึกรายจ่ายโครงการ</span>
             </div>
             <form id="expense-form" onsubmit="submitNewExpense(event)">
               <div class="form-group">
@@ -1971,12 +1965,12 @@
                 </div>
               </div>
               <div class="form-group">
-                <label for="exp-file">📎 อัปโหลดหลักฐานการจ่ายเงิน (เลือกได้หลายบิล / มาอัปโหลดเพิ่มทีหลังได้)</label>
+                <label for="exp-file">อัปโหลดหลักฐานการจ่ายเงิน (เลือกได้หลายบิล / มาอัปโหลดเพิ่มทีหลังได้)</label>
                 <input type="file" id="exp-file" accept="image/*,application/pdf" multiple onchange="previewExpenseFile(event)">
                 <div id="exp-file-list"></div>
               </div>
               <button type="submit" class="btn-primary" id="btn-submit-expense" style="background: linear-gradient(135deg, #dc2626, #991b1b); box-shadow: 0 4px 12px rgba(220,38,38,0.4);">
-                💾 บันทึกรายจ่าย
+                บันทึกรายจ่าย
               </button>
             </form>
           </div>
@@ -1987,7 +1981,7 @@
           <div class="card" style="padding: 0; overflow: hidden; border: 2px solid #7f1d1d;">
             <div class="card-title" style="padding: 16px 20px; border-bottom: 1px solid #450a0a; margin-bottom: 0; color: #fca5a5; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; background: rgba(43, 17, 17, 0.4);">
               <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 16px; font-weight: bold;">💸 ประวัติบันทึกรายจ่ายโครงการ (Expenses Record)</span>
+                <span style="font-size: 16px; font-weight: bold;">ประวัติบันทึกรายจ่ายโครงการ (Expenses Record)</span>
                 <span id="expense-badge" class="badge overdue" style="font-size: 12px;">0 รายการ</span>
               </div>
               <div style="display: flex; gap: 10px; align-items: center;">
@@ -2000,7 +1994,7 @@
                   <option value="ค่าธรรมเนียมวิชาชีพ/ภาษี">ค่าธรรมเนียมวิชาชีพ/ภาษี</option>
                   <option value="รายจ่ายอื่นๆ">รายจ่ายอื่นๆ</option>
                 </select>
-                <input type="text" id="exp-search-input" placeholder="🔍 ค้นหารายละเอียด..." oninput="filterExpensesList()" style="width: 160px; padding: 6px 10px; font-size: 12px; background: #1a0808; border: 1px solid #b91c1c; color: #fef3c7; border-radius: 6px;">
+                <input type="text" id="exp-search-input" placeholder="ค้นหารายละเอียด..." oninput="filterExpensesList()" style="width: 160px; padding: 6px 10px; font-size: 12px; background: #1a0808; border: 1px solid #b91c1c; color: #fef3c7; border-radius: 6px;">
               </div>
             </div>
             <div class="table-container" style="max-height: 520px;">
@@ -2033,9 +2027,9 @@
       <div style="max-width: 800px; margin: 0 auto;">
         <div class="card">
           <div class="card-title">
-            <span>👥 แบบฟอร์มลงทะเบียนลูกบ้านใหม่</span>
+            <span>แบบฟอร์มลงทะเบียนลูกบ้านใหม่</span>
             <button type="button" class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #2a1508; font-weight: bold; border: 2px solid #140803;" onclick="openCustomerListModal()">
-              📜 รายชื่อลูกบ้านทั้งหมด
+              รายชื่อลูกบ้านทั้งหมด
             </button>
           </div>
           <form id="resident-form" onsubmit="submitNewResident(event)" autocomplete="off">
@@ -2081,15 +2075,15 @@
                 <input type="email" id="res-email" placeholder="ระบุอีเมล (ถ้ามี)">
               </div>
               <div class="form-group" style="grid-column: span 2;">
-                <label>🏠 ที่อยู่ตามบัตรประชาชน</label>
+                <label>ที่อยู่ตามบัตรประชาชน</label>
                 <textarea id="res-id-address" rows="2" placeholder="ระบุที่อยู่ตามบัตรประชาชน"></textarea>
               </div>
               <div class="form-group" style="grid-column: span 2;">
-                <label>📍 ที่อยู่ปัจจุบัน / สถานที่จัดส่งเอกสาร (เติมตามโครงการอัตโนมัติ)</label>
+                <label>ที่อยู่ปัจจุบัน / สถานที่จัดส่งเอกสาร (เติมตามโครงการอัตโนมัติ)</label>
                 <textarea id="res-cur-address" rows="2" placeholder="ระบบจะดึงที่อยู่โครงการให้อัตโนมัติ"></textarea>
               </div>
               <div class="form-group" style="grid-column: span 2;">
-                <label>📷 อัปโหลดภาพถ่ายลูกค้า (ถ้ามี)</label>
+                <label>อัปโหลดภาพถ่ายลูกค้า (ถ้ามี)</label>
                 <input type="file" id="res-photo" accept="image/*" onchange="previewResidentPhoto(event)">
               </div>
             </div>
@@ -2125,10 +2119,10 @@
         <div style="display: flex; flex-direction: column; gap: 20px;">
           <div class="card">
             <div class="card-title">
-              <span>📄 ออกเอกสารการขาย</span>
+              <span>ออกเอกสารการขาย</span>
               <select id="inv-doc-type" onchange="switchDocTypeForm(this.value)" style="width: auto; padding: 6px 14px; font-size: 13px; font-weight: bold; background: linear-gradient(145deg, #3d1b0a, #1a0c04); color: var(--accent-gold); border: 2px solid var(--accent-gold); border-radius: 8px; cursor: pointer; outline: none; box-shadow: 0 2px 8px rgba(0,0,0,0.6);">
-                <option value="INVOICE" style="background: #2a1508; color: #fef3c7;">📑 ใบแจ้งหนี้ (Invoice)</option>
-                <option value="QUOTATION" style="background: #2a1508; color: #fef3c7;">📜 ใบเสนอราคา/ใบจอง (Quotation)</option>
+                <option value="INVOICE" style="background: #2a1508; color: #fef3c7;">ใบแจ้งหนี้ (Invoice)</option>
+                <option value="QUOTATION" style="background: #2a1508; color: #fef3c7;">ใบเสนอราคา/ใบจอง (Quotation)</option>
               </select>
             </div>
             <form onsubmit="handleGenerateInvoice(event)">
@@ -2147,8 +2141,8 @@
               
               <div class="form-group" style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; border: 1px dashed var(--accent-gold);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                  <label style="margin-bottom:0; font-size:14px; color:var(--accent-gold);">📑 รายการเรียกเก็บ (สูงสุด 10 รายการ) *</label>
-                  <button type="button" class="btn-action" style="background: linear-gradient(135deg, #059669, #047857); padding: 3px 10px;" onclick="addInvoiceItemRow()">➕ เพิ่มรายการ</button>
+                  <label style="margin-bottom:0; font-size:14px; color:var(--accent-gold);">รายการเรียกเก็บ (สูงสุด 10 รายการ) *</label>
+                  <button type="button" class="btn-action" style="background: linear-gradient(135deg, #059669, #047857); padding: 3px 10px;" onclick="addInvoiceItemRow()">+ เพิ่มรายการ</button>
                 </div>
                 
                 <div id="invoice-items-container"></div>
@@ -2159,18 +2153,18 @@
                 </div>
 
                 <div id="inv-tenant-tax-hint" style="display: none; margin-top: 8px; padding: 5px 10px; border-radius: 6px; background: rgba(2, 132, 199, 0.2); border: 1px solid #0284c7; color: #7dd3fc; font-size: 11.5px;">
-                  💼 ยูนิตนี้เป็นผู้เช่า (Tenant) — สามารถติ๊กหักภาษี 5% ด้านล่างได้หากลูกค้าหัก ณ ที่จ่าย
+                  ยูนิตนี้เป็นผู้เช่า (Tenant) — สามารถติ๊กหักภาษี 5% ด้านล่างได้หากลูกค้าหัก ณ ที่จ่าย
                 </div>
 
                 <div class="tax-config-box">
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-bottom: 1px dashed #4a2511; padding-bottom: 5px;">
-                    <span style="font-size: 12px; font-weight: bold; color: var(--accent-gold);">🧮 ตัวเลือกภาษี & รายการปรับลด/บวกเพิ่ม</span>
-                    <button type="button" class="btn-action" style="background: linear-gradient(135deg, #d97706, #b45309); padding: 2px 8px; font-size: 11px;" onclick="addCustomTaxRow('inv')">➕ กำหนดเอง</button>
+                    <span style="font-size: 12px; font-weight: bold; color: var(--accent-gold);">ตัวเลือกภาษี & รายการปรับลด/บวกเพิ่ม</span>
+                    <button type="button" class="btn-action" style="background: linear-gradient(135deg, #d97706, #b45309); padding: 2px 8px; font-size: 11px;" onclick="addCustomTaxRow('inv')">+ กำหนดเอง</button>
                   </div>
                   <div class="tax-check-row">
                     <label class="tax-check-label">
                       <input type="checkbox" id="inv-vat-enable" onchange="recalcDocTax('inv')">
-                      <span style="color: #6ee7b7;">➕ บวกภาษี (VAT)</span>
+                      <span style="color: #6ee7b7;">+ บวกภาษี (VAT)</span>
                       <input type="number" id="inv-vat-rate" class="tax-inline-rate" value="7" step="any" min="0" oninput="recalcDocTax('inv')">
                       <span>%</span>
                     </label>
@@ -2179,7 +2173,7 @@
                   <div class="tax-check-row">
                     <label class="tax-check-label">
                       <input type="checkbox" id="inv-wht-enable" onchange="recalcDocTax('inv')">
-                      <span style="color: #fca5a5;">➖ หักภาษี ณ ที่จ่าย (ผู้เช่า)</span>
+                      <span style="color: #fca5a5;">- หักภาษี ณ ที่จ่าย (ผู้เช่า)</span>
                       <input type="number" id="inv-wht-rate" class="tax-inline-rate" value="5" step="any" min="0" oninput="recalcDocTax('inv')">
                       <span>%</span>
                     </label>
@@ -2195,20 +2189,20 @@
               </div>
 
               <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, #0284c7, #0369a1);" id="btn-generate-inv">
-                🖨️ ตรวจสอบ, ส่งงานเข้าคิว & พิมพ์เอกสาร (PDF)
+                ตรวจสอบ, ส่งงานเข้าคิว & พิมพ์เอกสาร (PDF)
               </button>
             </form>
           </div>
 
           <div class="card">
             <div class="card-title">
-              <span>🗺️ ผังสถานะยูนิตโครงการ (Dynamic Map)</span>
+              <span>ผังสถานะยูนิตโครงการ (Dynamic Map)</span>
               <span style="font-size: 11px; color: var(--text-muted);">ดึงข้อมูลยูนิตจริงจากระบบ</span>
             </div>
-            <div style="display:flex; gap:10px; font-size:10px; margin-bottom:8px;">
-              <span>🔴 เจ้าของอยู่เอง</span>
-              <span style="color:#38bdf8;">🔵 ผู้เช่า</span>
-              <span style="color:#fbbf24;">🟡 มีบิลค้าง</span>
+            <div style="display:flex; gap:12px; font-size:10px; margin-bottom:8px;">
+              <span style="display:inline-flex; align-items:center; gap:5px;"><span style="width:8px; height:8px; border-radius:50%; background:#ef4444; display:inline-block;"></span>เจ้าของอยู่เอง</span>
+              <span style="color:#38bdf8; display:inline-flex; align-items:center; gap:5px;"><span style="width:8px; height:8px; border-radius:50%; background:#38bdf8; display:inline-block;"></span>ผู้เช่า</span>
+              <span style="color:#fbbf24; display:inline-flex; align-items:center; gap:5px;"><span style="width:8px; height:8px; border-radius:50%; background:#fbbf24; display:inline-block;"></span>มีบิลค้าง</span>
             </div>
             <div class="unit-map-grid" id="unit-map-container"></div>
           </div>
@@ -2216,7 +2210,7 @@
 
         <div class="card" style="padding: 0; overflow: hidden;">
           <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
-            <span>📋 ตารางติดตามสถานะบิลทั้งหมด (Sales Tracking List)</span>
+            <span>ตารางติดตามสถานะบิลทั้งหมด (Sales Tracking List)</span>
           </div>
           <div class="table-container" style="max-height: 600px;">
             <table class="data-table">
@@ -2250,7 +2244,7 @@
           <div class="value" id="proc-total-items">0</div>
         </div>
         <div class="metric-card" style="border-color: #ef4444;">
-          <div class="title">🔴 พัสดุต้องสั่งเพิ่ม (Below Min)</div>
+          <div class="title">พัสดุต้องสั่งเพิ่ม (Below Min)</div>
           <div class="value" id="proc-alert-count" style="color: #fca5a5;">0</div>
         </div>
         <div class="metric-card" style="border-color: #10b981;">
@@ -2264,15 +2258,15 @@
           <!-- Switcher: ฟอร์มปกติ vs โหมดตรวจนับหน้างานด้วย AI -->
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 2px dashed #6b3414; padding-bottom: 10px;">
             <div style="display: flex; gap: 6px;">
-              <button type="button" class="proc-tab-btn" id="btn-proc-mode-normal" onclick="switchProcMode('normal')">📝 บันทึกรับพัสดุ</button>
-              <button type="button" class="proc-tab-btn active" id="btn-proc-mode-audit" onclick="switchProcMode('audit')">⚡ ตรวจนับสต็อก (AI)</button>
+              <button type="button" class="proc-tab-btn" id="btn-proc-mode-normal" onclick="switchProcMode('normal')">บันทึกรับพัสดุ</button>
+              <button type="button" class="proc-tab-btn active" id="btn-proc-mode-audit" onclick="switchProcMode('audit')">ตรวจนับสต็อก (AI)</button>
             </div>
             <span style="font-size: 11px; color: var(--accent-gold); font-weight: bold;">Smart Mode</span>
           </div>
 
           <!-- แบบฟอร์มเดิม (ปกติ) -->
           <form id="procurement-form" onsubmit="submitNewProcurement(event)" style="display: none;">
-            <div class="card-title" style="margin-bottom: 14px;">📦 บันทึกพัสดุจัดซื้อใหม่</div>
+            <div class="card-title" style="margin-bottom: 14px;">บันทึกพัสดุจัดซื้อใหม่</div>
             <div class="form-group">
               <label>ชื่อพัสดุ / สินค้า *</label>
               <input type="text" id="proc-item-name" placeholder="เช่น หลอดไฟ LED 12W, น้ำยาถูพื้น">
@@ -2301,14 +2295,14 @@
                 <input type="number" id="proc-unit-price" placeholder="0">
               </div>
             </div>
-            <button type="submit" class="btn-primary" id="btn-submit-proc" style="background: linear-gradient(135deg, #0284c7, #0369a1);">💾 บันทึกรับพัสดุใหม่เข้าสต็อก</button>
+            <button type="submit" class="btn-primary" id="btn-submit-proc" style="background: linear-gradient(135deg, #0284c7, #0369a1);">บันทึกรับพัสดุใหม่เข้าสต็อก</button>
           </form>
 
           <!-- ⚡ โหมดตรวจนับสต็อกหน้างาน (AI Quick Audit) -->
           <div id="proc-audit-container">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <div style="font-size: 15px; font-weight: bold; color: var(--accent-gold);">⚡ ตรวจนับสต็อกหน้างาน (AI Auto-Sort)</div>
-              <button type="button" class="btn-action" style="font-size: 11px; padding: 4px 8px;" onclick="addQuickAuditRow()">➕ เพิ่มรายการ</button>
+              <div style="font-size: 15px; font-weight: bold; color: var(--accent-gold);">ตรวจนับสต็อกหน้างาน (AI Auto-Sort)</div>
+              <button type="button" class="btn-action" style="font-size: 11px; padding: 4px 8px;" onclick="addQuickAuditRow()">+ เพิ่มรายการ</button>
             </div>
             <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
               กรอกเพียง <strong>ชื่อของ + จำนวน</strong> หน้างาน ไม่ต้องพิมพ์หมวดหมู่ AI จะจับคู่สต็อกเดิมและแยกหมวดหมู่ให้อัตโนมัติ
@@ -2319,13 +2313,13 @@
             </div>
 
             <button type="button" class="btn-primary" style="background: linear-gradient(135deg, #d97706, #b45309); margin-top: 10px;" onclick="processQuickAuditAi()">
-              ⚡ ประมวลผล & วิเคราะห์หมวดหมู่ด้วย AI
+              ประมวลผล & วิเคราะห์หมวดหมู่ด้วย AI
             </button>
 
             <!-- กล่องแสดงผลลัพธ์พรีวิวก่อนบันทึก -->
             <div id="audit-review-result-box" class="audit-review-box">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span style="font-size: 13px; font-weight: bold; color: var(--accent-gold);">📋 ผลวิเคราะห์สต็อก (พร้อมบันทึก)</span>
+                <span style="font-size: 13px; font-weight: bold; color: var(--accent-gold);">ผลวิเคราะห์สต็อก (พร้อมบันทึก)</span>
                 <span style="font-size: 11px; color: var(--text-muted);" id="audit-summary-count">0 รายการ</span>
               </div>
               <div style="max-height: 200px; overflow-y: auto; border: 1px solid #381808; border-radius: 8px; margin-bottom: 10px;">
@@ -2342,7 +2336,7 @@
                 </table>
               </div>
               <button type="button" class="btn-primary" id="btn-save-audit-final" style="background: linear-gradient(135deg, #059669, #047857); margin-top: 4px;" onclick="confirmSaveAuditToDatabase()">
-                💾 บันทึกผลการตรวจนับลงสต็อกจริง
+                บันทึกผลการตรวจนับลงสต็อกจริง
               </button>
             </div>
 
@@ -2352,7 +2346,7 @@
 
         <div class="card" style="padding: 0; overflow: hidden;">
           <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
-            <span>📦 รายการสต็อกพัสดุทั้งหมด (Inventory List)</span>
+            <span>รายการสต็อกพัสดุทั้งหมด (Inventory List)</span>
           </div>
           <div class="table-container" style="max-height: 520px;">
             <table class="data-table">
@@ -2382,7 +2376,7 @@
         
         <div class="card" style="border-color: var(--accent-gold);">
           <div class="card-title" style="color: var(--accent-gold);">
-            <span>🔢 ตั้งค่าเลขที่รันเอกสารเริ่มต้น (Invoice & Receipt Dynamic Running)</span>
+            <span>ตั้งค่าเลขที่รันเอกสารเริ่มต้น (Invoice & Receipt Dynamic Running)</span>
             <span class="badge pending">Admin Only</span>
           </div>
           <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
@@ -2399,14 +2393,13 @@
             </div>
           </div>
           <button type="button" class="btn-primary" id="btn-save-doc-number" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="handleSetDocRunningNumber()">
-            💾 บันทึกตั้งค่าเลขที่รันเอกสาร
+            บันทึกตั้งค่าเลขที่รันเอกสาร
           </button>
         </div>
 
         <div class="card">
-          <div class="card-title">🛠️ อัปโหลดไฟล์ดิบสำรองข้อมูล (Admin Only)</div>
+          <div class="card-title">อัปโหลดไฟล์ดิบสำรองข้อมูล (Admin Only)</div>
           <div class="drop-zone" id="drop-zone">
-            <p style="font-size: 40px; margin-bottom: 10px;">📁</p>
             <h3 style="color: var(--text-main); margin-bottom: 8px;">ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์</h3>
             <p style="color: var(--text-muted); font-size: 13px;">ระบบจะส่งไฟล์เข้าโฟลเดอร์ Raw_Data_Backups อัตโนมัติ</p>
             <input type="file" id="file-input" multiple style="display: none;">
@@ -2418,7 +2411,7 @@
 
         <div class="card" style="border-color: #7f1d1d; background: linear-gradient(145deg, #3d1515, #220808);">
           <div class="card-title" style="color: #fca5a5; border-bottom-color: #991b1b;">
-            <span>⚠️ แดชบอร์ดรีเซ็ตระบบ (Admin Testing Reset)</span>
+            <span>แดชบอร์ดรีเซ็ตระบบ (Admin Testing Reset)</span>
             <span class="badge overdue">อันตราย</span>
           </div>
           <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
@@ -2426,7 +2419,7 @@
             <em style="color: #f87171;">* บัญชีผู้ใช้งานและรหัสผ่านพนักงานในระบบจะไม่ถูกลบ *</em>
           </p>
           <button type="button" class="btn-primary" id="btn-admin-reset" style="background: linear-gradient(135deg, #dc2626, #991b1b); border-color: #450a0a;" onclick="handleAdminFactoryReset()">
-            🗑️ ล้างข้อมูลใน Sheet และรีเซ็ตระบบทั้งหมด (เริ่มรอบใหม่)
+            ล้างข้อมูลใน Sheet และรีเซ็ตระบบทั้งหมด (เริ่มรอบใหม่)
           </button>
         </div>
 
@@ -2440,8 +2433,7 @@
       <section class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 22px;">
         <div class="metric-card" style="border-color: #b45309;">
           <div class="title" style="display:flex; justify-content:space-between; align-items:center;">
-            <span>🏠 ยูนิตทั้งหมดในระบบ</span>
-            <span style="font-size: 16px;">🔑</span>
+            <span>ยูนิตทั้งหมดในระบบ</span>
           </div>
           <div class="value" id="smap-total-units">0 ยูนิต</div>
           <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">เจ้าของ: <span id="smap-owner-count" style="color:var(--text-main); font-weight:bold;">0</span> | ผู้เช่า: <span id="smap-tenant-count" style="color:#38bdf8; font-weight:bold;">0</span></div>
@@ -2449,8 +2441,7 @@
 
         <div class="metric-card" style="border: 4px solid #059669; box-shadow: 0 0 20px rgba(5,150,105,0.4), inset 0 0 12px rgba(5,150,105,0.3); background: linear-gradient(145deg, #134e4a, #062f27);">
           <div class="title" style="display:flex; justify-content:space-between; align-items:center; color: #6ee7b7;">
-            <span>✅ ชำระครบแล้ว (เคลียร์บิล)</span>
-            <span style="font-size: 16px;">💰</span>
+            <span>ชำระครบแล้ว (เคลียร์บิล)</span>
           </div>
           <div class="value" id="smap-settled-units" style="color: #34d399; text-shadow: 0 0 10px rgba(52,211,153,0.8);">0 ยูนิต</div>
           <div style="font-size: 11px; color: #a7f3d0; margin-top: 4px;">อัตราการชำระ: <span id="smap-settled-pct" style="font-weight:bold;">0%</span> ของโครงการ</div>
@@ -2458,8 +2449,7 @@
 
         <div class="metric-card" style="border: 4px solid #dc2626; box-shadow: 0 0 25px rgba(220,38,38,0.5), inset 0 0 15px rgba(220,38,38,0.3); background: linear-gradient(145deg, #450a0a, #2b0404);">
           <div class="title" style="display:flex; justify-content:space-between; align-items:center; color: #fca5a5;">
-            <span>🔥 หนี้ค้างชำระ (Real-time)</span>
-            <span style="font-size: 16px;">⏰</span>
+            <span>หนี้ค้างชำระ (Real-time)</span>
           </div>
           <div class="value" id="smap-overdue-units" style="color: #f87171; text-shadow: 0 0 12px rgba(248,113,113,0.9);">0 ยูนิตค้างจ่าย</div>
           <div style="font-size: 12px; color: #fecaca; margin-top: 4px; font-weight: bold;">ยอดค้างรวม: <span id="smap-overdue-amount" style="color: #fbbf24; font-size: 14px;">฿0</span> (<span id="smap-overdue-invoices">0</span> บิล)</div>
@@ -2467,8 +2457,7 @@
 
         <div class="metric-card" style="border-color: #0284c7;">
           <div class="title" style="display:flex; justify-content:space-between; align-items:center;">
-            <span>📑 ใบแจ้งหนี้ที่ออกทั้งหมด</span>
-            <span style="font-size: 16px;">📜</span>
+            <span>ใบแจ้งหนี้ที่ออกทั้งหมด</span>
           </div>
           <div class="value" id="smap-total-invoices" style="color: #38bdf8;">0 ใบ</div>
           <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">ยอดออกบิลสะสม: <span id="smap-total-invoice-amt" style="color: var(--accent-gold); font-weight:bold;">฿0</span></div>
@@ -2480,7 +2469,7 @@
         <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; margin-bottom: 20px; border-bottom: 2px dashed #6b3414; padding-bottom: 16px;">
           <div>
             <h2 style="font-size: 20px; color: var(--accent-gold); display: flex; align-items: center; gap: 8px;">
-              <span>🗺️ ผังสถานะยูนิตโครงการ (Dynamic Property Map)</span>
+              <span>ผังสถานะยูนิตโครงการ (Dynamic Property Map)</span>
             </h2>
             <p style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">
               ดึงข้อมูลยูนิต สถานะการออกบิล และยอดหนี้ค้างชำระจริงจาก Google Sheets แบบเรียลไทม์
@@ -2491,19 +2480,19 @@
           <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
             <div style="display: flex; gap: 6px; background: #1a0c04; padding: 4px; border-radius: 12px; border: 2px solid #381808;">
               <button type="button" class="smap-filter-btn active" id="smap-filter-all" onclick="setSmartMapFilter('all')">ทั้งหมด</button>
-              <button type="button" class="smap-filter-btn" id="smap-filter-overdue" onclick="setSmartMapFilter('overdue')">🔥 ค้างชำระ</button>
-              <button type="button" class="smap-filter-btn" id="smap-filter-settled" onclick="setSmartMapFilter('settled')">✅ ชำระแล้ว</button>
-              <button type="button" class="smap-filter-btn" id="smap-filter-owner" onclick="setSmartMapFilter('owner')">🔑 เจ้าของ</button>
-              <button type="button" class="smap-filter-btn" id="smap-filter-tenant" onclick="setSmartMapFilter('tenant')">💼 ผู้เช่า</button>
+              <button type="button" class="smap-filter-btn" id="smap-filter-overdue" onclick="setSmartMapFilter('overdue')">ค้างชำระ</button>
+              <button type="button" class="smap-filter-btn" id="smap-filter-settled" onclick="setSmartMapFilter('settled')">ชำระแล้ว</button>
+              <button type="button" class="smap-filter-btn" id="smap-filter-owner" onclick="setSmartMapFilter('owner')">เจ้าของ</button>
+              <button type="button" class="smap-filter-btn" id="smap-filter-tenant" onclick="setSmartMapFilter('tenant')">ผู้เช่า</button>
             </div>
 
             <div style="position: relative;">
-              <input type="text" id="smap-search-input" placeholder="🔍 ค้นหายูนิต / ชื่อลูกบ้าน..." oninput="handleSmartMapSearch()" 
+              <input type="text" id="smap-search-input" placeholder="ค้นหายูนิต / ชื่อลูกบ้าน..." oninput="handleSmartMapSearch()" 
                      style="padding: 9px 14px; background: #231106; color: var(--text-main); border: 2px solid #140803; border-radius: 10px; font-size: 13px; width: 220px; outline: none;">
             </div>
 
             <button type="button" class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #2a1508; font-weight: bold; border: 2px solid #140803; padding: 9px 14px; border-radius: 10px;" onclick="loadDashboardData()">
-              🔄 รีเฟรชข้อมูล
+              รีเฟรชข้อมูล
             </button>
           </div>
         </div>
@@ -2671,7 +2660,7 @@
       const container = document.getElementById("invoice-items-container");
       const currentRows = container.getElementsByClassName("invoice-item-row");
       if (currentRows.length >= 10) {
-        alert("⚠️ จำกัดสูงสุดไม่เกิน 10 รายการต่อ 1 เอกสาร");
+        alert("จำกัดสูงสุดไม่เกิน 10 รายการต่อ 1 เอกสาร");
         return;
       }
 
@@ -2682,7 +2671,7 @@
         <span class="item-num">${rowIndex}.</span>
         <input type="text" class="item-desc-input" placeholder="ระบุรายการ เช่น ค่าส่วนกลาง, ค่าน้ำ" style="flex: 2;" required>
         <input type="number" class="item-amt-input" step="any" min="0" placeholder="0.00" style="flex: 1;" oninput="calculateInvoiceTotal()" required>
-        ${rowIndex > 1 ? `<button type="button" class="btn-action" style="background:#dc2626; padding: 6px 10px;" onclick="removeInvoiceItemRow(this)">🗑️</button>` : `<div style="width:32px;"></div>`}
+        ${rowIndex > 1 ? `<button type="button" class="btn-action" style="background:#dc2626; padding: 6px 10px;" onclick="removeInvoiceItemRow(this)">✕</button>` : `<div style="width:32px;"></div>`}
       `;
       container.appendChild(rowDiv);
       calculateInvoiceTotal();
@@ -2754,12 +2743,12 @@
     function calculateLevelData(exp) {
       let level = Math.floor(Math.sqrt(exp / 3)) + 1;
       if (level > 99) level = 99;
-      let title = "🥚 Novice Staff (พนักงานฝึกหัด)";
-      if (level >= 10 && level <= 29) title = "💼 Kafra Trainee (เจ้าหน้าที่ทั่วไป)";
-      else if (level >= 30 && level <= 49) title = "🛡️ Kafra Senior (เจ้าหน้าที่อาวุโส)";
-      else if (level >= 50 && level <= 79) title = "⚔️ Kafra Chief (หัวหน้าหน่วยบริการ)";
-      else if (level >= 80 && level <= 98) title = "👑 Kafra Master (ผู้เชี่ยวชาญระดับสูง)";
-      else if (level === 99) title = "🌟 Legendary Admin (ตำนานแห่งนิติบุคคล)";
+      let title = "Novice Staff (พนักงานฝึกหัด)";
+      if (level >= 10 && level <= 29) title = "Kafra Trainee (เจ้าหน้าที่ทั่วไป)";
+      else if (level >= 30 && level <= 49) title = "Kafra Senior (เจ้าหน้าที่อาวุโส)";
+      else if (level >= 50 && level <= 79) title = "Kafra Chief (หัวหน้าหน่วยบริการ)";
+      else if (level >= 80 && level <= 98) title = "Kafra Master (ผู้เชี่ยวชาญระดับสูง)";
+      else if (level === 99) title = "Legendary Admin (ตำนานแห่งนิติบุคคล)";
       let currentBaseExp = 3 * Math.pow(level - 1, 2);
       let nextExp = (level === 99) ? currentBaseExp : (3 * Math.pow(level, 2));
       let progressPercent = (level === 99) ? 100 : ((exp - currentBaseExp) / (nextExp - currentBaseExp)) * 100;
@@ -2769,7 +2758,7 @@
     function showExpToast(amount, actionName) {
       const toast = document.createElement('div');
       toast.className = 'exp-toast';
-      toast.innerHTML = `🌟 +${amount} EXP <span style="font-size:12px; font-weight:normal;">(${actionName})</span>`;
+      toast.innerHTML = `+${amount} EXP <span style="font-size:12px; font-weight:normal;">(${actionName})</span>`;
       document.body.appendChild(toast);
       setTimeout(() => toast.remove(), 3000);
       if(currentUser) {
@@ -2789,7 +2778,7 @@
       document.getElementById("prof-title").innerText = stats.title;
       document.getElementById("prof-level").innerText = stats.level;
       let stars = "";
-      for(let i=0; i<(currentUser.prestige || 0); i++) stars += "⭐";
+      for(let i=0; i<(currentUser.prestige || 0); i++) stars += "★ ";
       document.getElementById("prof-prestige").innerText = stars;
       let expLabel = (stats.level === 99) ? `${currentUser.exp.toLocaleString()} / MAX` : `${currentUser.exp.toLocaleString()} / ${stats.nextExp.toLocaleString()} EXP`;
       document.getElementById("prof-exp-text").innerText = expLabel;
@@ -2865,8 +2854,8 @@
           document.getElementById("login-overlay").style.display = "none";
           document.getElementById("char-select-screen").style.display = "flex";
           pickAvatar(tempPendingUser.avatar || "WIZmini");
-        } else alert("❌ " + resJson.message);
-      } catch (err) { alert("⚠️ เชื่อมต่อขัดข้อง: " + err.message); } 
+        } else alert(resJson.message);
+      } catch (err) { alert("เชื่อมต่อขัดข้อง: " + err.message); } 
       finally { btn.disabled = false; btn.innerText = "เข้าสู่ระบบ"; }
     }
 
@@ -2953,7 +2942,7 @@
     function searchUnitLedger() {
       const q = document.getElementById("ledger-search-unit").value.trim();
       if (!q) {
-        alert("⚠️ กรุณาพิมพ์ระบุเลขยูนิตที่ต้องการค้นหา");
+        alert("กรุณาพิมพ์ระบุเลขยูนิตที่ต้องการค้นหา");
         return;
       }
 
@@ -3021,7 +3010,7 @@
             <td style="padding: 10px 12px; color: #6ee7b7;">${res.phone || "-"}</td>
             <td style="padding: 10px 12px; color: var(--text-muted); font-size: 12px;">${res.currentAddress || "-"}</td>
             <td style="padding: 10px 12px; text-align: center;">
-              <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openEditResidentModal('${uStr}')">✏️ แก้ไข</button>
+              <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openEditResidentModal('${uStr}')">แก้ไข</button>
             </td>
           </tr>
         `;
@@ -3070,14 +3059,14 @@
       event.preventDefault();
       const btn = document.getElementById("btn-submit-resident");
       btn.disabled = true;
-      btn.innerText = "⏳ กำลังบันทึกข้อมูล...";
+      btn.innerText = "กำลังบันทึกข้อมูล...";
 
       const resType = document.getElementById("res-type").value;
       const unit = document.getElementById("res-unit").value.trim();
       const name = document.getElementById("res-name").value.trim();
 
       if (!unit || !name) {
-        alert("⚠️ กรุณาระบุเลขยูนิตและชื่อ-นามสกุลให้ครบถ้วน");
+        alert("กรุณาระบุเลขยูนิตและชื่อ-นามสกุลให้ครบถ้วน");
         btn.disabled = false;
         btn.innerText = "ลงทะเบียนลูกบ้าน & เปิดแฟ้มเก็บข้อมูล";
         return;
@@ -3111,17 +3100,17 @@
 
         if (resJson.status === "success") {
           showExpToast(15, "ลงทะเบียนลูกบ้านใหม่");
-          alert("✅ บันทึกลงทะเบียนลูกบ้านเรียบร้อยแล้ว!");
+          alert("บันทึกลงทะเบียนลูกบ้านเรียบร้อยแล้ว!");
           document.getElementById("resident-form").reset();
           residentPhotoBase64 = null;
           residentPhotoName = "";
           toggleOwnerFields("Owner");
           await loadDashboardData();
         } else {
-          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการลงทะเบียน"));
+          alert(resJson.message || "เกิดข้อผิดพลาดในการลงทะเบียน");
         }
       } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
+        alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
       } finally {
         btn.disabled = false;
         btn.innerText = "ลงทะเบียนลูกบ้าน & เปิดแฟ้มเก็บข้อมูล";
@@ -3245,7 +3234,7 @@
       const targetKey = cleanUnitKey(unitNumber);
       const foundRes = cachedResidents.find(r => cleanUnitKey(r.unitNumber) === targetKey);
       if (!foundRes) {
-        alert("⚠️ ไม่พบข้อมูลลูกบ้านรายนี้");
+        alert("ไม่พบข้อมูลลูกบ้านรายนี้");
         return;
       }
       const res = normalizeResidentRecord(foundRes);
@@ -3295,13 +3284,13 @@
 
       if (API_URL.indexOf("A0ba8VMMA") !== -1 && hasLoadedDashboardOnce && !activeBackendVersion) {
         alert(
-          "🛑 ระบบระงับการบันทึกไว้ชั่วคราว เพื่อป้องกันข้อมูลกระโดดข้ามช่อง!\n\n" +
+          "ระบบระงับการบันทึกไว้ชั่วคราว เพื่อป้องกันข้อมูลกระโดดข้ามช่อง!\n\n" +
           "สาเหตุ: ลิงก์ Google Apps Script หลังบ้านยังรันโค้ดเวอร์ชันเก่าอยู่\n\n" +
           "วิธีแก้ไข (ทำครั้งเดียว):\n" +
-          "1. เปิดหน้า Google Apps Script วางโค้ด Code.gs ตัวใหม่ แล้วกด Save (💾)\n" +
+          "1. เปิดหน้า Google Apps Script วางโค้ด Code.gs ตัวใหม่ แล้วกด Save\n" +
           "2. กดปุ่ม 'การทำให้ใช้งานได้ (Deploy)' ➔ เลือก 'จัดการการทำให้ใช้งานได้ (Manage deployments)'\n" +
-          "3. กดไอคอนรูปดินสอ ✏️ ➔ ช่องเวอร์ชันเลือก 'เวอร์ชันใหม่ (New version)' ➔ กดปุ่ม 'การทำให้ใช้งานได้'\n" +
-          "   (⚠️ ห้ามกด 'การทำให้ใช้งานได้รายการใหม่' เพราะลิงก์จะเปลี่ยน)\n" +
+          "3. กดไอคอนรูปดินสอ ➔ ช่องเวอร์ชันเลือก 'เวอร์ชันใหม่ (New version)' ➔ กดปุ่ม 'การทำให้ใช้งานได้'\n" +
+          "   (ห้ามกด 'การทำให้ใช้งานได้รายการใหม่' เพราะลิงก์จะเปลี่ยน)\n" +
           "4. กลับมารีเฟรชหน้าเว็บนี้ (กด F5) แล้วกดบันทึกได้ทันทีครับ"
         );
         return;
@@ -3309,7 +3298,7 @@
 
       const btn = document.getElementById("btn-submit-update-resident");
       btn.disabled = true;
-      btn.innerText = "⏳ กำลังบันทึกการแก้ไข...";
+      btn.innerText = "กำลังบันทึกการแก้ไข...";
 
       const rawTypeVal = document.getElementById("edit-res-type") ? document.getElementById("edit-res-type").value : "Owner";
       const payload = {
@@ -3338,18 +3327,18 @@
 
         if (resJson.status === "success") {
           showExpToast(5, "อัปเดตข้อมูลลูกบ้าน");
-          alert("✅ บันทึกการแก้ไขข้อมูลเรียบร้อยแล้ว!");
+          alert("บันทึกการแก้ไขข้อมูลเรียบร้อยแล้ว!");
           closeEditResidentModal();
           await loadDashboardData();
           openCustomerListModal();
         } else {
-          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
+          alert(resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง");
         }
       } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
+        alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.innerText = "💾 บันทึกการแก้ไขข้อมูล";
+        btn.innerText = "บันทึกการแก้ไขข้อมูล";
       }
     }
 
@@ -3431,7 +3420,7 @@
       tbody.innerHTML = "";
 
       if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 15px; color: #6ee7b7;">✅ ไม่มีคิวค้างรับเงิน (เคลียร์ครบแล้ว)</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 15px; color: #6ee7b7;">ไม่มีคิวค้างรับเงิน (เคลียร์ครบแล้ว)</td></tr>`;
         return;
       }
 
@@ -3454,7 +3443,7 @@
           <td style="color: var(--text-muted); font-size:12px;">${item.operator}</td>
           <td style="text-align: center;">
             <button type="button" class="btn-action" style="background: linear-gradient(135deg, #059669, #047857);" onclick="fillPaymentFromQueue('${u}', '${n}', '${f}', '${m}', '${dNo}')">
-              ⚡ รับเงิน
+              รับเงิน
             </button>
           </td>
         </tr>`;
@@ -3486,11 +3475,11 @@
         const dStr = String(docNo).replace(/'/g, "\\'");
         const taxBadgesHtml = formatShortTaxBadgesHtml(item.taxMeta);
         const btnPrintHtml = (docNo && docNo !== "-")
-          ? `<button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openInvoiceTaxPrintModal('${dStr}')">🖨️ พิมพ์</button>`
+          ? `<button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openInvoiceTaxPrintModal('${dStr}')">พิมพ์</button>`
           : "";
         const btnCancelHtml = (status === "Pending" || status === "Quotation" || currentUser?.role === "Admin") 
-          ? `<button type="button" class="btn-action" style="background: #dc2626;" onclick="handleCancelInvoice('${dStr}')">🚫 ยกเลิก</button>` 
-          : `<span style="font-size:11px; color:var(--text-muted);">🔒 ล็อก</span>`;
+          ? `<button type="button" class="btn-action" style="background: #dc2626;" onclick="handleCancelInvoice('${dStr}')">ยกเลิก</button>` 
+          : `<span style="font-size:11px; color:var(--text-muted);">ล็อก</span>`;
 
         tbody.innerHTML += `<tr>
           <td style="color: var(--accent-gold); font-weight: bold;">${docNo}</td>
@@ -3522,7 +3511,7 @@
 
         let statusBadge = `<span class="badge paid">ปกติ</span>`;
         if (qty <= minAlert) {
-          statusBadge = `<span class="badge overdue" style="animation: pulse 1.5s infinite;">🔴 ต้องสั่งเพิ่ม</span>`;
+          statusBadge = `<span class="badge overdue" style="animation: pulse 1.5s infinite;">ต้องสั่งเพิ่ม</span>`;
         }
 
         tbody.innerHTML += `<tr>
@@ -3533,7 +3522,7 @@
           <td>฿${price.toLocaleString()}</td>
           <td>${statusBadge}</td>
           <td style="text-align: center;">
-            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-size: 11px; padding: 4px 10px;" onclick="openStockModal('${codeStr}')">✏️ แก้ไขข้อมูล / สต็อก</button>
+            <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-size: 11px; padding: 4px 10px;" onclick="openStockModal('${codeStr}')">แก้ไขข้อมูล / สต็อก</button>
           </td>
         </tr>`;
       });
@@ -3706,7 +3695,6 @@
       grid.innerHTML = "";
       if (filtered.length === 0) {
         grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
-          <div style="font-size: 32px; margin-bottom: 8px;">🔍</div>
           ไม่พบยูนิตที่ตรงกับเงื่อนไขการค้นหา
         </div>`;
         return;
@@ -3716,12 +3704,11 @@
         const uStr = item.unitNumber.replace(/'/g, "\\'");
         const isOverdue = item.hasDebt;
         const cardClass = isOverdue ? "smart-unit-card is-overdue" : "smart-unit-card is-settled";
-        const iconType = item.residentType === "Tenant" ? "💼" : "🔑";
         const typeLabel = item.residentType === "Tenant" ? "ผู้เช่า" : "เจ้าของ";
 
         const badgeHtml = isOverdue 
-          ? `<div class="smap-badge overdue" title="มียอดค้างชำระ">🔥 ค้าง ${item.unpaidCount} บิล ฿${item.unpaidSum.toLocaleString()}</div>`
-          : `<div class="smap-badge settled" title="ชำระเงินครบถ้วน">✅ ชำระแล้ว</div>`;
+          ? `<div class="smap-badge overdue" title="มียอดค้างชำระ">ค้าง ${item.unpaidCount} บิล ฿${item.unpaidSum.toLocaleString()}</div>`
+          : `<div class="smap-badge settled" title="ชำระเงินครบถ้วน">ชำระแล้ว</div>`;
 
         const card = document.createElement("div");
         card.className = cardClass;
@@ -3729,10 +3716,10 @@
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span class="smart-unit-num">${item.unitNumber}</span>
-              <span style="font-size: 11px; color: ${item.residentType === 'Tenant' ? '#38bdf8' : 'var(--accent-gold)'};" title="${typeLabel}">${iconType} ${typeLabel}</span>
+              <span style="font-size: 11px; color: ${item.residentType === 'Tenant' ? '#38bdf8' : 'var(--accent-gold)'};" title="${typeLabel}">${typeLabel}</span>
             </div>
             <div class="smart-unit-resident" title="${item.residentName}">
-              👤 ${item.residentName}
+              ${item.residentName}
             </div>
             <div style="margin-top: 4px;">
               ${badgeHtml}
@@ -3740,9 +3727,9 @@
           </div>
 
           <div class="smart-unit-actions">
-            <button type="button" class="smart-unit-btn" title="สมุดบัญชียูนิต (Individual Ledger)" onclick="openUnitLedgerModal('${uStr}')">📖 บัญชี</button>
-            <button type="button" class="smart-unit-btn" style="color: #6ee7b7;" title="รับเงิน / ออกบิล" onclick="quickPayOrBill('${uStr}')">⚡ จ่าย/บิล</button>
-            <button type="button" class="smart-unit-btn" style="color: #38bdf8;" title="แก้ไขข้อมูลลูกบ้าน" onclick="openEditResidentModal('${uStr}')">✏️ แก้ไข</button>
+            <button type="button" class="smart-unit-btn" title="สมุดบัญชียูนิต (Individual Ledger)" onclick="openUnitLedgerModal('${uStr}')">บัญชี</button>
+            <button type="button" class="smart-unit-btn" style="color: #6ee7b7;" title="รับเงิน / ออกบิล" onclick="quickPayOrBill('${uStr}')">จ่าย/บิล</button>
+            <button type="button" class="smart-unit-btn" style="color: #38bdf8;" title="แก้ไขข้อมูลลูกบ้าน" onclick="openEditResidentModal('${uStr}')">แก้ไข</button>
           </div>
         `;
         grid.appendChild(card);
@@ -3788,7 +3775,7 @@
         const taxBadgesHtml = formatShortTaxBadgesHtml(item.taxMeta);
 
         const btnReceiptHtml = status.toLowerCase() === 'paid' 
-          ? `<button type="button" class="btn-action" style="background: linear-gradient(135deg, var(--accent-green), #047857);" onclick="openReceiptTaxPrintModal(${origIdx})">🖨️ พิมพ์ใบเสร็จ</button>` 
+          ? `<button type="button" class="btn-action" style="background: linear-gradient(135deg, var(--accent-green), #047857);" onclick="openReceiptTaxPrintModal(${origIdx})">พิมพ์ใบเสร็จ</button>` 
           : `<span style="font-size:12px; color:var(--text-muted);">-</span>`;
         tableBody.innerHTML += `<tr>
           <td>${formattedDate}</td>
@@ -3852,17 +3839,17 @@
         const expIdStr = escapeJsSingleQuote(expId);
 
         const evidenceHtml = billCount > 0
-          ? `<button type="button" class="btn-evidence-popup" onclick="openExpenseFilesModal('${expIdStr}')" title="คลิกเพื่อดูบิลทั้งหมด เพิ่มบิล หรือเลือกลบบิล">📎 ดูไฟล์ (${billCount} ใบ)</button>`
-          : `<button type="button" class="btn-evidence-empty" onclick="openExpenseFilesModal('${expIdStr}')" title="คลิกเพื่อเพิ่มไฟล์หลักฐาน">➕ แนบบิล</button>`;
+          ? `<button type="button" class="btn-evidence-popup" onclick="openExpenseFilesModal('${expIdStr}')" title="คลิกเพื่อดูบิลทั้งหมด เพิ่มบิล หรือเลือกลบบิล">ดูไฟล์ (${billCount} ใบ)</button>`
+          : `<button type="button" class="btn-evidence-empty" onclick="openExpenseFilesModal('${expIdStr}')" title="คลิกเพื่อเพิ่มไฟล์หลักฐาน">+ แนบบิล</button>`;
 
         const isAdmin = (currentUser?.role === "Admin");
-        const btnAttachText = billCount > 0 ? "➕ เพิ่มบิล" : "📤 แนบไฟล์";
+        const btnAttachText = billCount > 0 ? "+ เพิ่มบิล" : "แนบไฟล์";
         
         let actionHtml = `<div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">`;
-        actionHtml += `<button type="button" class="btn-action" style="background: #0f766e;" onclick="openVoucherModal('${expIdStr}')">📄 ดู/พิมพ์</button>`;
+        actionHtml += `<button type="button" class="btn-action" style="background: #0f766e;" onclick="openVoucherModal('${expIdStr}')">ดู/พิมพ์</button>`;
 
         if (isAdmin) {
-            actionHtml += `<button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openExpenseUpdateModal('${expIdStr}', true)">🛠 แก้ไข</button>`;
+            actionHtml += `<button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openExpenseUpdateModal('${expIdStr}', true)">แก้ไข</button>`;
         } else {
             actionHtml += `<button type="button" class="btn-action" style="background: #d97706;" onclick="openExpenseFilesModal('${expIdStr}')">${btnAttachText}</button>`;
         }
@@ -4069,7 +4056,7 @@
       });
 
       if (items.length === 0) {
-        alert("⚠️ กรุณากรอกชื่อพัสดุและจำนวนอย่างน้อย 1 รายการครับ");
+        alert("กรุณากรอกชื่อพัสดุและจำนวนอย่างน้อย 1 รายการครับ");
         return;
       }
 
@@ -4141,7 +4128,7 @@
           <tr style="border-bottom: 1px solid #381808;">
             <td style="padding: 6px 8px; color: var(--text-main); font-weight: bold;">
               ${res.name}
-              ${res.isExisting ? `<span style="font-size:10px; color:#6ee7b7; display:block;">[รหัส: ${res.itemCode}]</span>` : `<span style="font-size:10px; color:#38bdf8; display:block;">[✨ พัสดุใหม่]</span>`}
+              ${res.isExisting ? `<span style="font-size:10px; color:#6ee7b7; display:block;">[รหัส: ${res.itemCode}]</span>` : `<span style="font-size:10px; color:#38bdf8; display:block;">[พัสดุใหม่]</span>`}
             </td>
             <td style="padding: 6px 8px; color: #fde68a;">${res.category}</td>
             <td style="padding: 6px 8px; text-align: center; color: var(--accent-gold); font-weight: bold; white-space: nowrap;">
@@ -4163,7 +4150,7 @@
 
       const btn = document.getElementById("btn-save-audit-final");
       btn.disabled = true;
-      btn.innerText = "⏳ กำลังบันทึกลงชีต...";
+      btn.innerText = "กำลังบันทึกลงชีต...";
 
       try {
         const resJson = await fetchWithRetry(API_URL, {
@@ -4179,7 +4166,7 @@
 
         if (resJson.status === "success") {
           showExpToast(15, "ตรวจนับสต็อกหน้างาน (AI)");
-          alert("✅ " + resJson.message);
+          alert(resJson.message);
           document.getElementById("quick-audit-rows-list").innerHTML = "";
           document.getElementById("audit-review-result-box").style.display = "none";
           quickAuditParsedItems = [];
@@ -4188,13 +4175,13 @@
           addQuickAuditRow();
           await loadDashboardData();
         } else {
-          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
+          alert(resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง");
         }
       } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการบันทึกสต็อก: " + err.message);
+        alert("เกิดข้อผิดพลาดในการบันทึกสต็อก: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.innerText = "💾 บันทึกผลการตรวจนับลงสต็อกจริง";
+        btn.innerText = "บันทึกผลการตรวจนับลงสต็อกจริง";
       }
     }
 
@@ -4203,7 +4190,7 @@
       event.preventDefault();
       const btn = document.getElementById("btn-submit-payment");
       btn.disabled = true;
-      btn.innerText = "⏳ กำลังบันทึกรับเงิน...";
+      btn.innerText = "กำลังบันทึกรับเงิน...";
 
       const rawUnit = document.getElementById("form-unit").value.trim();
       const resName = document.getElementById("form-name").value.trim();
@@ -4238,7 +4225,7 @@
 
         if (resJson.status === "success") {
           showExpToast(resJson.expAdded || 5, "บันทึกรับชำระเงิน");
-          alert(`✅ บันทึกรับเงินสำเร็จ! เลขที่ใบเสร็จ: ${resJson.docNo || '-'} (ยอดสุทธิ ฿${formatBaht(paySummary.netTotal)})`);
+          alert(`บันทึกรับเงินสำเร็จ! เลขที่ใบเสร็จ: ${resJson.docNo || '-'} (ยอดสุทธิ ฿${formatBaht(paySummary.netTotal)})`);
           document.getElementById("payment-form").reset();
           activeQueuedInvoiceDocNo = "";
           resetDocTaxForm("pay");
@@ -4246,10 +4233,10 @@
           if (hintEl) hintEl.style.display = "none";
           await loadDashboardData();
         } else {
-          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
+          alert(resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง");
         }
       } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
+        alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
       } finally {
         btn.disabled = false;
         btn.innerText = "บันทึกรับชำระเงิน & ตัดยอดคิว";
@@ -4439,9 +4426,8 @@
         ${filesArr.length > 1 && clearFnName ? `<button type="button" onclick="${clearFnName}()" style="background:none; border:none; color:#fca5a5; text-decoration:underline; cursor:pointer; font-size:11px;">ล้างทั้งหมด</button>` : ""}
       </div>`;
       filesArr.forEach((f, idx) => {
-        const icon = (f.type && f.type.includes("pdf")) || f.name.toLowerCase().endsWith(".pdf") ? "📕" : "🖼️";
         html += `<div class="exp-file-queue-chip">
-          <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${icon} ${idx + 1}. ${escapeHtml(f.name)} <small style="color:var(--text-muted);">(${formatFileSizeShort(f.size)})</small></span>
+          <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${idx + 1}. ${escapeHtml(f.name)} <small style="color:var(--text-muted);">(${formatFileSizeShort(f.size)})</small></span>
           <button type="button" onclick="${removeFnName}(${idx})" style="background:#7f1d1d; border:1px solid #dc2626; color:#fecaca; border-radius:6px; padding:1px 7px; cursor:pointer; font-size:11px;" title="เอาไฟล์นี้ออก">✕</button>
         </div>`;
       });
@@ -4474,7 +4460,7 @@
       event.preventDefault();
       const btn = document.getElementById("btn-submit-expense");
       btn.disabled = true;
-      btn.innerText = "⏳ กำลังบันทึกรายจ่าย...";
+      btn.innerText = "กำลังบันทึกรายจ่าย...";
 
       const catVal = document.getElementById("exp-category").value;
       const descVal = document.getElementById("exp-desc").value.trim();
@@ -4533,20 +4519,20 @@
 
           showExpToast(5, "บันทึกรายจ่ายโครงการ");
           const totalUploaded = encodedFiles.length;
-          alert("✅ " + (totalUploaded > 0
+          alert(totalUploaded > 0
             ? `บันทึกรายจ่ายพร้อมแนบบิลหลักฐาน ${totalUploaded} ใบ เรียบร้อยแล้ว`
-            : resJson.message));
+            : resJson.message);
           document.getElementById("expense-form").reset();
           clearPendingNewExpenseFiles();
           await loadDashboardData();
         } else {
-          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
+          alert(resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง");
         }
       } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+        alert("เกิดข้อผิดพลาดในการบันทึก: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.innerText = "💾 บันทึกรายจ่าย";
+        btn.innerText = "บันทึกรายจ่าย";
       }
     }
 
@@ -4621,7 +4607,7 @@
       event.preventDefault();
       const btn = document.getElementById("btn-submit-proc");
       btn.disabled = true;
-      btn.innerText = "⏳ กำลังบันทึกพัสดุ...";
+      btn.innerText = "กำลังบันทึกพัสดุ...";
 
       const payload = {
         type: "new_procurement",
@@ -4644,17 +4630,17 @@
 
         if (resJson.status === "success") {
           showExpToast(10, "เพิ่มรายการจัดซื้อพัสดุ");
-          alert("✅ " + resJson.message);
+          alert(resJson.message);
           document.getElementById("procurement-form").reset();
           await loadDashboardData();
         } else {
-          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
+          alert(resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง");
         }
       } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+        alert("เกิดข้อผิดพลาดในการบันทึก: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.innerText = "💾 บันทึกรับพัสดุใหม่เข้าสต็อก";
+        btn.innerText = "บันทึกรับพัสดุใหม่เข้าสต็อก";
       }
     }
 
@@ -4662,7 +4648,7 @@
       activeStockItemCode = itemCode;
       const item = cachedProcurement.find(p => String(p.itemCode).trim() === String(itemCode).trim());
       if (!item) {
-        alert("⚠️ ไม่พบข้อมูลรายการพัสดุนี้");
+        alert("ไม่พบข้อมูลรายการพัสดุนี้");
         return;
       }
 
@@ -4691,7 +4677,7 @@
       const unitPrice = document.getElementById("stock-modal-price").value;
 
       if (!activeStockItemCode || !itemName || newQty === "" || !unit || newMin === "") {
-        alert("⚠️ กรุณาระบุข้อมูลให้ครบถ้วน (ชื่อพัสดุ, หมวดหมู่, จำนวนคงเหลือ, หน่วยนับ, จุดเตือน)");
+        alert("กรุณาระบุข้อมูลให้ครบถ้วน (ชื่อพัสดุ, หมวดหมู่, จำนวนคงเหลือ, หน่วยนับ, จุดเตือน)");
         return;
       }
 
@@ -4714,14 +4700,14 @@
         }, 3, 1500, "กำลังปรับปรุงข้อมูลพัสดุ", "กำลังอัปเดตข้อมูลใน Google Sheets...");
 
         if (resJson.status === "success") {
-          alert("✅ " + resJson.message);
+          alert(resJson.message);
           closeStockModal();
           await loadDashboardData();
         } else {
-          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
+          alert(resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง");
         }
       } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+        alert("เกิดข้อผิดพลาดในการบันทึก: " + err.message);
       }
     }
 
@@ -4729,7 +4715,7 @@
     function openVoucherModal(expId) {
       const item = cachedExpenses.find(e => String(e.ExpenseId).trim() === String(expId).trim());
       if (!item) {
-        alert("⚠️ ไม่พบข้อมูลรายการรายจ่ายนี้ในระบบ");
+        alert("ไม่พบข้อมูลรายการรายจ่ายนี้ในระบบ");
         return;
       }
 
@@ -4737,8 +4723,8 @@
       const attachments = getExpenseAttachments(item);
       const expIdStr = escapeJsSingleQuote(expId);
       const attachSummaryHtml = attachments.length > 0
-        ? `<button type="button" class="btn-evidence-popup" style="margin-left:6px;" onclick="closeVoucherModal(); openExpenseFilesModal('${expIdStr}')">📎 เปิดดูบิลทั้งหมด (${attachments.length} ใบ)</button>`
-        : `<span style="color:var(--text-muted);">ยังไม่มีไฟล์แนบ</span> <button type="button" class="btn-evidence-empty" style="margin-left:6px;" onclick="closeVoucherModal(); openExpenseFilesModal('${expIdStr}')">➕ แนบบิล</button>`;
+        ? `<button type="button" class="btn-evidence-popup" style="margin-left:6px;" onclick="closeVoucherModal(); openExpenseFilesModal('${expIdStr}')">เปิดดูบิลทั้งหมด (${attachments.length} ใบ)</button>`
+        : `<span style="color:var(--text-muted);">ยังไม่มีไฟล์แนบ</span> <button type="button" class="btn-evidence-empty" style="margin-left:6px;" onclick="closeVoucherModal(); openExpenseFilesModal('${expIdStr}')">+ แนบบิล</button>`;
 
       document.getElementById("voucher-details-container").innerHTML = `
         <strong>วันที่:</strong> ${formatDisplayDate(item.Date)}<br>
@@ -4782,7 +4768,7 @@
       isCurrentExpenseAdminOverride = isAdminOverride;
       const item = cachedExpenses.find(e => String(e.ExpenseId).trim() === String(expId).trim());
       if (!item) {
-        alert("⚠️ ไม่พบข้อมูลรายการรายจ่ายนี้ในระบบ");
+        alert("ไม่พบข้อมูลรายการรายจ่ายนี้ในระบบ");
         return;
       }
 
@@ -4800,21 +4786,21 @@
       const existingBills = getExpenseAttachments(item);
       const existingLbl = document.getElementById("exp-modal-existing-files-label");
       if (existingLbl) {
-        existingLbl.innerText = `📂 บิลหลักฐานที่แนบไว้แล้ว: ${existingBills.length} ใบ`;
+        existingLbl.innerText = `บิลหลักฐานที่แนบไว้แล้ว: ${existingBills.length} ใบ`;
       }
 
       const adminDiv = document.getElementById("exp-modal-admin-fields");
       const titleEl = document.getElementById("expense-modal-title");
 
       if (isAdminOverride && currentUser?.role === "Admin") {
-        titleEl.innerText = "🛠️ แก้ไขรายการรายจ่าย & เพิ่มบิลหลักฐาน (Admin)";
+        titleEl.innerText = "แก้ไขรายการรายจ่าย & เพิ่มบิลหลักฐาน (Admin)";
         adminDiv.style.display = "block";
         document.getElementById("exp-modal-category").value = item.Category;
         document.getElementById("exp-modal-desc").value = item.Description;
         document.getElementById("exp-modal-amount").value = item.Amount;
         document.getElementById("exp-modal-method").value = item['Payment Method'];
       } else {
-        titleEl.innerText = "📎 อัปโหลดบิลหลักฐานการจ่ายเงินเพิ่มเติม";
+        titleEl.innerText = "อัปโหลดบิลหลักฐานการจ่ายเงินเพิ่มเติม";
         adminDiv.style.display = "none";
       }
 
@@ -4861,7 +4847,7 @@
       const origAmt = document.getElementById("exp-modal-fallback-amt").value;
 
       if (!isCurrentExpenseAdminOverride && pendingModalExpenseFiles.length === 0) {
-        alert("⚠️ กรุณาเลือกไฟล์บิลหลักฐานที่ต้องการอัปโหลดเพิ่มอย่างน้อย 1 ไฟล์");
+        alert("กรุณาเลือกไฟล์บิลหลักฐานที่ต้องการอัปโหลดเพิ่มอย่างน้อย 1 ไฟล์");
         return;
       }
 
@@ -4912,11 +4898,11 @@
           }
         }
 
-        alert("✅ " + (finalRes.message || "อัปเดตข้อมูลและหลักฐานรายจ่ายเรียบร้อยแล้ว"));
+        alert(finalRes.message || "อัปเดตข้อมูลและหลักฐานรายจ่ายเรียบร้อยแล้ว");
         closeExpenseUpdateModal();
         await loadDashboardData();
       } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+        alert("เกิดข้อผิดพลาดในการบันทึก: " + err.message);
       }
     }
 
@@ -4938,7 +4924,7 @@
     function openExpenseFilesModal(expId) {
       const item = cachedExpenses.find(e => String(e.ExpenseId).trim() === String(expId).trim());
       if (!item) {
-        alert("⚠️ ไม่พบข้อมูลรายการรายจ่ายนี้ในระบบ");
+        alert("ไม่พบข้อมูลรายการรายจ่ายนี้ในระบบ");
         return;
       }
 
@@ -4990,7 +4976,7 @@
         selectAllCb.indeterminate = selCount > 0 && selCount < totalBillsCount;
       }
       if (delBtn) {
-        delBtn.innerText = `🗑️ ลบบิลที่เลือก (${selCount} ใบ)`;
+        delBtn.innerText = `ลบบิลที่เลือก (${selCount} ใบ)`;
         delBtn.disabled = selCount === 0;
         delBtn.style.opacity = selCount > 0 ? "1" : "0.45";
         delBtn.style.cursor = selCount > 0 ? "pointer" : "not-allowed";
@@ -5007,7 +4993,7 @@
 
       const titleEl = document.getElementById("expense-files-dialog-title");
       if (titleEl) {
-        titleEl.innerText = `🗂️ แฟ้มหลักฐานการจ่ายเงิน (${count} ใบ)`;
+        titleEl.innerText = `แฟ้มหลักฐานการจ่ายเงิน (${count} ใบ)`;
       }
 
       const summaryEl = document.getElementById("exp-files-dialog-summary");
@@ -5030,7 +5016,7 @@
       if (footerCount) {
         footerCount.innerText = count > 0
           ? `แสดงหลักฐานครบทั้งหมด ${count} ใบ (คลิกที่รูปบิลเพื่อขยายดูใบใหญ่ หรือติ๊กถูกเพื่อเลือกลบบิล)`
-          : "ยังไม่มีบิลแนบในรายการนี้ สามารถกดปุ่ม ➕ เพิ่มบิลหลักฐาน ด้านบนได้ทันที";
+          : "ยังไม่มีบิลแนบในรายการนี้ สามารถกดปุ่ม + เพิ่มบิลหลักฐาน ด้านบนได้ทันที";
       }
 
       // ล้าง key ที่ไม่มีอยู่แล้วออกจากชุดเลือก
@@ -5047,9 +5033,8 @@
       if (count === 0) {
         grid.innerHTML = `
           <div style="grid-column: 1 / -1; text-align: center; padding: 38px 20px; background: rgba(18, 6, 2, 0.65); border: 2px dashed #4a2511; border-radius: 14px; color: var(--text-muted);">
-            <div style="font-size: 36px; margin-bottom: 8px;">📂</div>
             <div style="font-size: 14px; font-weight: bold; color: #fde68a; margin-bottom: 4px;">ยังไม่มีไฟล์บิลหลักฐานสำหรับรายการนี้</div>
-            <div style="font-size: 12px;">กดปุ่ม <strong>"➕ เพิ่มบิลหลักฐาน"</strong> ด้านบนเพื่ออัปโหลดสลิปหรือใบวางบิล (อัปโหลดเพิ่มหลายรอบได้ไม่จำกัด)</div>
+            <div style="font-size: 12px;">กดปุ่ม <strong>"+ เพิ่มบิลหลักฐาน"</strong> ด้านบนเพื่ออัปโหลดสลิปหรือใบวางบิล (อัปโหลดเพิ่มหลายรอบได้ไม่จำกัด)</div>
           </div>
         `;
         return;
@@ -5082,7 +5067,7 @@
                 <span>บิลใบที่ ${idx + 1} / ${count}</span>
               </label>
               <button type="button" class="btn-action" style="background: #7f1d1d; border-color: #dc2626; color: #fecaca; padding: 3px 8px; font-size: 11px;" onclick="deleteSingleExpenseBill('${keyJs}')" title="ลบบิลใบนี้ออก">
-                🗑️ ลบ
+                ลบ
               </button>
             </div>
 
@@ -5092,7 +5077,7 @@
             </div>
 
             <div style="font-size: 12.5px; font-weight: bold; color: #fef3c7; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(att.name || "")}">
-              ${isPdf ? "📕" : "🧾"} ${escapeHtml(att.name || ("บิลหลักฐาน #" + (idx + 1)))}
+              ${escapeHtml(att.name || ("บิลหลักฐาน #" + (idx + 1)))}
             </div>
             <div style="font-size: 11px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
               ${metaLine}
@@ -5100,10 +5085,10 @@
 
             <div style="display: flex; gap: 6px; margin-top: auto; padding-top: 4px;">
               <button type="button" class="btn-action" style="flex: 1.3; background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: bold;" onclick="openBillViewerDialog(${idx})">
-                🔍 ขยายดูบิล
+                ขยายดูบิล
               </button>
               <a href="${escapeHtml(att.url || "#")}" target="_blank" rel="noopener noreferrer" class="btn-action" style="flex: 1; text-align: center; text-decoration: none; background: #451a03; display: inline-flex; align-items: center; justify-content: center;">
-                🔗 เปิดเต็ม
+                เปิดเต็ม
               </a>
             </div>
           </div>
@@ -5158,7 +5143,7 @@
       const wrap = imgEl.parentElement;
       wrap.innerHTML = `
         <div style="text-align: center; padding: 14px; color: #fde68a;">
-          <div style="font-size: 34px; margin-bottom: 4px;">${isPdf ? "📕" : "🧾"}</div>
+          <div style="font-size: 13px; font-weight: bold; color: var(--accent-gold); margin-bottom: 4px;">${isPdf ? "[ไฟล์ PDF]" : "[ไฟล์รูปภาพ]"}</div>
           <div style="font-size: 11.5px; font-weight: bold;">คลิกเพื่อเปิดดูไฟล์บิล</div>
         </div>
       `;
@@ -5225,10 +5210,10 @@
 
       box.style.display = "block";
       if (titleEl) {
-        titleEl.innerText = `📥 ไฟล์บิลใหม่ที่เตรียมอัปโหลดเพิ่ม (${pendingPopupStagedFiles.length} ใบ)`;
+        titleEl.innerText = `ไฟล์บิลใหม่ที่เตรียมอัปโหลดเพิ่ม (${pendingPopupStagedFiles.length} ใบ)`;
       }
       if (btn) {
-        btn.innerText = `📤 ยืนยันอัปโหลดเข้าแฟ้ม (${pendingPopupStagedFiles.length} ใบ)`;
+        btn.innerText = `ยืนยันอัปโหลดเข้าแฟ้ม (${pendingPopupStagedFiles.length} ใบ)`;
       }
       renderQueuedFilesList("exp-popup-staged-list", pendingPopupStagedFiles, "removePopupStagedFile", "");
     }
@@ -5288,7 +5273,7 @@
         clearPopupStagedFiles();
         renderExpenseFilesDialogContent();
       } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการอัปโหลดบิลเพิ่ม: " + err.message);
+        alert("เกิดข้อผิดพลาดในการอัปโหลดบิลเพิ่ม: " + err.message);
       } finally {
         setExpenseFilesDialogBusy(false);
       }
@@ -5315,7 +5300,7 @@
 
       const billNamesPreview = matchedBills.slice(0, 3).map(b => `• ${b.name || "ไฟล์หลักฐาน"}`).join("\n");
       const moreLine = matchedBills.length > 3 ? `\n...และอีก ${matchedBills.length - 3} ใบ` : "";
-      const confirmMsg = `🗑️ ยืนยันการลบบิลหลักฐานจำนวน ${matchedBills.length} ใบ ออกจากรายการ "${item.Description}" ใช่หรือไม่?\n\n${billNamesPreview}${moreLine}`;
+      const confirmMsg = `ยืนยันการลบบิลหลักฐานจำนวน ${matchedBills.length} ใบ ออกจากรายการ "${item.Description}" ใช่หรือไม่?\n\n${billNamesPreview}${moreLine}`;
       if (!confirm(confirmMsg)) return;
 
       const targetIds = [];
@@ -5373,7 +5358,7 @@
           }
         }
       } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการลบบิลหลักฐาน: " + err.message);
+        alert("เกิดข้อผิดพลาดในการลบบิลหลักฐาน: " + err.message);
       } finally {
         setExpenseFilesDialogBusy(false);
       }
@@ -5437,7 +5422,7 @@
 
       const titleEl = document.getElementById("bill-viewer-dialog-title");
       if (titleEl) {
-        titleEl.innerText = `🔍 บิลใบที่ ${activeViewerBillIndex + 1}/${attachments.length} — ${att.name || "หลักฐานการจ่ายเงิน"}`;
+        titleEl.innerText = `บิลใบที่ ${activeViewerBillIndex + 1}/${attachments.length} — ${att.name || "หลักฐานการจ่ายเงิน"}`;
       }
 
       const counterEl = document.getElementById("bill-viewer-counter");
@@ -5516,9 +5501,9 @@
     function switchDocTypeForm(val) {
       const btn = document.getElementById("btn-generate-inv");
       if (val === "QUOTATION") {
-        btn.innerText = "🖨️ พิมพ์ใบเสนอราคา / ใบจอง (PDF)";
+        btn.innerText = "พิมพ์ใบเสนอราคา / ใบจอง (PDF)";
       } else {
-        btn.innerText = "🖨️ ตรวจสอบ, ส่งงานเข้าคิว & พิมพ์ใบแจ้งหนี้ (PDF)";
+        btn.innerText = "ตรวจสอบ, ส่งงานเข้าคิว & พิมพ์ใบแจ้งหนี้ (PDF)";
       }
     }
 
@@ -5527,13 +5512,13 @@
       const nextRecNo = document.getElementById("admin-next-rec-no").value.trim();
 
       if (!nextInvNo && !nextRecNo) {
-        alert("⚠️ กรุณาระบุตัวเลขอย่างน้อย 1 ช่องสำหรับการตั้งค่า");
+        alert("กรุณาระบุตัวเลขอย่างน้อย 1 ช่องสำหรับการตั้งค่า");
         return;
       }
 
       const btn = document.getElementById("btn-save-doc-number");
       btn.disabled = true;
-      btn.innerText = "⏳ กำลังบันทึกการตั้งค่า...";
+      btn.innerText = "กำลังบันทึกการตั้งค่า...";
 
       try {
         const resJson = await fetchWithRetry(API_URL, {
@@ -5549,16 +5534,16 @@
         }, 3, 1500, "กำลังตั้งค่าเลขรันเอกสาร", "กำลังอัปเดตตัวเลขถัดไปใน Google Sheets...");
 
         if (resJson.status === "success") {
-          alert("✅ " + resJson.message);
+          alert(resJson.message);
           await loadDashboardData();
         } else {
-          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
+          alert(resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง");
         }
       } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
+        alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.innerText = "💾 บันทึกตั้งค่าเลขที่รัน";
+        btn.innerText = "บันทึกตั้งค่าเลขที่รัน";
       }
     }
 
@@ -5577,13 +5562,13 @@
         }, 3, 1500, "กำลังยกเลิกเอกสาร", "กำลังส่งคำขอยกเลิกบิลไปยัง Google Sheets...");
 
         if (resJson.status === "success") {
-          alert("✅ " + resJson.message);
+          alert(resJson.message);
           await loadDashboardData();
         } else {
-          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
+          alert(resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง");
         }
       } catch (err) {
-        alert("⚠️ เกิดข้อผิดพลาดในการยกเลิกบิล: " + err.message);
+        alert("เกิดข้อผิดพลาดในการยกเลิกบิล: " + err.message);
       }
     }
 
@@ -5631,7 +5616,7 @@
       const container = document.getElementById(`${pfx}-custom-adj-container`);
       if (!container) return;
       if (container.getElementsByClassName("custom-adj-row").length >= 6) {
-        alert("⚠️ เพิ่มรายการปรับยอดกำหนดเองได้สูงสุด 6 รายการต่อบิลครับ");
+        alert("เพิ่มรายการปรับยอดกำหนดเองได้สูงสุด 6 รายการต่อบิลครับ");
         return;
       }
 
@@ -5644,8 +5629,8 @@
       row.className = "custom-adj-row";
       row.innerHTML = `
         <select class="custom-adj-sign" onchange="recalcDocTax('${pfx}')">
-          <option value="deduct" ${signVal === "deduct" ? "selected" : ""}>➖ หักออก (-)</option>
-          <option value="add" ${signVal === "add" ? "selected" : ""}>➕ บวกเพิ่ม (+)</option>
+          <option value="deduct" ${signVal === "deduct" ? "selected" : ""}>หักออก (-)</option>
+          <option value="add" ${signVal === "add" ? "selected" : ""}>บวกเพิ่ม (+)</option>
         </select>
         <input type="text" class="custom-adj-label" list="custom-tax-labels-list" placeholder="ระบุชื่อ เช่น หักภาษี 3%, ส่วนลด" value="${escapeHtmlText(labelVal)}" oninput="recalcDocTax('${pfx}')">
         <input type="number" class="custom-adj-val" step="any" min="0" placeholder="ตัวเลข" value="${numVal}" oninput="recalcDocTax('${pfx}')">
@@ -5985,13 +5970,13 @@
       const noteBox = document.getElementById("print-payment-note");
       if (noteBox) {
         const whtExtraNote = summary.hasWht
-          ? `<br><span style="color:#b91c1c;">📌 หมายเหตุภาษีหัก ณ ที่จ่าย: กรุณานำส่งหนังสือรับรองการหักภาษี ณ ที่จ่าย (ใบ 50 ทวิ) ให้แก่ฝ่ายบัญชีนิติบุคคลเพื่อเป็นหลักฐานทางภาษี</span>`
+          ? `<br><span style="color:#b91c1c;">หมายเหตุภาษีหัก ณ ที่จ่าย: กรุณานำส่งหนังสือรับรองการหักภาษี ณ ที่จ่าย (ใบ 50 ทวิ) ให้แก่ฝ่ายบัญชีนิติบุคคลเพื่อเป็นหลักฐานทางภาษี</span>`
           : "";
         if (docMode === "RECEIPT") {
           noteBox.style.background = "#f0fdf4";
           noteBox.style.borderColor = "#86efac";
           noteBox.innerHTML = `
-            <strong style="color: #166534;">✅ สถานะการรับชำระเงิน: ได้รับเงินเรียบร้อยแล้ว (PAID)</strong><br>
+            <strong style="color: #166534;">สถานะการรับชำระเงิน: ได้รับเงินเรียบร้อยแล้ว (PAID)</strong><br>
             ช่องทางการชำระ: <strong>${escapeHtmlText(opts.payMethod || "โอนเงิน / สแกน QR")}</strong> | ออกโดยระบบนิติบุคคลอุดมสุขเพลส (Official Receipt)<br>
             เอกสารฉบับนี้พิมพ์จากระบบคอมพิวเตอร์ มีผลสมบูรณ์ตามระเบียบนิติบุคคล${whtExtraNote}
           `;
@@ -5999,7 +5984,7 @@
           noteBox.style.background = "#fffbeb";
           noteBox.style.borderColor = "#fde68a";
           noteBox.innerHTML = `
-            <strong style="color: #b45309;">📌 ข้อมูลและขั้นตอนการชำระเงิน:</strong><br>
+            <strong style="color: #b45309;">ข้อมูลและขั้นตอนการชำระเงิน:</strong><br>
             1. กรุณานำใบแจ้งหนี้นี้มาชำระ ณ สำนักงานนิติบุคคล หรือชำระผ่านช่องทางโอนเงินเข้าบัญชีบริษัท<br>
             2. เมื่อชำระเงินเรียบร้อยแล้ว <strong>ฝ่ายการเงินจะดำเนินการออก "ใบเสร็จรับเงินฉบับเต็ม (Official Receipt)"</strong> ให้เป็นหลักฐานทันที${whtExtraNote}
           `;
@@ -6025,7 +6010,7 @@
     function openReceiptTaxPrintModal(paymentIdx) {
       const item = cachedPayments[paymentIdx];
       if (!item) {
-        alert("⚠️ ไม่พบข้อมูลใบเสร็จรายการนี้");
+        alert("ไม่พบข้อมูลใบเสร็จรายการนี้");
         return;
       }
 
@@ -6043,7 +6028,7 @@
 
       const resObj = (cachedResidents || []).find(r => cleanUnitKey(r.unitNumber) === cleanUnitKey(unit));
       const tenantBadge = (resObj && resObj.residentType === "Tenant")
-        ? `<span style="color:#38bdf8; font-weight:bold;"> (💼 ยูนิตผู้เช่า)</span>`
+        ? `<span style="color:#38bdf8; font-weight:bold;"> (ยูนิตผู้เช่า)</span>`
         : "";
 
       activeTaxPrintContext = {
@@ -6060,12 +6045,12 @@
         items: null
       };
 
-      document.getElementById("doc-tax-modal-title").innerText = `🧾 ตั้งค่าภาษี & พิมพ์ใบเสร็จรับเงิน (${docNo})`;
+      document.getElementById("doc-tax-modal-title").innerText = `ตั้งค่าภาษี & พิมพ์ใบเสร็จรับเงิน (${docNo})`;
       document.getElementById("doc-tax-modal-info").innerHTML = `
         <div><strong style="color:var(--accent-gold);">เลขที่ใบเสร็จ:</strong> ${escapeHtmlText(docNo)} | <strong>ยูนิต:</strong> ${escapeHtmlText(unit)}${tenantBadge}</div>
         <div><strong style="color:var(--accent-gold);">ลูกค้า:</strong> ${escapeHtmlText(residentName)} | <strong>รายการ:</strong> ${escapeHtmlText(feeType)}</div>
       `;
-      document.getElementById("modal-base-subtotal-label").innerText = "💰 ยอดตั้งต้นก่อนภาษี (Subtotal - บาท)";
+      document.getElementById("modal-base-subtotal-label").innerText = "ยอดตั้งต้นก่อนภาษี (Subtotal - บาท)";
       const baseInput = document.getElementById("modal-base-subtotal");
       baseInput.readOnly = false;
       baseInput.value = baseSubtotal;
@@ -6077,7 +6062,7 @@
     function openInvoiceTaxPrintModal(invDocNo) {
       const item = (cachedAllInvoices || []).find(inv => String(inv.docNo || "").trim() === String(invDocNo || "").trim());
       if (!item) {
-        alert("⚠️ ไม่พบข้อมูลเอกสารใบแจ้งหนี้นี้");
+        alert("ไม่พบข้อมูลเอกสารใบแจ้งหนี้นี้");
         return;
       }
 
@@ -6091,7 +6076,7 @@
 
       const resObj = (cachedResidents || []).find(r => cleanUnitKey(r.unitNumber) === cleanUnitKey(item.unitNumber));
       const tenantBadge = (resObj && resObj.residentType === "Tenant")
-        ? `<span style="color:#38bdf8; font-weight:bold;"> (💼 ยูนิตผู้เช่า)</span>`
+        ? `<span style="color:#38bdf8; font-weight:bold;"> (ยูนิตผู้เช่า)</span>`
         : "";
 
       activeTaxPrintContext = {
@@ -6107,14 +6092,14 @@
       };
 
       const isMultiItem = itemsArr.length > 1;
-      document.getElementById("doc-tax-modal-title").innerText = `🧾 ตั้งค่าภาษี & พิมพ์${docMode === "QUOTATION" ? "ใบเสนอราคา" : "ใบแจ้งหนี้"} (${item.docNo})`;
+      document.getElementById("doc-tax-modal-title").innerText = `ตั้งค่าภาษี & พิมพ์${docMode === "QUOTATION" ? "ใบเสนอราคา" : "ใบแจ้งหนี้"} (${item.docNo})`;
       document.getElementById("doc-tax-modal-info").innerHTML = `
         <div><strong style="color:var(--accent-gold);">เลขที่เอกสาร:</strong> ${escapeHtmlText(item.docNo)} | <strong>ยูนิต:</strong> ${escapeHtmlText(item.unitNumber)}${tenantBadge}</div>
         <div><strong style="color:var(--accent-gold);">ลูกค้า:</strong> ${escapeHtmlText(item.residentName)} | <strong>จำนวนรายการย่อย:</strong> ${itemsArr.length} รายการ</div>
       `;
       document.getElementById("modal-base-subtotal-label").innerText = isMultiItem
-        ? "💰 ยอดรวมรายการก่อนภาษี (รวมจากรายการย่อยอัตโนมัติ)"
-        : "💰 ยอดตั้งต้นก่อนภาษี (Subtotal - บาท)";
+        ? "ยอดรวมรายการก่อนภาษี (รวมจากรายการย่อยอัตโนมัติ)"
+        : "ยอดตั้งต้นก่อนภาษี (Subtotal - บาท)";
       const baseInput = document.getElementById("modal-base-subtotal");
       baseInput.readOnly = isMultiItem;
       baseInput.value = baseSubtotal;
@@ -6245,7 +6230,7 @@
       subtotalAmt = roundCurrency(subtotalAmt);
 
       if (items.length === 0) {
-        alert("⚠️ กรุณาระบุรายการและจำนวนเงินอย่างน้อย 1 รายการ");
+        alert("กรุณาระบุรายการและจำนวนเงินอย่างน้อย 1 รายการ");
         return;
       }
 
@@ -6254,7 +6239,7 @@
 
       const btn = document.getElementById("btn-generate-inv");
       btn.disabled = true;
-      btn.innerText = "⏳ กำลังบันทึกข้อมูล...";
+      btn.innerText = "กำลังบันทึกข้อมูล...";
 
       try {
         const payload = {
@@ -6301,11 +6286,11 @@
 
           await loadDashboardData();
         } else {
-          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
+          alert(resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง");
         }
       } catch (err) {
         console.error("Generate Invoice Error:", err);
-        alert("⚠️ เกิดข้อผิดพลาดในการออกบิล: " + err.message);
+        alert("เกิดข้อผิดพลาดในการออกบิล: " + err.message);
       } finally {
         btn.disabled = false;
         switchDocTypeForm(docType);
