@@ -493,6 +493,161 @@
       }
     }
 
+    /* 🗂️ Multi-Bill Evidence Dialog & Gallery Styles */
+    dialog.ro-dialog-modal {
+      margin: auto;
+      padding: 0;
+      border: 6px solid #1a0c04;
+      border-radius: 20px;
+      background: linear-gradient(145deg, #5c2c12, #3d1b0a);
+      color: var(--text-main);
+      box-shadow: 0 22px 55px rgba(0, 0, 0, 0.92);
+      width: 94%;
+      max-width: 900px;
+      max-height: 90vh;
+    }
+    dialog.ro-dialog-modal[open] {
+      display: flex;
+      flex-direction: column;
+    }
+    dialog:modal {
+      overscroll-behavior: contain;
+    }
+    dialog::backdrop {
+      overflow: hidden;
+      overscroll-behavior: contain;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(6px);
+    }
+    .ro-dialog-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 2px 8px;
+      border-radius: 6px;
+      transition: 0.2s;
+      line-height: 1;
+    }
+    .ro-dialog-close-btn:hover {
+      color: #fca5a5;
+      background: rgba(220, 38, 38, 0.2);
+      transform: scale(1.1);
+    }
+    .btn-evidence-popup {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: linear-gradient(135deg, #0369a1, #075985);
+      border: 1.5px solid #38bdf8;
+      color: #e0f2fe;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: bold;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: 0.2s;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+    }
+    .btn-evidence-popup:hover {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      transform: translateY(-1px) scale(1.03);
+      box-shadow: 0 4px 10px rgba(56, 189, 248, 0.35);
+    }
+    .btn-evidence-empty {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(24, 10, 3, 0.65);
+      border: 1px dashed #9a3412;
+      color: #fdba74;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: 0.2s;
+    }
+    .btn-evidence-empty:hover {
+      background: #7c2d12;
+      border-color: var(--accent-gold);
+      color: #fef3c7;
+    }
+    .exp-bills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(225px, 1fr));
+      gap: 14px;
+      margin-top: 12px;
+    }
+    .exp-bill-card {
+      background: #1f0d05;
+      border: 2px solid #381808;
+      border-radius: 14px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: 0.2s;
+      position: relative;
+    }
+    .exp-bill-card:hover {
+      border-color: var(--accent-gold);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
+    }
+    .exp-bill-card.is-selected {
+      border-color: #ef4444;
+      background: linear-gradient(145deg, rgba(127, 29, 29, 0.38), #1f0d05);
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+    }
+    .exp-bill-thumb-wrap {
+      width: 100%;
+      height: 165px;
+      background: #120602;
+      border: 1.5px solid #2a1508;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: zoom-in;
+      position: relative;
+    }
+    .exp-bill-thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .exp-file-queue-chip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: #180902;
+      border: 1px solid #6b3414;
+      border-radius: 8px;
+      padding: 5px 9px;
+      font-size: 12px;
+      color: #fde68a;
+      margin-top: 5px;
+    }
+    .dialog-busy-bar {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(90deg, #78350f, #b45309, #78350f);
+      border-bottom: 2px solid var(--accent-gold);
+      color: #fffbeb;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
     /* ========================================================
        🖨️ PRINT STYLESHEET: โหมดพิมพ์สำหรับ Invoices และ Vouchers
        ======================================================== */
@@ -506,7 +661,7 @@
         width: 100% !important; height: auto !important; background: #ffffff !important;
         color: #000000 !important; margin: 0 !important; padding: 0 !important; overflow: visible !important;
       }
-      .sidebar, .main-content, .top-bar, .tab-content, .screen-overlay, .modal-overlay, .exp-toast, #global-loading-modal {
+      .sidebar, .main-content, .top-bar, .tab-content, .screen-overlay, .modal-overlay, dialog, .exp-toast, #global-loading-modal {
         display: none !important;
       }
       body.print-mode-inv #printable-invoice { display: block !important; width: 100% !important; background: #ffffff !important; color: #111827 !important; font-size: 11.5pt; line-height: 1.45; }
@@ -932,22 +1087,109 @@
           </div>
         </div>
 
-        <div id="exp-modal-info-summary" style="background:#180a03; border:1px solid #381808; padding:12px; border-radius:10px; margin-bottom:14px;">
+        <div id="exp-modal-info-summary" style="background:#180a03; border:1px solid #381808; padding:12px; border-radius:10px; margin-bottom:12px;">
           <div style="font-size:12px; color:var(--text-muted);" id="exp-modal-summary-text">-</div>
         </div>
 
+        <div id="exp-modal-existing-files-box" style="background: rgba(3, 105, 161, 0.16); border: 1px dashed #38bdf8; padding: 10px 12px; border-radius: 10px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <span id="exp-modal-existing-files-label" style="font-size: 12.5px; color: #bae6fd; font-weight: bold;">📂 บิลหลักฐานที่แนบไว้แล้ว: 0 ใบ</span>
+          <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: bold;" onclick="openFilesModalFromUpdateModal()">🗂️ เปิดดู / เลือกลบบิลเดิม</button>
+        </div>
+
         <div class="form-group">
-          <label>📎 อัปโหลดไฟล์หลักฐาน (สลิปโอนเงิน / หน้าเช็ค / ใบเสร็จ) *</label>
-          <input type="file" id="exp-modal-file" accept="image/*,application/pdf" onchange="previewExpenseModalFile(event)">
+          <label for="exp-modal-file">📎 อัปโหลดไฟล์บิลหลักฐานเพิ่ม (เลือกได้หลายไฟล์ — ระบบจะต่อท้ายบิลเดิม ไม่ทับไฟล์เก่า)</label>
+          <input type="file" id="exp-modal-file" accept="image/*,application/pdf" multiple onchange="previewExpenseModalFile(event)">
+          <div id="exp-modal-file-list"></div>
         </div>
 
         <div style="display: flex; gap: 10px; margin-top: 14px;">
           <button type="button" class="ro-btn" style="flex: 1;" onclick="closeExpenseUpdateModal()">ยกเลิก</button>
-          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #059669, #047857);" onclick="submitExpenseUpdateRecord()">💾 บันทึกข้อมูล</button>
+          <button type="button" class="btn-primary" style="flex: 2; margin-top: 0; background: linear-gradient(135deg, #059669, #047857);" onclick="submitExpenseUpdateRecord()">💾 บันทึกข้อมูล & อัปโหลดบิลเพิ่ม</button>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- 🗂️ DIALOG POPUP: แฟ้มดูบิลหลักฐานทั้งหมด + อัปโหลดบิลเพิ่มหลายรอบ + เลือกลบบิลรายใบ -->
+  <dialog id="expense-files-dialog" class="ro-dialog-modal" closedby="any" aria-labelledby="expense-files-dialog-title">
+    <div class="ro-header" style="align-items: center;">
+      <h2 id="expense-files-dialog-title" style="font-size: 16px; font-weight: bold; color: var(--accent-gold); margin: 0;">🗂️ แฟ้มหลักฐานการจ่ายเงิน</h2>
+      <button type="button" class="ro-dialog-close-btn" onclick="closeExpenseFilesModal()" aria-label="ปิดหน้าต่าง">✕</button>
+    </div>
+
+    <div id="exp-files-dialog-busy" class="dialog-busy-bar" aria-live="polite">
+      <span>⏳</span>
+      <span id="exp-files-dialog-busy-text">กำลังประมวลผลไฟล์หลักฐาน...</span>
+    </div>
+
+    <div style="padding: 18px 20px; overflow-y: auto; flex: 1;">
+      <div id="exp-files-dialog-summary" style="background: #180a03; border: 1.5px solid #381808; border-radius: 12px; padding: 12px 15px; font-size: 13px; line-height: 1.65; margin-bottom: 14px;"></div>
+
+      <!-- แถบเครื่องมือ: อัปโหลดบิลเพิ่มหลายรอบ & เลือกบิลเพื่อลบ -->
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; background: rgba(20, 8, 3, 0.65); border: 1.5px dashed #78350f; border-radius: 12px; padding: 10px 14px;">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <label for="exp-popup-upload-input" class="btn-action" style="background: linear-gradient(135deg, #059669, #047857); border-color: #064e3b; padding: 7px 14px; font-size: 12.5px; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; margin: 0; cursor: pointer;">
+            ➕ เพิ่มบิลหลักฐาน (อัปโหลดหลายใบ/หลายรอบ)
+          </label>
+          <input type="file" id="exp-popup-upload-input" accept="image/*,application/pdf" multiple onchange="handlePopupSelectMoreFiles(event)" style="position: absolute; clip-path: inset(50%); overflow: hidden; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;">
+        </div>
+
+        <div id="exp-bills-bulk-controls" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <label class="tax-check-label" for="exp-bills-select-all" style="font-size: 12.5px; color: #fde68a;">
+            <input type="checkbox" id="exp-bills-select-all" onchange="toggleSelectAllExpenseBills(this.checked)" style="accent-color: #ef4444;">
+            <span>เลือกทั้งหมด</span>
+          </label>
+          <button type="button" id="btn-delete-selected-bills" class="btn-action" style="background: #7f1d1d; border-color: #dc2626; color: #fecaca; padding: 6px 12px; font-weight: bold; opacity: 0.5; cursor: not-allowed;" onclick="deleteSelectedExpenseBills()" disabled>
+            🗑️ ลบบิลที่เลือก (0 ใบ)
+          </button>
+        </div>
+      </div>
+
+      <!-- กล่องแสดงไฟล์ใหม่ที่รออัปโหลดเข้าแฟ้มเพิ่มเติม -->
+      <div id="exp-popup-staged-box" style="display: none; margin-top: 12px; background: rgba(5, 150, 105, 0.14); border: 1.5px solid #059669; border-radius: 12px; padding: 12px 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
+          <strong id="exp-popup-staged-title" style="color: #6ee7b7; font-size: 13px;">📥 ไฟล์บิลใหม่ที่เตรียมอัปโหลดเพิ่ม (0 ใบ)</strong>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn-action" style="background: #451a03;" onclick="clearPopupStagedFiles()">ล้างรายการที่เลือก</button>
+            <button type="button" id="btn-confirm-popup-upload" class="btn-action" style="background: linear-gradient(135deg, #10b981, #047857); font-weight: bold; padding: 6px 14px;" onclick="submitPopupStagedFiles()">📤 ยืนยันอัปโหลดเข้าแฟ้ม</button>
+          </div>
+        </div>
+        <div id="exp-popup-staged-list"></div>
+      </div>
+
+      <!-- พื้นที่แสดงรายการบิลทั้งหมดของรายการรายจ่ายนี้ -->
+      <div id="exp-files-gallery-grid" class="exp-bills-grid"></div>
+    </div>
+
+    <div class="ro-footer" style="justify-content: space-between; align-items: center; flex-wrap: wrap;">
+      <span id="exp-files-footer-count" style="font-size: 12.5px; color: var(--text-muted);">แสดงครบทุกบิลในรายการนี้</span>
+      <button type="button" class="ro-btn" onclick="closeExpenseFilesModal()">ปิดหน้าต่าง</button>
+    </div>
+  </dialog>
+
+  <!-- 🔍 DIALOG POPUP: ขยายดูบิลใบเต็ม / เปิดอ่าน PDF พร้อมปุ่มเลื่อนดูบิลก่อนหน้า-ถัดไป และปุ่มลบบิล -->
+  <dialog id="expense-bill-viewer-dialog" class="ro-dialog-modal" closedby="any" aria-labelledby="bill-viewer-dialog-title" style="max-width: 980px; width: 96%;">
+    <div class="ro-header" style="align-items: center;">
+      <h2 id="bill-viewer-dialog-title" style="font-size: 15px; font-weight: bold; color: var(--accent-gold); margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔍 ดูรายละเอียดบิลหลักฐาน</h2>
+      <button type="button" class="ro-dialog-close-btn" onclick="closeBillViewerDialog()" aria-label="ปิดหน้าต่างขยายบิล">✕</button>
+    </div>
+
+    <div id="bill-viewer-body" style="padding: 14px; background: #120602; flex: 1; min-height: 360px; max-height: 72vh; overflow: auto; display: flex; align-items: center; justify-content: center;">
+    </div>
+
+    <div class="ro-footer" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button type="button" id="btn-viewer-prev" class="ro-btn" onclick="stepBillViewer(-1)">◀ บิลก่อนหน้า</button>
+        <span id="bill-viewer-counter" style="font-size: 13px; font-weight: bold; color: var(--accent-gold); padding: 0 6px;">1 / 1</span>
+        <button type="button" id="btn-viewer-next" class="ro-btn" onclick="stepBillViewer(1)">บิลถัดไป ▶</button>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <button type="button" id="btn-viewer-delete-current" class="ro-btn" style="background: #991b1b; border-color: #dc2626;" onclick="deleteCurrentViewedBill()">🗑️ ลบบิลใบนี้</button>
+        <a id="btn-viewer-open-newtab" href="#" target="_blank" rel="noopener noreferrer" class="ro-btn" style="background: #0369a1; text-decoration: none; display: inline-flex; align-items: center;">🔗 เปิดในแท็บใหม่</a>
+        <button type="button" class="ro-btn" onclick="closeBillViewerDialog()">ปิด</button>
+      </div>
+    </div>
+  </dialog>
 
   <!-- 📄 MODAL: ดู/พิมพ์ ใบสำคัญจ่าย (Expense Voucher) -->
   <div id="voucher-modal" class="modal-overlay">
@@ -1635,8 +1877,9 @@
                 </div>
               </div>
               <div class="form-group">
-                <label>📎 อัปโหลดหลักฐานการจ่ายเงิน (สลิป / หน้าเช็ค)</label>
-                <input type="file" id="exp-file" accept="image/*,application/pdf" onchange="previewExpenseFile(event)">
+                <label for="exp-file">📎 อัปโหลดหลักฐานการจ่ายเงิน (เลือกได้หลายบิล / มาอัปโหลดเพิ่มทีหลังได้)</label>
+                <input type="file" id="exp-file" accept="image/*,application/pdf" multiple onchange="previewExpenseFile(event)">
+                <div id="exp-file-list"></div>
               </div>
               <button type="submit" class="btn-primary" id="btn-submit-expense" style="background: linear-gradient(135deg, #dc2626, #991b1b); box-shadow: 0 4px 12px rgba(220,38,38,0.4);">
                 💾 บันทึกรายจ่าย
@@ -2201,13 +2444,13 @@
     let editResidentPhotoName = "";
     let editResidentPhotoMime = "";
     
-    let expenseFileBase64 = null;
-    let expenseFileName = "";
-    let expenseFileMime = "";
-
-    let expenseUpdateFileBase64 = null;
-    let expenseUpdateFileName = "";
-    let expenseUpdateFileMime = "";
+    let pendingNewExpenseFiles = [];
+    let pendingModalExpenseFiles = [];
+    let pendingPopupStagedFiles = [];
+    let activeFilesExpenseId = "";
+    let selectedBillKeysForDelete = new Set();
+    let activeViewerBillIndex = 0;
+    const drivePreviewMemCache = new Map();
 
     let pendingUnitForRegistration = "";
     let tempSelectedAvatar = "WIZmini";
@@ -3509,16 +3752,17 @@
       data.slice().reverse().forEach(item => {
         const formattedDate = formatDisplayDate(item.Date);
         const amt = Number(item.Amount || 0);
-        const attachUrl = item.AttachmentUrl || item.Attachment || "-";
+        const attachments = getExpenseAttachments(item);
+        const billCount = attachments.length;
         const expId = item.ExpenseId || "";
-        const expIdStr = String(expId).replace(/'/g, "\\'");
+        const expIdStr = escapeJsSingleQuote(expId);
 
-        const evidenceHtml = (attachUrl && attachUrl !== "-" && attachUrl.startsWith("http"))
-          ? `<a href="${attachUrl}" target="_blank" style="color: #38bdf8; text-decoration: underline; font-size: 12px;">📎 ดูไฟล์</a>`
-          : `<span style="color: var(--text-muted); font-size: 12px;">-</span>`;
+        const evidenceHtml = billCount > 0
+          ? `<button type="button" class="btn-evidence-popup" onclick="openExpenseFilesModal('${expIdStr}')" title="คลิกเพื่อดูบิลทั้งหมด เพิ่มบิล หรือเลือกลบบิล">📎 ดูไฟล์ (${billCount} ใบ)</button>`
+          : `<button type="button" class="btn-evidence-empty" onclick="openExpenseFilesModal('${expIdStr}')" title="คลิกเพื่อเพิ่มไฟล์หลักฐาน">➕ แนบบิล</button>`;
 
         const isAdmin = (currentUser?.role === "Admin");
-        const btnAttachText = (attachUrl && attachUrl !== "-" && attachUrl.startsWith("http")) ? "✏ เปลี่ยนไฟล์" : "📤 แนบไฟล์";
+        const btnAttachText = billCount > 0 ? "➕ เพิ่มบิล" : "📤 แนบไฟล์";
         
         let actionHtml = `<div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">`;
         actionHtml += `<button type="button" class="btn-action" style="background: #0f766e;" onclick="openVoucherModal('${expIdStr}')">📄 ดู/พิมพ์</button>`;
@@ -3526,18 +3770,18 @@
         if (isAdmin) {
             actionHtml += `<button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openExpenseUpdateModal('${expIdStr}', true)">🛠 แก้ไข</button>`;
         } else {
-            actionHtml += `<button type="button" class="btn-action" style="background: #d97706;" onclick="openExpenseUpdateModal('${expIdStr}')">${btnAttachText}</button>`;
+            actionHtml += `<button type="button" class="btn-action" style="background: #d97706;" onclick="openExpenseFilesModal('${expIdStr}')">${btnAttachText}</button>`;
         }
         actionHtml += `</div>`;
 
         tbody.innerHTML += `<tr>
           <td>${formattedDate}</td>
-          <td style="color: #fca5a5; font-weight: bold;">${item.Category || '-'}</td>
-          <td>${item.Description || '-'}</td>
+          <td style="color: #fca5a5; font-weight: bold;">${escapeHtml(item.Category || '-')}</td>
+          <td>${escapeHtml(item.Description || '-')}</td>
           <td style="color: #fca5a5; font-weight: bold;">฿${amt.toLocaleString()}</td>
-          <td>${item['Payment Method'] || '-'}</td>
+          <td>${escapeHtml(item['Payment Method'] || '-')}</td>
           <td style="text-align: center;">${evidenceHtml}</td>
-          <td style="color: var(--text-muted); font-size:12px;">${item.Operator || '-'}</td>
+          <td style="color: var(--text-muted); font-size:12px;">${escapeHtml(item.Operator || '-')}</td>
           <td style="text-align: center; min-width: 150px;">${actionHtml}</td>
         </tr>`;
       });
@@ -3918,52 +4162,288 @@
       }
     }
 
-    // 💸 อัปโหลดตัวอย่างไฟล์สลิปรายจ่าย
-    function previewExpenseFile(e) {
-      const file = e.target.files[0];
-      if (file) {
-        expenseFileName = file.name;
-        expenseFileMime = file.type || "image/jpeg";
-        const reader = new FileReader();
-        reader.onload = function(evt) { expenseFileBase64 = evt.target.result; };
-        reader.readAsDataURL(file);
-      }
+    // ==========================================
+    // 🗂️ ระบบจัดการไฟล์หลักฐานหลายบิล (Multi-Bill Helpers)
+    // ==========================================
+    function escapeHtml(val) {
+      if (val === null || val === undefined) return "";
+      return String(val)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
     }
 
-    // 💸 ส่งบันทึกรายจ่ายโครงการใหม่
+    function escapeJsSingleQuote(val) {
+      if (val === null || val === undefined) return "";
+      return String(val).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    }
+
+    function extractDriveFileIdClient(url) {
+      if (!url || typeof url !== "string") return "";
+      const m1 = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (m1 && m1[1]) return m1[1];
+      const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if (m2 && m2[1]) return m2[1];
+      const m3 = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (m3 && m3[1]) return m3[1];
+      return "";
+    }
+
+    function getAttachmentUniqueKey(att, idx = 0) {
+      if (!att) return "att_" + idx;
+      return String(att.id || att.fileId || extractDriveFileIdClient(att.url) || att.url || ("att_" + idx));
+    }
+
+    function getExpenseAttachments(item) {
+      if (!item) return [];
+      if (Array.isArray(item.Attachments)) return item.Attachments;
+
+      const rawSource = item.AttachmentRaw !== undefined
+        ? item.AttachmentRaw
+        : (item.AttachmentUrl || item.Attachment || "-");
+      const str = String(rawSource || "").trim();
+      if (!str || str === "-") {
+        item.Attachments = [];
+        return item.Attachments;
+      }
+
+      if (str.indexOf("[") === 0) {
+        try {
+          const parsed = JSON.parse(str);
+          if (Array.isArray(parsed)) {
+            item.Attachments = parsed
+              .filter(entry => entry && (typeof entry === "string" || entry.url))
+              .map((entry, idx) => {
+                if (typeof entry === "string") {
+                  const u = entry.trim();
+                  const fId = extractDriveFileIdClient(u);
+                  return {
+                    id: fId || ("legacy_" + idx),
+                    fileId: fId,
+                    name: "ไฟล์หลักฐาน #" + (idx + 1),
+                    url: u,
+                    mime: "",
+                    uploadedAt: "",
+                    uploadedBy: ""
+                  };
+                }
+                const u = String(entry.url || "").trim();
+                const fId = String(entry.fileId || extractDriveFileIdClient(u) || "");
+                return {
+                  id: String(entry.id || fId || ("att_" + idx)),
+                  fileId: fId,
+                  name: String(entry.name || ("ไฟล์หลักฐาน #" + (idx + 1))),
+                  url: u,
+                  mime: String(entry.mime || ""),
+                  uploadedAt: String(entry.uploadedAt || ""),
+                  uploadedBy: String(entry.uploadedBy || "")
+                };
+              })
+              .filter(entry => entry.url && entry.url !== "-");
+            return item.Attachments;
+          }
+        } catch (err) {
+          console.warn("Client attachment JSON parse fallback:", err);
+        }
+      }
+
+      const urls = str.split(/[\r\n]+/).map(s => s.trim()).filter(s => s.indexOf("http") === 0);
+      item.Attachments = urls.map((u, idx) => {
+        const fId = extractDriveFileIdClient(u);
+        return {
+          id: fId || ("legacy_" + idx),
+          fileId: fId,
+          name: urls.length > 1 ? ("ไฟล์หลักฐาน #" + (idx + 1)) : "ไฟล์หลักฐานการจ่ายเงิน",
+          url: u,
+          mime: "",
+          uploadedAt: "",
+          uploadedBy: ""
+        };
+      });
+      return item.Attachments;
+    }
+
+    function syncExpenseItemAttachments(item, newAttachments) {
+      if (!item) return;
+      const normalized = Array.isArray(newAttachments) ? newAttachments : [];
+      item.Attachments = normalized;
+      item.AttachmentUrl = normalized.length > 0 ? normalized[0].url : "-";
+      item.AttachmentRaw = normalized.length > 0 ? JSON.stringify(normalized) : "-";
+      filterExpensesList();
+    }
+
+    function formatFileSizeShort(bytes) {
+      const n = Number(bytes || 0);
+      if (n < 1024) return n + " B";
+      if (n < 1024 * 1024) return (n / 1024).toFixed(1) + " KB";
+      return (n / (1024 * 1024)).toFixed(2) + " MB";
+    }
+
+    function appendUniqueFilesToQueue(queueArr, fileList) {
+      if (!fileList || fileList.length === 0) return queueArr;
+      for (let i = 0; i < fileList.length; i++) {
+        const f = fileList[i];
+        const sig = `${f.name}_${f.size}_${f.lastModified}`;
+        const exists = queueArr.some(existing => `${existing.name}_${existing.size}_${existing.lastModified}` === sig);
+        if (!exists) queueArr.push(f);
+      }
+      return queueArr;
+    }
+
+    function readFileAsDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = evt => resolve({
+          fileData: evt.target.result,
+          fileName: file.name,
+          mimeType: file.type || (file.name.toLowerCase().endsWith(".pdf") ? "application/pdf" : "image/jpeg"),
+          rawSize: file.size || 0
+        });
+        reader.onerror = () => reject(new Error("ไม่สามารถอ่านไฟล์ " + file.name));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function splitEncodedFilesIntoBatches(encodedFiles) {
+      if (!Array.isArray(encodedFiles) || encodedFiles.length === 0) return [];
+      const MAX_FILES_PER_BATCH = 2;
+      const MAX_RAW_BYTES_PER_BATCH = 5.5 * 1024 * 1024;
+      const batches = [];
+      let currentBatch = [];
+      let currentBytes = 0;
+
+      for (let i = 0; i < encodedFiles.length; i++) {
+        const f = encodedFiles[i];
+        const sz = Number(f.rawSize || 0);
+        if (currentBatch.length > 0 && (currentBatch.length >= MAX_FILES_PER_BATCH || (currentBytes + sz) > MAX_RAW_BYTES_PER_BATCH)) {
+          batches.push(currentBatch);
+          currentBatch = [];
+          currentBytes = 0;
+        }
+        currentBatch.push({
+          fileData: f.fileData,
+          fileName: f.fileName,
+          mimeType: f.mimeType
+        });
+        currentBytes += sz;
+      }
+      if (currentBatch.length > 0) batches.push(currentBatch);
+      return batches;
+    }
+
+    function renderQueuedFilesList(containerId, filesArr, removeFnName, clearFnName) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      if (!filesArr || filesArr.length === 0) {
+        container.innerHTML = "";
+        return;
+      }
+      let html = `<div style="margin-top: 6px; font-size: 11.5px; color: #6ee7b7; display: flex; justify-content: space-between; align-items: center;">
+        <span>เลือกไว้ ${filesArr.length} ไฟล์ (คลิกเลือกเพิ่มจากโฟลเดอร์อื่นได้อีก)</span>
+        ${filesArr.length > 1 && clearFnName ? `<button type="button" onclick="${clearFnName}()" style="background:none; border:none; color:#fca5a5; text-decoration:underline; cursor:pointer; font-size:11px;">ล้างทั้งหมด</button>` : ""}
+      </div>`;
+      filesArr.forEach((f, idx) => {
+        const icon = (f.type && f.type.includes("pdf")) || f.name.toLowerCase().endsWith(".pdf") ? "📕" : "🖼️";
+        html += `<div class="exp-file-queue-chip">
+          <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${icon} ${idx + 1}. ${escapeHtml(f.name)} <small style="color:var(--text-muted);">(${formatFileSizeShort(f.size)})</small></span>
+          <button type="button" onclick="${removeFnName}(${idx})" style="background:#7f1d1d; border:1px solid #dc2626; color:#fecaca; border-radius:6px; padding:1px 7px; cursor:pointer; font-size:11px;" title="เอาไฟล์นี้ออก">✕</button>
+        </div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    // 💸 อัปโหลดตัวอย่างไฟล์สลิปรายจ่าย (รองรับหลายบิลพร้อมกัน)
+    function previewExpenseFile(e) {
+      if (e.target.files && e.target.files.length > 0) {
+        appendUniqueFilesToQueue(pendingNewExpenseFiles, e.target.files);
+        e.target.value = "";
+      }
+      renderQueuedFilesList("exp-file-list", pendingNewExpenseFiles, "removePendingNewExpenseFile", "clearPendingNewExpenseFiles");
+    }
+
+    function removePendingNewExpenseFile(idx) {
+      pendingNewExpenseFiles.splice(idx, 1);
+      renderQueuedFilesList("exp-file-list", pendingNewExpenseFiles, "removePendingNewExpenseFile", "clearPendingNewExpenseFiles");
+    }
+
+    function clearPendingNewExpenseFiles() {
+      pendingNewExpenseFiles = [];
+      const input = document.getElementById("exp-file");
+      if (input) input.value = "";
+      renderQueuedFilesList("exp-file-list", pendingNewExpenseFiles, "removePendingNewExpenseFile", "clearPendingNewExpenseFiles");
+    }
+
+    // 💸 ส่งบันทึกรายจ่ายโครงการใหม่ (รองรับแนบหลายบิลตั้งแต่เริ่มต้น)
     async function submitNewExpense(event) {
       event.preventDefault();
       const btn = document.getElementById("btn-submit-expense");
       btn.disabled = true;
       btn.innerText = "⏳ กำลังบันทึกรายจ่าย...";
 
-      const payload = {
-        type: "new_expense",
-        operator: currentUser?.username || "Staff",
-        operatorRole: currentUser?.role || "Finance",
-        category: document.getElementById("exp-category").value,
-        description: document.getElementById("exp-desc").value.trim(),
-        amount: document.getElementById("exp-amount").value,
-        paymentMethod: document.getElementById("exp-method").value,
-        fileData: expenseFileBase64,
-        fileName: expenseFileName,
-        mimeType: expenseFileMime
-      };
+      const catVal = document.getElementById("exp-category").value;
+      const descVal = document.getElementById("exp-desc").value.trim();
+      const amtVal = document.getElementById("exp-amount").value;
+      const methodVal = document.getElementById("exp-method").value;
 
       try {
+        const encodedFiles = [];
+        for (let i = 0; i < pendingNewExpenseFiles.length; i++) {
+          encodedFiles.push(await readFileAsDataUrl(pendingNewExpenseFiles[i]));
+        }
+        const batches = splitEncodedFilesIntoBatches(encodedFiles);
+        const firstBatch = batches.length > 0 ? batches[0] : [];
+
+        const payload = {
+          type: "new_expense",
+          operator: currentUser?.username || "Staff",
+          operatorRole: currentUser?.role || "Finance",
+          category: catVal,
+          description: descVal,
+          amount: amtVal,
+          paymentMethod: methodVal,
+          files: firstBatch,
+          fileData: firstBatch.length === 1 ? firstBatch[0].fileData : null,
+          fileName: firstBatch.length === 1 ? firstBatch[0].fileName : "",
+          mimeType: firstBatch.length === 1 ? firstBatch[0].mimeType : ""
+        };
+
         const resJson = await fetchWithRetry(API_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(payload)
-        }, 3, 1500, "กำลังบันทึกรายจ่าย", "กำลังอัปโหลดหลักฐานและบันทึกข้อมูล...");
+        }, 3, 1500, "กำลังบันทึกรายจ่าย", batches.length > 1
+          ? `กำลังสร้างรายการและอัปโหลดบิลชุดที่ 1/${batches.length}...`
+          : "กำลังอัปโหลดหลักฐานและบันทึกข้อมูล...");
 
         if (resJson.status === "success") {
+          const createdExpId = resJson.expenseId || "";
+          for (let b = 1; b < batches.length; b++) {
+            await fetchWithRetry(API_URL, {
+              method: "POST",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify({
+                type: "update_expense_record",
+                operator: currentUser?.username || "Staff",
+                operatorRole: currentUser?.role || "Finance",
+                expenseId: createdExpId,
+                originalDescription: descVal,
+                originalAmount: amtVal,
+                description: descVal,
+                amount: amtVal,
+                files: batches[b]
+              })
+            }, 3, 1500, "กำลังอัปโหลดบิลเพิ่มเติม", `กำลังอัปโหลดบิลชุดที่ ${b + 1}/${batches.length}...`);
+          }
+
           showExpToast(5, "บันทึกรายจ่ายโครงการ");
-          alert("✅ " + resJson.message);
+          const totalUploaded = encodedFiles.length;
+          alert("✅ " + (totalUploaded > 0
+            ? `บันทึกรายจ่ายพร้อมแนบบิลหลักฐาน ${totalUploaded} ใบ เรียบร้อยแล้ว`
+            : resJson.message));
           document.getElementById("expense-form").reset();
-          expenseFileBase64 = null;
-          expenseFileName = "";
-          expenseFileMime = "";
+          clearPendingNewExpenseFiles();
           await loadDashboardData();
         } else {
           alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
@@ -4160,14 +4640,21 @@
       }
 
       activeVoucherId = expId;
+      const attachments = getExpenseAttachments(item);
+      const expIdStr = escapeJsSingleQuote(expId);
+      const attachSummaryHtml = attachments.length > 0
+        ? `<button type="button" class="btn-evidence-popup" style="margin-left:6px;" onclick="closeVoucherModal(); openExpenseFilesModal('${expIdStr}')">📎 เปิดดูบิลทั้งหมด (${attachments.length} ใบ)</button>`
+        : `<span style="color:var(--text-muted);">ยังไม่มีไฟล์แนบ</span> <button type="button" class="btn-evidence-empty" style="margin-left:6px;" onclick="closeVoucherModal(); openExpenseFilesModal('${expIdStr}')">➕ แนบบิล</button>`;
+
       document.getElementById("voucher-details-container").innerHTML = `
         <strong>วันที่:</strong> ${formatDisplayDate(item.Date)}<br>
-        <strong>เลขที่อ้างอิง:</strong> ${item.ExpenseId}<br>
-        <strong>หมวดหมู่:</strong> <span style="color:#fca5a5;">${item.Category}</span><br>
-        <strong>รายละเอียด:</strong> ${item.Description}<br>
+        <strong>เลขที่อ้างอิง:</strong> ${escapeHtml(item.ExpenseId)}<br>
+        <strong>หมวดหมู่:</strong> <span style="color:#fca5a5;">${escapeHtml(item.Category)}</span><br>
+        <strong>รายละเอียด:</strong> ${escapeHtml(item.Description)}<br>
         <strong>จำนวนเงิน:</strong> ฿${Number(item.Amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}<br>
-        <strong>ช่องทาง:</strong> ${item['Payment Method']}<br>
-        <strong>ผู้บันทึก:</strong> ${item.Operator}
+        <strong>ช่องทาง:</strong> ${escapeHtml(item['Payment Method'])}<br>
+        <strong>ผู้บันทึก:</strong> ${escapeHtml(item.Operator)}<br>
+        <strong>หลักฐานการจ่ายเงิน:</strong> ${attachSummaryHtml}
       `;
       document.getElementById("voucher-modal").style.display = "flex";
     }
@@ -4195,7 +4682,7 @@
       document.body.className = "";
     }
 
-    // 💸 ป๊อปอัปแนบหลักฐาน / แก้ไขข้อมูลรายจ่าย (พร้อมระบบ Fallback สำรองข้อมูลเก่า)
+    // 💸 ป๊อปอัปแนบหลักฐานเพิ่ม / แก้ไขข้อมูลรายจ่าย (รองรับหลายบิล + Admin Override)
     let isCurrentExpenseAdminOverride = false;
     function openExpenseUpdateModal(expId, isAdminOverride = false) {
       isCurrentExpenseAdminOverride = isAdminOverride;
@@ -4211,87 +4698,724 @@
 
       document.getElementById("exp-modal-summary-text").innerHTML = `
         <strong>วันที่:</strong> ${formatDisplayDate(item.Date)}<br>
-        <strong>หมวดหมู่:</strong> ${item.Category}<br>
-        <strong>รายละเอียด:</strong> ${item.Description}<br>
-        <strong>จำนวนเงิน:</strong> ฿${Number(item.Amount).toLocaleString('en-US', { minimumFractionDigits: 2 })} (${item['Payment Method']})
+        <strong>หมวดหมู่:</strong> ${escapeHtml(item.Category)}<br>
+        <strong>รายละเอียด:</strong> ${escapeHtml(item.Description)}<br>
+        <strong>จำนวนเงิน:</strong> ฿${Number(item.Amount).toLocaleString('en-US', { minimumFractionDigits: 2 })} (${escapeHtml(item['Payment Method'])})
       `;
+
+      const existingBills = getExpenseAttachments(item);
+      const existingLbl = document.getElementById("exp-modal-existing-files-label");
+      if (existingLbl) {
+        existingLbl.innerText = `📂 บิลหลักฐานที่แนบไว้แล้ว: ${existingBills.length} ใบ`;
+      }
 
       const adminDiv = document.getElementById("exp-modal-admin-fields");
       const titleEl = document.getElementById("expense-modal-title");
 
       if (isAdminOverride && currentUser?.role === "Admin") {
-        titleEl.innerText = "🛠️ แก้ไขรายการรายจ่าย (Admin Full Override)";
+        titleEl.innerText = "🛠️ แก้ไขรายการรายจ่าย & เพิ่มบิลหลักฐาน (Admin)";
         adminDiv.style.display = "block";
         document.getElementById("exp-modal-category").value = item.Category;
         document.getElementById("exp-modal-desc").value = item.Description;
         document.getElementById("exp-modal-amount").value = item.Amount;
         document.getElementById("exp-modal-method").value = item['Payment Method'];
       } else {
-        titleEl.innerText = "📎 แนบไฟล์หลักฐานการจ่ายเงิน";
+        titleEl.innerText = "📎 อัปโหลดบิลหลักฐานการจ่ายเงินเพิ่มเติม";
         adminDiv.style.display = "none";
       }
 
-      document.getElementById("exp-modal-file").value = "";
-      expenseUpdateFileBase64 = null;
+      clearPendingModalExpenseFiles();
       document.getElementById("expense-update-modal").style.display = "flex";
+    }
+
+    function openFilesModalFromUpdateModal() {
+      const expId = document.getElementById("exp-modal-id").value;
+      closeExpenseUpdateModal();
+      if (expId) openExpenseFilesModal(expId);
     }
 
     function closeExpenseUpdateModal() {
       document.getElementById("expense-update-modal").style.display = "none";
-      expenseUpdateFileBase64 = null;
+      clearPendingModalExpenseFiles();
     }
 
     function previewExpenseModalFile(e) {
-      const file = e.target.files[0];
-      if (file) {
-        expenseUpdateFileName = file.name;
-        expenseUpdateFileMime = file.type || "image/jpeg";
-        const reader = new FileReader();
-        reader.onload = function(evt) { expenseUpdateFileBase64 = evt.target.result; };
-        reader.readAsDataURL(file);
+      if (e.target.files && e.target.files.length > 0) {
+        appendUniqueFilesToQueue(pendingModalExpenseFiles, e.target.files);
+        e.target.value = "";
       }
+      renderQueuedFilesList("exp-modal-file-list", pendingModalExpenseFiles, "removePendingModalExpenseFile", "clearPendingModalExpenseFiles");
+    }
+
+    function removePendingModalExpenseFile(idx) {
+      pendingModalExpenseFiles.splice(idx, 1);
+      renderQueuedFilesList("exp-modal-file-list", pendingModalExpenseFiles, "removePendingModalExpenseFile", "clearPendingModalExpenseFiles");
+    }
+
+    function clearPendingModalExpenseFiles() {
+      pendingModalExpenseFiles = [];
+      const input = document.getElementById("exp-modal-file");
+      if (input) input.value = "";
+      renderQueuedFilesList("exp-modal-file-list", pendingModalExpenseFiles, "removePendingModalExpenseFile", "clearPendingModalExpenseFiles");
     }
 
     async function submitExpenseUpdateRecord() {
       const expId = document.getElementById("exp-modal-id").value;
       if (!expId) return;
 
-      const payload = {
-        type: "update_expense_record",
-        operator: currentUser?.username,
-        operatorRole: currentUser?.role,
-        expenseId: expId,
-        description: document.getElementById("exp-modal-fallback-desc").value,
-        amount: document.getElementById("exp-modal-fallback-amt").value,
-        fileData: expenseUpdateFileBase64,
-        fileName: expenseUpdateFileName,
-        mimeType: expenseUpdateFileMime,
-        isFullOverride: isCurrentExpenseAdminOverride
-      };
+      const origDesc = document.getElementById("exp-modal-fallback-desc").value;
+      const origAmt = document.getElementById("exp-modal-fallback-amt").value;
 
-      if (isCurrentExpenseAdminOverride) {
-        payload.category = document.getElementById("exp-modal-category").value;
-        payload.description = document.getElementById("exp-modal-desc").value.trim();
-        payload.amount = document.getElementById("exp-modal-amount").value;
-        payload.paymentMethod = document.getElementById("exp-modal-method").value;
+      if (!isCurrentExpenseAdminOverride && pendingModalExpenseFiles.length === 0) {
+        alert("⚠️ กรุณาเลือกไฟล์บิลหลักฐานที่ต้องการอัปโหลดเพิ่มอย่างน้อย 1 ไฟล์");
+        return;
       }
 
       try {
-        const resJson = await fetchWithRetry(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
-        }, 3, 1500, "กำลังอัปเดตข้อมูลรายจ่าย", "อัปโหลดไฟล์หลักฐานไปยัง Expense_Receipts...");
-
-        if (resJson.status === "success") {
-          alert("✅ " + resJson.message);
-          closeExpenseUpdateModal();
-          await loadDashboardData();
-        } else {
-          alert("❌ " + (resJson.message || "เกิดข้อผิดพลาดในการบันทึกเอกสาร กรุณาลองใหม่อีกครั้ง"));
+        const encodedFiles = [];
+        for (let i = 0; i < pendingModalExpenseFiles.length; i++) {
+          encodedFiles.push(await readFileAsDataUrl(pendingModalExpenseFiles[i]));
         }
+        const batches = splitEncodedFilesIntoBatches(encodedFiles);
+        const totalSteps = Math.max(1, batches.length);
+        let finalRes = null;
+
+        for (let step = 0; step < totalSteps; step++) {
+          const batchFiles = batches[step] || [];
+          const payload = {
+            type: "update_expense_record",
+            operator: currentUser?.username,
+            operatorRole: currentUser?.role,
+            expenseId: expId,
+            originalDescription: origDesc,
+            originalAmount: origAmt,
+            description: origDesc,
+            amount: origAmt,
+            files: batchFiles,
+            fileData: batchFiles.length === 1 ? batchFiles[0].fileData : null,
+            fileName: batchFiles.length === 1 ? batchFiles[0].fileName : "",
+            mimeType: batchFiles.length === 1 ? batchFiles[0].mimeType : "",
+            isFullOverride: (step === 0) ? isCurrentExpenseAdminOverride : false
+          };
+
+          if (step === 0 && isCurrentExpenseAdminOverride) {
+            payload.category = document.getElementById("exp-modal-category").value;
+            payload.description = document.getElementById("exp-modal-desc").value.trim();
+            payload.amount = document.getElementById("exp-modal-amount").value;
+            payload.paymentMethod = document.getElementById("exp-modal-method").value;
+          }
+
+          finalRes = await fetchWithRetry(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+          }, 3, 1500, "กำลังอัปเดตข้อมูลรายจ่าย", totalSteps > 1
+            ? `กำลังอัปโหลดบิลชุดที่ ${step + 1}/${totalSteps}...`
+            : "กำลังอัปโหลดไฟล์หลักฐานไปยัง Expense_Receipts...");
+
+          if (!finalRes || finalRes.status !== "success") {
+            throw new Error(finalRes?.message || "เกิดข้อผิดพลาดในการอัปเดตข้อมูล");
+          }
+        }
+
+        alert("✅ " + (finalRes.message || "อัปเดตข้อมูลและหลักฐานรายจ่ายเรียบร้อยแล้ว"));
+        closeExpenseUpdateModal();
+        await loadDashboardData();
       } catch (err) {
         alert("⚠️ เกิดข้อผิดพลาดในการบันทึก: " + err.message);
+      }
+    }
+
+    // ========================================================
+    // 🗂️ POPUP MODAL: ดูบิลทั้งหมดของรายการ + เพิ่มบิลหลายรอบ + เลือกลบบิลรายใบ
+    // ========================================================
+    function setExpenseFilesDialogBusy(isBusy, message = "กำลังประมวลผล...") {
+      const bar = document.getElementById("exp-files-dialog-busy");
+      const txt = document.getElementById("exp-files-dialog-busy-text");
+      if (bar) bar.style.display = isBusy ? "flex" : "none";
+      if (txt && message) txt.innerText = message;
+
+      const confirmBtn = document.getElementById("btn-confirm-popup-upload");
+      const delBtn = document.getElementById("btn-delete-selected-bills");
+      if (confirmBtn) confirmBtn.disabled = isBusy;
+      if (delBtn && isBusy) delBtn.disabled = true;
+    }
+
+    function openExpenseFilesModal(expId) {
+      const item = cachedExpenses.find(e => String(e.ExpenseId).trim() === String(expId).trim());
+      if (!item) {
+        alert("⚠️ ไม่พบข้อมูลรายการรายจ่ายนี้ในระบบ");
+        return;
+      }
+
+      activeFilesExpenseId = String(expId).trim();
+      selectedBillKeysForDelete.clear();
+      pendingPopupStagedFiles = [];
+      const uploadInput = document.getElementById("exp-popup-upload-input");
+      if (uploadInput) uploadInput.value = "";
+
+      setExpenseFilesDialogBusy(false);
+      renderPopupStagedFilesUI();
+      renderExpenseFilesDialogContent();
+
+      const dialog = document.getElementById("expense-files-dialog");
+      if (dialog && !dialog.open) {
+        dialog.showModal();
+      }
+    }
+
+    function closeExpenseFilesModal() {
+      const viewer = document.getElementById("expense-bill-viewer-dialog");
+      if (viewer && viewer.open) viewer.close();
+
+      const dialog = document.getElementById("expense-files-dialog");
+      if (dialog && dialog.open) dialog.close();
+
+      activeFilesExpenseId = "";
+      selectedBillKeysForDelete.clear();
+      pendingPopupStagedFiles = [];
+      setExpenseFilesDialogBusy(false);
+    }
+
+    function getActiveFilesExpenseItem() {
+      if (!activeFilesExpenseId) return null;
+      return cachedExpenses.find(e => String(e.ExpenseId).trim() === activeFilesExpenseId) || null;
+    }
+
+    function updateDeleteSelectedButtonState(totalBillsCount) {
+      const delBtn = document.getElementById("btn-delete-selected-bills");
+      const selectAllCb = document.getElementById("exp-bills-select-all");
+      const bulkBox = document.getElementById("exp-bills-bulk-controls");
+      const selCount = selectedBillKeysForDelete.size;
+
+      if (bulkBox) {
+        bulkBox.style.display = totalBillsCount > 0 ? "flex" : "none";
+      }
+      if (selectAllCb) {
+        selectAllCb.checked = totalBillsCount > 0 && selCount === totalBillsCount;
+        selectAllCb.indeterminate = selCount > 0 && selCount < totalBillsCount;
+      }
+      if (delBtn) {
+        delBtn.innerText = `🗑️ ลบบิลที่เลือก (${selCount} ใบ)`;
+        delBtn.disabled = selCount === 0;
+        delBtn.style.opacity = selCount > 0 ? "1" : "0.45";
+        delBtn.style.cursor = selCount > 0 ? "pointer" : "not-allowed";
+        delBtn.style.background = selCount > 0 ? "linear-gradient(135deg, #dc2626, #991b1b)" : "#7f1d1d";
+      }
+    }
+
+    function renderExpenseFilesDialogContent() {
+      const item = getActiveFilesExpenseItem();
+      if (!item) return;
+
+      const attachments = getExpenseAttachments(item);
+      const count = attachments.length;
+
+      const titleEl = document.getElementById("expense-files-dialog-title");
+      if (titleEl) {
+        titleEl.innerText = `🗂️ แฟ้มหลักฐานการจ่ายเงิน (${count} ใบ)`;
+      }
+
+      const summaryEl = document.getElementById("exp-files-dialog-summary");
+      if (summaryEl) {
+        summaryEl.innerHTML = `
+          <div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <div>
+              <strong style="color: var(--accent-gold);">รายละเอียด:</strong> <span style="color: #fef3c7; font-weight: bold;">${escapeHtml(item.Description || "-")}</span><br>
+              <span style="color: var(--text-muted); font-size: 12px;">วันที่: ${formatDisplayDate(item.Date)} | หมวดหมู่: <span style="color:#fca5a5;">${escapeHtml(item.Category || "-")}</span> | รหัส: ${escapeHtml(item.ExpenseId || "-")}</span>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 18px; font-weight: bold; color: #fca5a5;">฿${Number(item.Amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+              <div style="font-size: 11.5px; color: var(--text-muted);">${escapeHtml(item['Payment Method'] || "-")} • ผู้บันทึก: ${escapeHtml(item.Operator || "-")}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      const footerCount = document.getElementById("exp-files-footer-count");
+      if (footerCount) {
+        footerCount.innerText = count > 0
+          ? `แสดงหลักฐานครบทั้งหมด ${count} ใบ (คลิกที่รูปบิลเพื่อขยายดูใบใหญ่ หรือติ๊กถูกเพื่อเลือกลบบิล)`
+          : "ยังไม่มีบิลแนบในรายการนี้ สามารถกดปุ่ม ➕ เพิ่มบิลหลักฐาน ด้านบนได้ทันที";
+      }
+
+      // ล้าง key ที่ไม่มีอยู่แล้วออกจากชุดเลือก
+      const validKeys = new Set(attachments.map((att, idx) => getAttachmentUniqueKey(att, idx)));
+      Array.from(selectedBillKeysForDelete).forEach(k => {
+        if (!validKeys.has(k)) selectedBillKeysForDelete.delete(k);
+      });
+
+      updateDeleteSelectedButtonState(count);
+
+      const grid = document.getElementById("exp-files-gallery-grid");
+      if (!grid) return;
+
+      if (count === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 38px 20px; background: rgba(18, 6, 2, 0.65); border: 2px dashed #4a2511; border-radius: 14px; color: var(--text-muted);">
+            <div style="font-size: 36px; margin-bottom: 8px;">📂</div>
+            <div style="font-size: 14px; font-weight: bold; color: #fde68a; margin-bottom: 4px;">ยังไม่มีไฟล์บิลหลักฐานสำหรับรายการนี้</div>
+            <div style="font-size: 12px;">กดปุ่ม <strong>"➕ เพิ่มบิลหลักฐาน"</strong> ด้านบนเพื่ออัปโหลดสลิปหรือใบวางบิล (อัปโหลดเพิ่มหลายรอบได้ไม่จำกัด)</div>
+          </div>
+        `;
+        return;
+      }
+
+      let cardsHtml = "";
+      attachments.forEach((att, idx) => {
+        const key = getAttachmentUniqueKey(att, idx);
+        const keyJs = escapeJsSingleQuote(key);
+        const isChecked = selectedBillKeysForDelete.has(key);
+        const fId = String(att.fileId || extractDriveFileIdClient(att.url) || "");
+        const fIdJs = escapeJsSingleQuote(fId);
+        const urlJs = escapeJsSingleQuote(att.url || "");
+        const isPdf = (att.mime && att.mime.toLowerCase().includes("pdf")) || String(att.name || "").toLowerCase().endsWith(".pdf");
+
+        const cachedDataUrl = fId && drivePreviewMemCache.has(fId) ? drivePreviewMemCache.get(fId) : "";
+        const thumbSrc = cachedDataUrl
+          ? cachedDataUrl
+          : (fId ? `https://drive.google.com/thumbnail?id=${encodeURIComponent(fId)}&sz=w700` : att.url);
+
+        const metaLine = att.uploadedAt
+          ? `อัปโหลด: ${escapeHtml(att.uploadedAt)}${att.uploadedBy ? " • " + escapeHtml(att.uploadedBy) : ""}`
+          : "ไฟล์หลักฐานที่บันทึกในระบบ";
+
+        cardsHtml += `
+          <div class="exp-bill-card ${isChecked ? "is-selected" : ""}" id="bill-card-${idx}">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;">
+              <label class="tax-check-label" style="font-size: 12px; color: #fde68a;">
+                <input type="checkbox" ${isChecked ? "checked" : ""} onchange="toggleSelectSingleExpenseBill('${keyJs}', this.checked)" style="accent-color: #ef4444;">
+                <span>บิลใบที่ ${idx + 1} / ${count}</span>
+              </label>
+              <button type="button" class="btn-action" style="background: #7f1d1d; border-color: #dc2626; color: #fecaca; padding: 3px 8px; font-size: 11px;" onclick="deleteSingleExpenseBill('${keyJs}')" title="ลบบิลใบนี้ออก">
+                🗑️ ลบ
+              </button>
+            </div>
+
+            <div class="exp-bill-thumb-wrap" onclick="openBillViewerDialog(${idx})" title="คลิกเพื่อขยายดูบิลใบที่ ${idx + 1}">
+              ${isPdf ? `<span style="position:absolute; top:6px; left:6px; background:#dc2626; color:#fff; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:4px; z-index:2;">PDF</span>` : ""}
+              <img src="${escapeHtml(thumbSrc)}" alt="บิลใบที่ ${idx + 1}" loading="lazy" onerror="handleBillThumbError(this, '${fIdJs}', '${urlJs}', ${isPdf ? "true" : "false"})">
+            </div>
+
+            <div style="font-size: 12.5px; font-weight: bold; color: #fef3c7; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(att.name || "")}">
+              ${isPdf ? "📕" : "🧾"} ${escapeHtml(att.name || ("บิลหลักฐาน #" + (idx + 1)))}
+            </div>
+            <div style="font-size: 11px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              ${metaLine}
+            </div>
+
+            <div style="display: flex; gap: 6px; margin-top: auto; padding-top: 4px;">
+              <button type="button" class="btn-action" style="flex: 1.3; background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: bold;" onclick="openBillViewerDialog(${idx})">
+                🔍 ขยายดูบิล
+              </button>
+              <a href="${escapeHtml(att.url || "#")}" target="_blank" rel="noopener noreferrer" class="btn-action" style="flex: 1; text-align: center; text-decoration: none; background: #451a03; display: inline-flex; align-items: center; justify-content: center;">
+                🔗 เปิดเต็ม
+              </a>
+            </div>
+          </div>
+        `;
+      });
+
+      grid.innerHTML = cardsHtml;
+    }
+
+    async function handleBillThumbError(imgEl, fileId, rawUrl, isPdf) {
+      if (!imgEl || imgEl.dataset.fallbackTried === "true") {
+        renderFallbackBillPlaceholder(imgEl, isPdf);
+        return;
+      }
+      imgEl.dataset.fallbackTried = "true";
+
+      if (!fileId) {
+        renderFallbackBillPlaceholder(imgEl, isPdf);
+        return;
+      }
+
+      if (drivePreviewMemCache.has(fileId)) {
+        imgEl.src = drivePreviewMemCache.get(fileId);
+        return;
+      }
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            type: "get_drive_file_preview",
+            fileId: fileId,
+            url: rawUrl
+          })
+        });
+        const json = await res.json();
+        if (json && json.status === "success" && json.dataUrl) {
+          drivePreviewMemCache.set(fileId, json.dataUrl);
+          imgEl.src = json.dataUrl;
+          return;
+        }
+      } catch (err) {
+        console.warn("Preview fallback warning:", err);
+      }
+
+      renderFallbackBillPlaceholder(imgEl, isPdf);
+    }
+
+    function renderFallbackBillPlaceholder(imgEl, isPdf) {
+      if (!imgEl || !imgEl.parentElement) return;
+      const wrap = imgEl.parentElement;
+      wrap.innerHTML = `
+        <div style="text-align: center; padding: 14px; color: #fde68a;">
+          <div style="font-size: 34px; margin-bottom: 4px;">${isPdf ? "📕" : "🧾"}</div>
+          <div style="font-size: 11.5px; font-weight: bold;">คลิกเพื่อเปิดดูไฟล์บิล</div>
+        </div>
+      `;
+    }
+
+    function toggleSelectSingleExpenseBill(key, isChecked) {
+      if (isChecked) selectedBillKeysForDelete.add(key);
+      else selectedBillKeysForDelete.delete(key);
+
+      const item = getActiveFilesExpenseItem();
+      const attachments = item ? getExpenseAttachments(item) : [];
+      attachments.forEach((att, idx) => {
+        if (getAttachmentUniqueKey(att, idx) === key) {
+          const card = document.getElementById(`bill-card-${idx}`);
+          if (card) card.classList.toggle("is-selected", isChecked);
+        }
+      });
+      updateDeleteSelectedButtonState(attachments.length);
+    }
+
+    function toggleSelectAllExpenseBills(isChecked) {
+      const item = getActiveFilesExpenseItem();
+      if (!item) return;
+      const attachments = getExpenseAttachments(item);
+      selectedBillKeysForDelete.clear();
+      if (isChecked) {
+        attachments.forEach((att, idx) => {
+          selectedBillKeysForDelete.add(getAttachmentUniqueKey(att, idx));
+        });
+      }
+      renderExpenseFilesDialogContent();
+    }
+
+    function handlePopupSelectMoreFiles(e) {
+      if (e.target.files && e.target.files.length > 0) {
+        appendUniqueFilesToQueue(pendingPopupStagedFiles, e.target.files);
+        e.target.value = "";
+      }
+      renderPopupStagedFilesUI();
+    }
+
+    function removePopupStagedFile(idx) {
+      pendingPopupStagedFiles.splice(idx, 1);
+      renderPopupStagedFilesUI();
+    }
+
+    function clearPopupStagedFiles() {
+      pendingPopupStagedFiles = [];
+      const input = document.getElementById("exp-popup-upload-input");
+      if (input) input.value = "";
+      renderPopupStagedFilesUI();
+    }
+
+    function renderPopupStagedFilesUI() {
+      const box = document.getElementById("exp-popup-staged-box");
+      const titleEl = document.getElementById("exp-popup-staged-title");
+      const btn = document.getElementById("btn-confirm-popup-upload");
+      if (!box) return;
+
+      if (!pendingPopupStagedFiles || pendingPopupStagedFiles.length === 0) {
+        box.style.display = "none";
+        return;
+      }
+
+      box.style.display = "block";
+      if (titleEl) {
+        titleEl.innerText = `📥 ไฟล์บิลใหม่ที่เตรียมอัปโหลดเพิ่ม (${pendingPopupStagedFiles.length} ใบ)`;
+      }
+      if (btn) {
+        btn.innerText = `📤 ยืนยันอัปโหลดเข้าแฟ้ม (${pendingPopupStagedFiles.length} ใบ)`;
+      }
+      renderQueuedFilesList("exp-popup-staged-list", pendingPopupStagedFiles, "removePopupStagedFile", "");
+    }
+
+    async function submitPopupStagedFiles() {
+      const item = getActiveFilesExpenseItem();
+      if (!item || pendingPopupStagedFiles.length === 0) return;
+
+      try {
+        setExpenseFilesDialogBusy(true, `กำลังเตรียมไฟล์บิล ${pendingPopupStagedFiles.length} ใบ สำหรับอัปโหลด...`);
+        const encodedFiles = [];
+        for (let i = 0; i < pendingPopupStagedFiles.length; i++) {
+          encodedFiles.push(await readFileAsDataUrl(pendingPopupStagedFiles[i]));
+        }
+        const batches = splitEncodedFilesIntoBatches(encodedFiles);
+        let latestAttachments = getExpenseAttachments(item);
+
+        for (let b = 0; b < batches.length; b++) {
+          setExpenseFilesDialogBusy(true, batches.length > 1
+            ? `กำลังอัปโหลดบิลเข้าแฟ้ม ชุดที่ ${b + 1}/${batches.length}...`
+            : `กำลังอัปโหลดบิล ${encodedFiles.length} ใบ เข้าสู่แฟ้มรายการนี้...`);
+
+          const batchFiles = batches[b];
+          const res = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              type: "update_expense_record",
+              operator: currentUser?.username || "Staff",
+              operatorRole: currentUser?.role || "Finance",
+              expenseId: item.ExpenseId,
+              originalDescription: item.Description,
+              originalAmount: item.Amount,
+              description: item.Description,
+              amount: item.Amount,
+              files: batchFiles,
+              fileData: batchFiles.length === 1 ? batchFiles[0].fileData : null,
+              fileName: batchFiles.length === 1 ? batchFiles[0].fileName : "",
+              mimeType: batchFiles.length === 1 ? batchFiles[0].mimeType : "",
+              isFullOverride: false
+            })
+          });
+          const resJson = await res.json();
+          if (!resJson || resJson.status !== "success") {
+            throw new Error(resJson?.message || "อัปโหลดไฟล์ไม่สำเร็จ");
+          }
+          if (Array.isArray(resJson.attachments)) {
+            latestAttachments = resJson.attachments;
+          }
+          if (resJson.expenseId) {
+            item.ExpenseId = resJson.expenseId;
+            activeFilesExpenseId = String(resJson.expenseId).trim();
+          }
+        }
+
+        syncExpenseItemAttachments(item, latestAttachments);
+        clearPopupStagedFiles();
+        renderExpenseFilesDialogContent();
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการอัปโหลดบิลเพิ่ม: " + err.message);
+      } finally {
+        setExpenseFilesDialogBusy(false);
+      }
+    }
+
+    async function deleteSingleExpenseBill(key) {
+      await executeDeleteExpenseBillsByKeys([key]);
+    }
+
+    async function deleteSelectedExpenseBills() {
+      const keys = Array.from(selectedBillKeysForDelete);
+      if (keys.length === 0) return;
+      await executeDeleteExpenseBillsByKeys(keys);
+    }
+
+    async function executeDeleteExpenseBillsByKeys(keysToRemove) {
+      const item = getActiveFilesExpenseItem();
+      if (!item || !Array.isArray(keysToRemove) || keysToRemove.length === 0) return;
+
+      const attachments = getExpenseAttachments(item);
+      const targetSet = new Set(keysToRemove);
+      const matchedBills = attachments.filter((att, idx) => targetSet.has(getAttachmentUniqueKey(att, idx)));
+      if (matchedBills.length === 0) return;
+
+      const billNamesPreview = matchedBills.slice(0, 3).map(b => `• ${b.name || "ไฟล์หลักฐาน"}`).join("\n");
+      const moreLine = matchedBills.length > 3 ? `\n...และอีก ${matchedBills.length - 3} ใบ` : "";
+      const confirmMsg = `🗑️ ยืนยันการลบบิลหลักฐานจำนวน ${matchedBills.length} ใบ ออกจากรายการ "${item.Description}" ใช่หรือไม่?\n\n${billNamesPreview}${moreLine}`;
+      if (!confirm(confirmMsg)) return;
+
+      const targetIds = [];
+      const targetUrls = [];
+      matchedBills.forEach(att => {
+        if (att.id) targetIds.push(String(att.id));
+        if (att.fileId) targetIds.push(String(att.fileId));
+        if (att.url) targetUrls.push(String(att.url));
+      });
+
+      try {
+        setExpenseFilesDialogBusy(true, `กำลังลบบิลหลักฐาน ${matchedBills.length} ใบ...`);
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            type: "delete_expense_attachments",
+            operator: currentUser?.username || "Staff",
+            operatorRole: currentUser?.role || "Finance",
+            expenseId: item.ExpenseId,
+            description: item.Description,
+            amount: item.Amount,
+            targetIds: targetIds,
+            targetUrls: targetUrls
+          })
+        });
+        const resJson = await res.json();
+        if (!resJson || resJson.status !== "success") {
+          throw new Error(resJson?.message || "ไม่สามารถลบบิลหลักฐานได้");
+        }
+
+        keysToRemove.forEach(k => selectedBillKeysForDelete.delete(k));
+        const remaining = Array.isArray(resJson.attachments)
+          ? resJson.attachments
+          : attachments.filter((att, idx) => !targetSet.has(getAttachmentUniqueKey(att, idx)));
+
+        if (resJson.expenseId) {
+          item.ExpenseId = resJson.expenseId;
+          activeFilesExpenseId = String(resJson.expenseId).trim();
+        }
+
+        syncExpenseItemAttachments(item, remaining);
+        renderExpenseFilesDialogContent();
+
+        // หากหน้าต่างขยายดูบิลเปิดอยู่ ให้เลื่อนไปบิลถัดไปหรือปิดหากไม่เหลือบิลแล้ว
+        const viewerDialog = document.getElementById("expense-bill-viewer-dialog");
+        if (viewerDialog && viewerDialog.open) {
+          if (remaining.length === 0) {
+            closeBillViewerDialog();
+          } else {
+            if (activeViewerBillIndex >= remaining.length) {
+              activeViewerBillIndex = remaining.length - 1;
+            }
+            renderBillViewerContent();
+          }
+        }
+      } catch (err) {
+        alert("⚠️ เกิดข้อผิดพลาดในการลบบิลหลักฐาน: " + err.message);
+      } finally {
+        setExpenseFilesDialogBusy(false);
+      }
+    }
+
+    // 🔍 หน้าต่างขยายดูบิลใบเต็ม (รองรับเลื่อนซ้าย-ขวา ดูครบทุกใบ และลบจากหน้าขยายได้ทันที)
+    function openBillViewerDialog(billIdx) {
+      const item = getActiveFilesExpenseItem();
+      if (!item) return;
+      const attachments = getExpenseAttachments(item);
+      if (attachments.length === 0) return;
+
+      activeViewerBillIndex = Math.max(0, Math.min(billIdx, attachments.length - 1));
+      renderBillViewerContent();
+
+      const viewerDialog = document.getElementById("expense-bill-viewer-dialog");
+      if (viewerDialog && !viewerDialog.open) {
+        viewerDialog.showModal();
+      }
+    }
+
+    function closeBillViewerDialog() {
+      const viewerDialog = document.getElementById("expense-bill-viewer-dialog");
+      if (viewerDialog && viewerDialog.open) {
+        viewerDialog.close();
+      }
+    }
+
+    function stepBillViewer(delta) {
+      const item = getActiveFilesExpenseItem();
+      if (!item) return;
+      const attachments = getExpenseAttachments(item);
+      if (attachments.length <= 1) return;
+
+      activeViewerBillIndex = (activeViewerBillIndex + delta + attachments.length) % attachments.length;
+      renderBillViewerContent();
+    }
+
+    async function deleteCurrentViewedBill() {
+      const item = getActiveFilesExpenseItem();
+      if (!item) return;
+      const attachments = getExpenseAttachments(item);
+      const currentAtt = attachments[activeViewerBillIndex];
+      if (!currentAtt) return;
+      const key = getAttachmentUniqueKey(currentAtt, activeViewerBillIndex);
+      await executeDeleteExpenseBillsByKeys([key]);
+    }
+
+    function renderBillViewerContent() {
+      const item = getActiveFilesExpenseItem();
+      if (!item) return;
+      const attachments = getExpenseAttachments(item);
+      if (attachments.length === 0) {
+        closeBillViewerDialog();
+        return;
+      }
+
+      const att = attachments[activeViewerBillIndex];
+      const fId = String(att.fileId || extractDriveFileIdClient(att.url) || "");
+      const isPdf = (att.mime && att.mime.toLowerCase().includes("pdf")) || String(att.name || "").toLowerCase().endsWith(".pdf");
+
+      const titleEl = document.getElementById("bill-viewer-dialog-title");
+      if (titleEl) {
+        titleEl.innerText = `🔍 บิลใบที่ ${activeViewerBillIndex + 1}/${attachments.length} — ${att.name || "หลักฐานการจ่ายเงิน"}`;
+      }
+
+      const counterEl = document.getElementById("bill-viewer-counter");
+      if (counterEl) {
+        counterEl.innerText = `${activeViewerBillIndex + 1} / ${attachments.length}`;
+      }
+
+      const prevBtn = document.getElementById("btn-viewer-prev");
+      const nextBtn = document.getElementById("btn-viewer-next");
+      if (prevBtn) prevBtn.disabled = attachments.length <= 1;
+      if (nextBtn) nextBtn.disabled = attachments.length <= 1;
+
+      const openLink = document.getElementById("btn-viewer-open-newtab");
+      if (openLink) openLink.href = att.url || "#";
+
+      const bodyEl = document.getElementById("bill-viewer-body");
+      if (!bodyEl) return;
+
+      if (isPdf && fId) {
+        bodyEl.innerHTML = `
+          <iframe src="https://drive.google.com/file/d/${encodeURIComponent(fId)}/preview" style="width: 100%; height: 66vh; border: none; border-radius: 10px; background: #ffffff;" title="${escapeHtml(att.name || "PDF Preview")}"></iframe>
+        `;
+      } else {
+        const cachedDataUrl = fId && drivePreviewMemCache.has(fId) ? drivePreviewMemCache.get(fId) : "";
+        const hiResSrc = cachedDataUrl
+          ? cachedDataUrl
+          : (fId ? `https://drive.google.com/thumbnail?id=${encodeURIComponent(fId)}&sz=w1600` : att.url);
+        const fIdJs = escapeJsSingleQuote(fId);
+        const urlJs = escapeJsSingleQuote(att.url || "");
+        bodyEl.innerHTML = `
+          <img src="${escapeHtml(hiResSrc)}" alt="${escapeHtml(att.name || "บิลหลักฐาน")}" style="max-width: 100%; max-height: 66vh; object-fit: contain; border-radius: 8px; box-shadow: 0 6px 24px rgba(0,0,0,0.7);" onerror="handleViewerFullImageError(this, '${fIdJs}', '${urlJs}')">
+        `;
+      }
+    }
+
+    async function handleViewerFullImageError(imgEl, fileId, rawUrl) {
+      if (!imgEl || imgEl.dataset.fallbackTried === "true") {
+        if (fileId && imgEl.parentElement) {
+          imgEl.parentElement.innerHTML = `<iframe src="https://drive.google.com/file/d/${encodeURIComponent(fileId)}/preview" style="width: 100%; height: 66vh; border: none; border-radius: 10px; background: #ffffff;" title="Bill Preview"></iframe>`;
+        }
+        return;
+      }
+      imgEl.dataset.fallbackTried = "true";
+      await handleBillThumbError(imgEl, fileId, rawUrl, false);
+    }
+
+    // รองรับ Light-Dismiss คลิกนอกกรอบ <dialog> สำหรับเบราว์เซอร์ที่ยังไม่รองรับ closedby
+    function initDialogLightDismissFallback() {
+      const dialogs = document.querySelectorAll('dialog[closedby="any"]');
+      dialogs.forEach(dialog => {
+        dialog.addEventListener('close', () => {
+          dialog.returnValue = '';
+        });
+      });
+
+      if (!('closedBy' in HTMLDialogElement.prototype)) {
+        const isPointerOutside = (e, dialog) => {
+          const r = dialog.getBoundingClientRect();
+          return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+        };
+        dialogs.forEach(dialog => {
+          let pressedOutside = false;
+          dialog.addEventListener('pointerdown', e => {
+            pressedOutside = (e.target === dialog) && isPointerOutside(e, dialog);
+          });
+          dialog.addEventListener('pointerup', e => {
+            if (pressedOutside && e.target === dialog && isPointerOutside(e, dialog)) {
+              dialog.close();
+            }
+            pressedOutside = false;
+          });
+        });
       }
     }
 
@@ -5095,6 +6219,7 @@
     }
 
     window.onload = function() {
+      initDialogLightDismissFallback();
       checkAuth();
     };
   </script>
