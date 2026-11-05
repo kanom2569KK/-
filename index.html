@@ -74,42 +74,80 @@
     }
 
     .sidebar {
-      width: 100px; background: linear-gradient(180deg, #4a2511, #2a1508);
+      width: 148px; flex-shrink: 0; background: linear-gradient(180deg, #4a2511, #2a1508);
       margin: 20px 0 20px 20px; border-radius: 16px; border: 6px solid #1a0c04;
-      display: flex; flex-direction: column; align-items: center; padding: 25px 0;
+      display: flex; flex-direction: column; align-items: center; padding: 20px 10px;
       box-shadow: 10px 10px 30px rgba(0,0,0,0.6); z-index: 10;
     }
-    .company-logo { margin-bottom: 25px; position: relative; cursor: pointer; transition: 0.3s; }
+    .company-logo { margin-bottom: 18px; position: relative; cursor: pointer; transition: 0.3s; }
     .company-logo img {
       width: 60px; height: 60px; object-fit: contain; border-radius: 12px;
       border: 3px solid var(--accent-gold); background: #231106; box-shadow: 0 0 10px rgba(251,191,36,0.5);
     }
     .company-logo:hover { transform: scale(1.08); }
     .company-logo .tooltip {
-      position: absolute; left: 75px; top: 50%; transform: translateY(-50%);
+      position: absolute; left: calc(100% + 18px); top: 50%; transform: translateY(-50%);
       background: var(--wood-dark); color: var(--accent-gold); padding: 8px 14px; border-radius: 8px;
       font-size: 13px; font-weight: bold; white-space: nowrap; opacity: 0; pointer-events: none; transition: 0.2s; border: 2px solid var(--wood-border); z-index: 100;
     }
-    .company-logo:hover .tooltip { opacity: 1; left: 85px; }
+    .company-logo:hover .tooltip { opacity: 1; left: calc(100% + 26px); }
 
-    .nav-links { list-style: none; display: flex; flex-direction: column; gap: 14px; width: 100%; align-items: center; flex: 1;}
-    .nav-item { display: none; }
+    .nav-links { list-style: none; display: flex; flex-direction: column; gap: 9px; width: 100%; align-items: stretch; flex: 1; min-height: 0; }
+    .nav-item { display: none; width: 100%; }
     .nav-item button {
-      background: linear-gradient(135deg, #78350f, #451a03); border: 3px solid #200e05; font-size: 22px; color: var(--text-muted);
-      cursor: pointer; padding: 10px; border-radius: 12px; position: relative; width: 65px; height: 55px;
-      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      width: 100%; height: 44px; padding: 0 10px;
+      background: rgba(26, 12, 4, 0.68); border: 2px solid #5c2c12; border-radius: 11px;
+      display: flex; align-items: center; justify-content: flex-start; gap: 8px;
+      color: #fde68a; font-size: 13px; font-weight: 600; letter-spacing: 0.1px;
+      cursor: pointer; position: relative;
+      transition: all 0.18s ease;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.35), inset 0 1px 1px rgba(254, 240, 138, 0.08);
     }
-    .nav-item button:hover, .nav-item.active button {
-      background: linear-gradient(135deg, #d97706, #b45309); color: var(--accent-gold);
-      border-color: var(--accent-gold); transform: scale(1.1);
-      box-shadow: 0 0 15px rgba(251,191,36,0.6), inset 0 2px 4px rgba(255,255,255,0.3);
+    .nav-item button svg {
+      width: 19px; height: 19px;
+      flex: none; pointer-events: none;
+      transition: transform 0.18s ease;
+    }
+    .nav-item button .nav-label {
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      line-height: 1.2; pointer-events: none;
+    }
+    .nav-item button:hover {
+      background: linear-gradient(135deg, rgba(180, 83, 9, 0.88), rgba(120, 53, 15, 0.92));
+      border-color: #fbbf24; color: #fffbeb;
+      transform: translateX(2px);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+    }
+    .nav-item.active button {
+      background: linear-gradient(135deg, #d97706, #9a3412);
+      border-color: #fef08a; color: #ffffff;
+      transform: translateX(3px);
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    }
+    .nav-item button:hover svg, .nav-item.active button svg {
+      transform: scale(1.06);
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+    }
+    .nav-item button:focus-visible {
+      outline: 2px solid #fef08a; outline-offset: 2px;
     }
     .nav-item button .tooltip {
-      position: absolute; left: 65px; top: 50%; transform: translateY(-50%);
+      position: absolute; left: calc(100% + 10px); top: 50%; transform: translateY(-50%);
       background: var(--wood-dark); color: white; padding: 6px 12px; border-radius: 8px;
-      font-size: 12px; white-space: nowrap; opacity: 0; pointer-events: none; transition: 0.2s; border: 2px solid var(--wood-border); z-index: 100;
+      font-size: 12px; font-weight: 500; white-space: nowrap; opacity: 0; pointer-events: none; transition: 0.2s;
+      border: 2px solid var(--accent-gold); box-shadow: 0 6px 16px rgba(0,0,0,0.65); z-index: 100;
     }
-    .nav-item button:hover .tooltip { opacity: 1; left: 80px; }
+    .nav-item button:hover .tooltip { opacity: 1; left: calc(100% + 16px); }
+
+    @media (max-height: 740px) {
+      .sidebar { padding: 12px 10px; margin: 12px 0 12px 14px; }
+      .company-logo { margin-bottom: 10px; }
+      .company-logo img { width: 50px; height: 50px; }
+      .nav-links { gap: 6px; }
+      .nav-item button { height: 39px; font-size: 12.5px; }
+      .user-avatar { width: 50px; height: 50px; }
+      .user-avatar img { width: 42px; height: 42px; }
+    }
     
     .user-avatar { 
       margin-top: auto; width: 60px; height: 60px; background: linear-gradient(135deg, #78350f, #451a03); border-radius: 50%; 
@@ -1598,25 +1636,81 @@
 
     <ul class="nav-links">
       <li class="nav-item" id="menu-financial">
-        <button onclick="switchTab('financial')">💰<span class="tooltip">การเงิน & รับชำระ</span></button>
+        <button type="button" onclick="switchTab('financial')" aria-label="การเงิน & รับชำระ">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="6" width="20" height="13" rx="2.5"/>
+            <circle cx="12" cy="12.5" r="2.8"/>
+            <path d="M6 12.5h.01M18 12.5h.01M9 3l3 3 3-3"/>
+          </svg>
+          <span class="nav-label">รับเงิน</span>
+          <span class="tooltip">การเงิน & รับชำระ</span>
+        </button>
       </li>
       <li class="nav-item" id="menu-expenses">
-        <button onclick="switchTab('expenses')">💸<span class="tooltip">บันทึก & ประวัติรายจ่าย</span></button>
+        <button type="button" onclick="switchTab('expenses')" aria-label="บันทึก & ประวัติรายจ่าย">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 3h13l3 3v15l-2.5-1.5L15 21l-3-1.5L9 21l-2.5-1.5L4 21V3z"/>
+            <path d="M9 11h6m-2-2.5L15.5 11 13 13.5"/>
+          </svg>
+          <span class="nav-label">รายจ่าย</span>
+          <span class="tooltip">บันทึก & ประวัติรายจ่าย</span>
+        </button>
       </li>
       <li class="nav-item" id="menu-property-map">
-        <button onclick="switchTab('property-map')">🗺️<span class="tooltip">ผังสถานะยูนิต & หนี้ค้างชำระ</span></button>
+        <button type="button" onclick="switchTab('property-map')" aria-label="ผังสถานะยูนิต & หนี้ค้างชำระ">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+            <line x1="9" y1="3" x2="9" y2="18"/>
+            <line x1="15" y1="6" x2="15" y2="21"/>
+          </svg>
+          <span class="nav-label">ผังบ้าน</span>
+          <span class="tooltip">ผังสถานะยูนิต & หนี้ค้างชำระ</span>
+        </button>
       </li>
       <li class="nav-item" id="menu-residents">
-        <button onclick="switchTab('residents')">👥<span class="tooltip">ทะเบียนลูกบ้านใหม่</span></button>
+        <button type="button" onclick="switchTab('residents')" aria-label="ทะเบียนลูกบ้านใหม่">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span class="nav-label">ลูกบ้าน</span>
+          <span class="tooltip">ทะเบียนลูกบ้านใหม่</span>
+        </button>
       </li>
       <li class="nav-item" id="menu-billing">
-        <button onclick="switchTab('billing')">📑<span class="tooltip">ฝ่ายขาย & ออกบิล</span></button>
+        <button type="button" onclick="switchTab('billing')" aria-label="ฝ่ายขาย & ออกบิล">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="8" y1="13" x2="16" y2="13"/>
+            <line x1="8" y1="17" x2="13" y2="17"/>
+          </svg>
+          <span class="nav-label">ออกบิล</span>
+          <span class="tooltip">ฝ่ายขาย & ออกบิล</span>
+        </button>
       </li>
       <li class="nav-item" id="menu-procurement">
-        <button onclick="switchTab('procurement')">📦<span class="tooltip">จัดซื้อ & สต็อกพัสดุ</span></button>
+        <button type="button" onclick="switchTab('procurement')" aria-label="จัดซื้อ & สต็อกพัสดุ">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+            <line x1="12" y1="22.08" x2="12" y2="12"/>
+          </svg>
+          <span class="nav-label">คลังพัสดุ</span>
+          <span class="tooltip">จัดซื้อ & สต็อกพัสดุ</span>
+        </button>
       </li>
       <li class="nav-item" id="menu-admin-hub">
-        <button onclick="switchTab('admin-hub')">🛠️<span class="tooltip">แอดมิน: ไฟล์ดิบ & ระบบ</span></button>
+        <button type="button" onclick="switchTab('admin-hub')" aria-label="แอดมิน: ไฟล์ดิบ & ระบบ">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.77 1.05 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <span class="nav-label">แอดมิน</span>
+          <span class="tooltip">แอดมิน: ไฟล์ดิบ & ระบบ</span>
+        </button>
       </li>
     </ul>
     
