@@ -64,13 +64,14 @@
       background: linear-gradient(145deg, #4a2511, #361b0c);
       border: 6px solid #200e05; border-radius: 16px; padding: 22px;
       box-shadow: 0 8px 25px rgba(0,0,0,0.6), inset 0 0 15px rgba(0,0,0,0.4);
-      position: relative;
+      position: relative; min-inline-size: 0;
     }
     .card-title {
       font-size: 17px; font-weight: bold; margin-bottom: 18px;
       color: var(--accent-gold); text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
       border-bottom: 2px dashed #6b3414; padding-bottom: 8px;
       display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; flex-wrap: wrap; line-height: 1.35;
     }
 
     .sidebar {
@@ -157,13 +158,13 @@
     .user-avatar img { width: 50px; height: 50px; object-fit: contain; image-rendering: pixelated; }
     .user-avatar:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(251,191,36,0.8); }
 
-    .main-content { flex: 1; padding: 20px 30px; overflow-y: auto; height: 100vh; }
-    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-    .greeting h1 { font-size: 26px; font-weight: bold; color: var(--accent-gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+    .main-content { flex: 1; min-inline-size: 0; padding: 20px 30px; overflow-y: auto; height: 100vh; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+    .greeting h1 { font-size: 26px; font-weight: bold; color: var(--accent-gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.8); line-height: 1.25; }
     .greeting span { color: #fde047; }
     .search-bar {
       background: #2a1508; padding: 10px 20px; border-radius: 14px;
-      display: flex; align-items: center; gap: 10px; border: 3px solid #1a0c04; width: 300px;
+      display: flex; align-items: center; gap: 10px; border: 3px solid #1a0c04; width: 300px; max-inline-size: 100%;
       box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
     }
     .search-bar input { background: none; border: none; color: white; outline: none; width: 100%; font-size: 14px;}
@@ -177,12 +178,16 @@
       background: linear-gradient(145deg, #5c2c12, #381808);
       border: 5px solid #1a0c04; border-radius: 16px; padding: 18px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.4);
-      cursor: pointer; transition: 0.3s;
+      cursor: pointer; transition: 0.3s; min-inline-size: 0;
     }
     .metric-card:hover { transform: scale(1.03); border-color: var(--accent-gold); }
-    .metric-card .title { font-size: 13px; color: var(--text-muted); margin-bottom: 6px;}
-    .metric-card .value { font-size: 26px; font-weight: bold; color: var(--accent-gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.8);}
-    .content-grid { display: grid; grid-template-columns: 2fr 1.1fr; gap: 20px; }
+    .metric-card .title { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; line-height: 1.35; }
+    .metric-card .value { font-size: clamp(20px, 1.85vw, 26px); font-weight: bold; color: var(--accent-gold); text-shadow: 2px 2px 4px rgba(0,0,0,0.8); line-height: 1.25; word-break: break-word; }
+    .content-grid { display: grid; grid-template-columns: 2fr 1.1fr; gap: 20px; min-inline-size: 0; }
+    .content-grid > * { min-inline-size: 0; }
+    @media (max-width: 1100px) {
+      .content-grid { grid-template-columns: 1fr !important; }
+    }
 
     .form-group { margin-bottom: 14px; }
     .form-group label { display: block; font-size: 13px; color: var(--accent-gold); margin-bottom: 6px; font-weight: 600;}
@@ -209,13 +214,28 @@
       transform: scale(1.15);
     }
     
-    .table-container { overflow-x: auto; max-height: 280px; }
-    table.data-table { width: 100%; border-collapse: collapse; }
-    table.data-table th, table.data-table td { padding: 10px 12px; text-align: left; border-bottom: 2px solid #2a1508; font-size: 13px; }
-    table.data-table th { position: sticky; top: 0; background: #231106; color: var(--accent-gold); font-weight: bold; z-index: 2;}
+    .table-container {
+      overflow: auto; max-inline-size: 100%; max-height: 280px;
+      overscroll-behavior: contain; scrollbar-gutter: stable;
+    }
+    table.data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    table.data-table th, table.data-table td {
+      padding: 10px 12px; text-align: left; border-bottom: 2px solid #2a1508;
+      font-size: 13px; vertical-align: middle; line-height: 1.45;
+    }
+    table.data-table th {
+      position: sticky; inset-block-start: 0; top: 0;
+      background: #231106; color: var(--accent-gold); font-weight: bold;
+      white-space: nowrap; z-index: 2;
+    }
     table.data-table tbody tr:hover { background: rgba(251,191,36,0.05); }
     
-    .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;}
+    .badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: bold;
+      line-height: 1.25; text-transform: uppercase; letter-spacing: 0.3px;
+      white-space: nowrap; flex-shrink: 0; vertical-align: middle;
+    }
     .badge.overdue { background: rgba(220,38,38,0.3); color: #fca5a5; border: 1px solid var(--accent-red);}
     .badge.pending { background: rgba(217,119,6,0.3); color: #fcd34d; border: 1px solid #d97706;}
     .badge.paid { background: rgba(5,150,105,0.3); color: #6ee7b7; border: 1px solid var(--accent-green);}
@@ -224,11 +244,14 @@
       width: 100%; padding: 14px; border-radius: 12px; border: 3px solid #140803; font-size: 15px; font-weight: bold;
       background: linear-gradient(135deg, #d97706, #b45309); color: #fffbeb; cursor: pointer;
       box-shadow: 0 5px 15px rgba(0,0,0,0.5), inset 0 2px 3px rgba(255,255,255,0.3); transition: 0.2s; margin-top: 8px;
+      line-height: 1.3;
     }
     .btn-primary:hover { transform: scale(1.02); background: linear-gradient(135deg, #fbbf24, #d97706); }
     .btn-action { 
+      display: inline-flex; align-items: center; justify-content: center; gap: 4px;
       background: #78350f; border: 2px solid #200e05; color: white; 
-      padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; transition: 0.2s;
+      padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 12px;
+      line-height: 1.25; white-space: nowrap; flex-shrink: 0; transition: 0.2s;
     }
     .btn-action:hover { background: var(--wood-btn-hover); }
     
@@ -253,10 +276,25 @@
     }
     .ro-npc-frame img { width: 80px; height: 80px; object-fit: contain; image-rendering: pixelated; }
     .ro-dialog-box { flex: 1; background: #231106; border: 3px solid #140803; padding: 16px; border-radius: 12px; font-size: 14px; line-height: 1.6; }
-    .ro-footer { padding: 14px 20px; background: #2a1508; border-top: 3px solid #1a0c04; display: flex; justify-content: flex-end; gap: 12px; }
-    .ro-btn { padding: 8px 16px; font-size: 13px; font-weight: bold; border-radius: 8px; cursor: pointer; border: 2px solid #140803; color: white; background: #78350f; transition: 0.2s;}
+    .ro-footer { padding: 14px 20px; background: #2a1508; border-top: 3px solid #1a0c04; display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
+    .ro-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 8px 16px; font-size: 13px; font-weight: bold; line-height: 1.25;
+      border-radius: 8px; cursor: pointer; border: 2px solid #140803; color: white; background: #78350f;
+      white-space: nowrap; transition: 0.2s;
+    }
     .ro-btn:hover { background: #b45309; }
     .ro-btn-primary { background: linear-gradient(135deg, #0284c7, #0369a1); border: none; }
+    .quest-item {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      background: #231106; border: 1.5px solid #381808; border-radius: 10px; padding: 9px 12px;
+    }
+    .quest-exp {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(5, 150, 105, 0.2); color: #6ee7b7; border: 1px solid #059669;
+      border-radius: 999px; padding: 3px 9px; font-size: 11px; font-weight: bold;
+      line-height: 1.25; white-space: nowrap; flex-shrink: 0;
+    }
 
     .char-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); gap: 14px; margin: 20px 0;
@@ -363,11 +401,15 @@
       gap: 4px;
       font-size: 11px;
       font-weight: bold;
+      line-height: 1.3;
       padding: 4px 8px;
       border-radius: 8px;
       width: 100%;
       text-align: center;
       letter-spacing: 0.3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .smap-badge.settled {
       background: rgba(5,150,105,0.25);
@@ -400,6 +442,8 @@
       color: var(--text-muted);
       padding: 4px 6px;
       font-size: 12px;
+      line-height: 1.25;
+      white-space: nowrap;
       cursor: pointer;
       flex: 1;
       display: flex;
@@ -420,6 +464,8 @@
       color: var(--text-muted);
       font-size: 12px;
       font-weight: bold;
+      line-height: 1.25;
+      white-space: nowrap;
       border-radius: 8px;
       cursor: pointer;
       transition: 0.2s;
@@ -2966,12 +3012,12 @@
           if (st.toLowerCase() === "paid") totalPaid += amt;
 
           tbody.innerHTML += `<tr>
-            <td>${formatDisplayDate(p.Date)}</td>
-            <td style="color:var(--accent-gold); font-weight:bold;">${p.DocNo || '-'}</td>
-            <td>${p["Fee Type"] || '-'}</td>
-            <td style="color:#6ee7b7; font-weight:bold;">฿${amt.toLocaleString()}</td>
-            <td>${p["Payment Method"] || '-'}</td>
-            <td><span class="badge ${st.toLowerCase()}">${st}</span></td>
+            <td style="white-space: nowrap;">${formatDisplayDate(p.Date)}</td>
+            <td style="color:var(--accent-gold); font-weight:bold; white-space: nowrap;">${p.DocNo || '-'}</td>
+            <td style="min-width: 130px;">${p["Fee Type"] || '-'}</td>
+            <td style="color:#6ee7b7; font-weight:bold; white-space: nowrap;">฿${amt.toLocaleString()}</td>
+            <td style="white-space: nowrap;">${p["Payment Method"] || '-'}</td>
+            <td style="white-space: nowrap;"><span class="badge ${st.toLowerCase()}">${st}</span></td>
           </tr>`;
         });
       }
@@ -3003,13 +3049,13 @@
 
         tbody.innerHTML += `
           <tr style="border-bottom: 1px solid #140803;">
-            <td style="padding: 10px 12px; font-weight: bold; color: var(--accent-gold);">${String(res.unitNumber).toUpperCase()}</td>
-            <td style="padding: 10px 12px; color: var(--text-main); font-weight: 600;">${res.residentName || "-"}</td>
-            <td style="padding: 10px 12px;">${typeBadge}</td>
-            <td style="padding: 10px 12px; color: #60a5fa;">${res.titleDeedNo || "-"}</td>
-            <td style="padding: 10px 12px; color: #6ee7b7;">${res.phone || "-"}</td>
-            <td style="padding: 10px 12px; color: var(--text-muted); font-size: 12px;">${res.currentAddress || "-"}</td>
-            <td style="padding: 10px 12px; text-align: center;">
+            <td style="padding: 10px 12px; font-weight: bold; color: var(--accent-gold); white-space: nowrap;">${String(res.unitNumber).toUpperCase()}</td>
+            <td style="padding: 10px 12px; color: var(--text-main); font-weight: 600; min-width: 140px;">${res.residentName || "-"}</td>
+            <td style="padding: 10px 12px; white-space: nowrap;">${typeBadge}</td>
+            <td style="padding: 10px 12px; color: #60a5fa; white-space: nowrap;">${res.titleDeedNo || "-"}</td>
+            <td style="padding: 10px 12px; color: #6ee7b7; white-space: nowrap;">${res.phone || "-"}</td>
+            <td style="padding: 10px 12px; color: var(--text-muted); font-size: 12px; min-width: 180px;">${res.currentAddress || "-"}</td>
+            <td style="padding: 10px 12px; text-align: center; white-space: nowrap;">
               <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="openEditResidentModal('${uStr}')">แก้ไข</button>
             </td>
           </tr>
@@ -3435,13 +3481,13 @@
         const formattedMonth = formatDisplayMonth(item.billingMonth);
 
         tbody.innerHTML += `<tr>
-          <td>${formattedDate}</td>
-          <td style="color: var(--accent-gold); font-weight: bold;">${item.unitNumber}</td>
-          <td>${item.residentName}</td>
-          <td>${item.feeType}</td>
-          <td><span class="badge pending" style="font-size:11px;">${formattedMonth}</span></td>
-          <td style="color: var(--text-muted); font-size:12px;">${item.operator}</td>
-          <td style="text-align: center;">
+          <td style="white-space: nowrap;">${formattedDate}</td>
+          <td style="color: var(--accent-gold); font-weight: bold; white-space: nowrap;">${item.unitNumber}</td>
+          <td style="min-width: 120px;">${item.residentName}</td>
+          <td style="min-width: 140px;">${item.feeType}</td>
+          <td style="white-space: nowrap;"><span class="badge pending" style="font-size:11px;">${formattedMonth}</span></td>
+          <td style="color: var(--text-muted); font-size:12px; white-space: nowrap;">${item.operator}</td>
+          <td style="text-align: center; white-space: nowrap;">
             <button type="button" class="btn-action" style="background: linear-gradient(135deg, #059669, #047857);" onclick="fillPaymentFromQueue('${u}', '${n}', '${f}', '${m}', '${dNo}')">
               รับเงิน
             </button>
@@ -3482,14 +3528,14 @@
           : `<span style="font-size:11px; color:var(--text-muted);">ล็อก</span>`;
 
         tbody.innerHTML += `<tr>
-          <td style="color: var(--accent-gold); font-weight: bold;">${docNo}</td>
-          <td>${formattedDate}</td>
-          <td style="font-weight: bold;">${item.unitNumber}</td>
-          <td>${item.residentName}</td>
-          <td>${item.feeType}</td>
-          <td style="color: #6ee7b7;">฿${amt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${taxBadgesHtml}</td>
-          <td>${statusBadge}</td>
-          <td style="text-align: center; white-space: nowrap;"><div style="display:flex; gap:4px; justify-content:center;">${btnPrintHtml}${btnCancelHtml}</div></td>
+          <td style="color: var(--accent-gold); font-weight: bold; white-space: nowrap;">${docNo}</td>
+          <td style="white-space: nowrap;">${formattedDate}</td>
+          <td style="font-weight: bold; white-space: nowrap;">${item.unitNumber}</td>
+          <td style="min-width: 120px;">${item.residentName}</td>
+          <td style="min-width: 150px;">${item.feeType}</td>
+          <td style="color: #6ee7b7; white-space: nowrap;">฿${amt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${taxBadgesHtml}</td>
+          <td style="white-space: nowrap;">${statusBadge}</td>
+          <td style="text-align: center; white-space: nowrap;"><div style="display:inline-flex; gap:5px; justify-content:center; align-items:center;">${btnPrintHtml}${btnCancelHtml}</div></td>
         </tr>`;
       });
     }
@@ -3515,13 +3561,13 @@
         }
 
         tbody.innerHTML += `<tr>
-          <td style="color: var(--accent-gold); font-weight: bold;">${item.itemCode}</td>
-          <td style="font-weight: bold; color: var(--text-main);">${item.itemName}</td>
-          <td>${item.category}</td>
-          <td style="font-size: 14px; font-weight: bold; color: ${qty <= minAlert ? '#fca5a5' : '#6ee7b7'};">${qty} ${item.unit}</td>
-          <td>฿${price.toLocaleString()}</td>
-          <td>${statusBadge}</td>
-          <td style="text-align: center;">
+          <td style="color: var(--accent-gold); font-weight: bold; white-space: nowrap;">${item.itemCode}</td>
+          <td style="font-weight: bold; color: var(--text-main); min-width: 140px;">${item.itemName}</td>
+          <td style="white-space: nowrap;">${item.category}</td>
+          <td style="font-size: 14px; font-weight: bold; color: ${qty <= minAlert ? '#fca5a5' : '#6ee7b7'}; white-space: nowrap;">${qty} ${item.unit}</td>
+          <td style="white-space: nowrap;">฿${price.toLocaleString()}</td>
+          <td style="white-space: nowrap;">${statusBadge}</td>
+          <td style="text-align: center; white-space: nowrap;">
             <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-size: 11px; padding: 4px 10px;" onclick="openStockModal('${codeStr}')">แก้ไขข้อมูล / สต็อก</button>
           </td>
         </tr>`;
@@ -3778,13 +3824,13 @@
           ? `<button type="button" class="btn-action" style="background: linear-gradient(135deg, var(--accent-green), #047857);" onclick="openReceiptTaxPrintModal(${origIdx})">พิมพ์ใบเสร็จ</button>` 
           : `<span style="font-size:12px; color:var(--text-muted);">-</span>`;
         tableBody.innerHTML += `<tr>
-          <td>${formattedDate}</td>
-          <td style="color: var(--accent-gold); font-weight: bold;">${unit}</td>
-          <td>${residentName}</td>
-          <td>${feeType}</td>
-          <td style="color: #6ee7b7;">฿${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${taxBadgesHtml}</td>
-          <td><span class="badge ${status.toLowerCase()}">${status}</span></td>
-          <td>${btnReceiptHtml}</td>
+          <td style="white-space: nowrap;">${formattedDate}</td>
+          <td style="color: var(--accent-gold); font-weight: bold; white-space: nowrap;">${unit}</td>
+          <td style="min-width: 120px;">${residentName}</td>
+          <td style="min-width: 130px;">${feeType}</td>
+          <td style="color: #6ee7b7; white-space: nowrap;">฿${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${taxBadgesHtml}</td>
+          <td style="white-space: nowrap;"><span class="badge ${status.toLowerCase()}">${status}</span></td>
+          <td style="white-space: nowrap;">${btnReceiptHtml}</td>
         </tr>`;
       });
     }
@@ -3845,7 +3891,7 @@
         const isAdmin = (currentUser?.role === "Admin");
         const btnAttachText = billCount > 0 ? "+ เพิ่มบิล" : "แนบไฟล์";
         
-        let actionHtml = `<div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">`;
+        let actionHtml = `<div style="display: inline-flex; gap: 5px; justify-content: center; align-items: center; flex-wrap: nowrap;">`;
         actionHtml += `<button type="button" class="btn-action" style="background: #0f766e;" onclick="openVoucherModal('${expIdStr}')">ดู/พิมพ์</button>`;
 
         if (isAdmin) {
@@ -3856,14 +3902,14 @@
         actionHtml += `</div>`;
 
         tbody.innerHTML += `<tr>
-          <td>${formattedDate}</td>
-          <td style="color: #fca5a5; font-weight: bold;">${escapeHtml(item.Category || '-')}</td>
-          <td>${escapeHtml(item.Description || '-')}</td>
-          <td style="color: #fca5a5; font-weight: bold;">฿${amt.toLocaleString()}</td>
-          <td>${escapeHtml(item['Payment Method'] || '-')}</td>
-          <td style="text-align: center;">${evidenceHtml}</td>
-          <td style="color: var(--text-muted); font-size:12px;">${escapeHtml(item.Operator || '-')}</td>
-          <td style="text-align: center; min-width: 150px;">${actionHtml}</td>
+          <td style="white-space: nowrap;">${formattedDate}</td>
+          <td style="color: #fca5a5; font-weight: bold; white-space: nowrap;">${escapeHtml(item.Category || '-')}</td>
+          <td style="min-width: 180px;">${escapeHtml(item.Description || '-')}</td>
+          <td style="color: #fca5a5; font-weight: bold; white-space: nowrap;">฿${amt.toLocaleString()}</td>
+          <td style="white-space: nowrap;">${escapeHtml(item['Payment Method'] || '-')}</td>
+          <td style="text-align: center; white-space: nowrap;">${evidenceHtml}</td>
+          <td style="color: var(--text-muted); font-size:12px; white-space: nowrap;">${escapeHtml(item.Operator || '-')}</td>
+          <td style="text-align: center; white-space: nowrap;">${actionHtml}</td>
         </tr>`;
       });
     }
@@ -5797,9 +5843,9 @@
       const summary = computeTaxSummary(taxMeta.subtotal || 0, taxMeta);
       if (!summary.hasAdjustments || summary.shortBadges.length === 0) return "";
       const pills = summary.shortBadges.map(b =>
-        `<span style="display:inline-block; font-size:10px; padding:1px 5px; border-radius:4px; background:rgba(0,0,0,0.35); border:1px solid ${b.color}; color:${b.color}; margin-right:3px; margin-top:2px;">${escapeHtmlText(b.text)}</span>`
+        `<span style="display:inline-flex; align-items:center; font-size:10px; line-height:1.25; padding:1px 5px; border-radius:4px; background:rgba(0,0,0,0.35); border:1px solid ${b.color}; color:${b.color}; white-space:nowrap;">${escapeHtmlText(b.text)}</span>`
       ).join("");
-      return `<div style="line-height:1.2;">${pills}</div>`;
+      return `<div style="display:flex; flex-wrap:wrap; gap:3px; margin-top:3px;">${pills}</div>`;
     }
 
     function recalcDocTax(pfx) {
