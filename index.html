@@ -2900,29 +2900,43 @@
       document.getElementById("prof-exp-bar").style.width = `${stats.progressPercent}%`;
     }
 
-    function applyRolePermissions(role) {
+    function isDocUserOrRole(role, username) {
+      const r = String(role || "").trim().toLowerCase();
+      const u = String(username || "").trim().toLowerCase();
+      return r === "admindoc" || r === "doc" || r === "document" || u === "doc" || u.indexOf("doc") === 0;
+    }
+
+    function applyRolePermissions(role, username = "") {
       document.querySelectorAll('.nav-item').forEach(el => el.style.display = 'none');
+      const r = String(role || "").trim();
+      const rLower = r.toLowerCase();
+      const isDoc = isDocUserOrRole(role, username || currentUser?.username || "");
       let defaultTab = 'financial';
 
-      if (role === 'Admin') {
+      if (r === 'Admin' || rLower === 'admin') {
         document.getElementById('menu-financial').style.display = 'block';
         document.getElementById('menu-expenses').style.display = 'block';
         document.getElementById('menu-residents').style.display = 'block';
         document.getElementById('menu-billing').style.display = 'block';
         document.getElementById('menu-procurement').style.display = 'block';
         document.getElementById('menu-admin-hub').style.display = 'block';
-      } else if (role === 'Finance') {
+      } else if (r === 'Finance' || rLower === 'finance') {
         document.getElementById('menu-financial').style.display = 'block';
         document.getElementById('menu-expenses').style.display = 'block';
         document.getElementById('menu-procurement').style.display = 'block';
-      } else if (role === 'AdminDoc') {
+      } else if (isDoc) {
         document.getElementById('menu-residents').style.display = 'block';
         document.getElementById('menu-billing').style.display = 'block';
+        document.getElementById('menu-procurement').style.display = 'block';
         defaultTab = 'billing';
-      } else if (role === 'Sales') {
+      } else if (r === 'Sales' || rLower === 'sales') {
         document.getElementById('menu-residents').style.display = 'block';
         document.getElementById('menu-billing').style.display = 'block';
         defaultTab = 'residents';
+      }
+
+      if (isDoc) {
+        document.getElementById('menu-procurement').style.display = 'block';
       }
 
       const mapMenu = document.getElementById('menu-property-map');
@@ -2939,7 +2953,7 @@
         document.getElementById("char-select-screen").style.display = "none";
         document.getElementById("current-user-display").innerText = (currentUser.fullName.split(' ')[0] || currentUser.username).toUpperCase();
         document.getElementById("current-role-display").innerText = currentUser.role;
-        applyRolePermissions(currentUser.role);
+        applyRolePermissions(currentUser.role, currentUser.username);
         updateProfileUI();
         initInvoiceItems();
         if (typeof addQuickAuditRow === 'function') {
