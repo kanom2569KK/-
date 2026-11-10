@@ -196,7 +196,37 @@
       border: 3px solid #140803; border-radius: 10px; font-size: 14px; outline: none; transition: 0.3s;
       box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
     }
-    .form-group input:focus, .form-group select:focus { border-color: var(--accent-gold); }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent-gold); }
+    .form-group textarea.auto-fit-textarea {
+      field-sizing: content;
+      width: 100%;
+      height: auto;
+      min-block-size: 2.6lh;
+      max-block-size: 7lh;
+      line-height: 1.45;
+      resize: vertical;
+    }
+    .queued-inv-items-box {
+      background: rgba(20, 8, 3, 0.72);
+      border: 1.5px solid #b45309;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: 12.5px;
+      line-height: 1.45;
+    }
+    .queued-inv-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 4px 0;
+      border-bottom: 1px dashed rgba(251, 191, 36, 0.14);
+    }
+    .queued-inv-item-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
     select, select option { color: var(--text-main); background: #231106; }
 
     .form-group input::placeholder, .form-group textarea::placeholder {
@@ -227,8 +257,24 @@
       position: sticky; inset-block-start: 0; top: 0;
       background: #231106; color: var(--accent-gold); font-weight: bold;
       white-space: nowrap; z-index: 2;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
     }
     table.data-table tbody tr:hover { background: rgba(251,191,36,0.05); }
+    .table-search-wrap {
+      display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .table-search-input {
+      width: 230px; max-inline-size: 100%; padding: 6px 12px; font-size: 12.5px;
+      background: #1a0c04; border: 1.5px solid #9a3412; color: var(--text-main);
+      border-radius: 8px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .table-search-input::placeholder { color: rgba(254, 243, 199, 0.48); }
+    .table-search-input:focus {
+      border-color: var(--accent-gold); box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.2);
+    }
+    .table-search-input::-webkit-search-cancel-button {
+      cursor: pointer; filter: invert(80%) sepia(50%) saturate(600%) hue-rotate(350deg);
+    }
     
     .badge {
       display: inline-flex; align-items: center; justify-content: center;
@@ -1771,9 +1817,9 @@
         <h1>Good evening, <span id="current-user-display">Admin</span></h1>
         <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Role: <span id="current-role-display">Super Admin</span></p>
       </div>
-      <div class="search-bar">
-        <input type="text" id="global-search" placeholder="ค้นหาข้อมูลยูนิต, ลูกบ้าน..." onkeyup="filterTable()">
-      </div>
+      <search class="search-bar">
+        <input type="search" id="global-search" placeholder="ค้นหาข้อมูลยูนิต, ลูกบ้าน..." aria-label="ค้นหาข้อมูลยูนิตหรือลูกบ้าน" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="filterTable()">
+      </search>
     </div>
 
     <!-- Tab 1: Financial & Cashier -->
@@ -1801,11 +1847,16 @@
         <div style="display: flex; flex-direction: column; gap: 20px;">
           
           <div class="card" style="padding: 0; overflow: hidden;">
-            <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
-              <span>รายการแจ้งหนี้รอดำเนินการรับเงิน (Queue จากฝ่ายขาย/ธุรการ)</span>
-              <span id="queue-badge" class="badge pending">0 รายการ</span>
+            <div class="card-title" style="padding: 14px 20px; border-bottom: 1px solid #381808; margin-bottom: 0;">
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <span>รายการแจ้งหนี้รอดำเนินการรับเงิน (Queue จากฝ่ายขาย/ธุรการ)</span>
+                <span id="queue-badge" class="badge pending">0 รายการ</span>
+              </div>
+              <search class="table-search-wrap">
+                <input type="search" id="queue-search-input" class="table-search-input" placeholder="ค้นหายูนิต, ชื่อลูกบ้าน, รายการ, รอบบิล..." aria-label="ค้นหารายการแจ้งหนี้รอดำเนินการรับเงิน" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="filterPendingQueue()">
+              </search>
             </div>
-            <div class="table-container" style="max-height: 200px;">
+            <div class="table-container" style="max-height: 280px;">
               <table class="data-table">
                 <thead>
                   <tr>
@@ -1826,11 +1877,16 @@
           </div>
 
           <div class="card" style="padding: 0; overflow: hidden;">
-            <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
+            <div class="card-title" style="padding: 14px 20px; border-bottom: 1px solid #381808; margin-bottom: 0;">
               <span>ประวัติการรับเงิน & พิมพ์ใบเสร็จ (ฝ่ายการเงิน)</span>
-              <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: bold;" onclick="openLedgerModal()">
-                สมุดบัญชีรายยูนิต (Ledger)
-              </button>
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <search class="table-search-wrap">
+                  <input type="search" id="payments-search-input" class="table-search-input" style="width: 195px;" placeholder="ค้นหายูนิต, ชื่อ, เลขใบเสร็จ..." aria-label="ค้นหาประวัติการรับเงิน" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="filterPaymentsList()">
+                </search>
+                <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: bold;" onclick="openLedgerModal()">
+                  สมุดบัญชีรายยูนิต (Ledger)
+                </button>
+              </div>
             </div>
             <div class="table-container" style="max-height: 480px;">
               <table class="data-table">
@@ -1859,22 +1915,23 @@
             <div class="card-title">บันทึกรับชำระเงิน</div>
             <form id="payment-form" onsubmit="submitPayment(event)">
               <div class="form-group">
-                <label>เลขยูนิต / แปลง</label>
-                <input type="text" id="form-unit" placeholder="เช่น 1 หรือ A01" onblur="autoFillResidentName(this.value)" required>
+                <label for="form-unit">เลขยูนิต / แปลง</label>
+                <input type="text" id="form-unit" name="unitNumber" placeholder="เช่น 1 หรือ A01" onblur="autoFillResidentName(this.value)" required>
               </div>
               <div class="form-group">
-                <label>ชื่อผู้ชำระ</label>
-                <input type="text" id="form-name" placeholder="ระบบจะดึงชื่อให้อัตโนมัติ" required>
+                <label for="form-name">ชื่อผู้ชำระ</label>
+                <input type="text" id="form-name" name="residentName" placeholder="ระบบจะดึงชื่อให้อัตโนมัติ" required>
               </div>
-              <div style="display: flex; gap: 10px;">
-                <div class="form-group" style="flex: 1.2;">
-                  <label>ประเภท / รายการค่าใช้จ่าย *</label>
-                  <input type="text" id="form-fee-type" placeholder="ระบุรายการ เช่น ค่าส่วนกลางประจำปี" required>
-                </div>
-                <div class="form-group" style="flex: 0.8;">
-                  <label>ยอดก่อนภาษี (฿) *</label>
-                  <input type="number" id="form-amount" step="any" min="0" placeholder="0" oninput="recalcDocTax('pay')" required>
-                </div>
+
+              <div id="pay-queued-items-box" class="queued-inv-items-box" style="display: none;" aria-live="polite"></div>
+
+              <div class="form-group">
+                <label for="form-fee-type">ประเภท / รายการค่าใช้จ่าย *</label>
+                <textarea id="form-fee-type" name="feeType" class="auto-fit-textarea" rows="2" aria-describedby="pay-queued-items-box" placeholder="ระบุรายการ เช่น ค่าส่วนกลางประจำปี (รองรับหลายรายการย่อย)" required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="form-amount">ยอดก่อนภาษี (฿) *</label>
+                <input type="number" id="form-amount" name="amount" step="any" min="0" placeholder="0" oninput="recalcDocTax('pay')" required>
               </div>
 
               <div class="form-group" style="margin-top: -4px;">
@@ -1913,14 +1970,14 @@
               </div>
               <div style="display: flex; gap: 10px;">
                 <div class="form-group" style="flex: 1;">
-                  <label>ช่องทาง</label>
-                  <select id="form-payment-method">
+                  <label for="form-payment-method">ช่องทาง</label>
+                  <select id="form-payment-method" name="paymentMethod">
                     <option>โอนเงิน / สแกน QR</option><option>เงินสด</option><option>เช็คธนาคาร</option><option>บัตรเครดิต</option>
                   </select>
                 </div>
                 <div class="form-group" style="flex: 1;">
-                  <label>สถานะ</label>
-                  <select id="form-status">
+                  <label for="form-status">สถานะ</label>
+                  <select id="form-status" name="status">
                     <option value="Paid">ชำระแล้ว (Paid)</option>
                     <option value="Pending">รอตรวจสอบ (Pending)</option>
                   </select>
@@ -2255,8 +2312,17 @@
         </div>
 
         <div class="card" style="padding: 0; overflow: hidden;">
-          <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
+          <div class="card-title" style="padding: 14px 20px; border-bottom: 1px solid #381808; margin-bottom: 0;">
             <span>ตารางติดตามสถานะบิลทั้งหมด (Sales Tracking List)</span>
+            <search class="table-search-wrap">
+              <select id="sales-filter-status" onchange="filterSalesTrackingTable()" style="width: auto; padding: 6px 10px; font-size: 12px; background: #1a0c04; border: 1.5px solid #9a3412; color: var(--text-main); border-radius: 8px;">
+                <option value="">ทุกสถานะ</option>
+                <option value="Pending">รอดำเนินการ</option>
+                <option value="Settled">ชำระแล้ว</option>
+                <option value="Quotation">ใบเสนอราคา</option>
+              </select>
+              <input type="search" id="sales-search-input" class="table-search-input" placeholder="ค้นหาเลขเอกสาร, ยูนิต, ชื่อ, รายการ..." aria-label="ค้นหาตารางติดตามสถานะบิลทั้งหมด" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="filterSalesTrackingTable()">
+            </search>
           </div>
           <div class="table-container" style="max-height: 600px;">
             <table class="data-table">
@@ -2587,6 +2653,9 @@
     let activeStockItemCode = "";
     let activeVoucherId = "";
     let activeQueuedInvoiceDocNo = "";
+    let activeQueuedInvoiceItems = [];
+    let activeQueuedInvoiceUnit = "";
+    let activeQueuedInvoiceMonth = "";
     let activeTaxPrintContext = null;
 
     function showLoadingModal(title = "กำลังประมวลผลข้อมูล...", subtitle = "ระบบกำลังส่งคำสั่งและเชื่อมต่อ Google Sheets") {
@@ -3014,7 +3083,7 @@
           tbody.innerHTML += `<tr>
             <td style="white-space: nowrap;">${formatDisplayDate(p.Date)}</td>
             <td style="color:var(--accent-gold); font-weight:bold; white-space: nowrap;">${p.DocNo || '-'}</td>
-            <td style="min-width: 130px;">${p["Fee Type"] || '-'}</td>
+            <td style="min-width: 160px;">${renderLineItemsTableCellHtml(p, p["Fee Type"] || '-')}</td>
             <td style="color:#6ee7b7; font-weight:bold; white-space: nowrap;">฿${amt.toLocaleString()}</td>
             <td style="white-space: nowrap;">${p["Payment Method"] || '-'}</td>
             <td style="white-space: nowrap;"><span class="badge ${st.toLowerCase()}">${st}</span></td>
@@ -3388,8 +3457,151 @@
       }
     }
 
+    function summarizeInvoiceItemsForStorage(items, fallback = "ค่าส่วนกลาง") {
+      if (!Array.isArray(items) || items.length === 0) return fallback;
+      if (items.length === 1) return String(items[0].description || fallback).trim();
+      return items
+        .map((it, idx) => `${idx + 1}) ${String(it.description || "-").trim()}`)
+        .join(" | ");
+    }
+
+    function formatInvoiceItemsForTextarea(items, fallback = "") {
+      if (Array.isArray(items) && items.length > 1) {
+        return items
+          .map((it, idx) => `${idx + 1}) ${String(it.description || "-").trim()}`)
+          .join("\n");
+      }
+      if (Array.isArray(items) && items.length === 1 && items[0].description) {
+        return String(items[0].description).trim();
+      }
+      return String(fallback || "").trim();
+    }
+
+    function findLinkedInvoiceRecord(record) {
+      if (!record) return null;
+      const srcDoc = String(record.sourceDocNo || "").trim();
+      if (srcDoc) {
+        const byDoc = (cachedAllInvoices || []).find(inv => String(inv.docNo || "").trim() === srcDoc);
+        if (byDoc) return byDoc;
+      }
+      const isPaymentRec = ("Unit Number" in record) || ("Fee Type" in record);
+      if (isPaymentRec) {
+        const recUnitKey = cleanUnitKey(record["Unit Number"] || record.unitNumber || "");
+        const recAmt = Number(record["Amount"] || record.amount || 0);
+        const recFee = String(record["Fee Type"] || record.feeType || "").trim();
+        if (recUnitKey && recAmt > 0) {
+          const allInvs = (cachedAllInvoices || []).slice().reverse();
+          const matchedLegacy = allInvs.find(inv => {
+            if (!inv || inv.status === "Cancelled") return false;
+            if (cleanUnitKey(inv.unitNumber) !== recUnitKey) return false;
+            if (!Array.isArray(inv.items) || inv.items.length <= 1) return false;
+            if (Math.abs(Number(inv.amount || 0) - recAmt) >= 0.01) return false;
+            const firstDesc = String(inv.items[0]?.description || "").trim();
+            const invFee = String(inv.feeType || "").trim();
+            return (recFee === firstDesc || recFee === invFee);
+          });
+          if (matchedLegacy) return matchedLegacy;
+        }
+      }
+      return null;
+    }
+
+    function resolveInvoiceOrPaymentItems(record) {
+      if (!record) return [];
+      if (Array.isArray(record.items) && record.items.length > 0) {
+        return record.items
+          .filter(it => it && (it.description || Number(it.amount || 0) > 0))
+          .map(it => ({
+            description: String(it.description || "-").trim(),
+            amount: Number(it.amount || 0)
+          }));
+      }
+      const linkedInv = findLinkedInvoiceRecord(record);
+      if (linkedInv && Array.isArray(linkedInv.items) && linkedInv.items.length > 0) {
+        return linkedInv.items
+          .filter(it => it && (it.description || Number(it.amount || 0) > 0))
+          .map(it => ({
+            description: String(it.description || "-").trim(),
+            amount: Number(it.amount || 0)
+          }));
+      }
+      return [];
+    }
+
+    function renderLineItemsTableCellHtml(record, fallbackText = "-") {
+      const items = resolveInvoiceOrPaymentItems(record);
+      if (items.length > 1) {
+        const linesHtml = items.map((it, idx) => `
+          <div style="font-size: 12px; line-height: 1.38;">
+            <span style="color: var(--accent-gold); font-weight: bold;">${idx + 1}.</span>
+            <span>${escapeHtml(it.description || "-")}</span>
+            <span style="color: #6ee7b7; font-size: 11px; white-space: nowrap;">(฿${formatBaht(it.amount)})</span>
+          </div>
+        `).join("");
+        return `
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <div><span class="badge pending" style="font-size: 10px; padding: 2px 7px;">${items.length} รายการย่อย</span></div>
+            ${linesHtml}
+          </div>
+        `;
+      }
+      if (items.length === 1 && items[0].description) {
+        return escapeHtml(items[0].description);
+      }
+      const raw = String(fallbackText || "-").trim();
+      if (raw.indexOf(" | ") !== -1) {
+        return raw.split(" | ").map(part => `<div>${escapeHtml(part)}</div>`).join("");
+      }
+      return escapeHtml(raw);
+    }
+
+    function renderQueuedInvoiceItemsPreview() {
+      const box = document.getElementById("pay-queued-items-box");
+      if (!box) return;
+      if (!activeQueuedInvoiceDocNo && (!activeQueuedInvoiceItems || activeQueuedInvoiceItems.length === 0)) {
+        box.style.display = "none";
+        box.innerHTML = "";
+        return;
+      }
+      const items = activeQueuedInvoiceItems || [];
+      const docBadge = activeQueuedInvoiceDocNo ? escapeHtml(activeQueuedInvoiceDocNo) : "คิวรับเงิน";
+      const countText = items.length > 0 ? `${items.length} รายการย่อย` : "1 รายการ";
+      const rowsHtml = items.map((it, idx) => `
+        <div class="queued-inv-item-row">
+          <div style="color: var(--text-main);">
+            <strong style="color: var(--accent-gold);">${idx + 1}.</strong> ${escapeHtml(it.description || "-")}
+          </div>
+          <div style="color: #6ee7b7; font-weight: bold; white-space: nowrap;">฿${formatBaht(it.amount)}</div>
+        </div>
+      `).join("");
+
+      box.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: ${items.length > 0 ? '6px' : '0'}; padding-bottom: ${items.length > 0 ? '5px' : '0'}; border-bottom: ${items.length > 0 ? '1px solid #4a2511' : 'none'};">
+          <span style="color: var(--accent-gold); font-weight: bold; font-size: 12px;">อ้างอิงบิล: ${docBadge} (${countText})</span>
+          <button type="button" class="btn-action" style="padding: 2px 8px; font-size: 10.5px; background: #451a03; border-color: #78350f;" onclick="clearQueuedInvoiceSelection(false)">ยกเลิกผูกบิล</button>
+        </div>
+        ${rowsHtml}
+      `;
+      box.style.display = "block";
+    }
+
+    function clearQueuedInvoiceSelection(resetFields = false) {
+      activeQueuedInvoiceDocNo = "";
+      activeQueuedInvoiceItems = [];
+      activeQueuedInvoiceUnit = "";
+      activeQueuedInvoiceMonth = "";
+      renderQueuedInvoiceItemsPreview();
+      if (resetFields) {
+        document.getElementById("payment-form")?.reset();
+        resetDocTaxForm("pay");
+      }
+    }
+
     function autoFillResidentName(inputUnit) {
       const targetKey = cleanUnitKey(inputUnit);
+      if (activeQueuedInvoiceUnit && targetKey !== cleanUnitKey(activeQueuedInvoiceUnit)) {
+        clearQueuedInvoiceSelection(false);
+      }
       const hintEl = document.getElementById("pay-tenant-tax-hint");
       if (!targetKey) {
         if (hintEl) hintEl.style.display = "none";
@@ -3403,19 +3615,32 @@
     }
 
     function fillPaymentFromQueue(unit, name, feeType, month, docNo = "") {
-      activeQueuedInvoiceDocNo = docNo || "";
-      document.getElementById("form-unit").value = unit;
-      document.getElementById("form-name").value = name;
-      document.getElementById("form-fee-type").value = feeType;
-      autoFillResidentName(unit);
-
       const matchedInv = docNo
         ? (cachedPendingInvoices || []).find(p => String(p.docNo || "").trim() === String(docNo).trim())
         : (cachedPendingInvoices || []).find(p => cleanUnitKey(p.unitNumber) === cleanUnitKey(unit));
 
+      const resolvedItems = matchedInv ? resolveInvoiceOrPaymentItems(matchedInv) : [];
+      activeQueuedInvoiceDocNo = (matchedInv && matchedInv.docNo) ? matchedInv.docNo : (docNo || "");
+      activeQueuedInvoiceItems = resolvedItems;
+      activeQueuedInvoiceUnit = unit || (matchedInv ? matchedInv.unitNumber : "");
+      activeQueuedInvoiceMonth = (matchedInv && matchedInv.billingMonth) ? matchedInv.billingMonth : (month || "");
+
+      document.getElementById("form-unit").value = unit;
+      document.getElementById("form-name").value = name;
+      document.getElementById("form-fee-type").value = formatInvoiceItemsForTextarea(resolvedItems, feeType);
+      autoFillResidentName(unit);
+      renderQueuedInvoiceItemsPreview();
+
+      const itemsSubtotal = resolvedItems.length > 0
+        ? roundCurrency(resolvedItems.reduce((s, it) => s + Number(it.amount || 0), 0))
+        : 0;
+
       if (matchedInv && matchedInv.taxMeta) {
-        document.getElementById("form-amount").value = Number(matchedInv.taxMeta.subtotal || matchedInv.amount || 0);
+        document.getElementById("form-amount").value = Number(matchedInv.taxMeta.subtotal || itemsSubtotal || matchedInv.amount || 0);
         applyDocTaxConfigToDOM("pay", matchedInv.taxMeta);
+      } else if (itemsSubtotal > 0) {
+        document.getElementById("form-amount").value = itemsSubtotal;
+        resetDocTaxForm("pay");
       } else if (matchedInv && Number(matchedInv.amount || 0) > 0) {
         document.getElementById("form-amount").value = Number(matchedInv.amount);
         resetDocTaxForm("pay");
@@ -3450,10 +3675,10 @@
         } else if (Array.isArray(data)) { 
           cachedPayments = data; 
         }
-        renderTable(cachedPayments); 
-        renderExpensesTable(cachedExpenses);
-        renderPendingInvoicesQueue(cachedPendingInvoices);
-        renderSalesTrackingTable(cachedAllInvoices);
+        filterPaymentsList(); 
+        filterExpensesList();
+        filterPendingQueue();
+        filterSalesTrackingTable();
         renderPropertyMap(cachedResidents, cachedPendingInvoices);
         renderSmartPropertyMapDashboard();
         renderProcurementTable(cachedProcurement);
@@ -3461,32 +3686,110 @@
       } catch (error) { console.error("Load Error:", error); }
     }
 
-    function renderPendingInvoicesQueue(data) {
+    function matchesInvoiceSearch(item, rawQuery) {
+      if (!rawQuery) return true;
+      const q = String(rawQuery).trim().toLowerCase();
+      if (!q) return true;
+      const qUnit = cleanUnitKey(q);
+
+      const unitRaw = String(item.unitNumber || "").toLowerCase();
+      const unitClean = cleanUnitKey(item.unitNumber || "");
+      const resName = String(item.residentName || "").toLowerCase();
+      const docNo = String(item.docNo || "").toLowerCase();
+      const feeType = String(item.feeType || "").toLowerCase();
+      const op = String(item.operator || "").toLowerCase();
+      const amtStr = String(item.amount || "");
+      const monthRaw = String(item.billingMonth || "").toLowerCase();
+      const monthDisp = String(formatDisplayMonth(item.billingMonth) || "").toLowerCase();
+      const dateDisp = String(formatDisplayDate(item.date || item.timestamp) || "").toLowerCase();
+
+      if (
+        unitRaw.includes(q) ||
+        (qUnit && unitClean === qUnit) ||
+        resName.includes(q) ||
+        docNo.includes(q) ||
+        feeType.includes(q) ||
+        op.includes(q) ||
+        amtStr.includes(q) ||
+        monthRaw.includes(q) ||
+        monthDisp.includes(q) ||
+        dateDisp.includes(q)
+      ) {
+        return true;
+      }
+
+      const subItems = resolveInvoiceOrPaymentItems(item);
+      for (let i = 0; i < subItems.length; i++) {
+        const desc = String(subItems[i].description || "").toLowerCase();
+        const subAmt = String(subItems[i].amount || "");
+        if (desc.includes(q) || subAmt.includes(q)) return true;
+      }
+      return false;
+    }
+
+    function filterPendingQueue() {
+      const qEl = document.getElementById("queue-search-input");
+      const gEl = document.getElementById("global-search");
+      const query = (qEl && qEl.value.trim()) ? qEl.value.trim() : ((gEl && gEl.value.trim()) ? gEl.value.trim() : "");
+      const allPending = cachedPendingInvoices || [];
+      const filtered = query ? allPending.filter(inv => matchesInvoiceSearch(inv, query)) : allPending;
+
+      const badge = document.getElementById("queue-badge");
+      if (badge) {
+        badge.innerText = query
+          ? `พบ ${filtered.length} / ${allPending.length} รายการ`
+          : `${allPending.length} รายการ`;
+      }
+      renderPendingInvoicesQueue(filtered, !!query);
+    }
+
+    function filterSalesTrackingTable() {
+      const sEl = document.getElementById("sales-search-input");
+      const stEl = document.getElementById("sales-filter-status");
+      const query = sEl ? sEl.value.trim() : "";
+      const statusFilter = stEl ? stEl.value : "";
+
+      const filtered = (cachedAllInvoices || []).filter(inv => {
+        if (inv.status === "Cancelled") return false;
+        if (statusFilter) {
+          if (statusFilter === "Settled" && inv.status !== "Settled" && inv.status !== "Paid") return false;
+          if (statusFilter !== "Settled" && inv.status !== statusFilter) return false;
+        }
+        return matchesInvoiceSearch(inv, query);
+      });
+      renderSalesTrackingTable(filtered, !!(query || statusFilter));
+    }
+
+    function renderPendingInvoicesQueue(data, isFiltered = false) {
       const tbody = document.getElementById("pending-invoices-tbody");
       tbody.innerHTML = "";
 
       if (!data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 15px; color: #6ee7b7;">ไม่มีคิวค้างรับเงิน (เคลียร์ครบแล้ว)</td></tr>`;
+        const emptyMsg = isFiltered
+          ? `<span style="color: var(--text-muted);">ไม่พบรายการแจ้งหนี้ที่ตรงกับคำค้นหา</span>`
+          : `<span style="color: #6ee7b7;">ไม่มีคิวค้างรับเงิน (เคลียร์ครบแล้ว)</span>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 18px;">${emptyMsg}</td></tr>`;
         return;
       }
 
       data.forEach(item => {
-        const u = String(item.unitNumber).replace(/'/g, "\\'");
-        const n = String(item.residentName).replace(/'/g, "\\'");
-        const f = String(item.feeType).replace(/'/g, "\\'");
-        const m = String(item.billingMonth).replace(/'/g, "\\'");
-        const dNo = String(item.docNo || "").replace(/'/g, "\\'");
+        const u = escapeJsSingleQuote(item.unitNumber);
+        const n = escapeJsSingleQuote(item.residentName);
+        const f = escapeJsSingleQuote(item.feeType);
+        const m = escapeJsSingleQuote(item.billingMonth);
+        const dNo = escapeJsSingleQuote(item.docNo || "");
 
         const formattedDate = formatDisplayDate(item.date || item.timestamp);
         const formattedMonth = formatDisplayMonth(item.billingMonth);
+        const itemsCellHtml = renderLineItemsTableCellHtml(item, item.feeType);
 
         tbody.innerHTML += `<tr>
           <td style="white-space: nowrap;">${formattedDate}</td>
-          <td style="color: var(--accent-gold); font-weight: bold; white-space: nowrap;">${item.unitNumber}</td>
-          <td style="min-width: 120px;">${item.residentName}</td>
-          <td style="min-width: 140px;">${item.feeType}</td>
+          <td style="color: var(--accent-gold); font-weight: bold; white-space: nowrap;">${escapeHtml(item.unitNumber)}</td>
+          <td style="min-width: 120px;">${escapeHtml(item.residentName)}</td>
+          <td style="min-width: 180px;">${itemsCellHtml}</td>
           <td style="white-space: nowrap;"><span class="badge pending" style="font-size:11px;">${formattedMonth}</span></td>
-          <td style="color: var(--text-muted); font-size:12px; white-space: nowrap;">${item.operator}</td>
+          <td style="color: var(--text-muted); font-size:12px; white-space: nowrap;">${escapeHtml(item.operator)}</td>
           <td style="text-align: center; white-space: nowrap;">
             <button type="button" class="btn-action" style="background: linear-gradient(135deg, #059669, #047857);" onclick="fillPaymentFromQueue('${u}', '${n}', '${f}', '${m}', '${dNo}')">
               รับเงิน
@@ -3496,7 +3799,7 @@
       });
     }
 
-    function renderSalesTrackingTable(data) {
+    function renderSalesTrackingTable(data, isFiltered = false) {
       const tbody = document.getElementById("sales-tracking-tbody");
       tbody.innerHTML = "";
 
@@ -3504,7 +3807,10 @@
       const filteredData = data ? data.filter(item => item.status !== "Cancelled") : [];
 
       if (filteredData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 15px; color: var(--text-muted);">ยังไม่มีประวัติการออกเอกสาร (หรือรายการถูกยกเลิกทั้งหมด)</td></tr>`;
+        const emptyMsg = isFiltered
+          ? "ไม่พบเอกสารที่ตรงกับเงื่อนไขการค้นหา"
+          : "ยังไม่มีประวัติการออกเอกสาร (หรือรายการถูกยกเลิกทั้งหมด)";
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 15px; color: var(--text-muted);">${emptyMsg}</td></tr>`;
         return;
       }
 
@@ -3528,11 +3834,11 @@
           : `<span style="font-size:11px; color:var(--text-muted);">ล็อก</span>`;
 
         tbody.innerHTML += `<tr>
-          <td style="color: var(--accent-gold); font-weight: bold; white-space: nowrap;">${docNo}</td>
+          <td style="color: var(--accent-gold); font-weight: bold; white-space: nowrap;">${escapeHtml(docNo)}</td>
           <td style="white-space: nowrap;">${formattedDate}</td>
-          <td style="font-weight: bold; white-space: nowrap;">${item.unitNumber}</td>
-          <td style="min-width: 120px;">${item.residentName}</td>
-          <td style="min-width: 150px;">${item.feeType}</td>
+          <td style="font-weight: bold; white-space: nowrap;">${escapeHtml(item.unitNumber)}</td>
+          <td style="min-width: 120px;">${escapeHtml(item.residentName)}</td>
+          <td style="min-width: 180px;">${renderLineItemsTableCellHtml(item, item.feeType)}</td>
           <td style="color: #6ee7b7; white-space: nowrap;">฿${amt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${taxBadgesHtml}</td>
           <td style="white-space: nowrap;">${statusBadge}</td>
           <td style="text-align: center; white-space: nowrap;"><div style="display:inline-flex; gap:5px; justify-content:center; align-items:center;">${btnPrintHtml}${btnCancelHtml}</div></td>
@@ -3787,12 +4093,13 @@
       const pending = (cachedPendingInvoices || []).find(p => cleanUnitKey(p.unitNumber) === cleanKey);
       if (pending) {
         switchTab('financial');
-        const u = String(pending.unitNumber).replace(/'/g, "\\'");
-        const n = String(pending.residentName).replace(/'/g, "\\'");
-        const f = String(pending.feeType).replace(/'/g, "\\'");
-        const m = String(pending.billingMonth).replace(/'/g, "\\'");
-        const dNo = String(pending.docNo || "").replace(/'/g, "\\'");
-        fillPaymentFromQueue(u, n, f, m, dNo);
+        fillPaymentFromQueue(
+          String(pending.unitNumber || ""),
+          String(pending.residentName || ""),
+          String(pending.feeType || ""),
+          String(pending.billingMonth || ""),
+          String(pending.docNo || "")
+        );
       } else {
         switchTab('billing');
         const invUnitInput = document.getElementById("inv-unit");
@@ -3825,9 +4132,9 @@
           : `<span style="font-size:12px; color:var(--text-muted);">-</span>`;
         tableBody.innerHTML += `<tr>
           <td style="white-space: nowrap;">${formattedDate}</td>
-          <td style="color: var(--accent-gold); font-weight: bold; white-space: nowrap;">${unit}</td>
-          <td style="min-width: 120px;">${residentName}</td>
-          <td style="min-width: 130px;">${feeType}</td>
+          <td style="color: var(--accent-gold); font-weight: bold; white-space: nowrap;">${escapeHtml(unit)}</td>
+          <td style="min-width: 120px;">${escapeHtml(residentName)}</td>
+          <td style="min-width: 170px;">${renderLineItemsTableCellHtml(item, feeType)}</td>
           <td style="color: #6ee7b7; white-space: nowrap;">฿${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${taxBadgesHtml}</td>
           <td style="white-space: nowrap;"><span class="badge ${status.toLowerCase()}">${status}</span></td>
           <td style="white-space: nowrap;">${btnReceiptHtml}</td>
@@ -4240,10 +4547,26 @@
 
       const rawUnit = document.getElementById("form-unit").value.trim();
       const resName = document.getElementById("form-name").value.trim();
-      const feeType = document.getElementById("form-fee-type").value.trim();
+      const rawFeeType = document.getElementById("form-fee-type").value.trim();
+      const feeType = rawFeeType
+        .split(/\r?\n/)
+        .map(s => s.trim())
+        .filter(Boolean)
+        .join(" | ");
       const baseSubtotal = Number(document.getElementById("form-amount").value || 0);
       const payMethod = document.getElementById("form-payment-method").value;
       const statusVal = document.getElementById("form-status").value;
+
+      const isSameQueuedUnit = !activeQueuedInvoiceUnit || cleanUnitKey(rawUnit) === cleanUnitKey(activeQueuedInvoiceUnit);
+      const queuedDocNo = isSameQueuedUnit ? (activeQueuedInvoiceDocNo || "") : "";
+      const queuedMonth = isSameQueuedUnit ? (activeQueuedInvoiceMonth || "") : "";
+      let queuedItems = isSameQueuedUnit && Array.isArray(activeQueuedInvoiceItems) ? activeQueuedInvoiceItems : [];
+      if (queuedItems.length > 0) {
+        const queuedSum = roundCurrency(queuedItems.reduce((s, it) => s + Number(it.amount || 0), 0));
+        if (Math.abs(queuedSum - baseSubtotal) >= 0.01 && queuedItems.length === 1) {
+          queuedItems = [{ description: feeType || queuedItems[0].description, amount: baseSubtotal }];
+        }
+      }
 
       const payTaxConfig = getDocTaxConfigFromDOM("pay", baseSubtotal);
       const paySummary = computeTaxSummary(baseSubtotal, payTaxConfig);
@@ -4258,7 +4581,9 @@
         amount: paySummary.netTotal,
         paymentMethod: payMethod,
         status: statusVal,
-        sourceDocNo: activeQueuedInvoiceDocNo || "",
+        sourceDocNo: queuedDocNo,
+        billingMonth: queuedMonth,
+        items: queuedItems,
         taxMeta: paySummary.hasAdjustments ? payTaxConfig : null
       };
 
@@ -4273,7 +4598,7 @@
           showExpToast(resJson.expAdded || 5, "บันทึกรับชำระเงิน");
           alert(`บันทึกรับเงินสำเร็จ! เลขที่ใบเสร็จ: ${resJson.docNo || '-'} (ยอดสุทธิ ฿${formatBaht(paySummary.netTotal)})`);
           document.getElementById("payment-form").reset();
-          activeQueuedInvoiceDocNo = "";
+          clearQueuedInvoiceSelection(false);
           resetDocTaxForm("pay");
           const hintEl = document.getElementById("pay-tenant-tax-hint");
           if (hintEl) hintEl.style.display = "none";
@@ -4304,7 +4629,12 @@
 
     function escapeJsSingleQuote(val) {
       if (val === null || val === undefined) return "";
-      return String(val).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+      return String(val)
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'")
+        .replace(/"/g, "&quot;")
+        .replace(/\r/g, "")
+        .replace(/\n/g, " | ");
     }
 
     function extractDriveFileIdClient(url) {
@@ -4582,11 +4912,45 @@
       }
     }
 
-    function filterTable() {
-      const query = document.getElementById("global-search").value.toLowerCase();
-      renderTable(cachedPayments.filter(item => {
-        return String(item["Unit Number"] || "").toLowerCase().includes(query) || String(item["Resident Name"] || "").toLowerCase().includes(query);
+    function filterPaymentsList() {
+      const pEl = document.getElementById("payments-search-input");
+      const gEl = document.getElementById("global-search");
+      const rawQuery = (pEl && pEl.value.trim()) ? pEl.value.trim() : ((gEl && gEl.value.trim()) ? gEl.value.trim() : "");
+      if (!rawQuery) {
+        renderTable(cachedPayments);
+        return;
+      }
+      const q = rawQuery.toLowerCase();
+      const qUnit = cleanUnitKey(q);
+      renderTable((cachedPayments || []).filter(item => {
+        const unitRaw = String(item["Unit Number"] || item.unitNumber || "").toLowerCase();
+        const unitClean = cleanUnitKey(item["Unit Number"] || item.unitNumber || "");
+        const resName = String(item["Resident Name"] || "").toLowerCase();
+        const feeType = String(item["Fee Type"] || "").toLowerCase();
+        const docNo = String(item["DocNo"] || "").toLowerCase();
+        const payMethod = String(item["Payment Method"] || "").toLowerCase();
+        const amtStr = String(item["Amount"] || "");
+        const dateDisp = String(formatDisplayDate(item["Date"] || item["Timestamp"]) || "").toLowerCase();
+        if (
+          unitRaw.includes(q) ||
+          (qUnit && unitClean === qUnit) ||
+          resName.includes(q) ||
+          feeType.includes(q) ||
+          docNo.includes(q) ||
+          payMethod.includes(q) ||
+          amtStr.includes(q) ||
+          dateDisp.includes(q)
+        ) {
+          return true;
+        }
+        const subItems = resolveInvoiceOrPaymentItems(item);
+        return subItems.some(si => String(si.description || "").toLowerCase().includes(q));
       }));
+    }
+
+    function filterTable() {
+      filterPendingQueue();
+      filterPaymentsList();
     }
 
     function calculateMetrics(payments, expenses, pendingInvoices, allInvoices, procurement) {
@@ -4611,7 +4975,12 @@
 
       const queueCount = pendingInvoices ? pendingInvoices.length : 0;
       document.getElementById("total-pending-invoices").innerText = queueCount.toLocaleString();
-      document.getElementById("queue-badge").innerText = `${queueCount} รายการ`;
+      const qSearchEl = document.getElementById("queue-search-input");
+      const gSearchEl = document.getElementById("global-search");
+      const hasActiveQueueFilter = !!((qSearchEl && qSearchEl.value.trim()) || (gSearchEl && gSearchEl.value.trim()));
+      if (!hasActiveQueueFilter) {
+        document.getElementById("queue-badge").innerText = `${queueCount} รายการ`;
+      }
       if (document.getElementById("expense-badge")) {
         document.getElementById("expense-badge").innerText = `${expenses ? expenses.length : 0} รายการ`;
       }
@@ -6000,7 +6369,7 @@
         : [{ description: opts.defaultDesc || "ค่าบริการ", amount: Number(opts.subtotal || 0) }];
 
       itemsList.forEach((it, idx) => {
-        const suffixHtml = (idx === 0 && opts.payMethodNote) ? ` <span style="font-weight:normal;">(${escapeHtmlText(opts.payMethodNote)})</span>` : "";
+        const suffixHtml = (itemsList.length === 1 && idx === 0 && opts.payMethodNote) ? ` <span style="font-weight:normal;">(${escapeHtmlText(opts.payMethodNote)})</span>` : "";
         tbody.innerHTML += `
           <tr>
             <td style="text-align: center;">${idx + 1}</td>
@@ -6068,15 +6437,36 @@
         ? item["DocNo"]
         : ("REC-" + new Date().getFullYear() + String(new Date().getMonth() + 1).padStart(2, '0') + "-" + String(paymentIdx + 1).padStart(4, '0'));
       const savedTax = item.taxMeta || null;
-      const baseSubtotal = savedTax && savedTax.subtotal !== undefined
+      const resolvedItems = resolveInvoiceOrPaymentItems(item);
+      const linkedInv = findLinkedInvoiceRecord(item);
+      const itemsSum = resolvedItems.length > 0
+        ? roundCurrency(resolvedItems.reduce((s, it) => s + Number(it.amount || 0), 0))
+        : 0;
+      const baseSubtotal = (savedTax && savedTax.subtotal !== undefined)
         ? Number(savedTax.subtotal)
-        : Number(item["Amount"] || item["amount"] || 0);
+        : (itemsSum > 0 ? itemsSum : Number(item["Amount"] || item["amount"] || 0));
+
+      const rawMonth = item.billingMonth || (linkedInv ? linkedInv.billingMonth : "");
+      let periodLabel = "";
+      if (rawMonth && rawMonth !== "-") {
+        periodLabel = formatDisplayMonth(rawMonth);
+      } else if (resolvedItems.length > 1) {
+        const dObj = item["Date"] ? new Date(item["Date"]) : new Date();
+        if (!isNaN(dObj.getTime())) {
+          periodLabel = formatDisplayMonth(`${dObj.getFullYear()}-${String(dObj.getMonth() + 1).padStart(2, '0')}`);
+        } else {
+          periodLabel = "ค่าส่วนกลาง / บริการ";
+        }
+      } else {
+        periodLabel = feeType || "ค่าส่วนกลาง / บริการ";
+      }
 
       const resObj = (cachedResidents || []).find(r => cleanUnitKey(r.unitNumber) === cleanUnitKey(unit));
       const tenantBadge = (resObj && resObj.residentType === "Tenant")
         ? `<span style="color:#38bdf8; font-weight:bold;"> (ยูนิตผู้เช่า)</span>`
         : "";
 
+      const isMultiItem = resolvedItems.length > 1;
       activeTaxPrintContext = {
         targetKind: "RECEIPT",
         docMode: "RECEIPT",
@@ -6086,19 +6476,26 @@
         dateDisplay: formatDisplayDate(item["Date"] || new Date().toISOString()),
         unit: unit,
         residentName: residentName,
+        periodLabel: periodLabel,
         feeType: feeType,
         payMethod: payMethod,
-        items: null
+        items: resolvedItems.length > 0 ? resolvedItems : null
       };
+
+      const itemSummaryHtml = isMultiItem
+        ? `<strong>จำนวนรายการย่อย:</strong> ${resolvedItems.length} รายการ`
+        : `<strong>รายการ:</strong> ${escapeHtmlText(feeType)}`;
 
       document.getElementById("doc-tax-modal-title").innerText = `ตั้งค่าภาษี & พิมพ์ใบเสร็จรับเงิน (${docNo})`;
       document.getElementById("doc-tax-modal-info").innerHTML = `
         <div><strong style="color:var(--accent-gold);">เลขที่ใบเสร็จ:</strong> ${escapeHtmlText(docNo)} | <strong>ยูนิต:</strong> ${escapeHtmlText(unit)}${tenantBadge}</div>
-        <div><strong style="color:var(--accent-gold);">ลูกค้า:</strong> ${escapeHtmlText(residentName)} | <strong>รายการ:</strong> ${escapeHtmlText(feeType)}</div>
+        <div><strong style="color:var(--accent-gold);">ลูกค้า:</strong> ${escapeHtmlText(residentName)} | ${itemSummaryHtml}</div>
       `;
-      document.getElementById("modal-base-subtotal-label").innerText = "ยอดตั้งต้นก่อนภาษี (Subtotal - บาท)";
+      document.getElementById("modal-base-subtotal-label").innerText = isMultiItem
+        ? "ยอดรวมรายการก่อนภาษี (รวมจากรายการย่อยอัตโนมัติ)"
+        : "ยอดตั้งต้นก่อนภาษี (Subtotal - บาท)";
       const baseInput = document.getElementById("modal-base-subtotal");
-      baseInput.readOnly = false;
+      baseInput.readOnly = isMultiItem;
       baseInput.value = baseSubtotal;
 
       applyDocTaxConfigToDOM("modal", savedTax);
@@ -6182,7 +6579,7 @@
         dateDisplay: ctx.dateDisplay,
         unit: ctx.unit,
         residentName: ctx.residentName,
-        periodLabel: ctx.docMode === "RECEIPT" ? (ctx.feeType || "ค่าส่วนกลาง / บริการ") : (ctx.periodLabel || "-"),
+        periodLabel: ctx.periodLabel || (ctx.docMode === "RECEIPT" ? (ctx.feeType || "ค่าส่วนกลาง / บริการ") : "-"),
         items: printItems,
         subtotal: baseSubtotal,
         taxConfig: summary.hasAdjustments ? taxCfg : null,
@@ -6195,6 +6592,9 @@
         if (ctx.targetKind === "RECEIPT" && ctx.paymentIdx !== undefined && cachedPayments[ctx.paymentIdx]) {
           cachedPayments[ctx.paymentIdx].taxMeta = savedMeta;
           cachedPayments[ctx.paymentIdx]["Amount"] = summary.netTotal;
+          if (printItems && printItems.length > 1) {
+            cachedPayments[ctx.paymentIdx].items = printItems;
+          }
           renderTable(cachedPayments);
           calculateMetrics(cachedPayments, cachedExpenses, cachedPendingInvoices, cachedAllInvoices, cachedProcurement);
         } else if (ctx.targetKind === "INVOICE") {
@@ -6210,8 +6610,8 @@
             pendTarget.amount = summary.netTotal;
             pendTarget.items = printItems;
           }
-          renderSalesTrackingTable(cachedAllInvoices);
-          renderPendingInvoicesQueue(cachedPendingInvoices);
+          filterSalesTrackingTable();
+          filterPendingQueue();
         }
 
         fetch(API_URL, {
@@ -6298,7 +6698,7 @@
           totalAmount: invSummary.netTotal,
           amount: invSummary.netTotal,
           taxMeta: invSummary.hasAdjustments ? invTaxConfig : null,
-          feeType: items.length > 0 ? items[0].description : "ค่าบริการ",
+          feeType: summarizeInvoiceItemsForStorage(items, "ค่าบริการ"),
           operator: currentUser?.username || "Staff",
           operatorRole: currentUser?.role || "Staff"
         };
