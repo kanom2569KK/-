@@ -778,15 +778,49 @@
       font-weight: bold;
     }
 
+    /* 🖨️ ปุ่มพิมพ์รายงานสรุปขนาด A4 (เฉพาะ Admin เท่านั้น) */
+    .admin-print-a4-btn {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #b45309, #78350f);
+      border: 1.5px solid var(--accent-gold);
+      color: #fffbeb;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: bold;
+      line-height: 1.25;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+    }
+    .admin-print-a4-btn:hover {
+      background: linear-gradient(135deg, #d97706, #92400e);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(251, 191, 36, 0.35);
+    }
+    .admin-print-a4-btn svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
     /* ========================================================
-       🖨️ PRINT STYLESHEET: โหมดพิมพ์สำหรับ Invoices และ Vouchers
+       🖨️ PRINT STYLESHEET: โหมดพิมพ์สำหรับ Invoices, Vouchers & A4 Reports (Admin)
        ======================================================== */
-    #printable-invoice, #printable-voucher {
+    #printable-invoice, #printable-voucher, #printable-report {
       display: none;
     }
 
     @media print {
-      @page { size: A4 portrait; margin: 12mm 15mm; }
+      @page { size: A4 portrait; margin: 10mm 12mm; }
       html, body {
         width: 100% !important; height: auto !important; background: #ffffff !important;
         color: #000000 !important; margin: 0 !important; padding: 0 !important; overflow: visible !important;
@@ -796,6 +830,7 @@
       }
       body.print-mode-inv #printable-invoice { display: block !important; width: 100% !important; background: #ffffff !important; color: #111827 !important; font-size: 11.5pt; line-height: 1.45; }
       body.print-mode-voc #printable-voucher { display: block !important; width: 100% !important; background: #ffffff !important; color: #111827 !important; font-size: 11.5pt; line-height: 1.45; }
+      body.print-mode-rep #printable-report { display: block !important; width: 100% !important; background: #ffffff !important; color: #111827 !important; font-size: 9.5pt; line-height: 1.4; }
       
       .inv-header-table { width: 100%; border-bottom: 2.5px solid #1e3a8a; padding-bottom: 12px; margin-bottom: 16px; }
       .inv-logo-img { width: 80px; height: auto; object-fit: contain; }
@@ -815,8 +850,51 @@
       .inv-total-row { background-color: #f8fafc; font-weight: bold; font-size: 12pt; }
       .inv-signatures { width: 100%; margin-top: 26px; }
       .inv-sig-box { text-align: center; width: 75%; border-top: 1px dashed #64748b; padding-top: 8px; margin: 0 auto; font-size: 10pt; }
+
+      /* ตารางรายงานสรุปขนาด A4 (Admin Only) */
+      .rep-header-table { width: 100%; border-bottom: 2px solid #1e3a8a; padding-bottom: 8px; margin-bottom: 10px; }
+      .rep-logo-img { width: 64px; height: auto; object-fit: contain; }
+      .rep-company-name { font-size: 12.5pt; font-weight: bold; color: #0f172a; margin-bottom: 2px; }
+      .rep-company-sub { font-size: 8.5pt; color: #475569; line-height: 1.35; }
+      .rep-title-main { font-size: 15pt; font-weight: 800; color: #1e3a8a; text-align: right; line-height: 1.25; }
+      .rep-title-sub { font-size: 8.5pt; font-weight: bold; color: #64748b; text-align: right; letter-spacing: 0.5px; margin-top: 2px; }
+      .rep-meta-line { font-size: 8.5pt; color: #334155; text-align: right; margin-top: 4px; line-height: 1.35; }
+      .rep-filter-bar {
+        display: flex; justify-content: space-between; align-items: center; gap: 10px;
+        background: #f8fafc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+        border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; margin-bottom: 10px;
+        font-size: 8.8pt; color: #1e293b;
+      }
+      .rep-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 12px; font-size: 8.8pt; line-height: 1.38; }
+      .rep-table thead { display: table-header-group; }
+      .rep-table tfoot { display: table-row-group; }
+      .rep-table tr { break-inside: avoid; page-break-inside: avoid; }
+      .rep-table th, .rep-table td {
+        border: 1px solid #64748b; padding: 5px 6px; vertical-align: top;
+        word-wrap: break-word; overflow-wrap: anywhere; white-space: normal; color: #0f172a;
+      }
+      .rep-table th {
+        background-color: #e2e8f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+        font-weight: bold; color: #0f172a; font-size: 8.8pt; vertical-align: middle;
+      }
+      .rep-table tbody tr:nth-child(even) td {
+        background-color: #f8fafc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+      .rep-total-row td {
+        background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+        font-weight: bold; font-size: 9.5pt; border-top: 2px solid #1e3a8a; vertical-align: middle;
+      }
+      .rep-summary-cards { display: flex; gap: 8px; margin-bottom: 14px; break-inside: avoid; page-break-inside: avoid; }
+      .rep-summary-card {
+        flex: 1; border: 1px solid #94a3b8; border-radius: 6px; padding: 6px 10px;
+        background: #f8fafc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      }
+      .rep-summary-card .lbl { font-size: 8pt; color: #475569; }
+      .rep-summary-card .val { font-size: 10.5pt; font-weight: bold; color: #0f172a; margin-top: 1px; }
+      .rep-sig-table { width: 100%; margin-top: 24px; break-inside: avoid; page-break-inside: avoid; }
     }
   </style>
+  <style id="dynamic-a4-page-style"></style>
 </head>
 <body>
 
@@ -1021,6 +1099,72 @@
     </table>
   </div>
 
+  <!-- 🖨️ PRINT TEMPLATE 3: รายงานตารางสรุปขนาด A4 (เฉพาะ Admin เท่านั้น) -->
+  <div id="printable-report">
+    <table class="rep-header-table">
+      <tr>
+        <td style="width: 12%; vertical-align: middle;">
+          <img src="logomini.png" alt="Company Logo" class="rep-logo-img">
+        </td>
+        <td style="width: 48%; vertical-align: top; padding-left: 8px;">
+          <div class="rep-company-name">บริษัท อุดมสุขกบินทร์บุรี บ้านและที่ดิน จำกัด (สำนักงานใหญ่)</div>
+          <div class="rep-company-sub">
+            โครงการหมู่บ้านอุดมสุขเพลส (Udomsuk Place)<br>
+            899/55-56 หมู่ 9 ต.หนองกี่ อ.กบินทร์บุรี จ.ปราจีนบุรี 25110 | โทร. 065-685-9898 | เลขผู้เสียภาษี: <strong>0255552000178</strong>
+          </div>
+        </td>
+        <td style="width: 40%; vertical-align: top; text-align: right;">
+          <div class="rep-title-main" id="rep-doc-title">รายงานสรุปข้อมูล</div>
+          <div class="rep-title-sub" id="rep-doc-subtitle">MANAGEMENT SUMMARY REPORT (A4)</div>
+          <div class="rep-meta-line">
+            วันที่พิมพ์: <strong id="rep-print-datetime">-</strong><br>
+            ผู้สั่งพิมพ์ (Admin): <strong id="rep-printed-by">-</strong>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <div class="rep-filter-bar">
+      <div><strong>เงื่อนไขข้อมูล:</strong> <span id="rep-filter-info">ข้อมูลทั้งหมดในระบบ</span></div>
+      <div><strong>จำนวนรายการ:</strong> <span id="rep-row-count">0 รายการ</span></div>
+    </div>
+
+    <div id="rep-summary-box" class="rep-summary-cards"></div>
+
+    <table class="rep-table">
+      <colgroup id="rep-colgroup"></colgroup>
+      <thead id="rep-thead"></thead>
+      <tbody id="rep-tbody"></tbody>
+      <tfoot id="rep-tfoot"></tfoot>
+    </table>
+
+    <table class="rep-sig-table">
+      <tr>
+        <td style="width: 33%; text-align: center; vertical-align: top;">
+          <br><br>
+          <div class="inv-sig-box">
+            (<span id="rep-sig-admin">-</span>)<br>
+            <strong>ผู้จัดทำรายงาน (Admin)</strong>
+          </div>
+        </td>
+        <td style="width: 33%; text-align: center; vertical-align: top;">
+          <br><br>
+          <div class="inv-sig-box">
+            ( ..................................................... )<br>
+            <strong>ผู้ตรวจสอบ</strong>
+          </div>
+        </td>
+        <td style="width: 33%; text-align: center; vertical-align: top;">
+          <br><br>
+          <div class="inv-sig-box">
+            ( ..................................................... )<br>
+            <strong>ผู้อนุมัติ / ผู้บริหาร</strong>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
   <!-- 📜 POPUP: รายชื่อลูกบ้านแบบรายละเอียด -->
   <div id="customer-list-modal" class="modal-overlay">
     <div class="ro-window" style="max-width: 1020px; width: 95%;">
@@ -1028,9 +1172,13 @@
         <span>สารบบข้อมูลลูกบ้านทั้งหมด (Residents Directory)</span>
         <span class="ro-close" onclick="closeCustomerListModal()">✕</span>
       </div>
-      <div style="padding: 16px 20px 0 20px; display: flex; gap: 10px; align-items: center;">
+      <div style="padding: 16px 20px 0 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
         <input type="text" id="modal-resident-search" placeholder="พิมพ์ค้นหาเลขยูนิต, ชื่อ-นามสกุล, เลขโฉนด, เบอร์โทร หรือที่อยู่..." onkeyup="filterModalResidentList()" 
-               style="flex: 1; padding: 10px 14px; background: #231106; color: var(--text-main); border: 2px solid #140803; border-radius: 10px; outline: none; font-size: 13px;">
+               style="flex: 1; min-width: 240px; padding: 10px 14px; background: #231106; color: var(--text-main); border: 2px solid #140803; border-radius: 10px; outline: none; font-size: 13px;">
+        <button type="button" class="admin-print-a4-btn" style="padding: 9px 14px;" onclick="printAdminReportA4('residents')" title="พิมพ์รายงานสารบบลูกบ้านขนาด A4 (เฉพาะ Admin)">
+          <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <span>พิมพ์รายงาน A4</span>
+        </button>
         <button type="button" class="btn-action" style="background: linear-gradient(135deg, var(--accent-gold), #d97706); color: #2a1508; font-weight: bold; border: 2px solid #140803; padding: 10px 16px; border-radius: 10px; white-space: nowrap;" onclick="goToResidentRegistrationFromModal()">
           + ลงทะเบียนลูกบ้านใหม่
         </button>
@@ -1852,9 +2000,15 @@
                 <span>รายการแจ้งหนี้รอดำเนินการรับเงิน (Queue จากฝ่ายขาย/ธุรการ)</span>
                 <span id="queue-badge" class="badge pending">0 รายการ</span>
               </div>
-              <search class="table-search-wrap">
-                <input type="search" id="queue-search-input" class="table-search-input" placeholder="ค้นหายูนิต, ชื่อลูกบ้าน, รายการ, รอบบิล..." aria-label="ค้นหารายการแจ้งหนี้รอดำเนินการรับเงิน" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="filterPendingQueue()">
-              </search>
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <search class="table-search-wrap">
+                  <input type="search" id="queue-search-input" class="table-search-input" placeholder="ค้นหายูนิต, ชื่อลูกบ้าน, รายการ, รอบบิล..." aria-label="ค้นหารายการแจ้งหนี้รอดำเนินการรับเงิน" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="filterPendingQueue()">
+                </search>
+                <button type="button" class="admin-print-a4-btn" onclick="printAdminReportA4('pending_queue')" title="พิมพ์รายงานคิวค้างรับเงินขนาด A4 (เฉพาะ Admin)">
+                  <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                  <span>พิมพ์รายงาน A4</span>
+                </button>
+              </div>
             </div>
             <div class="table-container" style="max-height: 280px;">
               <table class="data-table">
@@ -1883,6 +2037,10 @@
                 <search class="table-search-wrap">
                   <input type="search" id="payments-search-input" class="table-search-input" style="width: 195px;" placeholder="ค้นหายูนิต, ชื่อ, เลขใบเสร็จ..." aria-label="ค้นหาประวัติการรับเงิน" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="filterPaymentsList()">
                 </search>
+                <button type="button" class="admin-print-a4-btn" onclick="printAdminReportA4('payments')" title="พิมพ์รายงานประวัติการรับเงินขนาด A4 (เฉพาะ Admin)">
+                  <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                  <span>พิมพ์รายงาน A4</span>
+                </button>
                 <button type="button" class="btn-action" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: bold;" onclick="openLedgerModal()">
                   สมุดบัญชีรายยูนิต (Ledger)
                 </button>
@@ -2087,7 +2245,7 @@
                 <span style="font-size: 16px; font-weight: bold;">ประวัติบันทึกรายจ่ายโครงการ (Expenses Record)</span>
                 <span id="expense-badge" class="badge overdue" style="font-size: 12px;">0 รายการ</span>
               </div>
-              <div style="display: flex; gap: 10px; align-items: center;">
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                 <select id="exp-filter-cat" onchange="filterExpensesList()" style="width: auto; padding: 6px 12px; font-size: 12px; background: #1a0808; border: 1px solid #b91c1c; color: #fca5a5; border-radius: 6px;">
                   <option value="">ทุกหมวดหมู่รายจ่าย</option>
                   <option value="ค่าซ่อมบำรุงส่วนกลาง">ค่าซ่อมบำรุงส่วนกลาง</option>
@@ -2098,6 +2256,10 @@
                   <option value="รายจ่ายอื่นๆ">รายจ่ายอื่นๆ</option>
                 </select>
                 <input type="text" id="exp-search-input" placeholder="ค้นหารายละเอียด..." oninput="filterExpensesList()" style="width: 160px; padding: 6px 10px; font-size: 12px; background: #1a0808; border: 1px solid #b91c1c; color: #fef3c7; border-radius: 6px;">
+                <button type="button" class="admin-print-a4-btn" onclick="printAdminReportA4('expenses')" title="พิมพ์รายงานสรุปรายจ่ายโครงการขนาด A4 (เฉพาะ Admin)">
+                  <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                  <span>พิมพ์รายงาน A4</span>
+                </button>
               </div>
             </div>
             <div class="table-container" style="max-height: 520px;">
@@ -2314,15 +2476,21 @@
         <div class="card" style="padding: 0; overflow: hidden;">
           <div class="card-title" style="padding: 14px 20px; border-bottom: 1px solid #381808; margin-bottom: 0;">
             <span>ตารางติดตามสถานะบิลทั้งหมด (Sales Tracking List)</span>
-            <search class="table-search-wrap">
-              <select id="sales-filter-status" onchange="filterSalesTrackingTable()" style="width: auto; padding: 6px 10px; font-size: 12px; background: #1a0c04; border: 1.5px solid #9a3412; color: var(--text-main); border-radius: 8px;">
-                <option value="">ทุกสถานะ</option>
-                <option value="Pending">รอดำเนินการ</option>
-                <option value="Settled">ชำระแล้ว</option>
-                <option value="Quotation">ใบเสนอราคา</option>
-              </select>
-              <input type="search" id="sales-search-input" class="table-search-input" placeholder="ค้นหาเลขเอกสาร, ยูนิต, ชื่อ, รายการ..." aria-label="ค้นหาตารางติดตามสถานะบิลทั้งหมด" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="filterSalesTrackingTable()">
-            </search>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <search class="table-search-wrap">
+                <select id="sales-filter-status" onchange="filterSalesTrackingTable()" style="width: auto; padding: 6px 10px; font-size: 12px; background: #1a0c04; border: 1.5px solid #9a3412; color: var(--text-main); border-radius: 8px;">
+                  <option value="">ทุกสถานะ</option>
+                  <option value="Pending">รอดำเนินการ</option>
+                  <option value="Settled">ชำระแล้ว</option>
+                  <option value="Quotation">ใบเสนอราคา</option>
+                </select>
+                <input type="search" id="sales-search-input" class="table-search-input" placeholder="ค้นหาเลขเอกสาร, ยูนิต, ชื่อ, รายการ..." aria-label="ค้นหาตารางติดตามสถานะบิลทั้งหมด" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="filterSalesTrackingTable()">
+              </search>
+              <button type="button" class="admin-print-a4-btn" onclick="printAdminReportA4('invoices')" title="พิมพ์รายงานติดตามสถานะบิลทั้งหมดขนาด A4 (เฉพาะ Admin)">
+                <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                <span>พิมพ์รายงาน A4</span>
+              </button>
+            </div>
           </div>
           <div class="table-container" style="max-height: 600px;">
             <table class="data-table">
@@ -2457,8 +2625,12 @@
         </div>
 
         <div class="card" style="padding: 0; overflow: hidden;">
-          <div class="card-title" style="padding: 16px 20px 0; border: none; margin-bottom: 0;">
+          <div class="card-title" style="padding: 14px 20px; border-bottom: 1px solid #381808; margin-bottom: 0;">
             <span>รายการสต็อกพัสดุทั้งหมด (Inventory List)</span>
+            <button type="button" class="admin-print-a4-btn" onclick="printAdminReportA4('procurement')" title="พิมพ์รายงานสต็อกพัสดุขนาด A4 (เฉพาะ Admin)">
+              <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              <span>พิมพ์รายงาน A4</span>
+            </button>
           </div>
           <div class="table-container" style="max-height: 520px;">
             <table class="data-table">
@@ -2485,6 +2657,54 @@
     <!-- Tab 5: Admin Hub -->
     <div id="tab-admin-hub" class="tab-content">
       <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+
+        <div class="card" style="border-color: var(--accent-gold); background: linear-gradient(145deg, #3d1b0a, #231106);">
+          <div class="card-title" style="color: var(--accent-gold);">
+            <span>ศูนย์พิมพ์รายงานสรุปขนาด A4 & จัดหน้าตาราง Google Sheets</span>
+            <span class="badge pending">Admin Only</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.55; margin-bottom: 14px;">
+            พิมพ์รายงานตารางข้อมูลลงกระดาษ <strong>A4</strong> พร้อมหัวกระดาษบริษัท ตัดคำอัตโนมัติ สรุปยอดรวมท้ายตาราง และสั่งจัดรูปแบบชีตหลังบ้าน (Google Sheets) ให้พอดีกระดาษ A4 ในคลิกเดียว
+          </p>
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label for="admin-a4-orientation">แนวกระดาษสำหรับการพิมพ์รายงาน A4</label>
+            <select id="admin-a4-orientation">
+              <option value="portrait">A4 แนวตั้ง (Portrait - แนะนำสำหรับรายงานมาตรฐาน)</option>
+              <option value="landscape">A4 แนวนอน (Landscape - สำหรับตารางที่ต้องการพื้นที่กว้างพิเศษ)</option>
+            </select>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 16px;">
+            <button type="button" class="admin-print-a4-btn" style="justify-content: center; padding: 10px 12px;" onclick="printAdminReportA4('expenses')">
+              <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              <span>พิมพ์รายงานรายจ่ายโครงการ (A4)</span>
+            </button>
+            <button type="button" class="admin-print-a4-btn" style="justify-content: center; padding: 10px 12px;" onclick="printAdminReportA4('payments')">
+              <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              <span>พิมพ์รายงานประวัติรับเงิน (A4)</span>
+            </button>
+            <button type="button" class="admin-print-a4-btn" style="justify-content: center; padding: 10px 12px;" onclick="printAdminReportA4('pending_queue')">
+              <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              <span>พิมพ์รายงานคิวค้างชำระ (A4)</span>
+            </button>
+            <button type="button" class="admin-print-a4-btn" style="justify-content: center; padding: 10px 12px;" onclick="printAdminReportA4('invoices')">
+              <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              <span>พิมพ์รายงานสถานะบิลทั้งหมด (A4)</span>
+            </button>
+            <button type="button" class="admin-print-a4-btn" style="justify-content: center; padding: 10px 12px;" onclick="printAdminReportA4('residents')">
+              <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              <span>พิมพ์รายงานสารบบลูกบ้าน (A4)</span>
+            </button>
+            <button type="button" class="admin-print-a4-btn" style="justify-content: center; padding: 10px 12px;" onclick="printAdminReportA4('procurement')">
+              <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+              <span>พิมพ์รายงานสต็อกคลังพัสดุ (A4)</span>
+            </button>
+          </div>
+          <div style="padding-top: 12px; border-top: 1px dashed #6b3414;">
+            <button type="button" class="btn-primary" id="btn-format-sheets-a4" style="background: linear-gradient(135deg, #059669, #047857);" onclick="handleFormatBackendSheetsA4()">
+              จัดหน้าตาราง Google Sheets หลังบ้านทุกชีตให้รองรับการพิมพ์ A4 อัตโนมัติ
+            </button>
+          </div>
+        </div>
         
         <div class="card" style="border-color: var(--accent-gold);">
           <div class="card-title" style="color: var(--accent-gold);">
@@ -2900,6 +3120,10 @@
       document.getElementById("prof-exp-bar").style.width = `${stats.progressPercent}%`;
     }
 
+    function isAdminUser() {
+      return !!(currentUser && String(currentUser.role || "").trim().toLowerCase() === "admin");
+    }
+
     function isDocUserOrRole(role, username) {
       const r = String(role || "").trim().toLowerCase();
       const u = String(username || "").trim().toLowerCase();
@@ -2910,8 +3134,14 @@
       document.querySelectorAll('.nav-item').forEach(el => el.style.display = 'none');
       const r = String(role || "").trim();
       const rLower = r.toLowerCase();
+      const isStrictAdmin = (rLower === 'admin');
       const isDoc = isDocUserOrRole(role, username || currentUser?.username || "");
       let defaultTab = 'financial';
+
+      // ปุ่มพิมพ์รายงานขนาด A4 แสดงเฉพาะ Admin เท่านั้น
+      document.querySelectorAll('.admin-print-a4-btn').forEach(btn => {
+        btn.style.display = isStrictAdmin ? 'inline-flex' : 'none';
+      });
 
       if (r === 'Admin' || rLower === 'admin') {
         document.getElementById('menu-financial').style.display = 'block';
@@ -6754,6 +6984,523 @@
       } finally {
         btn.disabled = false;
         switchDocTypeForm(docType);
+      }
+    }
+
+    /* ========================================================
+       🖨️ ระบบพิมพ์รายงานสรุปขนาด A4 & จัดหน้า Google Sheets (เฉพาะ Admin เท่านั้น)
+       ======================================================== */
+    function formatPrintReportLineItemsHtml(record, fallbackText = "-") {
+      const items = resolveInvoiceOrPaymentItems(record);
+      if (items.length > 1) {
+        return items.map((it, idx) =>
+          `<div><strong>${idx + 1}.</strong> ${escapeHtml(it.description || "-")} <span style="color:#334155;">(฿${formatBaht(it.amount)})</span></div>`
+        ).join("");
+      }
+      if (items.length === 1 && items[0].description) {
+        return escapeHtml(items[0].description);
+      }
+      const raw = String(fallbackText || "-").trim();
+      if (raw.indexOf(" | ") !== -1) {
+        return raw.split(" | ").map(part => `<div>${escapeHtml(part)}</div>`).join("");
+      }
+      return escapeHtml(raw);
+    }
+
+    function printAdminReportA4(reportType) {
+      if (!isAdminUser()) {
+        alert("ฟังก์ชันพิมพ์รายงานสรุปขนาด A4 สงวนสิทธิ์เฉพาะผู้ดูแลระบบ (Admin) เท่านั้น");
+        return;
+      }
+
+      const now = new Date();
+      const dd = String(now.getDate()).padStart(2, "0");
+      const mm = String(now.getMonth() + 1).padStart(2, "0");
+      const yyyy = now.getFullYear() + 543;
+      const hh = String(now.getHours()).padStart(2, "0");
+      const mi = String(now.getMinutes()).padStart(2, "0");
+      const printDateTimeStr = `${dd}/${mm}/${yyyy} ${hh}:${mi} น.`;
+      const adminName = currentUser?.fullName || currentUser?.username || "ผู้ดูแลระบบ (Admin)";
+
+      let docTitle = "รายงานสรุปข้อมูลโครงการ";
+      let docSubtitle = "MANAGEMENT SUMMARY REPORT (A4)";
+      let filterLabel = "ข้อมูลทั้งหมดในระบบ";
+      let columns = [];
+      let rowsHtml = "";
+      let tfootHtml = "";
+      let summaryCards = [];
+      let totalCount = 0;
+
+      if (reportType === "expenses") {
+        docTitle = "รายงานสรุปรายจ่ายโครงการ";
+        docSubtitle = "PROJECT EXPENSES SUMMARY REPORT (A4)";
+        const catFilter = document.getElementById("exp-filter-cat")?.value || "";
+        const searchTxt = (document.getElementById("exp-search-input")?.value || "").trim();
+        const searchLower = searchTxt.toLowerCase();
+
+        let list = (cachedExpenses || []).slice();
+        const filterParts = [];
+        if (catFilter) {
+          list = list.filter(it => String(it.Category || "") === catFilter);
+          filterParts.push(`หมวดหมู่: ${catFilter}`);
+        }
+        if (searchLower) {
+          list = list.filter(it => {
+            const d = String(it.Description || "").toLowerCase();
+            const c = String(it.Category || "").toLowerCase();
+            const op = String(it.Operator || "").toLowerCase();
+            const m = String(it["Payment Method"] || "").toLowerCase();
+            return d.includes(searchLower) || c.includes(searchLower) || op.includes(searchLower) || m.includes(searchLower);
+          });
+          filterParts.push(`คำค้นหา: "${searchTxt}"`);
+        }
+        if (filterParts.length > 0) filterLabel = filterParts.join(" | ");
+
+        columns = [
+          { label: "ลำดับ", width: "5%", align: "center" },
+          { label: "วันที่", width: "11%", align: "center" },
+          { label: "หมวดหมู่", width: "15%", align: "left" },
+          { label: "รายละเอียดรายจ่าย", width: "42%", align: "left" },
+          { label: "ช่องทาง", width: "11%", align: "center" },
+          { label: "ผู้บันทึก", width: "6%", align: "center" },
+          { label: "จำนวนเงิน (บาท)", width: "10%", align: "right" }
+        ];
+
+        totalCount = list.length;
+        let sumAll = 0;
+        let sumCash = 0;
+        let sumTransfer = 0;
+
+        if (list.length === 0) {
+          rowsHtml = `<tr><td colspan="7" style="text-align:center; padding:16px;">ไม่มีข้อมูลรายการรายจ่ายตามเงื่อนไขที่เลือก</td></tr>`;
+        } else {
+          rowsHtml = list.map((item, idx) => {
+            const amt = Number(item.Amount || 0);
+            const method = String(item["Payment Method"] || "-");
+            sumAll += amt;
+            if (method.includes("เงินสด")) sumCash += amt;
+            else sumTransfer += amt;
+            return `<tr>
+              <td style="text-align:center;">${idx + 1}</td>
+              <td style="text-align:center;">${escapeHtml(formatDisplayDate(item.Date))}</td>
+              <td>${escapeHtml(item.Category || "-")}</td>
+              <td>${escapeHtml(item.Description || "-")}</td>
+              <td style="text-align:center;">${escapeHtml(method)}</td>
+              <td style="text-align:center;">${escapeHtml(item.Operator || "-")}</td>
+              <td style="text-align:right; font-weight:600;">฿${formatBaht(amt)}</td>
+            </tr>`;
+          }).join("");
+        }
+
+        tfootHtml = `<tr class="rep-total-row">
+          <td colspan="6" style="text-align:right;">รวมยอดรายจ่ายสุทธิทั้งสิ้น (${totalCount.toLocaleString()} รายการ):</td>
+          <td style="text-align:right; color:#b91c1c;">฿${formatBaht(sumAll)}</td>
+        </tr>`;
+
+        summaryCards = [
+          { lbl: "จำนวนรายการจ่าย", val: `${totalCount.toLocaleString()} รายการ` },
+          { lbl: "รวมจ่ายด้วยเงินสด", val: `฿${formatBaht(sumCash)}` },
+          { lbl: "รวมโอนเงิน / เช็คธนาคาร", val: `฿${formatBaht(sumTransfer)}` },
+          { lbl: "รวมรายจ่ายสุทธิทั้งสิ้น", val: `฿${formatBaht(sumAll)}` }
+        ];
+      } else if (reportType === "payments") {
+        docTitle = "รายงานสรุปประวัติการรับชำระเงิน";
+        docSubtitle = "PAYMENT COLLECTION REPORT (A4)";
+        const pInput = (document.getElementById("payments-search-input")?.value || "").trim();
+        const gInput = (document.getElementById("global-search")?.value || "").trim();
+        const rawQ = pInput || gInput;
+        const q = rawQ.toLowerCase();
+        const qUnit = cleanUnitKey(q);
+
+        let list = (cachedPayments || []).slice();
+        if (q) {
+          list = list.filter(item => {
+            const unitRaw = String(item["Unit Number"] || item.unitNumber || "").toLowerCase();
+            const unitClean = cleanUnitKey(unitRaw);
+            const resName = String(item["Resident Name"] || "").toLowerCase();
+            const feeType = String(item["Fee Type"] || "").toLowerCase();
+            const docNo = String(item["DocNo"] || "").toLowerCase();
+            const payMethod = String(item["Payment Method"] || "").toLowerCase();
+            const amtStr = String(item["Amount"] || "");
+            const dateDisp = String(formatDisplayDate(item["Date"]) || "").toLowerCase();
+            if (unitRaw.includes(q) || (qUnit && unitClean === qUnit) || resName.includes(q) || feeType.includes(q) || docNo.includes(q) || payMethod.includes(q) || amtStr.includes(q) || dateDisp.includes(q)) {
+              return true;
+            }
+            const subItems = resolveInvoiceOrPaymentItems(item);
+            return subItems.some(si => String(si.description || "").toLowerCase().includes(q));
+          });
+          filterLabel = `คำค้นหา: "${rawQ}"`;
+        }
+
+        columns = [
+          { label: "ลำดับ", width: "5%", align: "center" },
+          { label: "วันที่", width: "10%", align: "center" },
+          { label: "เลขที่ใบเสร็จ", width: "13%", align: "center" },
+          { label: "ยูนิต", width: "9%", align: "center" },
+          { label: "ชื่อผู้ชำระ", width: "17%", align: "left" },
+          { label: "รายการรับชำระ", width: "26%", align: "left" },
+          { label: "ช่องทาง", width: "10%", align: "center" },
+          { label: "ยอดรับสุทธิ", width: "10%", align: "right" }
+        ];
+
+        totalCount = list.length;
+        let sumPaid = 0;
+        let paidCount = 0;
+        let pendingCount = 0;
+
+        if (list.length === 0) {
+          rowsHtml = `<tr><td colspan="8" style="text-align:center; padding:16px;">ไม่มีข้อมูลประวัติการรับชำระเงิน</td></tr>`;
+        } else {
+          rowsHtml = list.map((item, idx) => {
+            const amt = Number(item["Amount"] || item.amount || 0);
+            const st = String(item["Status"] || "Paid");
+            if (st.toLowerCase() === "paid") {
+              sumPaid += amt;
+              paidCount++;
+            } else {
+              pendingCount++;
+            }
+            return `<tr>
+              <td style="text-align:center;">${idx + 1}</td>
+              <td style="text-align:center;">${escapeHtml(formatDisplayDate(item["Date"] || item["Timestamp"]))}</td>
+              <td style="text-align:center; font-weight:600;">${escapeHtml(item["DocNo"] || "-")}</td>
+              <td style="text-align:center; font-weight:600;">${escapeHtml(item["Unit Number"] || item.unitNumber || "-")}</td>
+              <td>${escapeHtml(item["Resident Name"] || "-")}</td>
+              <td>${formatPrintReportLineItemsHtml(item, item["Fee Type"] || "ค่าส่วนกลาง")}</td>
+              <td style="text-align:center;">${escapeHtml(item["Payment Method"] || "-")}</td>
+              <td style="text-align:right; font-weight:600;">฿${formatBaht(amt)}</td>
+            </tr>`;
+          }).join("");
+        }
+
+        tfootHtml = `<tr class="rep-total-row">
+          <td colspan="7" style="text-align:right;">รวมยอดรับชำระแล้วสุทธิ (${paidCount.toLocaleString()} รายการ):</td>
+          <td style="text-align:right; color:#047857;">฿${formatBaht(sumPaid)}</td>
+        </tr>`;
+
+        summaryCards = [
+          { lbl: "รายการทั้งหมด", val: `${totalCount.toLocaleString()} รายการ` },
+          { lbl: "ชำระแล้ว (Paid)", val: `${paidCount.toLocaleString()} รายการ` },
+          { lbl: "รอตรวจสอบ", val: `${pendingCount.toLocaleString()} รายการ` },
+          { lbl: "ยอดรับชำระรวมสุทธิ", val: `฿${formatBaht(sumPaid)}` }
+        ];
+      } else if (reportType === "pending_queue") {
+        docTitle = "รายงานรายการแจ้งหนี้ค้างรับชำระเงิน";
+        docSubtitle = "PENDING INVOICE QUEUE REPORT (A4)";
+        const qInput = (document.getElementById("queue-search-input")?.value || "").trim();
+        const gInput = (document.getElementById("global-search")?.value || "").trim();
+        const query = qInput || gInput;
+
+        let list = (cachedPendingInvoices || []).slice();
+        if (query) {
+          list = list.filter(inv => matchesInvoiceSearch(inv, query));
+          filterLabel = `คำค้นหา: "${query}"`;
+        }
+
+        columns = [
+          { label: "ลำดับ", width: "5%", align: "center" },
+          { label: "เลขที่เอกสาร", width: "13%", align: "center" },
+          { label: "วันที่ออก", width: "10%", align: "center" },
+          { label: "ยูนิต", width: "9%", align: "center" },
+          { label: "ชื่อลูกบ้าน", width: "17%", align: "left" },
+          { label: "รายการแจ้งหนี้", width: "27%", align: "left" },
+          { label: "รอบบิล", width: "9%", align: "center" },
+          { label: "ยอดค้างชำระ", width: "10%", align: "right" }
+        ];
+
+        totalCount = list.length;
+        let sumDue = 0;
+        const uniqueUnits = new Set();
+
+        if (list.length === 0) {
+          rowsHtml = `<tr><td colspan="8" style="text-align:center; padding:16px;">ไม่มีรายการบิลค้างรับชำระในคิว</td></tr>`;
+        } else {
+          rowsHtml = list.map((item, idx) => {
+            const amt = Number(item.amount || 0);
+            sumDue += amt;
+            if (item.unitNumber) uniqueUnits.add(cleanUnitKey(item.unitNumber));
+            return `<tr>
+              <td style="text-align:center;">${idx + 1}</td>
+              <td style="text-align:center; font-weight:600;">${escapeHtml(item.docNo || "-")}</td>
+              <td style="text-align:center;">${escapeHtml(formatDisplayDate(item.date || item.timestamp))}</td>
+              <td style="text-align:center; font-weight:600;">${escapeHtml(item.unitNumber || "-")}</td>
+              <td>${escapeHtml(item.residentName || "-")}</td>
+              <td>${formatPrintReportLineItemsHtml(item, item.feeType)}</td>
+              <td style="text-align:center;">${escapeHtml(formatDisplayMonth(item.billingMonth))}</td>
+              <td style="text-align:right; font-weight:600;">฿${formatBaht(amt)}</td>
+            </tr>`;
+          }).join("");
+        }
+
+        tfootHtml = `<tr class="rep-total-row">
+          <td colspan="7" style="text-align:right;">รวมยอดค้างชำระทั้งสิ้น (${totalCount.toLocaleString()} รายการ):</td>
+          <td style="text-align:right; color:#b45309;">฿${formatBaht(sumDue)}</td>
+        </tr>`;
+
+        summaryCards = [
+          { lbl: "บิลค้างรับทั้งหมด", val: `${totalCount.toLocaleString()} ใบ` },
+          { lbl: "จำนวนยูนิตที่ค้างชำระ", val: `${uniqueUnits.size.toLocaleString()} ยูนิต` },
+          { lbl: "ยอดหนี้ค้างรับรวม", val: `฿${formatBaht(sumDue)}` }
+        ];
+      } else if (reportType === "invoices") {
+        docTitle = "รายงานติดตามสถานะใบแจ้งหนี้และใบเสนอราคา";
+        docSubtitle = "INVOICE & QUOTATION TRACKING REPORT (A4)";
+        const query = (document.getElementById("sales-search-input")?.value || "").trim();
+        const statusFilter = document.getElementById("sales-filter-status")?.value || "";
+
+        const filterParts = [];
+        if (statusFilter) filterParts.push(`สถานะ: ${statusFilter}`);
+        if (query) filterParts.push(`คำค้นหา: "${query}"`);
+        if (filterParts.length > 0) filterLabel = filterParts.join(" | ");
+
+        const list = (cachedAllInvoices || []).filter(inv => {
+          if (inv.status === "Cancelled") return false;
+          if (statusFilter) {
+            if (statusFilter === "Settled" && inv.status !== "Settled" && inv.status !== "Paid") return false;
+            if (statusFilter !== "Settled" && inv.status !== statusFilter) return false;
+          }
+          return matchesInvoiceSearch(inv, query);
+        });
+
+        columns = [
+          { label: "ลำดับ", width: "5%", align: "center" },
+          { label: "เลขที่เอกสาร", width: "13%", align: "center" },
+          { label: "วันที่ออก", width: "10%", align: "center" },
+          { label: "ยูนิต", width: "8%", align: "center" },
+          { label: "ชื่อลูกค้า", width: "16%", align: "left" },
+          { label: "รายการ", width: "28%", align: "left" },
+          { label: "สถานะ", width: "10%", align: "center" },
+          { label: "จำนวนเงิน", width: "10%", align: "right" }
+        ];
+
+        totalCount = list.length;
+        let sumAll = 0;
+        let sumSettled = 0;
+        let sumPending = 0;
+
+        if (list.length === 0) {
+          rowsHtml = `<tr><td colspan="8" style="text-align:center; padding:16px;">ไม่มีข้อมูลเอกสารตามเงื่อนไขที่เลือก</td></tr>`;
+        } else {
+          rowsHtml = list.map((item, idx) => {
+            const amt = Number(item.amount || 0);
+            sumAll += amt;
+            let stText = "รอดำเนินการ";
+            if (item.status === "Settled" || item.status === "Paid") {
+              stText = "ชำระแล้ว";
+              sumSettled += amt;
+            } else if (item.status === "Quotation") {
+              stText = "ใบเสนอราคา";
+            } else {
+              sumPending += amt;
+            }
+            return `<tr>
+              <td style="text-align:center;">${idx + 1}</td>
+              <td style="text-align:center; font-weight:600;">${escapeHtml(item.docNo || "-")}</td>
+              <td style="text-align:center;">${escapeHtml(formatDisplayDate(item.date || item.timestamp))}</td>
+              <td style="text-align:center; font-weight:600;">${escapeHtml(item.unitNumber || "-")}</td>
+              <td>${escapeHtml(item.residentName || "-")}</td>
+              <td>${formatPrintReportLineItemsHtml(item, item.feeType)}</td>
+              <td style="text-align:center;">${stText}</td>
+              <td style="text-align:right; font-weight:600;">฿${formatBaht(amt)}</td>
+            </tr>`;
+          }).join("");
+        }
+
+        tfootHtml = `<tr class="rep-total-row">
+          <td colspan="7" style="text-align:right;">รวมยอดเอกสารทั้งสิ้น (${totalCount.toLocaleString()} รายการ):</td>
+          <td style="text-align:right; color:#1e3a8a;">฿${formatBaht(sumAll)}</td>
+        </tr>`;
+
+        summaryCards = [
+          { lbl: "จำนวนเอกสารทั้งหมด", val: `${totalCount.toLocaleString()} ฉบับ` },
+          { lbl: "ยอดชำระแล้ว (Settled)", val: `฿${formatBaht(sumSettled)}` },
+          { lbl: "ยอดค้างชำระ (Pending)", val: `฿${formatBaht(sumPending)}` },
+          { lbl: "ยอดรวมสุทธิทั้งหมด", val: `฿${formatBaht(sumAll)}` }
+        ];
+      } else if (reportType === "residents") {
+        docTitle = "รายงานสารบบทะเบียนลูกบ้านโครงการ";
+        docSubtitle = "RESIDENTS DIRECTORY REPORT (A4)";
+        const q = (document.getElementById("modal-resident-search")?.value || "").trim();
+        const qLower = q.toLowerCase();
+
+        let list = (cachedResidents || []).slice();
+        if (qLower) {
+          list = list.filter(r =>
+            String(r.unitNumber || "").toLowerCase().includes(qLower) ||
+            String(r.residentName || "").toLowerCase().includes(qLower) ||
+            String(r.titleDeedNo || "").toLowerCase().includes(qLower) ||
+            String(r.phone || "").toLowerCase().includes(qLower) ||
+            String(r.idCardAddress || "").toLowerCase().includes(qLower) ||
+            String(r.currentAddress || "").toLowerCase().includes(qLower)
+          );
+          filterLabel = `คำค้นหา: "${q}"`;
+        }
+
+        columns = [
+          { label: "ลำดับ", width: "5%", align: "center" },
+          { label: "ยูนิต", width: "9%", align: "center" },
+          { label: "ชื่อผู้พักอาศัย", width: "19%", align: "left" },
+          { label: "ประเภท", width: "9%", align: "center" },
+          { label: "เลขโฉนด", width: "13%", align: "center" },
+          { label: "เบอร์โทรศัพท์", width: "12%", align: "center" },
+          { label: "ที่อยู่จัดส่งเอกสาร / ปัจจุบัน", width: "33%", align: "left" }
+        ];
+
+        totalCount = list.length;
+        let ownerCnt = 0;
+        let tenantCnt = 0;
+
+        if (list.length === 0) {
+          rowsHtml = `<tr><td colspan="7" style="text-align:center; padding:16px;">ไม่มีข้อมูลลูกบ้านในระบบ</td></tr>`;
+        } else {
+          rowsHtml = list.map((r, idx) => {
+            const isTenant = r.residentType === "Tenant";
+            if (isTenant) tenantCnt++; else ownerCnt++;
+            return `<tr>
+              <td style="text-align:center;">${idx + 1}</td>
+              <td style="text-align:center; font-weight:600;">${escapeHtml(String(r.unitNumber || "-").toUpperCase())}</td>
+              <td>${escapeHtml(r.residentName || "-")}</td>
+              <td style="text-align:center;">${isTenant ? "ผู้เช่า" : "เจ้าของ"}</td>
+              <td style="text-align:center;">${escapeHtml(r.titleDeedNo || "-")}</td>
+              <td style="text-align:center;">${escapeHtml(r.phone || "-")}</td>
+              <td>${escapeHtml(r.currentAddress || r.idCardAddress || "-")}</td>
+            </tr>`;
+          }).join("");
+        }
+
+        tfootHtml = `<tr class="rep-total-row">
+          <td colspan="6" style="text-align:right;">รวมจำนวนยูนิตในรายงานทั้งสิ้น:</td>
+          <td style="text-align:right; color:#1e3a8a;">${totalCount.toLocaleString()} ยูนิต</td>
+        </tr>`;
+
+        summaryCards = [
+          { lbl: "ยูนิตทั้งหมดในรายงาน", val: `${totalCount.toLocaleString()} ยูนิต` },
+          { lbl: "เจ้าของกรรมสิทธิ์ (Owner)", val: `${ownerCnt.toLocaleString()} ยูนิต` },
+          { lbl: "ผู้เช่าพักอาศัย (Tenant)", val: `${tenantCnt.toLocaleString()} ยูนิต` }
+        ];
+      } else if (reportType === "procurement") {
+        docTitle = "รายงานสรุปสต็อกคลังพัสดุโครงการ";
+        docSubtitle = "PROCUREMENT & INVENTORY STOCK REPORT (A4)";
+        const list = (cachedProcurement || []).slice();
+
+        columns = [
+          { label: "ลำดับ", width: "5%", align: "center" },
+          { label: "รหัสพัสดุ", width: "11%", align: "center" },
+          { label: "ชื่อพัสดุ / รายการ", width: "26%", align: "left" },
+          { label: "หมวดหมู่", width: "16%", align: "left" },
+          { label: "คงเหลือ", width: "11%", align: "center" },
+          { label: "ราคา/หน่วย", width: "10%", align: "right" },
+          { label: "มูลค่ารวม", width: "11%", align: "right" },
+          { label: "สถานะ", width: "10%", align: "center" }
+        ];
+
+        totalCount = list.length;
+        let totalStockVal = 0;
+        let lowStockCnt = 0;
+
+        if (list.length === 0) {
+          rowsHtml = `<tr><td colspan="8" style="text-align:center; padding:16px;">ไม่มีรายการพัสดุในคลัง</td></tr>`;
+        } else {
+          rowsHtml = list.map((it, idx) => {
+            const qty = Number(it.quantity || 0);
+            const minAlert = Number(it.minAlert || 5);
+            const price = Number(it.unitPrice || 0);
+            const lineVal = roundCurrency(qty * price);
+            totalStockVal += lineVal;
+            const isLow = qty <= minAlert;
+            if (isLow) lowStockCnt++;
+            return `<tr>
+              <td style="text-align:center;">${idx + 1}</td>
+              <td style="text-align:center; font-weight:600;">${escapeHtml(it.itemCode || "-")}</td>
+              <td>${escapeHtml(it.itemName || "-")}</td>
+              <td>${escapeHtml(it.category || "-")}</td>
+              <td style="text-align:center; font-weight:600;">${qty.toLocaleString()} ${escapeHtml(it.unit || "ชิ้น")}</td>
+              <td style="text-align:right;">฿${formatBaht(price)}</td>
+              <td style="text-align:right; font-weight:600;">฿${formatBaht(lineVal)}</td>
+              <td style="text-align:center; color:${isLow ? '#b91c1c' : '#047857'}; font-weight:600;">${isLow ? "ต้องสั่งเพิ่ม" : "ปกติ"}</td>
+            </tr>`;
+          }).join("");
+        }
+
+        tfootHtml = `<tr class="rep-total-row">
+          <td colspan="6" style="text-align:right;">รวมมูลค่าสต็อกพัสดุคงคลังทั้งสิ้น (${totalCount.toLocaleString()} รายการ):</td>
+          <td colspan="2" style="text-align:right; color:#047857;">฿${formatBaht(totalStockVal)}</td>
+        </tr>`;
+
+        summaryCards = [
+          { lbl: "รายการพัสดุทั้งหมด", val: `${totalCount.toLocaleString()} รายการ` },
+          { lbl: "ต้องสั่งเพิ่ม (Below Min)", val: `${lowStockCnt.toLocaleString()} รายการ` },
+          { lbl: "มูลค่าสต็อกรวมทั้งสิ้น", val: `฿${formatBaht(totalStockVal)}` }
+        ];
+      } else {
+        return;
+      }
+
+      document.getElementById("rep-doc-title").innerText = docTitle;
+      document.getElementById("rep-doc-subtitle").innerText = docSubtitle;
+      document.getElementById("rep-print-datetime").innerText = printDateTimeStr;
+      document.getElementById("rep-printed-by").innerText = adminName;
+      document.getElementById("rep-sig-admin").innerText = adminName;
+      document.getElementById("rep-filter-info").innerText = filterLabel;
+      document.getElementById("rep-row-count").innerText = `${totalCount.toLocaleString()} รายการ`;
+
+      document.getElementById("rep-colgroup").innerHTML = columns
+        .map(c => `<col style="width:${c.width};">`)
+        .join("");
+      document.getElementById("rep-thead").innerHTML = `<tr>${columns
+        .map(c => `<th style="text-align:${c.align};">${escapeHtml(c.label)}</th>`)
+        .join("")}</tr>`;
+      document.getElementById("rep-tbody").innerHTML = rowsHtml;
+      document.getElementById("rep-tfoot").innerHTML = tfootHtml;
+      document.getElementById("rep-summary-box").innerHTML = summaryCards
+        .map(s => `<div class="rep-summary-card"><div class="lbl">${escapeHtml(s.lbl)}</div><div class="val">${escapeHtml(s.val)}</div></div>`)
+        .join("");
+
+      const orientVal = document.getElementById("admin-a4-orientation")?.value === "landscape" ? "landscape" : "portrait";
+      const dynStyle = document.getElementById("dynamic-a4-page-style");
+      if (dynStyle) {
+        dynStyle.textContent = `@media print { @page { size: A4 ${orientVal}; margin: 10mm 12mm; } }`;
+      }
+
+      document.body.className = "print-mode-rep";
+      window.print();
+      document.body.className = "";
+      if (dynStyle) dynStyle.textContent = "";
+    }
+
+    async function handleFormatBackendSheetsA4() {
+      if (!isAdminUser()) {
+        alert("ฟังก์ชันจัดรูปแบบตารางหลังบ้านสงวนสิทธิ์เฉพาะ Admin เท่านั้น");
+        return;
+      }
+      const btn = document.getElementById("btn-format-sheets-a4");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = "กำลังจัดรูปแบบตาราง Google Sheets หลังบ้าน...";
+      }
+      try {
+        const resJson = await fetchWithRetry(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            type: "format_sheets_a4",
+            operator: currentUser?.username || "Admin",
+            operatorRole: currentUser?.role || "Admin"
+          })
+        }, 3, 1500, "กำลังจัดหน้าตาราง A4 หลังบ้าน", "กำลังตั้งค่าความกว้างคอลัมน์ ตัดคำอัตโนมัติ และซ่อนคอลัมน์ระบบใน Google Sheets...");
+
+        if (resJson && resJson.status === "success") {
+          alert(resJson.message || "จัดรูปแบบตาราง Google Sheets สำหรับพิมพ์ A4 เรียบร้อยแล้ว!");
+        } else {
+          alert(resJson?.message || "เกิดข้อผิดพลาดในการจัดรูปแบบตาราง");
+        }
+      } catch (err) {
+        alert("เชื่อมต่อเซิร์ฟเวอร์ขัดข้อง: " + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = "จัดหน้าตาราง Google Sheets หลังบ้านทุกชีตให้รองรับการพิมพ์ A4 อัตโนมัติ";
+        }
       }
     }
 
