@@ -865,17 +865,23 @@
         border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; margin-bottom: 10px;
         font-size: 8.8pt; color: #1e293b;
       }
-      .rep-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 12px; font-size: 8.8pt; line-height: 1.38; }
+      .rep-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 12px; font-size: 9pt; line-height: 1.4; }
       .rep-table thead { display: table-header-group; }
       .rep-table tfoot { display: table-row-group; }
       .rep-table tr { break-inside: avoid; page-break-inside: avoid; }
       .rep-table th, .rep-table td {
-        border: 1px solid #64748b; padding: 5px 6px; vertical-align: top;
+        border: 1px solid #64748b; padding: 5px 7px; vertical-align: top;
         word-wrap: break-word; overflow-wrap: anywhere; white-space: normal; color: #0f172a;
       }
       .rep-table th {
         background-color: #e2e8f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
-        font-weight: bold; color: #0f172a; font-size: 8.8pt; vertical-align: middle;
+        font-weight: bold; color: #0f172a; font-size: 9pt; vertical-align: middle;
+        overflow-wrap: break-word; word-break: normal;
+      }
+      .rep-nowrap {
+        white-space: nowrap !important;
+        word-break: normal !important;
+        overflow-wrap: normal !important;
       }
       .rep-table tbody tr:nth-child(even) td {
         background-color: #f8fafc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
@@ -2667,10 +2673,10 @@
             พิมพ์รายงานตารางข้อมูลลงกระดาษ <strong>A4</strong> พร้อมหัวกระดาษบริษัท ตัดคำอัตโนมัติ สรุปยอดรวมท้ายตาราง และสั่งจัดรูปแบบชีตหลังบ้าน (Google Sheets) ให้พอดีกระดาษ A4 ในคลิกเดียว
           </p>
           <div class="form-group" style="margin-bottom: 14px;">
-            <label for="admin-a4-orientation">แนวกระดาษสำหรับการพิมพ์รายงาน A4</label>
+            <label for="admin-a4-orientation">แนวกระดาษสำหรับการพิมพ์รายงาน A4 (ค่าเริ่มต้น: แนวนอน)</label>
             <select id="admin-a4-orientation">
-              <option value="portrait">A4 แนวตั้ง (Portrait - แนะนำสำหรับรายงานมาตรฐาน)</option>
-              <option value="landscape">A4 แนวนอน (Landscape - สำหรับตารางที่ต้องการพื้นที่กว้างพิเศษ)</option>
+              <option value="landscape" selected>A4 แนวนอน (Landscape - ค่ามาตรฐานสำหรับรายงานตาราง)</option>
+              <option value="portrait">A4 แนวตั้ง (Portrait - ตัวเลือกเสริม)</option>
             </select>
           </div>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 16px;">
@@ -7023,7 +7029,7 @@
       const adminName = currentUser?.fullName || currentUser?.username || "ผู้ดูแลระบบ (Admin)";
 
       let docTitle = "รายงานสรุปข้อมูลโครงการ";
-      let docSubtitle = "MANAGEMENT SUMMARY REPORT (A4)";
+      let docSubtitle = "MANAGEMENT SUMMARY REPORT (A4 LANDSCAPE)";
       let filterLabel = "ข้อมูลทั้งหมดในระบบ";
       let columns = [];
       let rowsHtml = "";
@@ -7033,7 +7039,7 @@
 
       if (reportType === "expenses") {
         docTitle = "รายงานสรุปรายจ่ายโครงการ";
-        docSubtitle = "PROJECT EXPENSES SUMMARY REPORT (A4)";
+        docSubtitle = "PROJECT EXPENSES SUMMARY REPORT (A4 LANDSCAPE)";
         const catFilter = document.getElementById("exp-filter-cat")?.value || "";
         const searchTxt = (document.getElementById("exp-search-input")?.value || "").trim();
         const searchLower = searchTxt.toLowerCase();
@@ -7057,13 +7063,13 @@
         if (filterParts.length > 0) filterLabel = filterParts.join(" | ");
 
         columns = [
-          { label: "ลำดับ", width: "5%", align: "center" },
-          { label: "วันที่", width: "11%", align: "center" },
-          { label: "หมวดหมู่", width: "15%", align: "left" },
-          { label: "รายละเอียดรายจ่าย", width: "42%", align: "left" },
-          { label: "ช่องทาง", width: "11%", align: "center" },
-          { label: "ผู้บันทึก", width: "6%", align: "center" },
-          { label: "จำนวนเงิน (บาท)", width: "10%", align: "right" }
+          { label: "ลำดับ", width: "4%", align: "center" },
+          { label: "วันที่", width: "9%", align: "center" },
+          { label: "หมวดหมู่", width: "14%", align: "left" },
+          { label: "รายละเอียดรายจ่าย", width: "44%", align: "left" },
+          { label: "ช่องทาง", width: "10%", align: "center" },
+          { label: "ผู้บันทึก", width: "7%", align: "center" },
+          { label: "จำนวนเงิน (บาท)", width: "12%", align: "right" }
         ];
 
         totalCount = list.length;
@@ -7081,20 +7087,20 @@
             if (method.includes("เงินสด")) sumCash += amt;
             else sumTransfer += amt;
             return `<tr>
-              <td style="text-align:center;">${idx + 1}</td>
-              <td style="text-align:center;">${escapeHtml(formatDisplayDate(item.Date))}</td>
+              <td class="rep-nowrap" style="text-align:center;">${idx + 1}</td>
+              <td class="rep-nowrap" style="text-align:center;">${escapeHtml(formatDisplayDate(item.Date))}</td>
               <td>${escapeHtml(item.Category || "-")}</td>
               <td>${escapeHtml(item.Description || "-")}</td>
               <td style="text-align:center;">${escapeHtml(method)}</td>
-              <td style="text-align:center;">${escapeHtml(item.Operator || "-")}</td>
-              <td style="text-align:right; font-weight:600;">฿${formatBaht(amt)}</td>
+              <td class="rep-nowrap" style="text-align:center;">${escapeHtml(item.Operator || "-")}</td>
+              <td class="rep-nowrap" style="text-align:right; font-weight:600;">฿${formatBaht(amt)}</td>
             </tr>`;
           }).join("");
         }
 
         tfootHtml = `<tr class="rep-total-row">
           <td colspan="6" style="text-align:right;">รวมยอดรายจ่ายสุทธิทั้งสิ้น (${totalCount.toLocaleString()} รายการ):</td>
-          <td style="text-align:right; color:#b91c1c;">฿${formatBaht(sumAll)}</td>
+          <td class="rep-nowrap" style="text-align:right; color:#b91c1c;">฿${formatBaht(sumAll)}</td>
         </tr>`;
 
         summaryCards = [
@@ -7105,7 +7111,7 @@
         ];
       } else if (reportType === "payments") {
         docTitle = "รายงานสรุปประวัติการรับชำระเงิน";
-        docSubtitle = "PAYMENT COLLECTION REPORT (A4)";
+        docSubtitle = "PAYMENT COLLECTION REPORT (A4 LANDSCAPE)";
         const pInput = (document.getElementById("payments-search-input")?.value || "").trim();
         const gInput = (document.getElementById("global-search")?.value || "").trim();
         const rawQ = pInput || gInput;
@@ -7133,14 +7139,14 @@
         }
 
         columns = [
-          { label: "ลำดับ", width: "5%", align: "center" },
-          { label: "วันที่", width: "10%", align: "center" },
-          { label: "เลขที่ใบเสร็จ", width: "13%", align: "center" },
-          { label: "ยูนิต", width: "9%", align: "center" },
-          { label: "ชื่อผู้ชำระ", width: "17%", align: "left" },
-          { label: "รายการรับชำระ", width: "26%", align: "left" },
+          { label: "ลำดับ", width: "4%", align: "center" },
+          { label: "วันที่", width: "8%", align: "center" },
+          { label: "เลขที่ใบเสร็จ", width: "12%", align: "center" },
+          { label: "ยูนิต", width: "8%", align: "center" },
+          { label: "ชื่อผู้ชำระ", width: "19%", align: "left" },
+          { label: "รายการรับชำระ", width: "27%", align: "left" },
           { label: "ช่องทาง", width: "10%", align: "center" },
-          { label: "ยอดรับสุทธิ", width: "10%", align: "right" }
+          { label: "ยอดรับสุทธิ", width: "12%", align: "right" }
         ];
 
         totalCount = list.length;
@@ -7161,21 +7167,21 @@
               pendingCount++;
             }
             return `<tr>
-              <td style="text-align:center;">${idx + 1}</td>
-              <td style="text-align:center;">${escapeHtml(formatDisplayDate(item["Date"] || item["Timestamp"]))}</td>
-              <td style="text-align:center; font-weight:600;">${escapeHtml(item["DocNo"] || "-")}</td>
-              <td style="text-align:center; font-weight:600;">${escapeHtml(item["Unit Number"] || item.unitNumber || "-")}</td>
+              <td class="rep-nowrap" style="text-align:center;">${idx + 1}</td>
+              <td class="rep-nowrap" style="text-align:center;">${escapeHtml(formatDisplayDate(item["Date"] || item["Timestamp"]))}</td>
+              <td class="rep-nowrap" style="text-align:center; font-weight:600;">${escapeHtml(item["DocNo"] || "-")}</td>
+              <td class="rep-nowrap" style="text-align:center; font-weight:600;">${escapeHtml(item["Unit Number"] || item.unitNumber || "-")}</td>
               <td>${escapeHtml(item["Resident Name"] || "-")}</td>
               <td>${formatPrintReportLineItemsHtml(item, item["Fee Type"] || "ค่าส่วนกลาง")}</td>
               <td style="text-align:center;">${escapeHtml(item["Payment Method"] || "-")}</td>
-              <td style="text-align:right; font-weight:600;">฿${formatBaht(amt)}</td>
+              <td class="rep-nowrap" style="text-align:right; font-weight:600;">฿${formatBaht(amt)}</td>
             </tr>`;
           }).join("");
         }
 
         tfootHtml = `<tr class="rep-total-row">
           <td colspan="7" style="text-align:right;">รวมยอดรับชำระแล้วสุทธิ (${paidCount.toLocaleString()} รายการ):</td>
-          <td style="text-align:right; color:#047857;">฿${formatBaht(sumPaid)}</td>
+          <td class="rep-nowrap" style="text-align:right; color:#047857;">฿${formatBaht(sumPaid)}</td>
         </tr>`;
 
         summaryCards = [
@@ -7186,7 +7192,7 @@
         ];
       } else if (reportType === "pending_queue") {
         docTitle = "รายงานรายการแจ้งหนี้ค้างรับชำระเงิน";
-        docSubtitle = "PENDING INVOICE QUEUE REPORT (A4)";
+        docSubtitle = "PENDING INVOICE QUEUE REPORT (A4 LANDSCAPE)";
         const qInput = (document.getElementById("queue-search-input")?.value || "").trim();
         const gInput = (document.getElementById("global-search")?.value || "").trim();
         const query = qInput || gInput;
@@ -7198,14 +7204,14 @@
         }
 
         columns = [
-          { label: "ลำดับ", width: "5%", align: "center" },
-          { label: "เลขที่เอกสาร", width: "13%", align: "center" },
-          { label: "วันที่ออก", width: "10%", align: "center" },
-          { label: "ยูนิต", width: "9%", align: "center" },
-          { label: "ชื่อลูกบ้าน", width: "17%", align: "left" },
-          { label: "รายการแจ้งหนี้", width: "27%", align: "left" },
+          { label: "ลำดับ", width: "4%", align: "center" },
+          { label: "เลขที่เอกสาร", width: "12%", align: "center" },
+          { label: "วันที่ออก", width: "8%", align: "center" },
+          { label: "ยูนิต", width: "8%", align: "center" },
+          { label: "ชื่อลูกบ้าน", width: "19%", align: "left" },
+          { label: "รายการแจ้งหนี้", width: "28%", align: "left" },
           { label: "รอบบิล", width: "9%", align: "center" },
-          { label: "ยอดค้างชำระ", width: "10%", align: "right" }
+          { label: "ยอดค้างชำระ", width: "12%", align: "right" }
         ];
 
         totalCount = list.length;
@@ -7220,21 +7226,21 @@
             sumDue += amt;
             if (item.unitNumber) uniqueUnits.add(cleanUnitKey(item.unitNumber));
             return `<tr>
-              <td style="text-align:center;">${idx + 1}</td>
-              <td style="text-align:center; font-weight:600;">${escapeHtml(item.docNo || "-")}</td>
-              <td style="text-align:center;">${escapeHtml(formatDisplayDate(item.date || item.timestamp))}</td>
-              <td style="text-align:center; font-weight:600;">${escapeHtml(item.unitNumber || "-")}</td>
+              <td class="rep-nowrap" style="text-align:center;">${idx + 1}</td>
+              <td class="rep-nowrap" style="text-align:center; font-weight:600;">${escapeHtml(item.docNo || "-")}</td>
+              <td class="rep-nowrap" style="text-align:center;">${escapeHtml(formatDisplayDate(item.date || item.timestamp))}</td>
+              <td class="rep-nowrap" style="text-align:center; font-weight:600;">${escapeHtml(item.unitNumber || "-")}</td>
               <td>${escapeHtml(item.residentName || "-")}</td>
               <td>${formatPrintReportLineItemsHtml(item, item.feeType)}</td>
-              <td style="text-align:center;">${escapeHtml(formatDisplayMonth(item.billingMonth))}</td>
-              <td style="text-align:right; font-weight:600;">฿${formatBaht(amt)}</td>
+              <td class="rep-nowrap" style="text-align:center;">${escapeHtml(formatDisplayMonth(item.billingMonth))}</td>
+              <td class="rep-nowrap" style="text-align:right; font-weight:600;">฿${formatBaht(amt)}</td>
             </tr>`;
           }).join("");
         }
 
         tfootHtml = `<tr class="rep-total-row">
           <td colspan="7" style="text-align:right;">รวมยอดค้างชำระทั้งสิ้น (${totalCount.toLocaleString()} รายการ):</td>
-          <td style="text-align:right; color:#b45309;">฿${formatBaht(sumDue)}</td>
+          <td class="rep-nowrap" style="text-align:right; color:#b45309;">฿${formatBaht(sumDue)}</td>
         </tr>`;
 
         summaryCards = [
@@ -7244,7 +7250,7 @@
         ];
       } else if (reportType === "invoices") {
         docTitle = "รายงานติดตามสถานะใบแจ้งหนี้และใบเสนอราคา";
-        docSubtitle = "INVOICE & QUOTATION TRACKING REPORT (A4)";
+        docSubtitle = "INVOICE & QUOTATION TRACKING REPORT (A4 LANDSCAPE)";
         const query = (document.getElementById("sales-search-input")?.value || "").trim();
         const statusFilter = document.getElementById("sales-filter-status")?.value || "";
 
@@ -7263,14 +7269,14 @@
         });
 
         columns = [
-          { label: "ลำดับ", width: "5%", align: "center" },
-          { label: "เลขที่เอกสาร", width: "13%", align: "center" },
-          { label: "วันที่ออก", width: "10%", align: "center" },
+          { label: "ลำดับ", width: "4%", align: "center" },
+          { label: "เลขที่เอกสาร", width: "12%", align: "center" },
+          { label: "วันที่ออก", width: "8%", align: "center" },
           { label: "ยูนิต", width: "8%", align: "center" },
-          { label: "ชื่อลูกค้า", width: "16%", align: "left" },
-          { label: "รายการ", width: "28%", align: "left" },
-          { label: "สถานะ", width: "10%", align: "center" },
-          { label: "จำนวนเงิน", width: "10%", align: "right" }
+          { label: "ชื่อลูกค้า", width: "18%", align: "left" },
+          { label: "รายการ", width: "29%", align: "left" },
+          { label: "สถานะ", width: "9%", align: "center" },
+          { label: "จำนวนเงิน", width: "12%", align: "right" }
         ];
 
         totalCount = list.length;
@@ -7294,21 +7300,21 @@
               sumPending += amt;
             }
             return `<tr>
-              <td style="text-align:center;">${idx + 1}</td>
-              <td style="text-align:center; font-weight:600;">${escapeHtml(item.docNo || "-")}</td>
-              <td style="text-align:center;">${escapeHtml(formatDisplayDate(item.date || item.timestamp))}</td>
-              <td style="text-align:center; font-weight:600;">${escapeHtml(item.unitNumber || "-")}</td>
+              <td class="rep-nowrap" style="text-align:center;">${idx + 1}</td>
+              <td class="rep-nowrap" style="text-align:center; font-weight:600;">${escapeHtml(item.docNo || "-")}</td>
+              <td class="rep-nowrap" style="text-align:center;">${escapeHtml(formatDisplayDate(item.date || item.timestamp))}</td>
+              <td class="rep-nowrap" style="text-align:center; font-weight:600;">${escapeHtml(item.unitNumber || "-")}</td>
               <td>${escapeHtml(item.residentName || "-")}</td>
               <td>${formatPrintReportLineItemsHtml(item, item.feeType)}</td>
-              <td style="text-align:center;">${stText}</td>
-              <td style="text-align:right; font-weight:600;">฿${formatBaht(amt)}</td>
+              <td class="rep-nowrap" style="text-align:center;">${stText}</td>
+              <td class="rep-nowrap" style="text-align:right; font-weight:600;">฿${formatBaht(amt)}</td>
             </tr>`;
           }).join("");
         }
 
         tfootHtml = `<tr class="rep-total-row">
           <td colspan="7" style="text-align:right;">รวมยอดเอกสารทั้งสิ้น (${totalCount.toLocaleString()} รายการ):</td>
-          <td style="text-align:right; color:#1e3a8a;">฿${formatBaht(sumAll)}</td>
+          <td class="rep-nowrap" style="text-align:right; color:#1e3a8a;">฿${formatBaht(sumAll)}</td>
         </tr>`;
 
         summaryCards = [
@@ -7319,7 +7325,7 @@
         ];
       } else if (reportType === "residents") {
         docTitle = "รายงานสารบบทะเบียนลูกบ้านโครงการ";
-        docSubtitle = "RESIDENTS DIRECTORY REPORT (A4)";
+        docSubtitle = "RESIDENTS DIRECTORY REPORT (A4 LANDSCAPE)";
         const q = (document.getElementById("modal-resident-search")?.value || "").trim();
         const qLower = q.toLowerCase();
 
@@ -7337,13 +7343,13 @@
         }
 
         columns = [
-          { label: "ลำดับ", width: "5%", align: "center" },
-          { label: "ยูนิต", width: "9%", align: "center" },
-          { label: "ชื่อผู้พักอาศัย", width: "19%", align: "left" },
-          { label: "ประเภท", width: "9%", align: "center" },
-          { label: "เลขโฉนด", width: "13%", align: "center" },
-          { label: "เบอร์โทรศัพท์", width: "12%", align: "center" },
-          { label: "ที่อยู่จัดส่งเอกสาร / ปัจจุบัน", width: "33%", align: "left" }
+          { label: "ลำดับ", width: "4%", align: "center" },
+          { label: "ยูนิต", width: "8%", align: "center" },
+          { label: "ชื่อผู้พักอาศัย", width: "20%", align: "left" },
+          { label: "ประเภท", width: "8%", align: "center" },
+          { label: "เลขโฉนด", width: "14%", align: "center" },
+          { label: "เบอร์โทรศัพท์", width: "11%", align: "center" },
+          { label: "ที่อยู่จัดส่งเอกสาร / ปัจจุบัน", width: "35%", align: "left" }
         ];
 
         totalCount = list.length;
@@ -7357,12 +7363,12 @@
             const isTenant = r.residentType === "Tenant";
             if (isTenant) tenantCnt++; else ownerCnt++;
             return `<tr>
-              <td style="text-align:center;">${idx + 1}</td>
-              <td style="text-align:center; font-weight:600;">${escapeHtml(String(r.unitNumber || "-").toUpperCase())}</td>
+              <td class="rep-nowrap" style="text-align:center;">${idx + 1}</td>
+              <td class="rep-nowrap" style="text-align:center; font-weight:600;">${escapeHtml(String(r.unitNumber || "-").toUpperCase())}</td>
               <td>${escapeHtml(r.residentName || "-")}</td>
-              <td style="text-align:center;">${isTenant ? "ผู้เช่า" : "เจ้าของ"}</td>
+              <td class="rep-nowrap" style="text-align:center;">${isTenant ? "ผู้เช่า" : "เจ้าของ"}</td>
               <td style="text-align:center;">${escapeHtml(r.titleDeedNo || "-")}</td>
-              <td style="text-align:center;">${escapeHtml(r.phone || "-")}</td>
+              <td class="rep-nowrap" style="text-align:center;">${escapeHtml(r.phone || "-")}</td>
               <td>${escapeHtml(r.currentAddress || r.idCardAddress || "-")}</td>
             </tr>`;
           }).join("");
@@ -7370,7 +7376,7 @@
 
         tfootHtml = `<tr class="rep-total-row">
           <td colspan="6" style="text-align:right;">รวมจำนวนยูนิตในรายงานทั้งสิ้น:</td>
-          <td style="text-align:right; color:#1e3a8a;">${totalCount.toLocaleString()} ยูนิต</td>
+          <td class="rep-nowrap" style="text-align:right; color:#1e3a8a;">${totalCount.toLocaleString()} ยูนิต</td>
         </tr>`;
 
         summaryCards = [
@@ -7380,17 +7386,17 @@
         ];
       } else if (reportType === "procurement") {
         docTitle = "รายงานสรุปสต็อกคลังพัสดุโครงการ";
-        docSubtitle = "PROCUREMENT & INVENTORY STOCK REPORT (A4)";
+        docSubtitle = "PROCUREMENT & INVENTORY STOCK REPORT (A4 LANDSCAPE)";
         const list = (cachedProcurement || []).slice();
 
         columns = [
-          { label: "ลำดับ", width: "5%", align: "center" },
-          { label: "รหัสพัสดุ", width: "11%", align: "center" },
-          { label: "ชื่อพัสดุ / รายการ", width: "26%", align: "left" },
-          { label: "หมวดหมู่", width: "16%", align: "left" },
-          { label: "คงเหลือ", width: "11%", align: "center" },
-          { label: "ราคา/หน่วย", width: "10%", align: "right" },
-          { label: "มูลค่ารวม", width: "11%", align: "right" },
+          { label: "ลำดับ", width: "4%", align: "center" },
+          { label: "รหัสพัสดุ", width: "10%", align: "center" },
+          { label: "ชื่อพัสดุ / รายการ", width: "27%", align: "left" },
+          { label: "หมวดหมู่", width: "15%", align: "left" },
+          { label: "คงเหลือ", width: "10%", align: "center" },
+          { label: "ราคา/หน่วย", width: "11%", align: "right" },
+          { label: "มูลค่ารวม", width: "13%", align: "right" },
           { label: "สถานะ", width: "10%", align: "center" }
         ];
 
@@ -7410,21 +7416,21 @@
             const isLow = qty <= minAlert;
             if (isLow) lowStockCnt++;
             return `<tr>
-              <td style="text-align:center;">${idx + 1}</td>
-              <td style="text-align:center; font-weight:600;">${escapeHtml(it.itemCode || "-")}</td>
+              <td class="rep-nowrap" style="text-align:center;">${idx + 1}</td>
+              <td class="rep-nowrap" style="text-align:center; font-weight:600;">${escapeHtml(it.itemCode || "-")}</td>
               <td>${escapeHtml(it.itemName || "-")}</td>
               <td>${escapeHtml(it.category || "-")}</td>
-              <td style="text-align:center; font-weight:600;">${qty.toLocaleString()} ${escapeHtml(it.unit || "ชิ้น")}</td>
-              <td style="text-align:right;">฿${formatBaht(price)}</td>
-              <td style="text-align:right; font-weight:600;">฿${formatBaht(lineVal)}</td>
-              <td style="text-align:center; color:${isLow ? '#b91c1c' : '#047857'}; font-weight:600;">${isLow ? "ต้องสั่งเพิ่ม" : "ปกติ"}</td>
+              <td class="rep-nowrap" style="text-align:center; font-weight:600;">${qty.toLocaleString()} ${escapeHtml(it.unit || "ชิ้น")}</td>
+              <td class="rep-nowrap" style="text-align:right;">฿${formatBaht(price)}</td>
+              <td class="rep-nowrap" style="text-align:right; font-weight:600;">฿${formatBaht(lineVal)}</td>
+              <td class="rep-nowrap" style="text-align:center; color:${isLow ? '#b91c1c' : '#047857'}; font-weight:600;">${isLow ? "ต้องสั่งเพิ่ม" : "ปกติ"}</td>
             </tr>`;
           }).join("");
         }
 
         tfootHtml = `<tr class="rep-total-row">
           <td colspan="6" style="text-align:right;">รวมมูลค่าสต็อกพัสดุคงคลังทั้งสิ้น (${totalCount.toLocaleString()} รายการ):</td>
-          <td colspan="2" style="text-align:right; color:#047857;">฿${formatBaht(totalStockVal)}</td>
+          <td colspan="2" class="rep-nowrap" style="text-align:right; color:#047857;">฿${formatBaht(totalStockVal)}</td>
         </tr>`;
 
         summaryCards = [
@@ -7456,7 +7462,11 @@
         .map(s => `<div class="rep-summary-card"><div class="lbl">${escapeHtml(s.lbl)}</div><div class="val">${escapeHtml(s.val)}</div></div>`)
         .join("");
 
-      const orientVal = document.getElementById("admin-a4-orientation")?.value === "landscape" ? "landscape" : "portrait";
+      const orientEl = document.getElementById("admin-a4-orientation");
+      const orientVal = (orientEl && orientEl.value === "portrait") ? "portrait" : "landscape";
+      if (orientVal === "portrait") {
+        document.getElementById("rep-doc-subtitle").innerText = docSubtitle.replace(" (A4 LANDSCAPE)", " (A4 PORTRAIT)");
+      }
       const dynStyle = document.getElementById("dynamic-a4-page-style");
       if (dynStyle) {
         dynStyle.textContent = `@media print { @page { size: A4 ${orientVal}; margin: 10mm 12mm; } }`;
